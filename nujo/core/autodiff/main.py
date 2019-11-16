@@ -1,13 +1,28 @@
 import numpy as np
 
 
+__all__ = [
+    'Expression',
+    'Variable',
+    'Constant',
+]
+
 # ====================================================================================================
 # ====================================================================================================
 
 class Expression:
 
-    def __init__(self, value, children=[]):
+    z_counter = 0
+
+    @staticmethod
+    def get_z_count():
+        Expression.z_counter += 1
+        return Expression.z_counter
+
+
+    def __init__(self, value, name='', children=[]):
         self.value = value
+        self.name = name
         self.children = children
 
         self._dependencies = []
@@ -17,20 +32,25 @@ class Expression:
     def dependencies(self):
         return self._dependencies
 
+    @dependencies.setter
+    def dependencies(self, value):
+        self._dependencies = value
+
     @property
     def grad(self):
         pass
 
-    @grad.setter
-    def grad(self, value):
-        self._grad = value
-
-    def backward(self, prev_grad=1):
+    def backward(self):
+        _ = self.grad
         for child in self.children:
-            child.backward(prev_grad=self.grad)
+            child.backward()
 
     def __add__(self, other):
+        if not isinstance(other, Expression):
+            other = Constant(other)
+
         z = Variable(self.value + other.value,
+                        name=f'z{Expression.get_z_count()}',
                         children=[self, other])
 
         self.dependencies.append((1, z))
@@ -38,8 +58,25 @@ class Expression:
 
         return z
 
+    def __sub__(self, other):
+        if not isinstance(other, Expression):
+            other = Constant(other)
+
+        z = Variable(self.value - other.value,
+                        name=f'z{Expression.get_z_count()}',
+                        children=[self, other])
+        
+        self.dependencies.append((1, z))
+        other.dependencies.append((-1, z))
+
+        return z
+
     def __mul__(self, other):
+        if not isinstance(other, Expression):
+            other = Constant(other)
+
         z = Variable(self.value * other.value,
+                        name=f'z{Expression.get_z_count()}',
                         children=[self, other])
 
         self.dependencies.append((other.value, z))
@@ -47,12 +84,50 @@ class Expression:
 
         return z
 
+    def __truediv__(self, other):
+        if not isinstance(other, Expression):
+            other = Constant(other)
+
+        z = Variable(self.value / other.value,
+                        name=f'z{Expression.get_z_count()}',
+                        children=[self, other])
+
+        self.dependencies.append((1/other.value, z))
+        other.dependencies.append(((-self.value)/(other.value**2), z))
+
+        return z
+
+    def __pow__(self, other):
+        if not isinstance(other, Expression):
+            other = Constant(other)
+
+        z = Variable(self.value**other.value,
+                        name=f'z{Expression.get_z_count()}',
+                        children=[self, other])
+
+        self.dependencies.append((other.value*self.value**(other.value-1), z))
+        other.dependencies.append((np.log(self.value)*self.value**other.value, z))
+
+        return z
+
+    def __sum__(self):
+        if isinstance(self.value, list):
+            return sum(self.value)
+        else:
+            return self.value
+
+    def __repr__(self):
+        return self.name
+
 # ====================================================================================================
 
 class Variable(Expression):
 
-    def __init__(self, value, children=[]):
-        super(Variable, self).__init__(value, children)
+    def __init__(self, value, name='', children=[]):
+        super(Variable, self).__init__(value, name, children)
+
+    def __repr__(self):
+        return self.name
 
     @property
     def grad(self):
@@ -64,8 +139,13 @@ class Variable(Expression):
         
         return self._grad
 
+    @grad.setter
+    def grad(self, value):
+        self._grad = value
+
     def zero_grad(self):
-        self.grad = np.zeros_like(self.value)
+        self.grad = None
+        self.dependencies = []
 
 # ====================================================================================================
 
@@ -73,6 +153,9 @@ class Constant(Expression):
 
     def __init__(self, value):
         super(Constant, self).__init__(value)
+
+    def __repr__(self):
+        return f'Constant({self.value})'
 
     @property
     def grad(self):
