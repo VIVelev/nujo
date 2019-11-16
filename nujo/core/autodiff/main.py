@@ -53,8 +53,8 @@ class Expression:
         if not isinstance(other, Expression):
             other = Constant(other)
 
-        if not modes.GRAD_ENABLED:
-            return Variable(self.value + other.value, name='Add::NO_GRAD')
+        if not modes.DIFF_ENABLED:
+            return Variable(self.value + other.value, name='Add::NO_DIFF')
 
         z = Variable(self.value + other.value,
                         name=f'Add::Z_{Expression.get_z_count()}',
@@ -72,8 +72,8 @@ class Expression:
         if not isinstance(other, Expression):
             other = Constant(other)
 
-        if not modes.GRAD_ENABLED:
-            return Variable(self.value - other.value, name='Sub::NO_GRAD')
+        if not modes.DIFF_ENABLED:
+            return Variable(self.value - other.value, name='Sub::NO_DIFF')
 
         z = Variable(self.value - other.value,
                         name=f'Sub::Z_{Expression.get_z_count()}',
@@ -94,8 +94,8 @@ class Expression:
         if not isinstance(other, Expression):
             other = Constant(other)
 
-        if not modes.GRAD_ENABLED:
-            return Variable(self.value * other.value, name='Mul::NO_GRAD')
+        if not modes.DIFF_ENABLED:
+            return Variable(self.value * other.value, name='Mul::NO_DIFF')
 
         z = Variable(self.value * other.value,
                         name=f'Mul::Z_{Expression.get_z_count()}',
@@ -113,8 +113,8 @@ class Expression:
         if not isinstance(other, Expression):
             other = Constant(other)
 
-        if not modes.GRAD_ENABLED:
-            return Variable(self.value / other.value, 'TrueDiv::NO_GRAD')
+        if not modes.DIFF_ENABLED:
+            return Variable(self.value / other.value, 'TrueDiv::NO_DIFF')
 
         z = Variable(self.value / other.value,
                         name=f'TrueDiv::Z_{Expression.get_z_count()}',
@@ -135,8 +135,8 @@ class Expression:
         if not isinstance(other, Expression):
             other = Constant(other)
 
-        if not modes.GRAD_ENABLED:
-            return Variable(self.value ** other.value, name='Pow::NO_GRAD')
+        if not modes.DIFF_ENABLED:
+            return Variable(self.value ** other.value, name='Pow::NO_DIFF')
 
         z = Variable(self.value ** other.value,
                         name=f'Pow::Z_{Expression.get_z_count()}',
@@ -151,8 +151,8 @@ class Expression:
         if not isinstance(other, Expression):
             other = Constant(other)
 
-        if not modes.GRAD_ENABLED:
-            return Variable(self.value @ other.value, name='MatMul::NO_GRAD')
+        if not modes.DIFF_ENABLED:
+            return Variable(self.value @ other.value, name='MatMul::NO_DIFF')
 
         z = Variable(self.value @ other.value,
                         name=f'MatMul::Z_{Expression.get_z_count()}',

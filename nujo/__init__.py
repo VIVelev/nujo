@@ -1,7 +1,7 @@
-from .core.autodiff import Constant, Variable, no_grad
+from .core.autodiff import Constant, Variable, no_diff
 
 __all__ = [
     'Constant',
     'Variable',
-    'no_grad',
+    'no_diff',
 ]

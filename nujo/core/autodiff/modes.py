@@ -1,17 +1,17 @@
 __all__ = [
-    'GRAD_ENABLED',
-    'no_grad',
+    'DIFF_ENABLED',
+    'no_diff',
 ]
 
 
-GRAD_ENABLED = True
+DIFF_ENABLED = True
 
-class no_grad():
+class no_diff():
 
     def __enter__(self):
-        global GRAD_ENABLED
-        GRAD_ENABLED = False
+        global DIFF_ENABLED
+        DIFF_ENABLED = False
 
     def __exit__(self, type, value, traceback):
-        global GRAD_ENABLED
-        GRAD_ENABLED = True
+        global DIFF_ENABLED
+        DIFF_ENABLED = True
