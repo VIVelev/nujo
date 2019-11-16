@@ -46,12 +46,14 @@ class Expression:
         for child in self.children:
             child.backward()
 
+        Expression.z_counter = 0
+
     def __add__(self, other):
         if not isinstance(other, Expression):
             other = Constant(other)
 
         z = Variable(self.value + other.value,
-                        name=f'z{Expression.get_z_count()}',
+                        name=f'Add::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
         self.dependencies.append(( array([[1]]), z ))
@@ -67,7 +69,7 @@ class Expression:
             other = Constant(other)
 
         z = Variable(self.value - other.value,
-                        name=f'z{Expression.get_z_count()}',
+                        name=f'Sub::Z_{Expression.get_z_count()}',
                         children=[self, other])
         
         self.dependencies.append(( array([[1]]), z ))
@@ -86,7 +88,7 @@ class Expression:
             other = Constant(other)
 
         z = Variable(self.value * other.value,
-                        name=f'z{Expression.get_z_count()}',
+                        name=f'Mul::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
         self.dependencies.append(( other.value, z ))
@@ -102,7 +104,7 @@ class Expression:
             other = Constant(other)
 
         z = Variable(self.value / other.value,
-                        name=f'z{Expression.get_z_count()}',
+                        name=f'TrueDiv::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
         self.dependencies.append(( 1/other.value, z ))
@@ -121,7 +123,7 @@ class Expression:
             other = Constant(other)
 
         z = Variable(self.value**other.value,
-                        name=f'z{Expression.get_z_count()}',
+                        name=f'Pow::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
         self.dependencies.append(( other.value*self.value**(other.value-1), z ))
@@ -134,7 +136,7 @@ class Expression:
             other = Constant(other)
 
         z = Variable(self.value@other.value,
-                        name=f'z{Expression.get_z_count()}',
+                        name=f'MatMul::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
         self.dependencies.append(( other.value, z ))
@@ -157,9 +159,6 @@ class Variable(Expression):
 
     def __init__(self, value, name='', children=[]):
         super(Variable, self).__init__(value, name, children)
-
-    def __repr__(self):
-        return self.name
 
     @property
     def grad(self):
@@ -186,8 +185,7 @@ class Constant(Expression):
     def __init__(self, value):
         super(Constant, self).__init__(value)
 
-    def __repr__(self):
-        return f'Constant({self.value})'
+        self.name = f'Const::({self.value})'
 
     @property
     def grad(self):
