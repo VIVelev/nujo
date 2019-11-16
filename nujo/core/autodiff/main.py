@@ -1,11 +1,12 @@
 import numpy as np
-
+from numpy import array
 
 __all__ = [
     'Expression',
     'Variable',
     'Constant',
 ]
+
 
 # ====================================================================================================
 # ====================================================================================================
@@ -53,10 +54,13 @@ class Expression:
                         name=f'z{Expression.get_z_count()}',
                         children=[self, other])
 
-        self.dependencies.append((1, z))
-        other.dependencies.append((1, z))
+        self.dependencies.append(( array([[1]]), z ))
+        other.dependencies.append(( array([[1]]), z ))
 
         return z
+
+    def __radd__(self, other):
+        return self.__add__(other)
 
     def __sub__(self, other):
         if not isinstance(other, Expression):
@@ -66,10 +70,16 @@ class Expression:
                         name=f'z{Expression.get_z_count()}',
                         children=[self, other])
         
-        self.dependencies.append((1, z))
-        other.dependencies.append((-1, z))
+        self.dependencies.append(( array([[1]]), z ))
+        other.dependencies.append(( array([[-1]]), z ))
 
         return z
+
+    def __rsub__(self, other):
+        if not isinstance(other, Expression):
+            other = Constant(other)
+        
+        return other.__sub__(self)
 
     def __mul__(self, other):
         if not isinstance(other, Expression):
@@ -79,10 +89,13 @@ class Expression:
                         name=f'z{Expression.get_z_count()}',
                         children=[self, other])
 
-        self.dependencies.append((other.value, z))
-        other.dependencies.append((self.value, z))
+        self.dependencies.append(( other.value, z ))
+        other.dependencies.append(( self.value, z ))
 
         return z
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
 
     def __truediv__(self, other):
         if not isinstance(other, Expression):
@@ -92,10 +105,16 @@ class Expression:
                         name=f'z{Expression.get_z_count()}',
                         children=[self, other])
 
-        self.dependencies.append((1/other.value, z))
-        other.dependencies.append(((-self.value)/(other.value**2), z))
+        self.dependencies.append(( 1/other.value, z ))
+        other.dependencies.append(( (-self.value)/(other.value**2), z ))
 
         return z
+
+    def __rtruediv__(self, other):
+        if not isinstance(other, Expression):
+            other = Constant(other)
+        
+        return other.__truediv__(self)
 
     def __pow__(self, other):
         if not isinstance(other, Expression):
@@ -105,16 +124,29 @@ class Expression:
                         name=f'z{Expression.get_z_count()}',
                         children=[self, other])
 
-        self.dependencies.append((other.value*self.value**(other.value-1), z))
-        other.dependencies.append((np.log(self.value)*self.value**other.value, z))
+        self.dependencies.append(( other.value*self.value**(other.value-1), z ))
+        # other.dependencies.append(( array([[1]]), z ))
 
         return z
 
-    def __sum__(self):
-        if isinstance(self.value, list):
-            return sum(self.value)
-        else:
-            return self.value
+    def __matmul__(self, other):
+        if not isinstance(other, Expression):
+            other = Constant(other)
+
+        z = Variable(self.value@other.value,
+                        name=f'z{Expression.get_z_count()}',
+                        children=[self, other])
+
+        self.dependencies.append(( other.value, z ))
+        other.dependencies.append(( self.value, z ))
+
+        return z
+
+    def __rmatmul__(self, other):
+        if not isinstance(other, Expression):
+            other = Constant(other)
+
+        return other.__matmul__(self)
 
     def __repr__(self):
         return self.name
@@ -133,7 +165,7 @@ class Variable(Expression):
     def grad(self):
         if self._grad is None:
             if len(self.dependencies) == 0:
-                self._grad = 1
+                self._grad = array([[1]])
             else:
                 self._grad = np.sum(weight * z.grad for weight, z in self.dependencies)
         
@@ -160,7 +192,7 @@ class Constant(Expression):
     @property
     def grad(self):
         if self._grad is None:
-            self._grad = 1
+            self._grad = array([[1]])
         
         return self._grad
 
