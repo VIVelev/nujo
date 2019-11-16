@@ -1,5 +1,6 @@
-import numpy as np
 from numpy import array
+
+from . import modes
 
 __all__ = [
     'Expression',
@@ -21,7 +22,7 @@ class Expression:
         return Expression.z_counter
 
 
-    def __init__(self, value, name='', children=[]):
+    def __init__(self, value, name='undefined', children=[]):
         self.value = value
         self.name = name
         self.children = children
@@ -52,6 +53,9 @@ class Expression:
         if not isinstance(other, Expression):
             other = Constant(other)
 
+        if not modes.GRAD_ENABLED:
+            return Variable(self.value + other.value, name='Add::NO_GRAD')
+
         z = Variable(self.value + other.value,
                         name=f'Add::Z_{Expression.get_z_count()}',
                         children=[self, other])
@@ -67,6 +71,9 @@ class Expression:
     def __sub__(self, other):
         if not isinstance(other, Expression):
             other = Constant(other)
+
+        if not modes.GRAD_ENABLED:
+            return Variable(self.value - other.value, name='Sub::NO_GRAD')
 
         z = Variable(self.value - other.value,
                         name=f'Sub::Z_{Expression.get_z_count()}',
@@ -87,6 +94,9 @@ class Expression:
         if not isinstance(other, Expression):
             other = Constant(other)
 
+        if not modes.GRAD_ENABLED:
+            return Variable(self.value * other.value, name='Mul::NO_GRAD')
+
         z = Variable(self.value * other.value,
                         name=f'Mul::Z_{Expression.get_z_count()}',
                         children=[self, other])
@@ -102,6 +112,9 @@ class Expression:
     def __truediv__(self, other):
         if not isinstance(other, Expression):
             other = Constant(other)
+
+        if not modes.GRAD_ENABLED:
+            return Variable(self.value / other.value, 'TrueDiv::NO_GRAD')
 
         z = Variable(self.value / other.value,
                         name=f'TrueDiv::Z_{Expression.get_z_count()}',
@@ -122,12 +135,15 @@ class Expression:
         if not isinstance(other, Expression):
             other = Constant(other)
 
-        z = Variable(self.value**other.value,
+        if not modes.GRAD_ENABLED:
+            return Variable(self.value ** other.value, name='Pow::NO_GRAD')
+
+        z = Variable(self.value ** other.value,
                         name=f'Pow::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
         self.dependencies.append(( other.value*self.value**(other.value-1), z ))
-        # other.dependencies.append(( array([[1]]), z ))
+        other.dependencies.append(( array([[1]]), z ))
 
         return z
 
@@ -135,7 +151,10 @@ class Expression:
         if not isinstance(other, Expression):
             other = Constant(other)
 
-        z = Variable(self.value@other.value,
+        if not modes.GRAD_ENABLED:
+            return Variable(self.value @ other.value, name='MatMul::NO_GRAD')
+
+        z = Variable(self.value @ other.value,
                         name=f'MatMul::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
@@ -157,7 +176,7 @@ class Expression:
 
 class Variable(Expression):
 
-    def __init__(self, value, name='', children=[]):
+    def __init__(self, value, name='undefined', children=[]):
         super(Variable, self).__init__(value, name, children)
 
     @property
@@ -166,7 +185,7 @@ class Variable(Expression):
             if len(self.dependencies) == 0:
                 self._grad = array([[1]])
             else:
-                self._grad = np.sum(weight * z.grad for weight, z in self.dependencies)
+                self._grad = sum(weight * z.grad for weight, z in self.dependencies)
         
         return self._grad
 
@@ -183,9 +202,7 @@ class Variable(Expression):
 class Constant(Expression):
 
     def __init__(self, value):
-        super(Constant, self).__init__(value)
-
-        self.name = f'Const::({self.value})'
+        super(Constant, self).__init__(value, name=f'Const::({value})')
 
     @property
     def grad(self):
