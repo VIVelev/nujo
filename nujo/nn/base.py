@@ -17,6 +17,12 @@ class Transformation:
 
         return flow
 
+    def __call__(self, input):
+        return self.forward(input)
+
+    def forward(self, input):
+        pass
+
 class Flow(Transformation):
 
     def __init__(self):
@@ -27,11 +33,24 @@ class Flow(Transformation):
     def __repr__(self):
         return self.name + ' >>'
 
+    def __rshift__(self, other):
+        self.append_transformations(other)
+        return self
+
+    def __call__(self, input):
+        output = input
+        for t in self._transformations:
+            output = t(output)
+
+        return output
+
+    def __getitem__(self, key):
+        return self._transformations[key]
+
+    def __iter__(self):
+        return iter(self._transformations)
+
     def append_transformations(self, *args):
         for t in args:
             self.name += ' >> ' + t.name
             self._transformations.append(t)
-
-    def __rshift__(self, other):
-        self.append_transformations(other)
-        return self

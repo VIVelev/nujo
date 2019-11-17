@@ -60,8 +60,8 @@ class Expression:
                         name=f'Add::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
-        self.dependencies.append(( array([[1]]), z ))
-        other.dependencies.append(( array([[1]]), z ))
+        self.dependencies.append(( array(1), z ))
+        other.dependencies.append(( array(1), z ))
 
         return z
 
@@ -79,8 +79,8 @@ class Expression:
                         name=f'Sub::Z_{Expression.get_z_count()}',
                         children=[self, other])
         
-        self.dependencies.append(( array([[1]]), z ))
-        other.dependencies.append(( array([[-1]]), z ))
+        self.dependencies.append(( array(1), z ))
+        other.dependencies.append(( array(-1), z ))
 
         return z
 
@@ -101,8 +101,8 @@ class Expression:
                         name=f'Mul::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
-        self.dependencies.append(( other.value, z ))
-        other.dependencies.append(( self.value, z ))
+        self.dependencies.append(( array(other.value), z ))
+        other.dependencies.append(( array(self.value), z ))
 
         return z
 
@@ -120,8 +120,8 @@ class Expression:
                         name=f'TrueDiv::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
-        self.dependencies.append(( 1/other.value, z ))
-        other.dependencies.append(( (-self.value)/(other.value**2), z ))
+        self.dependencies.append(( array(1/other.value), z ))
+        other.dependencies.append(( array((-self.value)/(other.value**2)), z ))
 
         return z
 
@@ -142,8 +142,8 @@ class Expression:
                         name=f'Pow::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
-        self.dependencies.append(( other.value*self.value**(other.value-1), z ))
-        other.dependencies.append(( array([[1]]), z ))
+        self.dependencies.append(( array(other.value*self.value**(other.value-1)), z ))
+        other.dependencies.append(( array(1), z ))
 
         return z
 
@@ -158,8 +158,8 @@ class Expression:
                         name=f'MatMul::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
-        self.dependencies.append(( other.value, z ))
-        other.dependencies.append(( self.value, z ))
+        self.dependencies.append(( array(other.value), z ))
+        other.dependencies.append(( array(self.value), z ))
 
         return z
 
@@ -183,9 +183,15 @@ class Variable(Expression):
     def grad(self):
         if self._grad is None:
             if len(self.dependencies) == 0:
-                self._grad = array([[1]])
+                self._grad = array(1)
             else:
-                self._grad = sum(weight * z.grad for weight, z in self.dependencies)
+                self._grad = 0
+
+                for weight, z in self.dependencies:
+                    if not weight.shape or not z.grad.shape:
+                        self._grad += weight * z.grad
+                    else:
+                        self._grad += weight.T * z.grad.T
         
         return self._grad
 
@@ -207,7 +213,7 @@ class Constant(Expression):
     @property
     def grad(self):
         if self._grad is None:
-            self._grad = array([[1]])
+            self._grad = array(1)
         
         return self._grad
 
