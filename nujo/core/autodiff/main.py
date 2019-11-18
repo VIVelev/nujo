@@ -222,6 +222,13 @@ class Expression:
             l = p % other.shape[0]
         
         ##############################################################
+        
+        # print('Self-shape:', self.shape)
+        # print('Other-shape:', other.shape)
+        # print('Z-shape:', z.shape)
+        # print('dSelf-shape:', dself.shape)
+        # print('dOther-shape:', dother.shape)
+        # print()
 
         self.dependencies.append(( dself, z ))
         other.dependencies.append(( dother, z ))
@@ -252,14 +259,16 @@ class Variable(Expression):
             else:
                 self._grad = 0
 
+                # print()
+                # print('='*30)
+                # print(self, self.shape, 'dependencies')
                 for weight, z in self.dependencies:
-
-                    # print(self, self.shape, 'dependencies')
+                    
                     # print('-'*10)
                     # print('Weight:', weight)
                     # print('Shape:', weight.shape)
                     # print('-'*5)
-                    # print('Grad:', z.grad)
+                    # print('Z Grad:', z.grad)
                     # print('Shape:', z.grad.shape)
                     # print('-'*5)
                     # print()
@@ -268,7 +277,7 @@ class Variable(Expression):
                         (weight.shape == (1, 1) or z.grad.shape == (1, 1)):
                         self._grad += weight * z.grad
                     else:
-                        self._grad += (weight.reshape(self.shape[0], self.shape[1], -1) * z.grad.T).squeeze()
+                        self._grad += weight.reshape(self.shape[0], self.shape[1], -1) * z.grad
         
         return self._grad
 
