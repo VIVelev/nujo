@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+import numpy as np
 from numpy import array
 
 from . import modes
@@ -41,6 +44,17 @@ class Expression:
     @property
     def grad(self):
         pass
+
+    @property
+    def T(self):
+        transposed = deepcopy(self)
+        transposed.value = self.value.T
+        return transposed
+
+    @property
+    def shape(self):
+        self.value = array(self.value)
+        return self.value.shape
 
     def backward(self):
         _ = self.grad
@@ -143,11 +157,13 @@ class Expression:
                         children=[self, other])
 
         self.dependencies.append(( array(other.value*self.value**(other.value-1)), z ))
-        other.dependencies.append(( array(1), z ))
+        other.dependencies.append(( array(1), z )) # TODO: FIX (wrong partial)
 
         return z
 
     def __matmul__(self, other):
+        assert self.shape[1] == other.shape[0]
+
         if not isinstance(other, Expression):
             other = Constant(other)
 
@@ -158,8 +174,57 @@ class Expression:
                         name=f'MatMul::Z_{Expression.get_z_count()}',
                         children=[self, other])
 
-        self.dependencies.append(( array(other.value), z ))
-        other.dependencies.append(( array(self.value), z ))
+        #################### CALC MATRIX PARTIALS ####################
+        # Z = XW
+        # Calc:
+        #   - dself = dZ/dX
+        #   - dother = dZ/dW
+
+        # ------------------------------------------------------------
+        dself = np.ones((z.shape[0]*self.shape[0],
+                            z.shape[1]*self.shape[1]))
+
+        # print(self.shape) # 2x3
+        # print(other.shape) # 3x1
+        # Z -> 2x1
+        # dZ/dX -> 4x3
+        
+        i, j = 0, 0 # indecies of Z
+        l, k = 0, 0 # indecies of X
+        # p, q : indecies of dZ/dX
+        for p in range(dself.shape[0]):
+            for q in range(dself.shape[1]):
+                if l == i:
+                    dself[p, q] = other.value[k, j]
+
+                j = q % z.shape[1]
+                k = q % self.shape[1]
+
+            i = q % z.shape[0]
+            l = p % self.shape[0]
+        
+        # ------------------------------------------------------------
+        dother = np.ones((z.shape[0]*other.shape[0],
+                            z.shape[1]*other.shape[1]))
+        
+        i, j = 0, 0 # indecies of Z
+        l, k = 0, 0 # indecies of W
+        # p, q : indecies of dZ/dW
+        for p in range(dother.shape[0]):
+            for q in range(dother.shape[1]):
+                if k == j:
+                    dother[p, q] = self.value[i, k]
+
+                j = q % z.shape[1]
+                k = q % other.shape[1]
+
+            i = q % z.shape[0]
+            l = p % other.shape[0]
+        
+        ##############################################################
+
+        self.dependencies.append(( dself, z ))
+        other.dependencies.append(( dother, z ))
 
         return z
 
@@ -188,10 +253,22 @@ class Variable(Expression):
                 self._grad = 0
 
                 for weight, z in self.dependencies:
-                    if not weight.shape or not z.grad.shape:
+
+                    # print(self, self.shape, 'dependencies')
+                    # print('-'*10)
+                    # print('Weight:', weight)
+                    # print('Shape:', weight.shape)
+                    # print('-'*5)
+                    # print('Grad:', z.grad)
+                    # print('Shape:', z.grad.shape)
+                    # print('-'*5)
+                    # print()
+                    
+                    if (not weight.shape or not z.grad.shape) or \
+                        (weight.shape == (1, 1) or z.grad.shape == (1, 1)):
                         self._grad += weight * z.grad
                     else:
-                        self._grad += weight.T * z.grad.T
+                        self._grad += (weight.reshape(self.shape[0], self.shape[1], -1) * z.grad.T).squeeze()
         
         return self._grad
 
