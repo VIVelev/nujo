@@ -213,7 +213,7 @@ class Expression:
         for p in range(dother.shape[0]):
             for q in range(dother.shape[1]):
                 if k == j:
-                    dother[p, q] = self.value[i, k]
+                    dother[p, q] = self.value[i, l]
 
                 j = q % z.shape[1]
                 k = q % other.shape[1]
