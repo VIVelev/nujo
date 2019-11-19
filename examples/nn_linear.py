@@ -38,4 +38,4 @@ if __name__ == '__main__':
     x, y = nj.Constant(x), nj.Constant(y)
 
     # Train
-    train(net, x, y, 100, 0.1)
+    train(net, x, y, 100, 0.03)
