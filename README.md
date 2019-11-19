@@ -1,55 +1,47 @@
 # Neural Dojo: A Reverse-mode Automatic Differentiation library for Neural Networks
 
-### Perceptron implementation:
+### Neural Network high-level API:
 
 ```python
 import numpy as np
 import nujo as nj
 
-##########
-# Create example data
-M = 500
-x = np.array([np.random.rand(1, 1) for _ in range(M)])
-y = x@[[4]] - 2
+# Define the net
+net = nj.Linear(3, 6) >> nj.Linear(6, 2) >> nj.Linear(2, 1)
 
-x, y = nj.Constant(x), nj.Constant(y)
-
-##########
-# Initialize weights
-m, b = nj.Variable(np.random.randn(1, 1)), nj.Variable(np.random.randn(1, 1))
-
-##########
 # Training loop
+def train(net, x, y, num_epochs, lr):
+    for epoch in range(1, num_epochs+1):
 
-# Number of epochs and learning rate
-n_epochs = 10_000
-lr = 10
+        # Forward
+        output = net(x)
+        # Compute Loss
+        loss = (1/x.shape[0])*(output-y)**2
+        
+        # Print the loss every 10th epoch for monitoring
+        if epoch % 10 == 0:
+            print('EPOCH:', epoch, '| LOSS: ', np.mean(loss.value))
+        
+        # Backprop
+        loss.backward()
+        
+        # Update
+        with nj.no_diff():
+            for layer in net:
+                layer.weights -= lr*layer.weights.grad
+                layer.bias -= lr*layer.bias.grad
+        
+        # Zero grad
+        for layer in net:
+            layer.weights.zero_grad()
+            layer.bias.zero_grad()
 
-# Loop
-for epoch in range(1, n_epochs+1):
-    
-    # Forward
-    output = x@m + b
-    # Compute loss
-    loss = 1/M*((output-y)**2)
-    
-    # Backprop errors
-    loss.backward()
+if __name__ == '__main__':
+    # Create example data
+    x = np.random.rand(30, 3)
+    y = x@[[2], [3], [4]] - 10
+    x, y = nj.Constant(x), nj.Constant(y)
 
-    # Print the loss every 100th epoch for monitoring
-    if epoch % 100 == 0:
-        print('EPOCH:', epoch, '| LOSS: ', np.mean(loss.value))
-    
-    # Gradient Descent update rule
-    with nj.no_diff():
-        m -= lr*np.mean(m.grad)
-        b -= lr*np.mean(b.grad)
-    
-    # Zero grad
-    m.zero_grad()
-    b.zero_grad()
-
-##########
-# Test with trained weights
-y_pred = x[:50]@m + b
+    # Train
+    train(net, x, y, 100, 0.1)
 ```
