@@ -184,21 +184,16 @@ class Expression:
         dself = np.ones((z.shape[0]*self.shape[0],
                             z.shape[1]*self.shape[1]))
 
-        # print(self.shape) # 2x3
-        # print(other.shape) # 3x1
-        # Z -> 2x1
-        # dZ/dX -> 4x3
-        
         i, j = 0, 0 # indecies of Z
-        l, k = 0, 0 # indecies of X
+        l, m = 0, 0 # indecies of X
         # p, q : indecies of dZ/dX
         for p in range(dself.shape[0]):
             for q in range(dself.shape[1]):
                 if l == i:
-                    dself[p, q] = other.value[k, j]
+                    dself[p, q] = other.value[m, j]
 
                 j = q % z.shape[1]
-                k = q % self.shape[1]
+                m = q % self.shape[1]
 
             i = q % z.shape[0]
             l = p % self.shape[0]
@@ -208,28 +203,21 @@ class Expression:
                             z.shape[1]*other.shape[1]))
         
         i, j = 0, 0 # indecies of Z
-        l, k = 0, 0 # indecies of W
+        l, m = 0, 0 # indecies of W
         # p, q : indecies of dZ/dW
         for p in range(dother.shape[0]):
             for q in range(dother.shape[1]):
-                if k == j:
+                if m == j:
                     dother[p, q] = self.value[i, l]
 
                 j = q % z.shape[1]
-                k = q % other.shape[1]
+                m = q % other.shape[1]
 
             i = q % z.shape[0]
             l = p % other.shape[0]
         
         ##############################################################
         
-        # print('Self-shape:', self.shape)
-        # print('Other-shape:', other.shape)
-        # print('Z-shape:', z.shape)
-        # print('dSelf-shape:', dself.shape)
-        # print('dOther-shape:', dother.shape)
-        # print()
-
         self.dependencies.append(( dself, z ))
         other.dependencies.append(( dother, z ))
 
@@ -252,33 +240,54 @@ class Variable(Expression):
         super(Variable, self).__init__(value, name, children)
 
     @property
-    def grad(self):
+    def grad(self, debug=False):
+
         if self._grad is None:
             if len(self.dependencies) == 0:
                 self._grad = array(1)
             else:
                 self._grad = 0
 
-                # print()
-                # print('='*30)
-                # print(self, self.shape, 'dependencies')
+                if debug:
+                    print()
+                    print('='*30)
+                    print(self, self.shape, ':: dependencies')
                 for weight, z in self.dependencies:
                     
-                    # print('-'*10)
-                    # print('Weight:', weight)
-                    # print('Shape:', weight.shape)
-                    # print('-'*5)
-                    # print('Z Grad:', z.grad)
-                    # print('Shape:', z.grad.shape)
-                    # print('-'*5)
-                    # print()
+                    if debug:
+                        print('-'*10)
+                        print('Weight of `Z_prev Grad`:', weight)
+                        print('Shape:', weight.shape)
+                        print('-'*5)
+                        print('Z_prev Grad:', z.grad)
+                        print('Shape:', z.grad.shape)
+                        print('-'*5)
                     
                     if (not weight.shape or not z.grad.shape) or \
                         (weight.shape == (1, 1) or z.grad.shape == (1, 1)):
                         self._grad += weight * z.grad
+
                     else:
-                        self._grad += weight.reshape(self.shape[0], self.shape[1], -1) * z.grad
-        
+                        z_grad = z.grad.repeat(self.shape[1], axis=1)
+
+                        j = 0
+                        for i in range(0, weight.shape[0], self.shape[0]):
+                            weight[i:i+self.shape[0]] = weight[i:i+self.shape[0]] * z_grad[j]
+                            if i % self.shape[0] == 0:
+                                j+=1
+
+                        mask_weight = np.tile(np.eye(self.shape[1]), weight.shape[1]//self.shape[1])
+                        mask_accumulate = np.tile(np.eye(self.shape[0]), z.shape[0])
+                        accumulated_grad = mask_accumulate @ (weight @ mask_weight.T)
+
+                        self._grad = accumulated_grad / z.shape[0]
+
+                    if debug:
+                        print('Current Grad:', self._grad)
+                        print('Shape:', self._grad.shape)
+                        print('-'*5)
+                        print()
+
         return self._grad
 
     @grad.setter
