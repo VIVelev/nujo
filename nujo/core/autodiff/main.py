@@ -268,19 +268,12 @@ class Variable(Expression):
                         self._grad += weight * z.grad
 
                     else:
-                        z_grad = z.grad.repeat(self.shape[1], axis=1)
+                        weight = weight.reshape(z.grad.shape[0], self.shape[0], z.grad.shape[1]*self.shape[1])
+                        z_grad = z.grad.repeat(self.shape[1], axis=1).reshape(z.grad.shape[0], 1, -1)
+                        sum_mask = np.tile(np.eye(self.shape[1]), z.grad.shape[1])
 
-                        j = 0
-                        for i in range(0, weight.shape[0], self.shape[0]):
-                            weight[i:i+self.shape[0]] = weight[i:i+self.shape[0]] * z_grad[j]
-                            if i % self.shape[0] == 0:
-                                j+=1
-
-                        mask_weight = np.tile(np.eye(self.shape[1]), weight.shape[1]//self.shape[1])
-                        mask_accumulate = np.tile(np.eye(self.shape[0]), z.shape[0])
-                        accumulated_grad = mask_accumulate @ (weight @ mask_weight.T)
-
-                        self._grad = accumulated_grad / z.shape[0]
+                        accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
+                        self._grad = accumulated_grad / z.grad.shape[0]
 
                     if debug:
                         print('Current Grad:', self._grad)
