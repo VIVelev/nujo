@@ -4,7 +4,7 @@ import numpy as np
 from numpy import array
 
 from . import modes
-from .utils import counter
+from .utils import counter, matrix_dotprod_differentiation
 
 __all__ = [
     'Expression',
@@ -176,50 +176,7 @@ class Expression:
                         name=f'MatMul::Z_{self._z_counter.get()}',
                         children=[self, other])
 
-        #################### CALC MATRIX PARTIALS ####################
-        # Z = XW
-        # Calc:
-        #   - dself = dZ/dX
-        #   - dother = dZ/dW
-
-        # ------------------------------------------------------------
-        dself = np.ones((z.shape[0]*self.shape[0],
-                            z.shape[1]*self.shape[1]))
-
-        i, j = 0, 0 # indecies of Z
-        l, m = 0, 0 # indecies of X
-        # p, q : indecies of dZ/dX
-        for p in range(dself.shape[0]):
-            for q in range(dself.shape[1]):
-                if l == i:
-                    dself[p, q] = other.value[m, j]
-
-                j = q % z.shape[1]
-                m = q % self.shape[1]
-
-            i = q % z.shape[0]
-            l = p % self.shape[0]
-        
-        # ------------------------------------------------------------
-        dother = np.ones((z.shape[0]*other.shape[0],
-                            z.shape[1]*other.shape[1]))
-        
-        i, j = 0, 0 # indecies of Z
-        l, m = 0, 0 # indecies of W
-        # p, q : indecies of dZ/dW
-        for p in range(dother.shape[0]):
-            for q in range(dother.shape[1]):
-                if m == j:
-                    dother[p, q] = self.value[i, l]
-
-                j = q % z.shape[1]
-                m = q % other.shape[1]
-
-            i = q % z.shape[0]
-            l = p % other.shape[0]
-        
-        ##############################################################
-        
+        dself, dother = matrix_dotprod_differentiation(z, self.value, other.value)
         self.dependencies.append(( dself, z ))
         other.dependencies.append(( dother, z ))
 
