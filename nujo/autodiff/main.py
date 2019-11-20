@@ -64,10 +64,10 @@ class Expression:
             other = Constant(other)
 
         if not modes.DIFF_ENABLED:
-            return Variable(self.value + other.value, name='Add::NO_DIFF')
+            return Variable(self.value + other.value, name='NO_DIFF<Add>')
 
         z = Variable(self.value + other.value,
-                        name=f'Add::Z_{self._z_counter.get()}',
+                        name=f'Z_{self._z_counter.get()}<Add>',
                         children=[self, other])
 
         self.dependencies.append(( array(1), z ))
@@ -86,10 +86,10 @@ class Expression:
             other = Constant(other)
 
         if not modes.DIFF_ENABLED:
-            return Variable(self.value - other.value, name='Sub::NO_DIFF')
+            return Variable(self.value - other.value, name='NO_DIFF<Sub>')
 
         z = Variable(self.value - other.value,
-                        name=f'Sub::Z_{self._z_counter.get()}',
+                        name=f'Z_{self._z_counter.get()}<Sub>',
                         children=[self, other])
         
         self.dependencies.append(( array(1), z ))
@@ -108,10 +108,10 @@ class Expression:
             other = Constant(other)
 
         if not modes.DIFF_ENABLED:
-            return Variable(self.value * other.value, name='Mul::NO_DIFF')
+            return Variable(self.value * other.value, name='NO_DIFF<Mul>')
 
         z = Variable(self.value * other.value,
-                        name=f'Mul::Z_{self._z_counter.get()}',
+                        name=f'Z_{self._z_counter.get()}<Mul>',
                         children=[self, other])
 
         self.dependencies.append(( array(other.value), z ))
@@ -130,10 +130,10 @@ class Expression:
             other = Constant(other)
 
         if not modes.DIFF_ENABLED:
-            return Variable(self.value / other.value, 'TrueDiv::NO_DIFF')
+            return Variable(self.value / other.value, 'NO_DIFF<TrueDiv>')
 
         z = Variable(self.value / other.value,
-                        name=f'TrueDiv::Z_{self._z_counter.get()}',
+                        name=f'Z_{self._z_counter.get()}<TrueDiv>',
                         children=[self, other])
 
         self.dependencies.append(( array(1/other.value), z ))
@@ -152,10 +152,10 @@ class Expression:
             other = Constant(other)
 
         if not modes.DIFF_ENABLED:
-            return Variable(self.value ** other.value, name='Pow::NO_DIFF')
+            return Variable(self.value ** other.value, name='NO_DIFF<Pow>')
 
         z = Variable(self.value ** other.value,
-                        name=f'Pow::Z_{self._z_counter.get()}',
+                        name=f'Z_{self._z_counter.get()}<Pow>',
                         children=[self, other])
 
         self.dependencies.append(( array(other.value*self.value**(other.value-1)), z ))
@@ -170,10 +170,10 @@ class Expression:
             other = Constant(other)
 
         if not modes.DIFF_ENABLED:
-            return Variable(self.value @ other.value, name='MatMul::NO_DIFF')
+            return Variable(self.value @ other.value, name='NO_DIFF<MatMul>')
 
         z = Variable(self.value @ other.value,
-                        name=f'MatMul::Z_{self._z_counter.get()}',
+                        name=f'Z_{self._z_counter.get()}<MatMul>',
                         children=[self, other])
 
         dself, dother = matrix_dotprod_differentiation(z, self.value, other.value)
@@ -202,7 +202,7 @@ class Variable(Expression):
         if debug:
             print()
             print('='*30)
-            print(self, self.shape, ':: dependencies')
+            print(self, self.shape, '- dependencies')
 
         if len(self.dependencies) == 0:
             self._grad = array(1)
@@ -239,7 +239,7 @@ class Variable(Expression):
 class Constant(Expression):
 
     def __init__(self, value):
-        super(Constant, self).__init__(value, name=f'Const::({value})')
+        super(Constant, self).__init__(value, name=f'{value}<Const>')
 
     def compute_grad(self):
         self._grad = array(1)

@@ -9,6 +9,7 @@ pylint = "*"
 
 [packages]
 numpy = "*"
+graphviz = "*"
 
 [requires]
 python_version = "3.7"
