@@ -30,5 +30,7 @@ class Linear(Transformation):
         else:
             self.bias = 0
 
+        self.parameters = [self.weights, self.bias]
+
     def forward(self, input):
         return input@self.weights + self.bias
