@@ -1,7 +1,7 @@
 import numpy as np
 
+from ..autodiff import Variable
 from .base import Transformation
-from ..core.autodiff import Variable
 
 __all__ = [
     'Linear',

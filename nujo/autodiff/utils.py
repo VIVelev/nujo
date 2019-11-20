@@ -1,5 +1,11 @@
 import numpy as np
 
+__all__ = [
+    'counter',
+    'matrix_dotprod_differentiation',
+]
+
+
 class counter:
     n = 0
 
