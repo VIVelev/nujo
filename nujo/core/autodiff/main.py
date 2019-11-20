@@ -4,6 +4,7 @@ import numpy as np
 from numpy import array
 
 from . import modes
+from .utils import counter
 
 __all__ = [
     'Expression',
@@ -17,33 +18,21 @@ __all__ = [
 
 class Expression:
 
-    z_counter = 0
-
-    @staticmethod
-    def get_z_count():
-        Expression.z_counter += 1
-        return Expression.z_counter
-
+    _z_counter = counter()
 
     def __init__(self, value, name='undefined', children=[]):
         self.value = value
         self.name = name
         self.children = children
+        self.dependencies = []
 
-        self._dependencies = []
         self._grad = None
 
     @property
-    def dependencies(self):
-        return self._dependencies
-
-    @dependencies.setter
-    def dependencies(self, value):
-        self._dependencies = value
-
-    @property
     def grad(self):
-        pass
+        if self._grad is None:
+            self.compute_grad()
+        return self._grad
 
     @property
     def T(self):
@@ -56,12 +45,19 @@ class Expression:
         self.value = array(self.value)
         return self.value.shape
 
+    def compute_grad(self):
+        pass
+
+    def zero_grad(self):
+        self.dependencies = []
+        self._grad = None
+
     def backward(self):
-        _ = self.grad
+        self.compute_grad()
         for child in self.children:
             child.backward()
 
-        Expression.z_counter = 0
+        self._z_counter.reset()
 
     def __add__(self, other):
         if not isinstance(other, Expression):
@@ -71,7 +67,7 @@ class Expression:
             return Variable(self.value + other.value, name='Add::NO_DIFF')
 
         z = Variable(self.value + other.value,
-                        name=f'Add::Z_{Expression.get_z_count()}',
+                        name=f'Add::Z_{self._z_counter.get()}',
                         children=[self, other])
 
         self.dependencies.append(( array(1), z ))
@@ -80,7 +76,10 @@ class Expression:
         return z
 
     def __radd__(self, other):
-        return self.__add__(other)
+        if not isinstance(other, Expression):
+            other = Constant(other)
+        
+        return other.__add__(self)
 
     def __sub__(self, other):
         if not isinstance(other, Expression):
@@ -90,7 +89,7 @@ class Expression:
             return Variable(self.value - other.value, name='Sub::NO_DIFF')
 
         z = Variable(self.value - other.value,
-                        name=f'Sub::Z_{Expression.get_z_count()}',
+                        name=f'Sub::Z_{self._z_counter.get()}',
                         children=[self, other])
         
         self.dependencies.append(( array(1), z ))
@@ -112,7 +111,7 @@ class Expression:
             return Variable(self.value * other.value, name='Mul::NO_DIFF')
 
         z = Variable(self.value * other.value,
-                        name=f'Mul::Z_{Expression.get_z_count()}',
+                        name=f'Mul::Z_{self._z_counter.get()}',
                         children=[self, other])
 
         self.dependencies.append(( array(other.value), z ))
@@ -121,7 +120,10 @@ class Expression:
         return z
 
     def __rmul__(self, other):
-        return self.__mul__(other)
+        if not isinstance(other, Expression):
+            other = Constant(other)
+        
+        return other.__mul__(self)
 
     def __truediv__(self, other):
         if not isinstance(other, Expression):
@@ -131,7 +133,7 @@ class Expression:
             return Variable(self.value / other.value, 'TrueDiv::NO_DIFF')
 
         z = Variable(self.value / other.value,
-                        name=f'TrueDiv::Z_{Expression.get_z_count()}',
+                        name=f'TrueDiv::Z_{self._z_counter.get()}',
                         children=[self, other])
 
         self.dependencies.append(( array(1/other.value), z ))
@@ -153,7 +155,7 @@ class Expression:
             return Variable(self.value ** other.value, name='Pow::NO_DIFF')
 
         z = Variable(self.value ** other.value,
-                        name=f'Pow::Z_{Expression.get_z_count()}',
+                        name=f'Pow::Z_{self._z_counter.get()}',
                         children=[self, other])
 
         self.dependencies.append(( array(other.value*self.value**(other.value-1)), z ))
@@ -171,7 +173,7 @@ class Expression:
             return Variable(self.value @ other.value, name='MatMul::NO_DIFF')
 
         z = Variable(self.value @ other.value,
-                        name=f'MatMul::Z_{Expression.get_z_count()}',
+                        name=f'MatMul::Z_{self._z_counter.get()}',
                         children=[self, other])
 
         #################### CALC MATRIX PARTIALS ####################
@@ -239,57 +241,41 @@ class Variable(Expression):
     def __init__(self, value, name='undefined', children=[]):
         super(Variable, self).__init__(value, name, children)
 
-    @property
-    def grad(self, debug=False):
+    def compute_grad(self, debug=False):
+        if debug:
+            print()
+            print('='*30)
+            print(self, self.shape, ':: dependencies')
 
-        if self._grad is None:
-            if len(self.dependencies) == 0:
-                self._grad = array(1)
+        if len(self.dependencies) == 0:
+            self._grad = array(1)
+            return
+
+        self._grad = 0
+        for weight, z in self.dependencies:
+            if debug:
+                print('-'*10)
+                print('Weight of `Z_prev Grad`:', weight)
+                print('Shape:', weight.shape)
+                print('-'*5)
+                print('Z_prev Grad:', z.grad)
+                print('Shape:', z.grad.shape)
+                print('-'*5)
+                
+            if weight.shape == () or z.grad.shape == ():
+                self._grad += weight * z.grad
             else:
-                self._grad = 0
-
-                if debug:
-                    print()
-                    print('='*30)
-                    print(self, self.shape, ':: dependencies')
-                for weight, z in self.dependencies:
-                    
-                    if debug:
-                        print('-'*10)
-                        print('Weight of `Z_prev Grad`:', weight)
-                        print('Shape:', weight.shape)
-                        print('-'*5)
-                        print('Z_prev Grad:', z.grad)
-                        print('Shape:', z.grad.shape)
-                        print('-'*5)
-                    
-                    if (not weight.shape or not z.grad.shape) or \
-                        (weight.shape == (1, 1) or z.grad.shape == (1, 1)):
-                        self._grad += weight * z.grad
-
-                    else:
-                        weight = weight.reshape(z.grad.shape[0], self.shape[0], z.grad.shape[1]*self.shape[1])
-                        z_grad = z.grad.repeat(self.shape[1], axis=1).reshape(z.grad.shape[0], 1, -1)
-                        sum_mask = np.tile(np.eye(self.shape[1]), z.grad.shape[1])
-
-                        accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
-                        self._grad = accumulated_grad / z.grad.shape[0]
-
-                    if debug:
-                        print('Current Grad:', self._grad)
-                        print('Shape:', self._grad.shape)
-                        print('-'*5)
-                        print()
-
-        return self._grad
-
-    @grad.setter
-    def grad(self, value):
-        self._grad = value
-
-    def zero_grad(self):
-        self.grad = None
-        self.dependencies = []
+                weight = weight.reshape(z.grad.shape[0], self.shape[0], z.grad.shape[1]*self.shape[1])
+                z_grad = z.grad.repeat(self.shape[1], axis=1).reshape(z.grad.shape[0], 1, -1)
+                sum_mask = np.tile(np.eye(self.shape[1]), z.grad.shape[1])
+                accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
+                self._grad += accumulated_grad / z.grad.shape[0]
+        
+        if debug:
+            print('Current Grad:', self._grad)
+            print('Shape:', self._grad.shape)
+            print('-'*5)
+            print()
 
 # ====================================================================================================
 
@@ -298,11 +284,7 @@ class Constant(Expression):
     def __init__(self, value):
         super(Constant, self).__init__(value, name=f'Const::({value})')
 
-    @property
-    def grad(self):
-        if self._grad is None:
-            self._grad = array(1)
-        
-        return self._grad
+    def compute_grad(self):
+        self._grad = array(1)
 
 # ====================================================================================================
