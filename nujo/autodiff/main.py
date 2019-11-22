@@ -64,7 +64,8 @@ class Expression:
             other = Constant(other)
 
         if not modes.DIFF_ENABLED:
-            return Variable(self.value + other.value, name='NO_DIFF<Add>')
+            suffix = '<Add>(NO_DIFF)'
+            return Variable(self.value + other.value, name=self.name+(suffix not in self.name)*suffix)
 
         z = Variable(self.value + other.value,
                         name=f'Z_{self._z_counter.get()}<Add>',
@@ -86,7 +87,8 @@ class Expression:
             other = Constant(other)
 
         if not modes.DIFF_ENABLED:
-            return Variable(self.value - other.value, name='NO_DIFF<Sub>')
+            suffix = '<Sub>(NO_DIFF)'
+            return Variable(self.value - other.value, name=self.name+(suffix not in self.name)*suffix)
 
         z = Variable(self.value - other.value,
                         name=f'Z_{self._z_counter.get()}<Sub>',
@@ -108,7 +110,8 @@ class Expression:
             other = Constant(other)
 
         if not modes.DIFF_ENABLED:
-            return Variable(self.value * other.value, name='NO_DIFF<Mul>')
+            suffix = '<Mul>(NO_DIFF)'
+            return Variable(self.value * other.value, name=self.name+(suffix not in self.name)*suffix)
 
         z = Variable(self.value * other.value,
                         name=f'Z_{self._z_counter.get()}<Mul>',
@@ -130,7 +133,8 @@ class Expression:
             other = Constant(other)
 
         if not modes.DIFF_ENABLED:
-            return Variable(self.value / other.value, 'NO_DIFF<TrueDiv>')
+            suffix = '<TrueDiv>(NO_DIFF)'
+            return Variable(self.value / other.value, name=self.name+(suffix not in self.name)*suffix)
 
         z = Variable(self.value / other.value,
                         name=f'Z_{self._z_counter.get()}<TrueDiv>',
@@ -152,7 +156,8 @@ class Expression:
             other = Constant(other)
 
         if not modes.DIFF_ENABLED:
-            return Variable(self.value ** other.value, name='NO_DIFF<Pow>')
+            suffix = '<Pow>(NO_DIFF)'
+            return Variable(self.value ** other.value, name=self.name+(suffix not in self.name)*suffix)
 
         z = Variable(self.value ** other.value,
                         name=f'Z_{self._z_counter.get()}<Pow>',
@@ -170,7 +175,8 @@ class Expression:
             other = Constant(other)
 
         if not modes.DIFF_ENABLED:
-            return Variable(self.value @ other.value, name='NO_DIFF<MatMul>')
+            suffix = '<MatMul>(NO_DIFF)'
+            return Variable(self.value @ other.value, name=self.name+(suffix not in self.name)*suffix)
 
         z = Variable(self.value @ other.value,
                         name=f'Z_{self._z_counter.get()}<MatMul>',
