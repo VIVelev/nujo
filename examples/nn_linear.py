@@ -1,11 +1,13 @@
 import numpy as np
 import nujo as nj
+import nujo.optim as optim
 
-# Define the net
+# Define the net and optimizer
 net = nj.Linear(3, 6) >> nj.Linear(6, 2) >> nj.Linear(2, 1)
+optimizer = optim.GradientDescent(net.parameters, lr=0.005)
 
 # Training loop
-def train(net, x, y, num_epochs, lr):
+def train(net, x, y, num_epochs):
     for epoch in range(1, num_epochs+1):
 
         # Forward
@@ -21,15 +23,10 @@ def train(net, x, y, num_epochs, lr):
         loss.backward()
         
         # Update
-        with nj.no_diff():
-            for layer in net:
-                layer.weights -= lr*layer.weights.grad
-                layer.bias -= lr*layer.bias.grad
+        optimizer.step()
         
         # Zero grad
-        for layer in net:
-            layer.weights.zero_grad()
-            layer.bias.zero_grad()
+        optimizer.zero_grad()
 
 if __name__ == '__main__':
     # Create example data
@@ -38,4 +35,4 @@ if __name__ == '__main__':
     x, y = nj.Constant(x), nj.Constant(y)
 
     # Train
-    train(net, x, y, 100, 0.03)
+    train(net, x, y, 100)

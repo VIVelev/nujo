@@ -1,5 +1,6 @@
 import numpy as np
 
+from ..autodiff import no_diff
 from .base import Optimizer
 
 __all__ = [
@@ -11,8 +12,11 @@ __all__ = [
 
 
 class GradientDescent(Optimizer):
-    def __init__(self, net, lr=0.1):
-        super(GradientDescent, self).__init__(net, lr)
+    def __init__(self, parameters, lr=0.1):
+        super(GradientDescent, self).__init__(parameters, lr)
 
     def step(self):
-        pass
+        with no_diff():
+            for l in range(len(self.parameters)):
+                for i in range(len(self.parameters[l])):
+                    self.parameters[l][i] -= self.lr * self.parameters[l][i].grad

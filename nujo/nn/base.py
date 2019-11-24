@@ -29,6 +29,7 @@ class Flow(Transformation):
         super(Flow, self).__init__(name='')
 
         self._transformations = []
+        self.parameters = []
 
     def __repr__(self):
         return self.name + ' >>'
@@ -54,3 +55,6 @@ class Flow(Transformation):
         for t in args:
             self.name += ' >> ' + t.name
             self._transformations.append(t)
+
+            if 'parameters' in dir(t):
+                self.parameters.append(t.parameters)
