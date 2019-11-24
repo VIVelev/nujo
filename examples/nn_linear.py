@@ -1,9 +1,11 @@
 import numpy as np
+
 import nujo as nj
+import nujo.nn as nn
 import nujo.optim as optim
 
 # Define the net and optimizer
-net = nj.Linear(3, 6) >> nj.Linear(6, 2) >> nj.Linear(2, 1)
+net = nn.Linear(3, 6) >> nn.Linear(6, 2) >> nn.Linear(2, 1)
 optimizer = optim.GradientDescent(net.parameters, lr=0.005)
 
 # Training loop
