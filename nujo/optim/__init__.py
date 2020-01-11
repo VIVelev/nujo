@@ -1,6 +1,7 @@
-from .optimizers import GradientDescent, Momentum
+from .optimizers import GradientDescent, Momentum, RMSprop
 
 __all__ = [
     'GradientDescent',
     'Momentum',
+    'RMSprop'
 ]
