@@ -13,7 +13,7 @@ __all__ = [
     'GradientDescent',
     'Momentum',
     'RMSprop',
-    # 'Adam',
+    'Adam',
 ]
 
 
@@ -22,67 +22,108 @@ __all__ = [
 
 class GradientDescent(Optimizer):
 
-    def __init__(self, parameters, lr=0.01):
-        super(GradientDescent, self).__init__(parameters, lr)
+    def __init__(self, params, lr=0.001):
+        super(GradientDescent, self).__init__(params, lr)
 
     def step(self):
         with no_diff():
-            for l in range(len(self.parameters)):   # Iterate over layers
-                for i in range(len(self.parameters[l])):    # Iterate over parameters in layer `l`
-                    self.parameters[l][i] -= self.lr * self.parameters[l][i].grad
+            for l in range(len(self.params)):   # Iterate over layers
+                for i in range(len(self.params[l])):    # Iterate over params in layer `l`
+                    self.params[l][i] -= self.lr * self.params[l][i].grad
 
 # ====================================================================================================
 
 class Momentum(Optimizer):
 
-    def __init__(self, parameters, lr=0.01, beta=0.9):
-        super(Momentum, self).__init__(parameters, lr)
+    def __init__(self, params, lr=0.001, beta=0.9):
+        super(Momentum, self).__init__(params, lr)
 
         self.beta = beta
-        self.velocity = {}
+        self._velocity = {}
 
     def step(self):
         with no_diff():
-            for l in range(len(self.parameters)):   # Iterate over layers
-                for i in range(len(self.parameters[l])):    # Iterate over parameters in layer `l`
+            for l in range(len(self.params)):   # Iterate over layers
+                for i in range(len(self.params[l])):    # Iterate over params in layer `l`
 
                     # Get the corresponding velocity
                     key = f'Layer[{l}]-Param[{i}]'
-                    if key not in self.velocity:
-                        self.velocity[key] = np.zeros_like(self.parameters[l][i])
+                    if key not in self._velocity:
+                        self._velocity[key] = np.zeros_like(self.params[l][i])
 
                     # Exponentially Weighted Moving Average
-                    self.velocity[key] = self.beta * self.velocity[key] \
-                                            + (1 - self.beta) * self.parameters[l][i].grad
+                    self._velocity[key] = self.beta * self._velocity[key] \
+                                            + (1 - self.beta) * self.params[l][i].grad
                     # Update
-                    self.parameters[l][i] -= self.lr * self.velocity[key]
+                    self.params[l][i] -= self.lr * self._velocity[key]
 
 # ====================================================================================================
 
 class RMSprop(Optimizer):
 
-    def __init__(self, parameters, lr=0.01, beta=0.999, eps=1e-8):
-        super(RMSprop, self).__init__(parameters, lr)
+    def __init__(self, params, lr=0.001, beta=0.999, eps=1e-08):
+        super(RMSprop, self).__init__(params, lr)
 
         self.beta = beta
         self.eps = eps
-        self.squared = {}
+        self._squared = {}
 
     def step(self):
         with no_diff():
-            for l in range(len(self.parameters)):   # Iterate over layers
-                for i in range(len(self.parameters[l])):    # Iterate over parameters in layer `l`
+            for l in range(len(self.params)):   # Iterate over layers
+                for i in range(len(self.params[l])):    # Iterate over params in layer `l`
 
                     # Get the corresponding squared gradient
                     key = f'Layer[{l}]-Param[{i}]'
-                    if key not in self.squared:
-                        self.squared[key] = np.zeros_like(self.parameters[l][i])
+                    if key not in self._squared:
+                        self._squared[key] = np.zeros_like(self.params[l][i])
 
                     # Exponentially Weighted Moving Average
-                    self.squared[key] = self.beta * self.squared[key] \
-                                            + (1 - self.beta) * np.square(self.parameters[l][i].grad)
+                    self._squared[key] = self.beta * self._squared[key] \
+                                            + (1 - self.beta) * np.square(self.params[l][i].grad)
                     # Update
-                    self.parameters[l][i] -= self.lr * self.parameters[l][i].grad \
-                                                / (np.sqrt(self.squared[key]) + self.eps)
+                    self.params[l][i] -= self.lr * self.params[l][i].grad \
+                                            / (np.sqrt(self._squared[key]) + self.eps)
+
+# ====================================================================================================
+
+class Adam(Optimizer):
+
+    def __init__(self, params, lr=0.001, betas=(0.9, 0.999), eps=1e-08):
+        super(Adam, self).__init__(params, lr)
+
+        self.betas = betas
+        self.eps = eps
+
+        self._velocity = {}
+        self._squared = {}
+        self._t = 1
+
+    def step(self):
+        with no_diff():
+            for l in range(len(self.params)):   # Iterate over layers
+                for i in range(len(self.params[l])):    # Iterate over params in layer `l`
+
+                    # Get the corresponding velocity and squared gradient
+                    key = f'Layer[{l}]-Param[{i}]'
+                    if key not in self._velocity:
+                        self._velocity[key] = np.zeros_like(self.params[l][i])
+                        self._squared[key] = np.zeros_like(self.params[l][i])
+
+                    # Exponentially Weighted Moving Average
+                    self._velocity[key] = self.betas[0] * self._velocity[key] \
+                                            + (1 - self.betas[0]) * self.params[l][i].grad
+
+                    self._squared[key] = self.betas[1] * self._squared[key] \
+                                            + (1 - self.betas[1]) * np.square(self.params[l][i].grad)
+
+                    # Bias correction
+                    v_corrected = self._velocity[key] / (1 - self.betas[0] ** self._t)
+                    s_corrected = self._squared[key] / (1 - self.betas[1] ** self._t)
+                    self._t += 1
+
+                    # Update
+                    self.params[l][i] -= self.lr * v_corrected \
+                                            / (np.sqrt(s_corrected) + self.eps)
 
 # ====================================================================================================
