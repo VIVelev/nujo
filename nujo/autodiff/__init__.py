@@ -1,8 +1,11 @@
-from . import main, modes
-from .main import *
-from .modes import *
+from .main import Constant, Expression, Variable
+from .modes import DIFF_ENABLED, no_diff
 
 __all__ = [
-    *main.__all__, # Expression, Variable, Constant
-    *modes.__all__, # DIFF_ENABLED, no_diff
+    'Constant',
+    'Expression',
+    'Variable',
+
+    'DIFF_ENABLED',
+    'no_diff',
 ]

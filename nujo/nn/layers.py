@@ -1,7 +1,7 @@
 import numpy as np
 
-from ..autodiff import Variable
-from .base import Transformation
+from nujo.autodiff import Variable
+from nujo.nn.base import Transformation
 
 __all__ = [
     'Linear',
@@ -33,4 +33,4 @@ class Linear(Transformation):
         self.parameters = [weights, bias]
 
     def forward(self, input):
-        return input@self.parameters[0] + self.parameters[1]
+        return input @ self.parameters[0] + self.parameters[1]

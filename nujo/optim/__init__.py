@@ -1,6 +1,6 @@
-from . import optimizers
-from .optimizers import *
+from .optimizers import GradientDescent, Momentum
 
 __all__ = [
-    *optimizers.__all__,
+    'GradientDescent',
+    'Momentum',
 ]

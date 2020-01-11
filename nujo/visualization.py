@@ -1,6 +1,6 @@
 from graphviz import Digraph
 
-from .autodiff import Variable
+from nujo.autodiff import Variable
 
 __all__ = [
     'ComputationGraphPlotter',

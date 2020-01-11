@@ -3,8 +3,8 @@ from copy import deepcopy
 import numpy as np
 from numpy import array
 
-from . import modes
-from .utils import counter, matrix_dotprod_differentiation
+from nujo.autodiff import modes
+from nujo.autodiff.utils import counter, matrix_dotprod_differentiation
 
 __all__ = [
     'Expression',

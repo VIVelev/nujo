@@ -1,6 +1,5 @@
-from . import layers
-from .layers import *
+from .layers import Linear
 
 __all__ = [
-    *layers.__all__,
+    'Linear',
 ]
