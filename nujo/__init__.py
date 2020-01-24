@@ -5,3 +5,5 @@ __all__ = [
     'Variable',
     'no_diff',
 ]
+
+__version__ = '0.1.0'
