@@ -11,7 +11,6 @@ class Constant(Tensor):
     value : value
 
     '''
-
     def __init__(self, value):
         super(Constant, self).__init__(value, name=f'{value}<Const>')
 

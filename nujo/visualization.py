@@ -17,7 +17,7 @@ class ComputationGraphPlotter:
             if len(node.children) > 0:
                 return 'lightblue'
             return 'indianred1'
-        else:            
+        else:
             return 'gray'
 
     @staticmethod
@@ -26,26 +26,24 @@ class ComputationGraphPlotter:
             return 'box'
         else:
             return 'oval'
-        
+
     def create(self, root):
         if len(root.children) == 0:
             return
-        
+
         for child in root.children:
-            self.computation_graph.node(
-                repr(child),
-                color=self.get_color(child),
-                shape=self.get_shape(child),
-                style='filled')
-            
-            self.computation_graph.node(
-                repr(root),
-                color=self.get_color(root),
-                shape=self.get_shape(root),
-                style='filled')
-            
+            self.computation_graph.node(repr(child),
+                                        color=self.get_color(child),
+                                        shape=self.get_shape(child),
+                                        style='filled')
+
+            self.computation_graph.node(repr(root),
+                                        color=self.get_color(root),
+                                        shape=self.get_shape(root),
+                                        style='filled')
+
             self.computation_graph.edge(repr(child), repr(root))
             self.create(child)
-            
+
     def view(self):
         self.computation_graph.view()

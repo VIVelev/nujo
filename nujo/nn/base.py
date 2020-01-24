@@ -23,8 +23,8 @@ class Transformation:
     def forward(self, input):
         pass
 
-class Flow(Transformation):
 
+class Flow(Transformation):
     def __init__(self):
         super(Flow, self).__init__(name='')
 

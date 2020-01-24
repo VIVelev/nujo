@@ -3,8 +3,8 @@ __all__ = [
     'no_diff',
 ]
 
-
 DIFF_ENABLED = True
+
 
 class no_diff():
     ''' No Differentiation block
@@ -12,7 +12,6 @@ class no_diff():
     Creates a block of code where no differentiation is done.
 
     '''
-
     def __enter__(self):
         global DIFF_ENABLED
         DIFF_ENABLED = False
