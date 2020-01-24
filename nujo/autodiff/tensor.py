@@ -1,8 +1,10 @@
+from abc import abstractmethod
 from copy import deepcopy
 
 from numpy import array
 
 from nujo.autodiff.constant import Constant
+from nujo.autodiff.functions import *
 from nujo.autodiff.modes import DIFF_ENABLED
 from nujo.autodiff.utils import counter, matrix_dotprod_differentiation
 from nujo.autodiff.variable import Variable
@@ -49,6 +51,7 @@ class Tensor:
         self.value = array(self.value)
         return self.value.shape
 
+    @abstractmethod
     def compute_grad(self):    # To be overridden by subclasses.
         pass
 
