@@ -5,7 +5,7 @@ from numpy import array
 
 from nujo.autodiff.constant import Constant
 from nujo.autodiff.functions import Addition
-from nujo.autodiff.utils import counter, matrix_dotprod_differentiation
+from nujo.autodiff.misc import counter
 
 
 class Tensor:
@@ -21,7 +21,7 @@ class Tensor:
 
     '''
 
-    _z_counter = counter()    # Counter used to indicate the order of computations.
+    z_counter = counter()    # Counter used to indicate the order of computations.
 
     def __init__(self, value, name='undefined', children=[]):
         self.value = value
@@ -62,7 +62,7 @@ class Tensor:
         for child in self.children:
             child.backward()
 
-        self._z_counter.reset()    # A new forward pass awaits.
+        Tensor.z_counter.reset()    # A new forward pass awaits.
 
     def __add__(self, other):
         if not isinstance(other, Tensor):
@@ -87,7 +87,7 @@ class Tensor:
                 name=self.name + (suffix not in self.name) * suffix)
 
         z = Variable(self.value - other.value,
-            name=f'Z_{self._z_counter.get()}<Sub>',
+            name=f'Z_{self.z_counter.get()}<Sub>',
             children=[self, other])
 
         self.dependencies.append(( array(1), z ))
@@ -112,7 +112,7 @@ class Tensor:
                 name=self.name + (suffix not in self.name) * suffix)
 
         z = Variable(self.value * other.value,
-            name=f'Z_{self._z_counter.get()}<Mul>',
+            name=f'Z_{self.z_counter.get()}<Mul>',
             children=[self, other])
 
         self.dependencies.append(( array(other.value), z ))
@@ -137,7 +137,7 @@ class Tensor:
                 name=self.name + (suffix not in self.name) * suffix)
 
         z = Variable(self.value / other.value,
-            name=f'Z_{self._z_counter.get()}<TrueDiv>',
+            name=f'Z_{self.z_counter.get()}<TrueDiv>',
             children=[self, other])
 
         self.dependencies.append(( array(1/other.value), z ))
@@ -162,7 +162,7 @@ class Tensor:
                 name=self.name + (suffix not in self.name) * suffix)
 
         z = Variable(self.value ** other.value,
-            name=f'Z_{self._z_counter.get()}<Pow>',
+            name=f'Z_{self.z_counter.get()}<Pow>',
             children=[self, other])
 
         self.dependencies.append(( array(other.value*self.value**(other.value-1)), z ))
@@ -183,7 +183,7 @@ class Tensor:
                 name=self.name + (suffix not in self.name) * suffix)
 
         z = Variable(self.value @ other.value,
-            name=f'Z_{self._z_counter.get()}<MatMul>',
+            name=f'Z_{self.z_counter.get()}<MatMul>',
             children=[self, other])
 
         dself, dother = matrix_dotprod_differentiation(z, self.value, other.value)
