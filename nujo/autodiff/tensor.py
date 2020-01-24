@@ -4,7 +4,9 @@ from copy import deepcopy
 from numpy import array
 
 from nujo.autodiff.constant import Constant
-from nujo.autodiff.functions import Addition
+from nujo.autodiff.functions import (Addition, MatrixMultiplication,
+                                     Multiplication, Power, Subtraction,
+                                     TrueDivision)
 from nujo.autodiff.misc import counter
 
 
@@ -21,7 +23,8 @@ class Tensor:
 
     '''
 
-    z_counter = counter()    # Counter used to indicate the order of computations.
+    # Counter used to indicate the order of computations.
+    z_counter = counter()
 
     def __init__(self, value, name='undefined', children=[]):
         self.value = value
@@ -50,7 +53,7 @@ class Tensor:
         return self.value.shape
 
     @abstractmethod
-    def compute_grad(self):    # To be overridden by subclasses.
+    def compute_grad(self):  # To be overridden by subclasses.
         pass
 
     def zero_grad(self):
@@ -62,7 +65,7 @@ class Tensor:
         for child in self.children:
             child.backward()
 
-        Tensor.z_counter.reset()    # A new forward pass awaits.
+        Tensor.z_counter.reset()  # A new forward pass awaits.
 
     def __add__(self, other):
         if not isinstance(other, Tensor):
@@ -73,27 +76,14 @@ class Tensor:
     def __radd__(self, other):
         if not isinstance(other, Tensor):
             other = Constant(other)
-        
+
         return other.__add__(self)
 
     def __sub__(self, other):
         if not isinstance(other, Tensor):
             other = Constant(other)
 
-        if DIFF_ENABLED:
-            suffix = '<Sub>(NO_DIFF)'
-            return Variable(
-                self.value - other.value,
-                name=self.name + (suffix not in self.name) * suffix)
-
-        z = Variable(self.value - other.value,
-            name=f'Z_{self.z_counter.get()}<Sub>',
-            children=[self, other])
-
-        self.dependencies.append(( array(1), z ))
-        other.dependencies.append(( array(-1), z ))
-
-        return z
+        return Subtraction(self, other)()
 
     def __rsub__(self, other):
         if not isinstance(other, Tensor):
@@ -105,70 +95,31 @@ class Tensor:
         if not isinstance(other, Tensor):
             other = Constant(other)
 
-        if not DIFF_ENABLED:
-            suffix = '<Mul>(NO_DIFF)'
-            return Variable(
-                self.value * other.value,
-                name=self.name + (suffix not in self.name) * suffix)
-
-        z = Variable(self.value * other.value,
-            name=f'Z_{self.z_counter.get()}<Mul>',
-            children=[self, other])
-
-        self.dependencies.append(( array(other.value), z ))
-        other.dependencies.append(( array(self.value), z ))
-
-        return z
+        return Multiplication(self, other)()
 
     def __rmul__(self, other):
         if not isinstance(other, Tensor):
             other = Constant(other)
-        
+
         return other.__mul__(self)
 
     def __truediv__(self, other):
         if not isinstance(other, Tensor):
             other = Constant(other)
 
-        if not DIFF_ENABLED:
-            suffix = '<TrueDiv>(NO_DIFF)'
-            return Variable(
-                self.value / other.value,
-                name=self.name + (suffix not in self.name) * suffix)
-
-        z = Variable(self.value / other.value,
-            name=f'Z_{self.z_counter.get()}<TrueDiv>',
-            children=[self, other])
-
-        self.dependencies.append(( array(1/other.value), z ))
-        other.dependencies.append(( array((-self.value)/(other.value**2)), z ))
-
-        return z
+        return TrueDivision(self, other)()
 
     def __rtruediv__(self, other):
         if not isinstance(other, Tensor):
             other = Constant(other)
-        
+
         return other.__truediv__(self)
 
     def __pow__(self, other):
         if not isinstance(other, Tensor):
             other = Constant(other)
 
-        if not DIFF_ENABLED:
-            suffix = '<Pow>(NO_DIFF)'
-            return Variable(
-                self.value ** other.value,
-                name=self.name + (suffix not in self.name) * suffix)
-
-        z = Variable(self.value ** other.value,
-            name=f'Z_{self.z_counter.get()}<Pow>',
-            children=[self, other])
-
-        self.dependencies.append(( array(other.value*self.value**(other.value-1)), z ))
-        other.dependencies.append(( array(1), z )) # TODO: FIX (wrong partial)
-
-        return z
+        return Power(self, other)()
 
     def __matmul__(self, other):
         assert self.shape[1] == other.shape[0]
@@ -176,21 +127,7 @@ class Tensor:
         if not isinstance(other, Tensor):
             other = Constant(other)
 
-        if not DIFF_ENABLED:
-            suffix = '<MatMul>(NO_DIFF)'
-            return Variable(
-                self.value @ other.value,
-                name=self.name + (suffix not in self.name) * suffix)
-
-        z = Variable(self.value @ other.value,
-            name=f'Z_{self.z_counter.get()}<MatMul>',
-            children=[self, other])
-
-        dself, dother = matrix_dotprod_differentiation(z, self.value, other.value)
-        self.dependencies.append(( dself, z ))
-        other.dependencies.append(( dother, z ))
-
-        return z
+        return MatrixMultiplication(self, other)()
 
     def __rmatmul__(self, other):
         if not isinstance(other, Tensor):

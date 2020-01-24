@@ -7,7 +7,6 @@ from nujo.autodiff.modes import DIFF_ENABLED
 
 class Function:
     ''' Abstract Base Class for functions '''
-
     def __init__(self, *inputs, name='Function'):
         self.inputs = inputs
         self.name = name
@@ -24,7 +23,8 @@ class Function:
         z = self.forward()
 
         if DIFF_ENABLED:
-            for tensor, derivative in zip(self.inputs, self.backward( array(1) )):
-                tensor.dependencies.append(( derivative, z ))
+            for tensor, derivative in zip(self.inputs,
+                                          self.backward(array(1))):
+                tensor.dependencies.append((derivative, z))
 
         return z
