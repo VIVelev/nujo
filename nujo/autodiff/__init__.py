@@ -1,11 +1,9 @@
-from .main import Constant, Expression, Variable
-from .modes import DIFF_ENABLED, no_diff
+from nujo.autodiff.constant import Constant
+from nujo.autodiff.modes import no_diff
+from nujo.autodiff.variable import Variable
 
 __all__ = [
     'Constant',
-    'Expression',
-    'Variable',
-
-    'DIFF_ENABLED',
     'no_diff',
+    'Variable',
 ]

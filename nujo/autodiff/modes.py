@@ -7,6 +7,11 @@ __all__ = [
 DIFF_ENABLED = True
 
 class no_diff():
+    ''' No Differentiation block
+
+    Creates a block of code where no differentiation is done.
+
+    '''
 
     def __enter__(self):
         global DIFF_ENABLED
