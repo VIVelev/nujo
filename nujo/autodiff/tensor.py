@@ -4,10 +4,8 @@ from copy import deepcopy
 from numpy import array
 
 from nujo.autodiff.constant import Constant
-from nujo.autodiff.functions import *
-from nujo.autodiff.modes import DIFF_ENABLED
+from nujo.autodiff.functions import Addition
 from nujo.autodiff.utils import counter, matrix_dotprod_differentiation
-from nujo.autodiff.variable import Variable
 
 
 class Tensor:
@@ -70,20 +68,7 @@ class Tensor:
         if not isinstance(other, Tensor):
             other = Constant(other)
 
-        if not DIFF_ENABLED:
-            suffix = '<Add>(NO_DIFF)'
-            return Variable(
-                self.value + other.value,
-                name=self.name + (suffix not in self.name) * suffix)
-
-        z = Variable(self.value + other.value,
-            name=f'Z_{self._z_counter.get()}<Add>',
-            children=[self, other])
-
-        self.dependencies.append(( array(1), z ))
-        other.dependencies.append(( array(1), z ))
-
-        return z
+        return Addition(self, other)()
 
     def __radd__(self, other):
         if not isinstance(other, Tensor):

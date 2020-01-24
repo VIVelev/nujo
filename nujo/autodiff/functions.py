@@ -1,22 +1,22 @@
+from nujo.autodiff.constant import Constant
 from nujo.autodiff.function import Function
+from nujo.autodiff.modes import DIFF_ENABLED
+from nujo.autodiff.variable import Variable
 
 __all__ = [
-    'Add',
+    'Addition',
 ]
 
 
 class Addition(Function):
 
-    @staticmethod
-    def forward(input_a, input_b):
-        return input_a + input_b
+    def __init__(self, input_a, input_b, name='Add'):
+        super(Addition, self).__init__(input_a, input_b, name=name)
 
-    @staticmethod
-    def backward(input):
-        return input
+    def forward(self):
+        return Variable(self.inputs[0] + self.inputs[1],
+            name = f'Z_{self.inputs[0]._z_counter.get()}{self.name}',
+            children = self.inputs if DIFF_ENABLED else [])
 
-class Multiplication(Function):
-
-    @staticmethod
-    def forward(input_a, input_b):
-        pass
+    def backward(self, grad):
+        return grad, grad

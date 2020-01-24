@@ -1,11 +1,15 @@
 from abc import abstractmethod
 
+from numpy import array
+
+from nujo.autodiff.modes import DIFF_ENABLED
+
 
 class Function:
     ''' Abstract Base Class for functions '''
 
-    def __init__(self, *tensors, name='undefined'):
-        self.tensors = tensors
+    def __init__(self, *inputs, name='Function'):
+        self.inputs = inputs
         self.name = name
 
     @abstractmethod
@@ -19,7 +23,8 @@ class Function:
     def __call__(self):
         z = self.forward()
 
-        for tensor, derivative in zip(self.tensors, self.backward(1)):
-            tensor.dependencies.append(( derivative, z ))
+        if DIFF_ENABLED:
+            for tensor, derivative in zip(self.inputs, self.backward( array(1) )):
+                tensor.dependencies.append(( derivative, z ))
 
         return z
