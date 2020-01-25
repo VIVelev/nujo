@@ -1,12 +1,7 @@
-from abc import abstractmethod
 from copy import deepcopy
 
 from numpy import array
 
-from nujo.autodiff.constant import Constant
-from nujo.autodiff.functions import (Addition, MatrixMultiplication,
-                                     Multiplication, Power, Subtraction,
-                                     TrueDivision)
 from nujo.autodiff.misc import counter
 
 
@@ -52,9 +47,8 @@ class Tensor:
         self.value = array(self.value)
         return self.value.shape
 
-    @abstractmethod
     def compute_grad(self):  # To be overridden by subclasses.
-        pass
+        self._grad = array(1)
 
     def zero_grad(self):
         self.dependencies = []
@@ -69,69 +63,75 @@ class Tensor:
 
     def __add__(self, other):
         if not isinstance(other, Tensor):
-            other = Constant(other)
+            other = Tensor(other)
 
+        from nujo.autodiff.functions import Addition
         return Addition(self, other)()
 
     def __radd__(self, other):
         if not isinstance(other, Tensor):
-            other = Constant(other)
+            other = Tensor(other)
 
         return other.__add__(self)
 
     def __sub__(self, other):
         if not isinstance(other, Tensor):
-            other = Constant(other)
+            other = Tensor(other)
 
+        from nujo.autodiff.functions import Subtraction
         return Subtraction(self, other)()
 
     def __rsub__(self, other):
         if not isinstance(other, Tensor):
-            other = Constant(other)
+            other = Tensor(other)
 
         return other.__sub__(self)
 
     def __mul__(self, other):
         if not isinstance(other, Tensor):
-            other = Constant(other)
+            other = Tensor(other)
 
+        from nujo.autodiff.functions import Multiplication
         return Multiplication(self, other)()
 
     def __rmul__(self, other):
         if not isinstance(other, Tensor):
-            other = Constant(other)
+            other = Tensor(other)
 
         return other.__mul__(self)
 
     def __truediv__(self, other):
         if not isinstance(other, Tensor):
-            other = Constant(other)
+            other = Tensor(other)
 
+        from nujo.autodiff.functions import TrueDivision
         return TrueDivision(self, other)()
 
     def __rtruediv__(self, other):
         if not isinstance(other, Tensor):
-            other = Constant(other)
+            other = Tensor(other)
 
         return other.__truediv__(self)
 
     def __pow__(self, other):
         if not isinstance(other, Tensor):
-            other = Constant(other)
+            other = Tensor(other)
 
+        from nujo.autodiff.functions import Power
         return Power(self, other)()
 
     def __matmul__(self, other):
         assert self.shape[1] == other.shape[0]
 
         if not isinstance(other, Tensor):
-            other = Constant(other)
+            other = Tensor(other)
 
+        from nujo.autodiff.functions import MatrixMultiplication
         return MatrixMultiplication(self, other)()
 
     def __rmatmul__(self, other):
         if not isinstance(other, Tensor):
-            other = Constant(other)
+            other = Tensor(other)
 
         return other.__matmul__(self)
 
