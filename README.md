@@ -1,46 +1,42 @@
 # Neural Dojo: A Reverse-mode Automatic Differentiation library for Neural Networks
 
-### Neural Network high-level API:
+### Prerequisites
 
-```python
-import numpy as np
+* [Python](https://www.python.org/) - The Programming Language used.
+* [Poetry](https://python-poetry.org/) - Dependency and Virtual Environment Management
 
-import nujo as nj
-import nujo.nn as nn
-import nujo.optim as optim
-
-# Define the net and optimizer
-net = nn.Linear(3, 6) >> nn.Linear(6, 2) >> nn.Linear(2, 1)
-optimizer = optim.GradientDescent(net.parameters, lr=0.005)
-
-# Training loop
-def train(net, x, y, num_epochs):
-    for epoch in range(1, num_epochs+1):
-
-        # Forward
-        output = net(x)
-        # Compute Loss
-        loss = (1/x.shape[0])*(output-y)**2
-        
-        # Print the loss every 10th epoch for monitoring
-        if epoch % 10 == 0:
-            print('EPOCH:', epoch, '| LOSS: ', np.mean(loss.value))
-        
-        # Backprop
-        loss.backward()
-        
-        # Update
-        optimizer.step()
-        
-        # Zero grad
-        optimizer.zero_grad()
-
-if __name__ == '__main__':
-    # Create example data
-    x = np.random.rand(30, 3)
-    y = x@[[2], [3], [4]] - 10
-    x, y = nj.Constant(x), nj.Constant(y)
-
-    # Train
-    train(net, x, y, 100)
+***Download for Mac OSX using Homebrew***
+``` bash
+$ brew install python
+$ brew install poetry
 ```
+
+### Installing
+
+```bash
+$ git clone https://github.com/VIVele/nujo && cd nujo
+$ poetry install && poetry shell
+```
+
+## Running the tests
+
+Coming soon...
+
+## Built With
+
+* [NumPy](http://www.numpy.org/) - Fundamental package for scientific computing with Python
+* [Graphviz](https://www.graphviz.org/) - Open source graph visualization software
+
+## Contributing
+
+Please read [CONTRIBUTING.md](https://github.com/VIVelev/nujo/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Authors
+
+* **Victor Velev** - *Initial work* - [VIVelev](https://github.com/VIVelev)
+
+See also the list of [contributors](https://github.com/VIVelev/nujo/contributors) who participated in this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
