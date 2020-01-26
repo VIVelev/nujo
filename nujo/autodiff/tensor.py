@@ -21,7 +21,7 @@ class Tensor(Node):
     def __init__(self, value, diff=True, children=[], name='<Tensor>'):
         super(Tensor, self).__init__(children, name=name)
 
-        self.value = value
+        self.value = array(value)
         self.diff = diff
 
         self.grad_dependencies = []
@@ -41,7 +41,6 @@ class Tensor(Node):
 
     @property
     def shape(self):
-        self.value = array(self.value)
         return self.value.shape
 
     def add_grad_dependency(self, wrt, weight):
@@ -54,12 +53,12 @@ class Tensor(Node):
                 print('=' * 30)
                 print(self, self.shape, '- dependencies')
 
-            if len(self.dependencies) == 0:
+            if len(self.grad_dependencies) == 0:
                 self._grad = array(1)
                 return
 
             self._grad = 0
-            for weight, z in self.dependencies:
+            for z, weight in self.grad_dependencies:
                 if debug:
                     print('-' * 10)
                     print('Weight of `Z_prev Grad`:', weight)
@@ -100,28 +99,32 @@ class Tensor(Node):
         return Addition(self, other)()
 
     def __radd__(self, other):
-        return other.__add__(self)
+        return self.__add__(other)
+
+    def __neg__(self):
+        from nujo.autodiff.functions import Negation
+        return Negation(self)()
 
     def __sub__(self, other):
-        from nujo.autodiff.functions import Subtraction
-        return Subtraction(self, other)()
+        return self.__add__(other.__neg__())
 
     def __rsub__(self, other):
-        return other.__sub__(self)
+        return self.__neg__().__add__(other)
 
     def __mul__(self, other):
         from nujo.autodiff.functions import Multiplication
         return Multiplication(self, other)()
 
     def __rmul__(self, other):
-        return other.__mul__(self)
+        return self.__mul__(other)
 
     def __truediv__(self, other):
-        from nujo.autodiff.functions import TrueDivision
-        return TrueDivision(self, other)()
+        from nujo.autodiff.functions import Reciprocal
+        return self.__mul__(Reciprocal(other))
 
     def __rtruediv__(self, other):
-        return other.__truediv__(self)
+        from nujo.autodiff.functions import Reciprocal
+        return Reciprocal(self).__mul__(other)
 
     def __pow__(self, other):
         from nujo.autodiff.functions import Power
@@ -132,7 +135,8 @@ class Tensor(Node):
         return MatrixMultiplication(self, other)()
 
     def __rmatmul__(self, other):
-        return other.__matmul__(self)
+        from nujo.autodiff.functions import MatrixMultiplication
+        return MatrixMultiplication(other, self)()
 
     def __repr__(self):
         return self.name

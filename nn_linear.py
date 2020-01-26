@@ -36,7 +36,7 @@ if __name__ == '__main__':
     # Create example data
     x = np.random.rand(30, 3)
     y = x @ [[2], [3], [4]] - 10
-    x, y = nj.Constant(x), nj.Constant(y)
+    x, y = nj.Tensor(x, diff=False), nj.Tensor(y, diff=False)
 
     # Train
     train(net, x, y, 100)

@@ -22,6 +22,6 @@ class Function(Node):
 
         if DIFF_ENABLED:
             for tensor, derivative in zip(self.children, self.backward()):
-                tensor.add_dependency(z, derivative)
+                tensor.add_grad_dependency(z, derivative)
 
         return z

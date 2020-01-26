@@ -1,6 +1,6 @@
-import numpy as np
+from numpy.random import randn
 
-from nujo.autodiff import Variable
+from nujo.autodiff import Tensor
 from nujo.nn.base import Transformation
 
 __all__ = [
@@ -17,14 +17,13 @@ class Linear(Transformation):
         super(Linear,
               self).__init__(name=f'{name}({in_features}, {out_features})')
 
-        weights = Variable(np.random.randn(in_features, out_features),
-                           name=self.name + '.weights')
+        weights = Tensor(randn(in_features, out_features),
+                         name=self.name + '.weights')
 
         if bias:
-            bias = Variable(np.random.randn(1, out_features),
-                            name=self.name + '.bias')
+            bias = Tensor(randn(1, out_features), name=self.name + '.bias')
         else:
-            bias = Variable(0)
+            bias = Tensor(0)
 
         self.parameters = [weights, bias]
 

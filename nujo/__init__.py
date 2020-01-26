@@ -1,8 +1,7 @@
-from nujo.autodiff import Constant, Variable, no_diff
+from nujo.autodiff import Tensor, no_diff
 
 __all__ = [
-    'Constant',
-    'Variable',
+    'Tensor'
     'no_diff',
 ]
 

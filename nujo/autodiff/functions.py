@@ -7,9 +7,9 @@ from nujo.autodiff.tensor import Tensor
 
 __all__ = [
     'Addition',
-    'Subtraction',
+    'Negation',
     'Multiplication',
-    'TrueDivision',
+    'Reciprocal',
     'Power',
     'MatrixMultiplication',
 ]
@@ -33,17 +33,17 @@ class Addition(Function):
 # ===================================================================================================
 
 
-class Subtraction(Function):
-    def __init__(self, input_a, input_b, name='<Sub>'):
-        super(Subtraction, self).__init__([input_a, input_b], name=name)
+class Negation(Function):
+    def __init__(self, input, name='<Neg>'):
+        super(Negation, self).__init__([input], name=name)
 
     def forward(self):
-        return Tensor(self.children[0].value - self.children[1].value,
+        return Tensor(-self.children[0].value,
                       children=self.children,
                       name=generate_tensor_name(self.id, self.name))
 
     def backward(self):
-        return array(1), array(-1)
+        return (array(-1), )
 
 
 # ===================================================================================================
@@ -65,18 +65,17 @@ class Multiplication(Function):
 # ===================================================================================================
 
 
-class TrueDivision(Function):
-    def __init__(self, input_a, input_b, name='<TrueDiv>'):
-        super(TrueDivision, self).__init__([input_a, input_b], name=name)
+class Reciprocal(Function):
+    def __init__(self, input, name='<Recipr>'):
+        super(Reciprocal, self).__init__([input], name=name)
 
     def forward(self):
-        return Tensor(self.children[0].value / self.children[1].value,
+        return Tensor(1 / (self.children[0].value + Reciprocal.epsilon),
                       children=self.children,
                       name=generate_tensor_name(self.id, self.name))
 
     def backward(self):
-        return ((1 / self.children[1].value),
-                ((-self.children[0].value) / (self.children[1]**2)))
+        return (-1 / ((self.children[0].value + Reciprocal.epsilon)**2), )
 
 
 # ===================================================================================================

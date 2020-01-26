@@ -13,6 +13,7 @@ class Node:
 
     '''
 
+    epsilon = 1e-18
     id_generator = counter()
 
     def __init__(self, children, name='<Node>'):
