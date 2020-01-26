@@ -1,33 +1,30 @@
 from copy import deepcopy
 
-from numpy import array
+from numpy import array, eye, tile
 
-from nujo.autodiff.misc import counter
+from nujo.autodiff.modes import DIFF_ENABLED
+from nujo.autodiff.node import Node
 
 
-class Tensor:
+class Tensor(Node):
     ''' Tensor - multi-dimensional array
 
     Tensor is the basic block of computation in Nujo.
 
     Parameters:
     -----------
-    value : value
-    name : string
-    children : list
+    value : value, numerical value of the tensor
+    children : list, the tensors form which this tensor is produced
+    name : string, representation of the tensor
 
     '''
+    def __init__(self, value, diff=True, children=[], name='<Tensor>'):
+        super(Tensor, self).__init__(children, name=name)
 
-    # Counter used to indicate the order of computations.
-    z_counter = counter()
-
-    def __init__(self, value, name='undefined', children=[]):
         self.value = value
-        self.name = name
-        self.children = children
+        self.diff = diff
 
-        self.dependencies = []
-
+        self.grad_dependencies = []
         self._grad = None
 
     @property
@@ -47,11 +44,50 @@ class Tensor:
         self.value = array(self.value)
         return self.value.shape
 
-    def compute_grad(self):  # To be overridden by subclasses.
-        self._grad = array(1)
+    def add_grad_dependency(self, wrt, weight):
+        self.grad_dependencies.append((wrt, weight))
+
+    def compute_grad(self, debug=False):
+        if self.diff and DIFF_ENABLED:
+            if debug:
+                print()
+                print('=' * 30)
+                print(self, self.shape, '- dependencies')
+
+            if len(self.dependencies) == 0:
+                self._grad = array(1)
+                return
+
+            self._grad = 0
+            for weight, z in self.dependencies:
+                if debug:
+                    print('-' * 10)
+                    print('Weight of `Z_prev Grad`:', weight)
+                    print('Shape:', weight.shape)
+                    print('-' * 5)
+                    print('Z_prev Grad:', z.grad)
+                    print('Shape:', z.grad.shape)
+                    print('-' * 5)
+
+                if weight.shape == () or z.grad.shape == ():
+                    self._grad += weight * z.grad
+                else:
+                    weight = weight.reshape(z.grad.shape[0], self.shape[0],
+                                            z.grad.shape[1] * self.shape[1])
+                    z_grad = z.grad.repeat(self.shape[1], axis=1).reshape(
+                        z.grad.shape[0], 1, -1)
+                    sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
+                    accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
+                    self._grad += accumulated_grad / z.grad.shape[0]
+
+            if debug:
+                print('Current Grad:', self._grad)
+                print('Shape:', self._grad.shape)
+                print('-' * 5)
+                print()
 
     def zero_grad(self):
-        self.dependencies = []
+        self.grad_dependencies = []
         self._grad = None
 
     def backward(self):
@@ -59,80 +95,43 @@ class Tensor:
         for child in self.children:
             child.backward()
 
-        Tensor.z_counter.reset()  # A new forward pass awaits.
-
     def __add__(self, other):
-        if not isinstance(other, Tensor):
-            other = Tensor(other)
-
         from nujo.autodiff.functions import Addition
         return Addition(self, other)()
 
     def __radd__(self, other):
-        if not isinstance(other, Tensor):
-            other = Tensor(other)
-
         return other.__add__(self)
 
     def __sub__(self, other):
-        if not isinstance(other, Tensor):
-            other = Tensor(other)
-
         from nujo.autodiff.functions import Subtraction
         return Subtraction(self, other)()
 
     def __rsub__(self, other):
-        if not isinstance(other, Tensor):
-            other = Tensor(other)
-
         return other.__sub__(self)
 
     def __mul__(self, other):
-        if not isinstance(other, Tensor):
-            other = Tensor(other)
-
         from nujo.autodiff.functions import Multiplication
         return Multiplication(self, other)()
 
     def __rmul__(self, other):
-        if not isinstance(other, Tensor):
-            other = Tensor(other)
-
         return other.__mul__(self)
 
     def __truediv__(self, other):
-        if not isinstance(other, Tensor):
-            other = Tensor(other)
-
         from nujo.autodiff.functions import TrueDivision
         return TrueDivision(self, other)()
 
     def __rtruediv__(self, other):
-        if not isinstance(other, Tensor):
-            other = Tensor(other)
-
         return other.__truediv__(self)
 
     def __pow__(self, other):
-        if not isinstance(other, Tensor):
-            other = Tensor(other)
-
         from nujo.autodiff.functions import Power
         return Power(self, other)()
 
     def __matmul__(self, other):
-        assert self.shape[1] == other.shape[0]
-
-        if not isinstance(other, Tensor):
-            other = Tensor(other)
-
         from nujo.autodiff.functions import MatrixMultiplication
         return MatrixMultiplication(self, other)()
 
     def __rmatmul__(self, other):
-        if not isinstance(other, Tensor):
-            other = Tensor(other)
-
         return other.__matmul__(self)
 
     def __repr__(self):

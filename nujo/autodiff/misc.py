@@ -21,7 +21,7 @@ class counter:
 
 
 def generate_tensor_name(i, func_name):
-    return f'Z:{i}<{func_name}>'
+    return f'Z:{i}{func_name}'
 
 
 def matrix_dotprod_differentiation(X, W):

@@ -1,8 +1,9 @@
+from numpy import array
+
 from nujo.autodiff.function import Function
 from nujo.autodiff.misc import (generate_tensor_name,
                                 matrix_dotprod_differentiation)
-from nujo.autodiff.modes import DIFF_ENABLED
-from nujo.autodiff.variable import Variable
+from nujo.autodiff.tensor import Tensor
 
 __all__ = [
     'Addition',
@@ -17,108 +18,105 @@ __all__ = [
 
 
 class Addition(Function):
-    def __init__(self, input_a, input_b, name='Add'):
-        super(Addition, self).__init__(input_a, input_b, name=name)
+    def __init__(self, input_a, input_b, name='<Add>'):
+        super(Addition, self).__init__([input_a, input_b], name=name)
 
     def forward(self):
-        return Variable(self.inputs[0].value + self.inputs[1].value,
-                        name=generate_tensor_name(
-                            self.inputs[0].z_counter.get(), self.name),
-                        children=self.inputs if DIFF_ENABLED else [])
+        return Tensor(self.children[0].value + self.children[1].value,
+                      children=self.children,
+                      name=generate_tensor_name(self.id, self.name))
 
-    def backward(self, grad):
-        return grad, grad
+    def backward(self):
+        return array(1), array(1)
 
 
 # ===================================================================================================
 
 
 class Subtraction(Function):
-    def __init__(self, input_a, input_b, name='Sub'):
-        super(Subtraction, self).__init__(input_a, input_b, name=name)
+    def __init__(self, input_a, input_b, name='<Sub>'):
+        super(Subtraction, self).__init__([input_a, input_b], name=name)
 
     def forward(self):
-        return Variable(self.inputs[0].value - self.inputs[1].value,
-                        name=generate_tensor_name(
-                            self.inputs[0].z_counter.get(), self.name),
-                        children=self.inputs if DIFF_ENABLED else [])
+        return Tensor(self.children[0].value - self.children[1].value,
+                      children=self.children,
+                      name=generate_tensor_name(self.id, self.name))
 
-    def backward(self, grad):
-        return grad, -grad
+    def backward(self):
+        return array(1), array(-1)
 
 
 # ===================================================================================================
 
 
 class Multiplication(Function):
-    def __init__(self, input_a, input_b, name='Mul'):
-        super(Multiplication, self).__init__(input_a, input_b, name=name)
+    def __init__(self, input_a, input_b, name='<Mul>'):
+        super(Multiplication, self).__init__([input_a, input_b], name=name)
 
     def forward(self):
-        return Variable(self.inputs[0].value * self.inputs[1].value,
-                        name=generate_tensor_name(
-                            self.inputs[0].z_counter.get(), self.name),
-                        children=self.inputs if DIFF_ENABLED else [])
+        return Tensor(self.children[0].value * self.children[1].value,
+                      children=self.children,
+                      name=generate_tensor_name(self.id, self.name))
 
-    def backward(self, grad):
-        return (self.inputs[1].value * grad, self.inputs[0].value * grad)
+    def backward(self):
+        return (self.children[1].value, self.children[0].value)
 
 
 # ===================================================================================================
 
 
 class TrueDivision(Function):
-    def __init__(self, input_a, input_b, name='TrueDiv'):
-        super(TrueDivision, self).__init__(input_a, input_b, name=name)
+    def __init__(self, input_a, input_b, name='<TrueDiv>'):
+        super(TrueDivision, self).__init__([input_a, input_b], name=name)
 
     def forward(self):
-        return Variable(self.inputs[0].value / self.inputs[1].value,
-                        name=generate_tensor_name(
-                            self.inputs[0].z_counter.get(), self.name),
-                        children=self.inputs if DIFF_ENABLED else [])
+        return Tensor(self.children[0].value / self.children[1].value,
+                      children=self.children,
+                      name=generate_tensor_name(self.id, self.name))
 
-    def backward(self, grad):
-        return ((1 / self.inputs[1].value) * grad,
-                ((-self.inputs[0].value) / (self.inputs[1]**2)) * grad)
+    def backward(self):
+        return ((1 / self.children[1].value),
+                ((-self.children[0].value) / (self.children[1]**2)))
 
 
 # ===================================================================================================
 
 
 class Power(Function):
-    def __init__(self, input_a, input_b, name='Pow'):
-        super(Power, self).__init__(input_a, input_b, name=name)
+    def __init__(self, input_a, input_b, name='<Pow>'):
+        super(Power, self).__init__([input_a, input_b], name=name)
 
     def forward(self):
-        return Variable(self.inputs[0].value**self.inputs[1].value,
-                        name=generate_tensor_name(
-                            self.inputs[0].z_counter.get(), self.name),
-                        children=self.inputs if DIFF_ENABLED else [])
+        return Tensor(self.children[0].value**self.children[1].value,
+                      children=self.children,
+                      name=generate_tensor_name(self.id, self.name))
 
-    def backward(self, grad):
-        return ((self.inputs[1].value *
-                 self.inputs[0].value**(self.inputs[1].value - 1)) * grad, grad
-                )  # TODO: FIX (wrong partial)
+    def backward(self):
+        return ((self.children[1].value *
+                 self.children[0].value**(self.children[1].value - 1)),
+                array(1))  # TODO: FIX (wrong partial)
 
 
 # ===================================================================================================
 
 
 class MatrixMultiplication(Function):
-    def __init__(self, input_a, input_b, name='MatMul'):
-        super(MatrixMultiplication, self).__init__(input_a, input_b, name=name)
+    def __init__(self, input_a, input_b, name='<MatMul>'):
+        super(MatrixMultiplication, self).__init__([input_a, input_b],
+                                                   name=name)
 
     def forward(self):
-        return Variable(self.inputs[0].value @ self.inputs[1].value,
-                        name=generate_tensor_name(
-                            self.inputs[0].z_counter.get(), self.name),
-                        children=self.inputs if DIFF_ENABLED else [])
+        assert self.children[0].shape[1] == self.children[1].shape[0]
 
-    def backward(self, grad):
+        return Tensor(self.children[0].value @ self.children[1].value,
+                      children=self.children,
+                      name=generate_tensor_name(self.id, self.name))
+
+    def backward(self):
         dinput0, dinput1 = matrix_dotprod_differentiation(
-            self.inputs[0].value, self.inputs[1].value)
+            self.children[0].value, self.children[1].value)
 
-        return dinput0 * grad, dinput1 * grad
+        return dinput0, dinput1
 
 
 # ===================================================================================================
