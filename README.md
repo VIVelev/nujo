@@ -2,11 +2,12 @@
 
 ### Prerequisites
 
-* [Python](https://www.python.org/) - The Programming Language used.
-* [Poetry](https://python-poetry.org/) - Dependency and Virtual Environment Management
+-   [Python](https://www.python.org/) - The Programming Language used.
+-   [Poetry](https://python-poetry.org/) - Dependency and Virtual Environment Management
 
-***Download for Mac OSX using Homebrew***
-``` bash
+**_Download for Mac OSX using Homebrew_**
+
+```bash
 $ brew install python
 $ brew install poetry
 ```
@@ -24,8 +25,8 @@ Coming soon...
 
 ## Built With
 
-* [NumPy](http://www.numpy.org/) - Fundamental package for scientific computing with Python
-* [Graphviz](https://www.graphviz.org/) - Open source graph visualization software
+-   [NumPy](http://www.numpy.org/) - Fundamental package for scientific computing with Python
+-   [Graphviz](https://www.graphviz.org/) - Open source graph visualization software
 
 ## Contributing
 
@@ -33,7 +34,8 @@ Please read [CONTRIBUTING.md](https://github.com/VIVelev/nujo/CONTRIBUTING.md) f
 
 ## Authors
 
-* **Victor Velev** - *Initial work* - [VIVelev](https://github.com/VIVelev)
+-   **Victor Velev** - _Initial work_ - [VIVelev](https://github.com/VIVelev)
+-   **Victor Gorchilov** - _Initial work_ - [ManiacMaxo](https://github.com/ManiacMaxo)
 
 See also the list of [contributors](https://github.com/VIVelev/nujo/contributors) who participated in this project.
 
