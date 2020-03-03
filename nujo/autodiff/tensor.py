@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 from numpy import array, eye, tile
 
 from nujo.autodiff.modes import DIFF_ENABLED
@@ -25,19 +23,30 @@ class Tensor(Node):
         self.diff = diff
 
         self.grad_dependencies = []
+
+        # Gradient cache
         self._grad = None
+
+        # Transposed tensor cache
+        self._T = None
 
     @property
     def grad(self):
         if self._grad is None:
             self.compute_grad()
+
         return self._grad
 
     @property
     def T(self):
-        transposed = deepcopy(self)
-        transposed.value = self.value.T
-        return transposed
+        if self._T is None:
+            from copy import deepcopy
+            transposed = deepcopy(self)
+            transposed.value = self.value.T
+
+            self._T = transposed
+
+        return self._T
 
     @property
     def shape(self):
@@ -86,8 +95,12 @@ class Tensor(Node):
                 print()
 
     def zero_grad(self):
+        # `zero_grad` is called after an iteration.
+        # The value of weight tensors is updated after an iteration.
+
         self.grad_dependencies = []
         self._grad = None
+        self._T = None
 
     def backward(self):
         self.compute_grad()
