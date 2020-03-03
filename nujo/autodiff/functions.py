@@ -19,7 +19,7 @@ __all__ = [
 
 class Addition(Function):
     def __init__(self, input_a, input_b, name='<Add>'):
-        super(Addition, self).__init__([input_a, input_b], name=name)
+        super(Addition, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
         return Tensor(self.children[0].value + self.children[1].value,
@@ -35,7 +35,7 @@ class Addition(Function):
 
 class Negation(Function):
     def __init__(self, input, name='<Neg>'):
-        super(Negation, self).__init__([input], name=name)
+        super(Negation, self).__init__(input, name=name)
 
     def forward(self):
         return Tensor(-self.children[0].value,
@@ -51,7 +51,7 @@ class Negation(Function):
 
 class Multiplication(Function):
     def __init__(self, input_a, input_b, name='<Mul>'):
-        super(Multiplication, self).__init__([input_a, input_b], name=name)
+        super(Multiplication, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
         return Tensor(self.children[0].value * self.children[1].value,
@@ -67,7 +67,7 @@ class Multiplication(Function):
 
 class Reciprocal(Function):
     def __init__(self, input, name='<Recipr>'):
-        super(Reciprocal, self).__init__([input], name=name)
+        super(Reciprocal, self).__init__(input, name=name)
 
     def forward(self):
         return Tensor(1 / (self.children[0].value + Reciprocal.epsilon),
@@ -83,7 +83,7 @@ class Reciprocal(Function):
 
 class Power(Function):
     def __init__(self, input_a, input_b, name='<Pow>'):
-        super(Power, self).__init__([input_a, input_b], name=name)
+        super(Power, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
         return Tensor(self.children[0].value**self.children[1].value,
@@ -101,8 +101,7 @@ class Power(Function):
 
 class MatrixMultiplication(Function):
     def __init__(self, input_a, input_b, name='<MatMul>'):
-        super(MatrixMultiplication, self).__init__([input_a, input_b],
-                                                   name=name)
+        super(MatrixMultiplication, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
         assert self.children[0].shape[1] == self.children[1].shape[0]

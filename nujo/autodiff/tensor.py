@@ -12,12 +12,12 @@ class Tensor(Node):
     Parameters:
     -----------
     value : value, numerical value of the tensor
-    children : list, the tensors form which this tensor is produced
+    children : varargs, the tensors form which this tensor is produced
     name : string, representation of the tensor
 
     '''
-    def __init__(self, value, diff=True, children=[], name='<Tensor>'):
-        super(Tensor, self).__init__(children, name=name)
+    def __init__(self, value, diff=True, *children, name='<Tensor>'):
+        super(Tensor, self).__init__(*children, name=name)
 
         self.value = array(value)
         self.diff = diff

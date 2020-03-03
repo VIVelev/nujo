@@ -6,8 +6,8 @@ from nujo.autodiff.node import Node
 
 class Function(Node):
     ''' Abstract Base Class for functions '''
-    def __init__(self, children, name='<Function>'):
-        super(Function, self).__init__(children, name)
+    def __init__(self, *children, name='<Function>'):
+        super(Function, self).__init__(*children, name)
 
     @abstractmethod
     def forward(self):
@@ -25,3 +25,8 @@ class Function(Node):
                 tensor.add_grad_dependency(z, derivative)
 
         return z
+
+
+# TODO:
+# Add explanation to what a function is
+# Make a `creator` property for Tensor instead of children ?
