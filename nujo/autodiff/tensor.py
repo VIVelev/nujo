@@ -28,7 +28,7 @@ class Tensor(Node):
 
         # (Tensor, weight) pair, used to backpropagate through the network
         # See: `Chain Rule` Wikipedia page for more info
-        self.grad_dependencies = []
+        self._grad_dependencies = []
 
         # Gradient cache
         self._grad = None
@@ -59,7 +59,7 @@ class Tensor(Node):
         return self.value.shape
 
     def add_grad_dependency(self, wrt, weight):
-        self.grad_dependencies.append((wrt, weight))
+        self._grad_dependencies.append((wrt, weight))
 
     def compute_grad(self, debug=False):
         if self.diff and DIFF_ENABLED:
@@ -68,12 +68,12 @@ class Tensor(Node):
                 print('=' * 30)
                 print(self, self.shape, '- dependencies')
 
-            if len(self.grad_dependencies) == 0:
+            if len(self._grad_dependencies) == 0:
                 self._grad = array(1)
                 return
 
             self._grad = 0
-            for z, weight in self.grad_dependencies:
+            for z, weight in self._grad_dependencies:
                 if debug:
                     print('-' * 10)
                     print('Weight of `Z_prev Grad`:', weight)
@@ -104,7 +104,7 @@ class Tensor(Node):
         # `zero_grad` is called after an iteration.
         # The value of weight tensors is updated after an iteration.
 
-        self.grad_dependencies = []
+        self._grad_dependencies = []
         self._grad = None
         self._T = None
 
