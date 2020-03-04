@@ -19,6 +19,9 @@ We have the following branches:
   
 [Gitflow reference](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
 
+### Task organisation
+The Kanban system used for this project is [Trello](https://trello.com/b/fObyuiWt/nujo-develop)
+
 ## Getting started
 >coming soon...
 
