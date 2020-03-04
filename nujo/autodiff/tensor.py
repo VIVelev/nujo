@@ -12,8 +12,14 @@ class Tensor(Node):
     Parameters:
     -----------
     value : value, numerical value of the tensor
+    diff : boolean, whether to compute gradients for the current tensor
     children : varargs, the tensors form which this tensor is produced
     name : string, representation of the tensor
+
+    creator : Function, the function that created the current tensor,
+    the only child of the Tensor
+    grad_dependencies : (Tensor, weight) pair, used to backpropagate
+    through the network. (See: `Chain Rule` in Wikipedia for more info.)
 
     '''
     def __init__(self, value, diff=True, *children, name='<Tensor>'):
@@ -21,6 +27,9 @@ class Tensor(Node):
 
         self.value = array(value)
         self.diff = diff
+
+        # The Nujo Function that created this tensor
+        self.creator = children[-1]
 
         self.grad_dependencies = []
 
@@ -104,7 +113,7 @@ class Tensor(Node):
 
     def backward(self):
         self.compute_grad()
-        for child in self.children:
+        for child in self.creator.children:
             child.backward()
 
     def __add__(self, other):
