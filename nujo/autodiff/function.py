@@ -5,7 +5,17 @@ from nujo.autodiff.node import Node
 
 
 class Function(Node):
-    ''' Abstract Base Class for functions '''
+    ''' Abstract Base Class for functions
+
+    A Function takes multiple tensors as input
+    and produces only one tensor as output.
+
+    Parameters:
+    -----------
+    children : varargs, the inpute tensors
+    name : string, the name of the function
+
+    '''
     def __init__(self, *children, name='<Function>'):
         super(Function, self).__init__(*children, name)
 

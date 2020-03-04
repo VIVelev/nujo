@@ -4,7 +4,7 @@ from nujo.autodiff.misc import counter
 class Node:
     ''' A Node in the computation graph.
 
-    Can be either a function or a tensor.
+    Can be either a Function or a Tensor.
 
     Parameters:
     -----------
