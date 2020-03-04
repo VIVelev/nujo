@@ -23,7 +23,7 @@ class Addition(Function):
 
     def forward(self):
         return Tensor(self.children[0].value + self.children[1].value,
-                      children=self,
+                      children=[self],
                       name=generate_tensor_name(self.id, self.name))
 
     def backward(self):
@@ -39,7 +39,7 @@ class Negation(Function):
 
     def forward(self):
         return Tensor(-self.children[0].value,
-                      children=self,
+                      children=[self],
                       name=generate_tensor_name(self.id, self.name))
 
     def backward(self):
@@ -55,7 +55,7 @@ class Multiplication(Function):
 
     def forward(self):
         return Tensor(self.children[0].value * self.children[1].value,
-                      children=self,
+                      children=[self],
                       name=generate_tensor_name(self.id, self.name))
 
     def backward(self):
@@ -71,7 +71,7 @@ class Reciprocal(Function):
 
     def forward(self):
         return Tensor(1 / (self.children[0].value + Reciprocal.epsilon),
-                      children=self,
+                      children=[self],
                       name=generate_tensor_name(self.id, self.name))
 
     def backward(self):
@@ -87,7 +87,7 @@ class Power(Function):
 
     def forward(self):
         return Tensor(self.children[0].value**self.children[1].value,
-                      children=self,
+                      children=[self],
                       name=generate_tensor_name(self.id, self.name))
 
     def backward(self):
@@ -107,7 +107,7 @@ class MatrixMultiplication(Function):
         assert self.children[0].shape[1] == self.children[1].shape[0]
 
         return Tensor(self.children[0].value @ self.children[1].value,
-                      children=self,
+                      children=[self],
                       name=generate_tensor_name(self.id, self.name))
 
     def backward(self):

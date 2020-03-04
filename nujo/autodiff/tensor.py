@@ -22,14 +22,14 @@ class Tensor(Node):
     through the network. (See: `Chain Rule` in Wikipedia for more info.)
 
     '''
-    def __init__(self, value, diff=True, *children, name='<Tensor>'):
+    def __init__(self, value, diff=True, children=[], name='<Tensor>'):
         super(Tensor, self).__init__(*children, name=name)
 
         self.value = array(value)
         self.diff = diff
 
         # The Nujo Function that created this tensor
-        self.creator = children[-1]
+        self.creator = children[-1] if len(children) else None
 
         self.grad_dependencies = []
 
@@ -113,8 +113,10 @@ class Tensor(Node):
 
     def backward(self):
         self.compute_grad()
-        for child in self.creator.children:
-            child.backward()
+
+        if self.creator:
+            for child in self.creator.children:
+                child.backward()
 
     def __add__(self, other):
         from nujo.autodiff.functions import Addition
