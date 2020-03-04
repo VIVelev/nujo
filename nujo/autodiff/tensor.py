@@ -7,19 +7,14 @@ from nujo.autodiff.node import Node
 class Tensor(Node):
     ''' Tensor - multi-dimensional array
 
-    Tensor is the basic block of computation in Nujo.
+    Tensors are the basic blocks of computation in Nujo.
 
     Parameters:
     -----------
     value : value, numerical value of the tensor
     diff : boolean, whether to compute gradients for the current tensor
-    children : varargs, the tensors form which this tensor is produced
+    children : list, the tensors form which this tensor is produced
     name : string, representation of the tensor
-
-    creator : Function, the function that created the current tensor,
-    the only child of the Tensor
-    grad_dependencies : (Tensor, weight) pair, used to backpropagate
-    through the network. (See: `Chain Rule` in Wikipedia for more info.)
 
     '''
     def __init__(self, value, diff=True, children=[], name='<Tensor>'):
@@ -31,6 +26,8 @@ class Tensor(Node):
         # The Nujo Function that created this tensor
         self.creator = children[-1] if len(children) else None
 
+        # (Tensor, weight) pair, used to backpropagate through the network
+        # See: `Chain Rule` Wikipedia page for more info
         self.grad_dependencies = []
 
         # Gradient cache

@@ -38,5 +38,4 @@ class Function(Node):
 
 
 # TODO:
-# Add explanation to what a function is
-# Make a `creator` property for Tensor instead of children ?
+# Refine the explanation to what a function is ???
