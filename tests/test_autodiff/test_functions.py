@@ -1,4 +1,5 @@
 import pytest
+from numpy import ndarray
 
 import nujo.autodiff.functions as funcs
 from nujo import Tensor
@@ -7,37 +8,81 @@ from nujo import Tensor
 def test_addition(get_tensors):
     A, B = get_tensors
     add = funcs.Addition(A, B)
-    C = add.forward()
 
+    # Test Forwardprop
+    C = add.forward()
+    assert isinstance(C, Tensor)
     assert (A.value + B.value).all() == C.value.all()
-    assert len(add.backward()) == 2
+
+    # Test Backprop
+    grad = add.backward()
+    assert len(grad) == 2
+
+    assert type(grad[0]) is ndarray
+    assert type(grad[1]) is ndarray
+
+    # Test Derivative computation
+    assert grad[0] == 1
+    assert grad[1] == 1
 
 
 def test_negation(get_tensors):
     A, _ = get_tensors
     neg = funcs.Negation(A)
-    C = neg.forward()
 
+    # Test Forwardprop
+    C = neg.forward()
+    assert isinstance(C, Tensor)
     assert (-A.value).all() == C.value.all()
-    assert len(neg.backward()) == 1
+
+    # Test Backprop
+    grad = neg.backward()
+    assert len(grad) == 1
+
+    assert type(grad[0]) is ndarray
+
+    # Test Derivative computation
+    assert grad[0] == -1
 
 
 def test_multiplication(get_tensors):
     A, B = get_tensors
     mul = funcs.Multiplication(A, B)
-    C = mul.forward()
 
+    # Test Forwardprop
+    C = mul.forward()
+    assert isinstance(C, Tensor)
     assert (A.value * B.value).all() == C.value.all()
-    assert len(mul.backward()) == 2
+
+    # Test Backprop
+    grad = mul.backward()
+    assert len(grad) == 2
+
+    assert type(grad[0]) is ndarray
+    assert type(grad[1]) is ndarray
+
+    # Test Derivative computation
+    assert grad[0].all() == B.value.all()
+    assert grad[1].all() == A.value.all()
 
 
 def test_reciprocal(get_tensors):
     A, _ = get_tensors
     recipr = funcs.Reciprocal(A)
-    C = recipr.forward()
 
+    # Test Forwardprop
+    C = recipr.forward()
+    assert isinstance(C, Tensor)
     assert (1 / A.value).all() == C.value.all()
-    assert len(recipr.backward()) == 1
+
+    # Test Backprop
+    grad = recipr.backward()
+    assert len(grad) == 1
+
+    assert type(grad[0]) is ndarray
+
+    # Test Derivative computation
+    assert grad[0].all() == (-1 / (A.value**2)).all()
 
 
 def test_power(get_tensors):
