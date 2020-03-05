@@ -2,17 +2,16 @@
 
 ### Prerequisites
 
--   [Python](https://www.python.org/) - The Programming Language used.
+-   [Python](https://www.python.org/) - The Programming Language used
 -   [Poetry](https://python-poetry.org/) - Dependency and Virtual Environment Management
 
-**_Download for Mac OSX using Homebrew_**
+***Download for Mac OSX using Homebrew***
 
 ```bash
-$ brew install python
-$ brew install poetry
+$ brew install python poetry
 ```
 
-### Installing
+### Installing and setting up
 
 ```bash
 $ git clone https://github.com/VIVele/nujo && cd nujo
