@@ -88,10 +88,22 @@ def test_reciprocal(get_tensors):
 def test_power(get_tensors):
     A, _ = get_tensors
     pow = funcs.Power(A, 2)
-    C = pow.forward()
 
+    # Test Forwardprop
+    C = pow.forward()
+    assert isinstance(C, Tensor)
     assert (A.value**2).all() == C.value.all()
-    assert len(pow.backward()) == 2
+
+    # Test Backprop
+    grad = pow.backward()
+    assert len(grad) == 2
+
+    assert type(grad[0]) is ndarray
+    assert type(grad[1]) is ndarray
+
+    # Test Derivative computation
+    assert grad[0].all() == (2 * A.value).all()
+    assert grad[1] == 1
 
 
 def test_matrixmultiplication(get_tensors):
