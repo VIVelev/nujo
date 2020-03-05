@@ -3,6 +3,7 @@ from numpy import ndarray
 
 import nujo.autodiff.functions as funcs
 from nujo import Tensor
+from nujo.autodiff.misc import matrix_dotprod_differentiation
 
 
 def test_addition(get_tensors):
@@ -109,10 +110,23 @@ def test_power(get_tensors):
 def test_matrixmultiplication(get_tensors):
     A, B = get_tensors
     matmul = funcs.MatrixMultiplication(A, B)
-    C = matmul.forward()
 
+    # Test Forwardprop
+    C = matmul.forward()
+    assert isinstance(C, Tensor)
     assert (A.value @ B.value).all() == C.value.all()
-    assert len(matmul.backward()) == 2
+
+    # Test Backprop
+    grad = matmul.backward()
+    assert len(grad) == 2
+
+    assert type(grad[0]) is ndarray
+    assert type(grad[1]) is ndarray
+
+    # Test Derivative computation
+    dA, dB = matrix_dotprod_differentiation(A.value, B.value)
+    assert grad[0].all() == dA.all()
+    assert grad[1].all() == dB.all()
 
 
 @pytest.fixture
