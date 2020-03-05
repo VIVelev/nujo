@@ -11,16 +11,20 @@
 $ brew install python poetry
 ```
 
-### Installing and setting up
+### Installing and setting up for development
 
 ```bash
-$ git clone https://github.com/VIVele/nujo && cd nujo
+$ git clone https://github.com/VIVelev/nujo && cd nujo
 $ poetry install && poetry shell
 ```
 
 ## Running the tests
 
-Coming soon...
+Once you have **Installed and set up** Nujo, run the following in the terminal:
+
+```bash
+$ pytest
+```
 
 ## Built With
 
