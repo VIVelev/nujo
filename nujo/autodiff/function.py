@@ -1,4 +1,5 @@
 from abc import abstractmethod
+
 from numpy import array
 
 from nujo.autodiff.misc import generate_tensor_name
@@ -35,9 +36,11 @@ class Function(Node):
         pass
 
     def __call__(self):
-        z = Tensor(self.forward(),
-                   children=[self],
-                   name=generate_tensor_name(self.id, self.name))
+        z = self.forward()
+        if not isinstance(z, Tensor):
+            z = Tensor(z,
+                       children=[self],
+                       name=generate_tensor_name(self.id, self.name))
 
         if DIFF_ENABLED:
             for tensor, derivative in zip(self.children, self.backward()):
