@@ -19,8 +19,8 @@ def test_addition(get_tensors):
     grad = add.backward()
     assert len(grad) == 2
 
-    assert type(grad[0]) is ndarray
-    assert type(grad[1]) is ndarray
+    assert isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], ndarray)
 
     # Test Derivative computation
     assert grad[0] == 1
@@ -40,7 +40,7 @@ def test_negation(get_tensors):
     grad = neg.backward()
     assert len(grad) == 1
 
-    assert type(grad[0]) is ndarray
+    assert isinstance(grad[0], ndarray)
 
     # Test Derivative computation
     assert grad[0] == -1
@@ -59,8 +59,8 @@ def test_multiplication(get_tensors):
     grad = mul.backward()
     assert len(grad) == 2
 
-    assert type(grad[0]) is ndarray
-    assert type(grad[1]) is ndarray
+    assert isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], ndarray)
 
     # Test Derivative computation
     assert grad[0].all() == B.value.all()
@@ -80,7 +80,7 @@ def test_reciprocal(get_tensors):
     grad = recipr.backward()
     assert len(grad) == 1
 
-    assert type(grad[0]) is ndarray
+    assert isinstance(grad[0], ndarray)
 
     # Test Derivative computation
     assert grad[0].all() == (-1 / (A.value**2)).all()
@@ -99,8 +99,8 @@ def test_power(get_tensors):
     grad = pow.backward()
     assert len(grad) == 2
 
-    assert type(grad[0]) is ndarray
-    assert type(grad[1]) is ndarray
+    assert isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], ndarray)
 
     # Test Derivative computation
     assert grad[0].all() == (2 * A.value).all()
@@ -120,8 +120,8 @@ def test_matrixmultiplication(get_tensors):
     grad = matmul.backward()
     assert len(grad) == 2
 
-    assert type(grad[0]) is ndarray
-    assert type(grad[1]) is ndarray
+    assert isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], ndarray)
 
     # Test Derivative computation
     dA, dB = matrix_dotprod_differentiation(A.value, B.value)
