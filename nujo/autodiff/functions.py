@@ -1,5 +1,6 @@
+from numpy import ones
+
 from nujo.autodiff.function import Function
-from nujo.autodiff.misc import matrix_dotprod_differentiation
 
 __all__ = [
     'Addition',
@@ -90,15 +91,72 @@ class MatrixMultiplication(Function):
     def __init__(self, input_a, input_b, name='<MatMul>'):
         super(MatrixMultiplication, self).__init__(input_a, input_b, name=name)
 
+    @staticmethod
+    def differentiate(X, W):
+        ''' Calculate Matrix partial derivatives
+
+        Given Z = XW, Calculate:
+            - dX = dZ/dX
+            - dW = dZ/dW
+
+        Parameters:
+        -----------
+        X : matrix, left hand multiplier
+        W : matrix, right hand multiplier
+
+        Returns:
+        --------
+        dX : partial derivative of Z w.r.t. X
+        dW : partial derivative of Z w.r.t. W
+
+        '''
+
+        # ------------------------------------------------------------
+        dX = ones((X.shape[0]**2, W.shape[1] * X.shape[1]))
+
+        i, j = 0, 0  # indecies of Z
+        k, m = 0, 0  # indecies of X
+        # p, q : indecies of dX
+
+        for p in range(dX.shape[0]):
+            for q in range(dX.shape[1]):
+                if k == i:
+                    dX[p, q] = W[m, j]
+
+                j = q % W.shape[1]
+                m = q % X.shape[1]
+
+            i = q % X.shape[0]
+            k = p % X.shape[0]
+
+        # ------------------------------------------------------------
+        dW = ones((X.shape[0] * W.shape[0], W.shape[1]**2))
+
+        i, j = 0, 0  # indecies of Z
+        k, m = 0, 0  # indecies of W
+        # p, q : indecies of dW
+
+        for p in range(dW.shape[0]):
+            for q in range(dW.shape[1]):
+                if m == j:
+                    dW[p, q] = X[i, k]
+
+                j = q % W.shape[1]
+                m = q % W.shape[1]
+
+            i = q % X.shape[0]
+            k = p % W.shape[0]
+
+        ##############################################################
+
+        return dX, dW
+
     def forward(self):
         assert self.children[0].shape[1] == self.children[1].shape[0]
         return self.children[0].value @ self.children[1].value
 
     def backward(self):
-        dinput0, dinput1 = matrix_dotprod_differentiation(
-            self.children[0].value, self.children[1].value)
-
-        return dinput0, dinput1
+        return MatrixMultiplication.differentiate(*self.children)
 
 
 # ===================================================================================================
