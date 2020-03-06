@@ -120,6 +120,9 @@ class Tensor(Node):
             for child in self.creator.children:
                 child.backward()
 
+    def __getitem__(self, position):
+        return self.value[position]
+
     def __add__(self, other):
         from nujo.autodiff.functions import Addition
         return Addition(self, other)()

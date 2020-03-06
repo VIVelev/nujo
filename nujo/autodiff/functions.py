@@ -162,16 +162,3 @@ class MatrixMultiplication(Function):
 
 
 # ===================================================================================================
-
-if __name__ == '__main__':
-    from nujo.autodiff.tensor import Tensor
-
-    A = Tensor([[1]])
-    dot_prod = MatrixMultiplication(A, A)
-
-    print(dot_prod.children)
-
-    Z = dot_prod()
-
-    print(Z.children)
-    print(dot_prod.children)
