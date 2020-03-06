@@ -5,15 +5,20 @@ from nujo.autodiff.node import Node
 
 
 class Tensor(Node):
-    ''' Tensor - multi-dimensional array
+    ''' Tensor - a multi-dimensional array
 
-    Tensors are the basic blocks of computation in Nujo.
+    Tensors are the main units of data and computation in Nujo.
+    They "flow" in the computation graph. :)
+
+    Tensors can be either constants or trainable weights,
+    depending on whether gradients are computed for the given tensor.
 
     Parameters:
     -----------
     value : value, numerical value of the tensor
-    diff : boolean, whether to compute gradients for the current tensor
-    children : list, the tensors form which this tensor is produced
+    diff : boolean, whether to compute gradients for the tensor
+    children : list, the nodes form which this tensor is produced,
+    usually it's a single node - the creator function
     name : string, representation of the tensor
 
     '''

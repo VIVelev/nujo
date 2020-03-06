@@ -25,7 +25,7 @@ def generate_tensor_name(i, func_name):
 
 
 def matrix_dotprod_differentiation(X, W):
-    #                   CALC MATRIX PARTIALS
+    # CALC MATRIX PARTIALS
     # Z = XW
     # Calc:
     #   - dX = dZ/dX

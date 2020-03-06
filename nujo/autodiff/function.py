@@ -5,10 +5,14 @@ from nujo.autodiff.node import Node
 
 
 class Function(Node):
-    ''' Abstract Base Class for functions
+    ''' Base Class for functions
+
+    Functions are applied to tensors.
 
     A Function takes multiple tensors as input
     and produces only one tensor as output.
+
+    Functions do not change tensors in-place.
 
     Parameters:
     -----------
@@ -35,7 +39,3 @@ class Function(Node):
                 tensor.add_grad_dependency(z, derivative)
 
         return z
-
-
-# TODO:
-# Refine the explanation to what a function is ???
