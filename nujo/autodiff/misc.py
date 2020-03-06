@@ -2,7 +2,6 @@ from numpy import ones
 
 __all__ = [
     'counter',
-    'generate_tensor_name',
     'matrix_dotprod_differentiation',
 ]
 
@@ -18,10 +17,6 @@ class counter:
     @classmethod
     def reset(cls):
         cls.n = 0
-
-
-def generate_tensor_name(i, func_name):
-    return f'Z:{i}{func_name}'
 
 
 def matrix_dotprod_differentiation(X, W):

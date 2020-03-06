@@ -2,7 +2,6 @@ from abc import abstractmethod
 
 from numpy import array
 
-from nujo.autodiff.misc import generate_tensor_name
 from nujo.autodiff.modes import DIFF_ENABLED
 from nujo.autodiff.node import Node
 from nujo.autodiff.tensor import Tensor
@@ -27,6 +26,9 @@ class Function(Node):
     def __init__(self, *children, name='<Function>'):
         super(Function, self).__init__(*children, name)
 
+    def _generate_tensor_name(self):
+        return f'Z:{self.id}{self.name}'
+
     @abstractmethod
     def forward(self):
         pass
@@ -38,9 +40,7 @@ class Function(Node):
     def __call__(self):
         z = self.forward()
         if not isinstance(z, Tensor):
-            z = Tensor(z,
-                       children=[self],
-                       name=generate_tensor_name(self.id, self.name))
+            z = Tensor(z, children=[self], name=self._generate_tensor_name())
 
         if DIFF_ENABLED:
             for tensor, derivative in zip(self.children, self.backward()):
