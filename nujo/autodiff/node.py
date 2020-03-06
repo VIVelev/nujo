@@ -1,4 +1,4 @@
-from nujo.autodiff.misc import counter
+from nujo.autodiff.utils import counter
 
 
 class Node:
