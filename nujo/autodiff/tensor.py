@@ -160,12 +160,12 @@ class Tensor(Node):
         return Power(self, other)()
 
     def __matmul__(self, other):
-        from nujo.autodiff.functions import MatrixMultiplication
-        return MatrixMultiplication(self, other)()
+        from nujo.autodiff.functions import MatrixMul
+        return MatrixMul(self, other)()
 
     def __rmatmul__(self, other):
-        from nujo.autodiff.functions import MatrixMultiplication
-        return MatrixMultiplication(other, self)()
+        from nujo.autodiff.functions import MatrixMul
+        return MatrixMul(other, self)()
 
     def __repr__(self):
         return self.name

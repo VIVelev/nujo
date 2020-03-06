@@ -8,7 +8,7 @@ __all__ = [
     'Multiplication',
     'Reciprocal',
     'Power',
-    'MatrixMultiplication',
+    'MatrixMul',
 ]
 
 # ===================================================================================================
@@ -87,11 +87,10 @@ class Power(Function):
 # ===================================================================================================
 
 
-# TODO: Rename to DotProduct ???
-# rename misc to utils
-class MatrixMultiplication(Function):
+# TODO: rename misc to utils
+class MatrixMul(Function):
     def __init__(self, input_a, input_b, name='<MatMul>'):
-        super(MatrixMultiplication, self).__init__(input_a, input_b, name=name)
+        super(MatrixMul, self).__init__(input_a, input_b, name=name)
 
     @staticmethod
     def differentiate(X, W):
@@ -158,7 +157,7 @@ class MatrixMultiplication(Function):
         return self.children[0].value @ self.children[1].value
 
     def backward(self):
-        return MatrixMultiplication.differentiate(*self.children)
+        return MatrixMul.differentiate(*self.children)
 
 
 # ===================================================================================================
