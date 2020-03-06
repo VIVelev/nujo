@@ -3,11 +3,15 @@ import pytest
 from nujo.autodiff.node import Node
 
 
-def test_node(get_nodes):
+def test_node_equality(get_nodes):
     A, B = get_nodes
 
     assert A == A
     assert A != B
+
+
+def test_node_children(get_nodes):
+    A, B = get_nodes
 
     A.add_child(1)
     A.add_child(2)
