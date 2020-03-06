@@ -1,9 +1,5 @@
-from numpy import array
-
 from nujo.autodiff.function import Function
-from nujo.autodiff.misc import (generate_tensor_name,
-                                matrix_dotprod_differentiation)
-from nujo.autodiff.tensor import Tensor
+from nujo.autodiff.misc import matrix_dotprod_differentiation
 
 __all__ = [
     'Addition',
@@ -22,12 +18,10 @@ class Addition(Function):
         super(Addition, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
-        return Tensor(self.children[0].value + self.children[1].value,
-                      children=[self],
-                      name=generate_tensor_name(self.id, self.name))
+        return self.children[0].value + self.children[1].value
 
     def backward(self):
-        return array(1), array(1)
+        return 1, 1
 
 
 # ===================================================================================================
@@ -38,12 +32,10 @@ class Negation(Function):
         super(Negation, self).__init__(input, name=name)
 
     def forward(self):
-        return Tensor(-self.children[0].value,
-                      children=[self],
-                      name=generate_tensor_name(self.id, self.name))
+        return -self.children[0].value
 
     def backward(self):
-        return (array(-1), )
+        return -1,
 
 
 # ===================================================================================================
@@ -54,12 +46,10 @@ class Multiplication(Function):
         super(Multiplication, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
-        return Tensor(self.children[0].value * self.children[1].value,
-                      children=[self],
-                      name=generate_tensor_name(self.id, self.name))
+        return self.children[0].value * self.children[1].value
 
     def backward(self):
-        return (self.children[1].value, self.children[0].value)
+        return self.children[1].value, self.children[0].value
 
 
 # ===================================================================================================
@@ -70,12 +60,10 @@ class Reciprocal(Function):
         super(Reciprocal, self).__init__(input, name=name)
 
     def forward(self):
-        return Tensor(1 / (self.children[0].value + Reciprocal.epsilon),
-                      children=[self],
-                      name=generate_tensor_name(self.id, self.name))
+        return 1 / (self.children[0].value + Reciprocal.epsilon)
 
     def backward(self):
-        return (-1 / ((self.children[0].value + Reciprocal.epsilon)**2), )
+        return -1 / ((self.children[0].value + Reciprocal.epsilon)**2),
 
 
 # ===================================================================================================
@@ -86,14 +74,13 @@ class Power(Function):
         super(Power, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
-        return Tensor(self.children[0].value**self.children[1].value,
-                      children=[self],
-                      name=generate_tensor_name(self.id, self.name))
+        return self.children[0].value**self.children[1].value
 
     def backward(self):
-        return ((self.children[1].value *
-                 self.children[0].value**(self.children[1].value - 1)),
-                array(1))  # TODO: FIX (wrong partial)
+        # TODO: FIX wrong partial - the second
+
+        return (self.children[1].value *
+                self.children[0].value**(self.children[1].value - 1), 1)
 
 
 # ===================================================================================================
@@ -105,10 +92,7 @@ class MatrixMultiplication(Function):
 
     def forward(self):
         assert self.children[0].shape[1] == self.children[1].shape[0]
-
-        return Tensor(self.children[0].value @ self.children[1].value,
-                      children=[self],
-                      name=generate_tensor_name(self.id, self.name))
+        return self.children[0].value @ self.children[1].value
 
     def backward(self):
         dinput0, dinput1 = matrix_dotprod_differentiation(

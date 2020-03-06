@@ -1,7 +1,10 @@
 from abc import abstractmethod
+from numpy import array
 
+from nujo.autodiff.misc import generate_tensor_name
 from nujo.autodiff.modes import DIFF_ENABLED
 from nujo.autodiff.node import Node
+from nujo.autodiff.tensor import Tensor
 
 
 class Function(Node):
@@ -32,10 +35,12 @@ class Function(Node):
         pass
 
     def __call__(self):
-        z = self.forward()
+        z = Tensor(self.forward(),
+                   children=[self],
+                   name=generate_tensor_name(self.id, self.name))
 
         if DIFF_ENABLED:
             for tensor, derivative in zip(self.children, self.backward()):
-                tensor.add_grad_dependency(z, derivative)
+                tensor.add_grad_dependency(z, array(derivative))
 
         return z
