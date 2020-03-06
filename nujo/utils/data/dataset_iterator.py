@@ -1,4 +1,3 @@
-
 class DatasetIterator:
     ''' Dataset Iterator
 
@@ -7,7 +6,6 @@ class DatasetIterator:
     dataset : ....
 
     '''
-
     def __init__(self, dataset):
         self._data = dataset
         self._index = 0
@@ -16,6 +14,6 @@ class DatasetIterator:
         if self._index >= len(self._data.X):
             raise StopIteration
 
-        result = (self._data.X[self._index], self._data.Y[self._index])
+        result = (self._data.X[self._index], self._data.y[self._index])
         self._index += 1
         return result

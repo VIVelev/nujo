@@ -1,3 +1,5 @@
+from os import mkdir
+from os.path import exists, expanduser
 import requests
 
 
@@ -9,5 +11,15 @@ class DataLoader:
 
     def download(self):
         r = requests.get(self._link)
-        file = '~/.nujo/' + self._name + '.data'
+        file = expanduser('~/.nujo/') + self._name + '.data'
+        nujo = expanduser('~/.nujo')
+        if not exists(nujo):
+            mkdir(nujo)
+            print("Directory '~/.nujo' Created ")
+        else:
+            print("Directory '~/.nujo' already exists")
+        print('File {} has been created.'.format(self.name))
         open(file, 'wb').write(r.content)
+
+
+data = DataLoader('iris').download()
