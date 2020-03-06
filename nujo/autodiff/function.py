@@ -24,7 +24,7 @@ class Function(Node):
 
     '''
     def __init__(self, *children, name='<Function>'):
-        super(Function, self).__init__(*children, name)
+        super(Function, self).__init__(*children, name=name)
 
     def _generate_tensor_name(self):
         return f'Z:{self.id}{self.name}'
