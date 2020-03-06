@@ -120,8 +120,38 @@ class Tensor(Node):
             for child in self.creator.children:
                 child.backward()
 
+    # Useful methods
+
+    def all(self):
+        return self.value.all()
+
+    def any(self):
+        return self.value.any()
+
     def __getitem__(self, position):
         return self.value[position]
+
+    # Comparison operations
+
+    def __lt__(self, other):
+        return self.value < other.value
+
+    def __le__(self, other):
+        return self.value <= other.value
+
+    def __eq__(self, other):
+        return self.value == other.value
+
+    def __ne__(self, other):
+        return self.value != other.value
+
+    def __gt__(self, other):
+        return self.value > other.value
+
+    def __ge__(self, other):
+        return self.value >= other.value
+
+    # Arithmetic operations
 
     def __add__(self, other):
         from nujo.autodiff.functions import Addition
@@ -159,6 +189,8 @@ class Tensor(Node):
         from nujo.autodiff.functions import Power
         return Power(self, other)()
 
+    # More complex arithmetic operations
+
     def __matmul__(self, other):
         from nujo.autodiff.functions import MatrixMul
         return MatrixMul(self, other)()
@@ -166,6 +198,8 @@ class Tensor(Node):
     def __rmatmul__(self, other):
         from nujo.autodiff.functions import MatrixMul
         return MatrixMul(other, self)()
+
+    # Representation
 
     def __repr__(self):
         return self.name
