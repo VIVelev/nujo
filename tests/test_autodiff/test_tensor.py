@@ -43,7 +43,7 @@ def test_tensor_backward(get_tensors):
 def test_tensor_transpose(get_tensors):
     A, _, _ = get_tensors
 
-    assert A.T.value.all() == A.value.T.all()
+    assert (A.T.value == A.value.T).all()
 
 
 def test_tensor_shape(get_tensors):

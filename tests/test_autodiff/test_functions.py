@@ -16,7 +16,7 @@ def test_addition(get_tensors):
     # Test Forwardprop
     C = add.forward()
     assert isinstance(C, Tensor)
-    assert (A.value + B.value).all() == C.value.all()
+    assert (A.value + B.value == C.value).all()
 
     # Test Backprop
     grad = add.backward()
@@ -41,7 +41,7 @@ def test_negation(get_tensors):
     # Test Forwardprop
     C = neg.forward()
     assert isinstance(C, Tensor)
-    assert (-A.value).all() == C.value.all()
+    assert (-A.value == C.value).all()
 
     # Test Backprop
     grad = neg.backward()
@@ -64,7 +64,7 @@ def test_multiplication(get_tensors):
     # Test Forwardprop
     C = mul.forward()
     assert isinstance(C, Tensor)
-    assert (A.value * B.value).all() == C.value.all()
+    assert (A.value * B.value == C.value).all()
 
     # Test Backprop
     grad = mul.backward()
@@ -74,8 +74,8 @@ def test_multiplication(get_tensors):
     assert isinstance(grad[1], ndarray)
 
     # Test Derivative computation
-    assert grad[0].all() == B.value.all()
-    assert grad[1].all() == A.value.all()
+    assert (grad[0] == B.value).all()
+    assert (grad[1] == A.value).all()
 
 
 # ===================================================================================================
@@ -89,7 +89,7 @@ def test_reciprocal(get_tensors):
     # Test Forwardprop
     C = recipr.forward()
     assert isinstance(C, Tensor)
-    assert (1 / A.value).all() == C.value.all()
+    assert (1 / A.value == C.value).all()
 
     # Test Backprop
     grad = recipr.backward()
@@ -98,7 +98,7 @@ def test_reciprocal(get_tensors):
     assert isinstance(grad[0], ndarray)
 
     # Test Derivative computation
-    assert grad[0].all() == (-1 / (A.value**2)).all()
+    assert (grad[0] == -1 / (A.value**2)).all()
 
 
 # ===================================================================================================
@@ -112,7 +112,7 @@ def test_power(get_tensors):
     # Test Forwardprop
     C = pow.forward()
     assert isinstance(C, Tensor)
-    assert (A.value**2).all() == C.value.all()
+    assert (A.value**2 == C.value).all()
 
     # Test Backprop
     grad = pow.backward()
@@ -122,7 +122,7 @@ def test_power(get_tensors):
     assert isinstance(grad[1], ndarray)
 
     # Test Derivative computation
-    assert grad[0].all() == (2 * A.value).all()
+    assert (grad[0] == 2 * A.value).all()
     assert grad[1] == 1
 
 
@@ -137,7 +137,7 @@ def test_matrixmultiplication(get_tensors):
     # Test Forwardprop
     C = matmul.forward()
     assert isinstance(C, Tensor)
-    assert (A.value @ B.value).all() == C.value.all()
+    assert (A.value @ B.value == C.value).all()
 
     # Test Backprop
     grad = matmul.backward()
@@ -148,8 +148,8 @@ def test_matrixmultiplication(get_tensors):
 
     # Test Derivative computation
     dA, dB = matrix_dotprod_differentiation(A.value, B.value)
-    assert grad[0].all() == dA.all()
-    assert grad[1].all() == dB.all()
+    assert (grad[0] == dA).all()
+    assert (grad[1] == dB).all()
 
 
 # ===================================================================================================
