@@ -5,6 +5,9 @@ import nujo.autodiff.functions as funcs
 from nujo import Tensor
 from nujo.autodiff.misc import matrix_dotprod_differentiation
 
+# ===================================================================================================
+# Unit Testing Addition
+
 
 def test_addition(get_tensors):
     A, B = get_tensors
@@ -27,6 +30,10 @@ def test_addition(get_tensors):
     assert grad[1] == 1
 
 
+# ===================================================================================================
+# Unit Testing Negation
+
+
 def test_negation(get_tensors):
     A, _ = get_tensors
     neg = funcs.Negation(A)
@@ -44,6 +51,10 @@ def test_negation(get_tensors):
 
     # Test Derivative computation
     assert grad[0] == -1
+
+
+# ===================================================================================================
+# Unit Testing Multiplication
 
 
 def test_multiplication(get_tensors):
@@ -67,6 +78,10 @@ def test_multiplication(get_tensors):
     assert grad[1].all() == A.value.all()
 
 
+# ===================================================================================================
+# Unit Testing Reciprocal
+
+
 def test_reciprocal(get_tensors):
     A, _ = get_tensors
     recipr = funcs.Reciprocal(A)
@@ -84,6 +99,10 @@ def test_reciprocal(get_tensors):
 
     # Test Derivative computation
     assert grad[0].all() == (-1 / (A.value**2)).all()
+
+
+# ===================================================================================================
+# Unit Testing Power
 
 
 def test_power(get_tensors):
@@ -105,6 +124,10 @@ def test_power(get_tensors):
     # Test Derivative computation
     assert grad[0].all() == (2 * A.value).all()
     assert grad[1] == 1
+
+
+# ===================================================================================================
+# Unit Testing MatrixMultiplication
 
 
 def test_matrixmultiplication(get_tensors):
@@ -129,9 +152,16 @@ def test_matrixmultiplication(get_tensors):
     assert grad[1].all() == dB.all()
 
 
+# ===================================================================================================
+# Unit Test fixtures
+
+
 @pytest.fixture
 def get_tensors():
     A = Tensor([[1, 2], [3, 4]])
     B = Tensor([[5, 6], [7, 8]])
 
     return A, B
+
+
+# ===================================================================================================
