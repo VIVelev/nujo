@@ -4,7 +4,7 @@
     http://ruder.io/optimizing-gradient-descent/index.html
 '''
 
-import numpy as np
+from numpy import sqrt, square, zeros_like
 
 from nujo.autodiff import no_diff
 from nujo.optim.base import Optimizer
@@ -52,7 +52,7 @@ class Momentum(Optimizer):
                     # Get the corresponding velocity
                     key = f'Layer[{l}]-Param[{i}]'
                     if key not in self._velocity:
-                        self._velocity[key] = np.zeros_like(self.params[l][i])
+                        self._velocity[key] = zeros_like(self.params[l][i])
 
                     # Exponentially Weighted Moving Average
                     self._velocity[key] = self.beta * self._velocity[key] +\
@@ -82,14 +82,14 @@ class RMSprop(Optimizer):
                     # Get the corresponding squared gradient
                     key = f'Layer[{l}]-Param[{i}]'
                     if key not in self._squared:
-                        self._squared[key] = np.zeros_like(self.params[l][i])
+                        self._squared[key] = zeros_like(self.params[l][i])
 
                     # Exponentially Weighted Moving Average
                     self._squared[key] = self.beta * self._squared[key] +\
-                        (1 - self.beta) * np.square(self.params[l][i].grad)
+                        (1 - self.beta) * square(self.params[l][i].grad)
                     # Update
                     self.params[l][i] -= self.lr * self.params[l][i].grad /\
-                        (np.sqrt(self._squared[key]) + self.eps)
+                        (sqrt(self._squared[key]) + self.eps)
 
 
 # ====================================================================================================
@@ -116,15 +116,15 @@ class Adam(Optimizer):
                     # Get the corresponding velocity and squared gradient
                     key = f'Layer[{l}]-Param[{i}]'
                     if key not in self._velocity:
-                        self._velocity[key] = np.zeros_like(self.params[l][i])
-                        self._squared[key] = np.zeros_like(self.params[l][i])
+                        self._velocity[key] = zeros_like(self.params[l][i])
+                        self._squared[key] = zeros_like(self.params[l][i])
 
                     # Exponentially Weighted Moving Average
                     self._velocity[key] = self.betas[0] * self._velocity[key] +\
                         (1 - self.betas[0]) * self.params[l][i].grad
 
                     self._squared[key] = self.betas[1] * self._squared[key] +\
-                        (1 - self.betas[1]) * np.square(self.params[l][i].grad)
+                        (1 - self.betas[1]) * square(self.params[l][i].grad)
 
                     # Bias correction
                     v_corrected = self._velocity[key] /\
@@ -135,7 +135,7 @@ class Adam(Optimizer):
 
                     # Update
                     self.params[l][i] -= self.lr * v_corrected /\
-                        (np.sqrt(s_corrected) + self.eps)
+                        (sqrt(s_corrected) + self.eps)
 
 
 # ====================================================================================================
