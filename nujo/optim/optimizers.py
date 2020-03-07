@@ -120,7 +120,7 @@ class Adam(Optimizer):
                         self._squared[key] = zeros_like(self.params[l][i])
 
                     # Exponentially Weighted Moving Average
-                    self._velocity[key] = self.betas[0] * self._velocity[key] +\
+                    self._velocity[key] = self.betas[0]*self._velocity[key] +\
                         (1 - self.betas[0]) * self.params[l][i].grad
 
                     self._squared[key] = self.betas[1] * self._squared[key] +\
