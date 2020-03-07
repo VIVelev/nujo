@@ -1,6 +1,6 @@
-''' SGD Optimizers
+''' Stochastic Gradient Descent (SGD) Optimizers
 
-    Check out the following link for more info about the optimizers: 
+    Check out the following link for more info about the optimizers:
     http://ruder.io/optimizing-gradient-descent/index.html
 '''
 
@@ -17,7 +17,6 @@ __all__ = [
 ]
 
 # ====================================================================================================
-# ====================================================================================================
 
 
 class GradientDescent(Optimizer):
@@ -27,8 +26,9 @@ class GradientDescent(Optimizer):
     def step(self):
         with no_diff():
             for l in range(len(self.params)):  # Iterate over layers
-                for i in range(len(
-                        self.params[l])):  # Iterate over params in layer `l`
+
+                # Iterate over params in layer `l`
+                for i in range(len(self.params[l])):
                     self.params[l][i] -= self.lr * self.params[l][i].grad
 
 
@@ -45,8 +45,9 @@ class Momentum(Optimizer):
     def step(self):
         with no_diff():
             for l in range(len(self.params)):  # Iterate over layers
-                for i in range(len(
-                        self.params[l])):  # Iterate over params in layer `l`
+
+                # Iterate over params in layer `l`
+                for i in range(len(self.params[l])):
 
                     # Get the corresponding velocity
                     key = f'Layer[{l}]-Param[{i}]'
@@ -54,8 +55,8 @@ class Momentum(Optimizer):
                         self._velocity[key] = np.zeros_like(self.params[l][i])
 
                     # Exponentially Weighted Moving Average
-                    self._velocity[key] = self.beta * self._velocity[key] \
-                                            + (1 - self.beta) * self.params[l][i].grad
+                    self._velocity[key] = self.beta * self._velocity[key] +\
+                        (1 - self.beta) * self.params[l][i].grad
                     # Update
                     self.params[l][i] -= self.lr * self._velocity[key]
 
@@ -74,8 +75,9 @@ class RMSprop(Optimizer):
     def step(self):
         with no_diff():
             for l in range(len(self.params)):  # Iterate over layers
-                for i in range(len(
-                        self.params[l])):  # Iterate over params in layer `l`
+
+                # Iterate over params in layer `l`
+                for i in range(len(self.params[l])):
 
                     # Get the corresponding squared gradient
                     key = f'Layer[{l}]-Param[{i}]'
@@ -83,11 +85,11 @@ class RMSprop(Optimizer):
                         self._squared[key] = np.zeros_like(self.params[l][i])
 
                     # Exponentially Weighted Moving Average
-                    self._squared[key] = self.beta * self._squared[key] \
-                                            + (1 - self.beta) * np.square(self.params[l][i].grad)
+                    self._squared[key] = self.beta * self._squared[key] +\
+                        (1 - self.beta) * np.square(self.params[l][i].grad)
                     # Update
-                    self.params[l][i] -= self.lr * self.params[l][i].grad \
-                                            / (np.sqrt(self._squared[key]) + self.eps)
+                    self.params[l][i] -= self.lr * self.params[l][i].grad /\
+                        (np.sqrt(self._squared[key]) + self.eps)
 
 
 # ====================================================================================================
@@ -107,8 +109,9 @@ class Adam(Optimizer):
     def step(self):
         with no_diff():
             for l in range(len(self.params)):  # Iterate over layers
-                for i in range(len(
-                        self.params[l])):  # Iterate over params in layer `l`
+
+                # Iterate over params in layer `l`
+                for i in range(len(self.params[l])):
 
                     # Get the corresponding velocity and squared gradient
                     key = f'Layer[{l}]-Param[{i}]'
@@ -117,22 +120,22 @@ class Adam(Optimizer):
                         self._squared[key] = np.zeros_like(self.params[l][i])
 
                     # Exponentially Weighted Moving Average
-                    self._velocity[key] = self.betas[0] * self._velocity[key] \
-                                            + (1 - self.betas[0]) * self.params[l][i].grad
+                    self._velocity[key] = self.betas[0] * self._velocity[key] +\
+                        (1 - self.betas[0]) * self.params[l][i].grad
 
-                    self._squared[key] = self.betas[1] * self._squared[key] \
-                                            + (1 - self.betas[1]) * np.square(self.params[l][i].grad)
+                    self._squared[key] = self.betas[1] * self._squared[key] +\
+                        (1 - self.betas[1]) * np.square(self.params[l][i].grad)
 
                     # Bias correction
-                    v_corrected = self._velocity[key] / (
-                        1 - self.betas[0]**self._t)
-                    s_corrected = self._squared[key] / (1 -
-                                                        self.betas[1]**self._t)
+                    v_corrected = self._velocity[key] /\
+                        (1 - self.betas[0]**self._t)
+                    s_corrected = self._squared[key] /\
+                        (1 - self.betas[1]**self._t)
                     self._t += 1
 
                     # Update
-                    self.params[l][i] -= self.lr * v_corrected \
-                                            / (np.sqrt(s_corrected) + self.eps)
+                    self.params[l][i] -= self.lr * v_corrected /\
+                        (np.sqrt(s_corrected) + self.eps)
 
 
 # ====================================================================================================
