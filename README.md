@@ -1,5 +1,7 @@
 # Neural Dojo: A Reverse-mode Automatic Differentiation library for Neural Networks
 
+![lint_and_test_workflow](https://github.com/VIVelev/nujo/workflows/Lint%20and%20Test/badge.svg)
+
 ### Prerequisites
 
 -   [Python](https://www.python.org/) - The Programming Language used
