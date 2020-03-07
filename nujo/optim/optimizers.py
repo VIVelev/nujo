@@ -10,7 +10,7 @@ from nujo.autodiff import no_diff
 from nujo.optim.base import Optimizer
 
 __all__ = [
-    'GradientDescent',
+    'SGD',
     'Momentum',
     'RMSprop',
     'Adam',
@@ -19,9 +19,9 @@ __all__ = [
 # ====================================================================================================
 
 
-class GradientDescent(Optimizer):
+class SGD(Optimizer):
     def __init__(self, params, lr=0.001):
-        super(GradientDescent, self).__init__(params, lr)
+        super(SGD, self).__init__(params, lr)
 
     def step(self):
         with no_diff():
