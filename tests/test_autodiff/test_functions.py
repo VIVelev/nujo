@@ -127,10 +127,10 @@ def test_power(get_tensors):
 
 
 # ===================================================================================================
-# Unit Testing MatrixMultiplication
+# Unit Testing Matrix Multiplication
 
 
-def test_MatrixMul(get_tensors):
+def test_matrixmul(get_tensors):
     A, B = get_tensors
     matmul = funcs.MatrixMul(A, B)
     C = matmul()
