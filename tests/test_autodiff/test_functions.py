@@ -49,9 +49,9 @@ def test_power(get_tensors):
     assert len(pow.backward()) == 2
 
 
-def test_matrixmultiplication(get_tensors):
+def test_MatrixMul(get_tensors):
     A, B = get_tensors
-    matmul = funcs.MatrixMultiplication(A, B)
+    matmul = funcs.MatrixMul(A, B)
     C = matmul()
 
     assert (A.value @ B.value).all() == C.value.all()
