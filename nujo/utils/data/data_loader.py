@@ -18,7 +18,7 @@ class DataLoader:
 
     def __init__(self, name):
         self._name = name
-        self._line = _UCI_REPO_URL.format(self._name)
+        self._line = self._UCI_REPO_URL.format(self._name)
 
     def download(self):
         r = requests.get(self._link)
