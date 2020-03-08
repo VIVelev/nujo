@@ -6,7 +6,7 @@ import nujo.optim as optim
 
 # Define the net and optimizer
 net = nn.Linear(3, 6) >> nn.Linear(6, 2) >> nn.Linear(2, 1)
-optimizer = optim.Momentum(net.parameters, lr=0.005)
+optimizer = optim.Adam(net.parameters, lr=0.1)
 
 
 # Training loop

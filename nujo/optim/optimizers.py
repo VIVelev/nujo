@@ -17,8 +17,7 @@ __all__ = [
 
 # ====================================================================================================
 
-# TODO: rename _single_step to update_rule
-# use type hints ???
+# TODO: use type hints ???
 
 
 class SGD(Optimizer):
@@ -41,7 +40,7 @@ class Momentum(Optimizer):
 
     def update_rule(self, param, grad):
         # Get the corresponding velocity
-        key = param.id
+        key = param.name
         if key not in self._velocity:
             self._velocity[key] = zeros_like(param)
 
@@ -66,7 +65,7 @@ class RMSprop(Optimizer):
 
     def update_rule(self, param, grad):
         # Get the corresponding squared gradient
-        key = param.id
+        key = param.name
         if key not in self._squared:
             self._squared[key] = zeros_like(param)
 
@@ -94,7 +93,7 @@ class Adam(Optimizer):
 
     def update_rule(self, param, grad):
         # Get the corresponding velocity and squared gradient
-        key = param.id
+        key = param.name
         if key not in self._velocity:
             self._velocity[key] = zeros_like(param)
             self._squared[key] = zeros_like(param)
