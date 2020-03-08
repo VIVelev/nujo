@@ -1,14 +1,14 @@
-from nujo.autodiff.misc import counter
+from nujo.autodiff.utils import counter
 
 
 class Node:
-    ''' A Node in the computation graph.
+    ''' A Node in the computation graph
 
-    Can be either a function or a tensor.
+    Can be either a Function or a Tensor.
 
     Parameters:
     -----------
-    children : the children of the node.
+    children : varargs, the children of the node.
     name : string, representation of the node.
 
     '''
@@ -16,7 +16,7 @@ class Node:
     epsilon = 1e-18
     id_generator = counter()
 
-    def __init__(self, children, name='<Node>'):
+    def __init__(self, *children, name='<Node>'):
         self.children = []
         for child in children:
             self.add_child(child)
@@ -25,7 +25,7 @@ class Node:
         self.id = Node.id_generator.get()
 
     def __eq__(self, other):
-        return self.name == other.name and self.id == other.id
+        return self.id == other.id
 
     def add_child(self, child):
         from nujo.autodiff.tensor import Tensor

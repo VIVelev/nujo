@@ -3,6 +3,11 @@ __all__ = [
     'no_diff',
 ]
 
+# This variable controls whether nujo to compute gradients
+# for the tensors in the computation graph:
+#     - True = differentiation enabled, compute gradients
+#       for the diff enabled (diff=True) tensors.
+#     - False = differentiation disabled, do NOT compute gradients.
 DIFF_ENABLED = True
 
 
@@ -10,6 +15,7 @@ class no_diff():
     ''' No Differentiation block
 
     Creates a block of code where no differentiation is done.
+    a.k.a. No gradients are computed for whatever tensor.
 
     '''
     def __enter__(self):
