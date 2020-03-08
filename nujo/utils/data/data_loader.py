@@ -5,6 +5,14 @@ import requests
 
 
 class DataLoader:
+    '''
+
+
+
+    Parameters:
+    -----------
+    name : will be downloaded from the UCI ML repo
+    '''
     _UCI_REPO_URL = 'https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}.data'
     _HOME_DIR = expanduser('~/.nujo')
 

@@ -8,15 +8,15 @@ from nujo.utils.data.dataset_iterator import DatasetIterator
 class Dataset:
     '''
 
-
-
     Parameters:
     -----------
-     :
+    name : will be downloaded from the UCI ML repo
 
     Returns:
     --------
-     :
+    tuple : stores the csv dataset,
+    - np array with floating point integers
+    - np array with labels
     '''
     def __init__(self, name):
         file = expanduser('~/.nujo/') + name
