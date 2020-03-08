@@ -1,25 +1,28 @@
 from os import mkdir
 from os.path import exists, expanduser
+
 import requests
 
 
 class DataLoader:
+    _UCI_REPO_URL = 'https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}.data'
+    _HOME_DIR = expanduser('~/.nujo')
+
     def __init__(self, name):
         self._name = name
-        self._link = 'https://archive.ics.uci.edu/ml/machine-learning-databases/{0}/{0}.data'.format(
-            name)
+        self._line = _UCI_REPO_URL.format(self._name)
 
     def download(self):
         r = requests.get(self._link)
-        file = expanduser('~/.nujo/') + self._name + '.data'
-        nujo = expanduser('~/.nujo')
-        if not exists(nujo):
-            mkdir(nujo)
-            print("Directory '~/.nujo' Created ")
+        file = self._HOME_DIR + self._name + '.data'
+        if not exists(self._HOME_DIR):
+            mkdir(self._HOME_DIR)
+            print('Directory "~/.nujo" Created ')
         else:
-            print("Directory '~/.nujo' already exists")
-        print('File {} has been created.'.format(self.name))
-        open(file, 'wb').write(r.content)
+            print('Directory "~/.nujo" already exists')
+        print(f'File {self._name} has been created.')
+        with open(file) as f:
+            f.write(r.content)
 
 
-data = DataLoader('iris').download()
+DataLoader('iris').download()

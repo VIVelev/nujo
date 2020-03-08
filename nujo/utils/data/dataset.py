@@ -1,9 +1,23 @@
-from numpy import array, empty, float32, vstack
-from nujo.utils.data.dataset_iterator import DatasetIterator
 from os.path import expanduser
+
+from numpy import array, empty, float32, vstack
+
+from nujo.utils.data.dataset_iterator import DatasetIterator
 
 
 class Dataset:
+    '''
+
+
+
+    Parameters:
+    -----------
+     :
+
+    Returns:
+    --------
+     :
+    '''
     def __init__(self, name):
         file = expanduser('~/.nujo/') + name
         if '.data' not in name:
