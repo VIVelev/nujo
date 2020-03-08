@@ -30,12 +30,12 @@ def test_tensor_backward(get_tensors):
     assert C.grad == 1
 
     assert len(A._grad_dependencies) == 1
-    assert A._grad_dependencies[0][0] == C
+    assert (A._grad_dependencies[0][0] == C).all()
     assert A._grad_dependencies[0][1] == 1
     assert A.grad == 1
 
     assert len(B._grad_dependencies) == 1
-    assert B._grad_dependencies[0][0] == C
+    assert (B._grad_dependencies[0][0] == C).all()
     assert B._grad_dependencies[0][1] == 1
     assert B.grad == 1
 

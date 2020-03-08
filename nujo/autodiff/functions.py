@@ -87,7 +87,6 @@ class Power(Function):
 # ===================================================================================================
 
 
-# TODO: rename misc to utils
 class MatrixMul(Function):
     def __init__(self, input_a, input_b, name='<MatMul>'):
         super(MatrixMul, self).__init__(input_a, input_b, name=name)
