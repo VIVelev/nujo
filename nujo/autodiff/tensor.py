@@ -179,11 +179,11 @@ class Tensor(Node):
 
     def __truediv__(self, other):
         from nujo.autodiff.functions import Reciprocal
-        return self.__mul__(Reciprocal(other))
+        return self.__mul__(Reciprocal(other)())
 
     def __rtruediv__(self, other):
         from nujo.autodiff.functions import Reciprocal
-        return Reciprocal(self).__mul__(other)
+        return Reciprocal(self)().__mul__(other)
 
     def __pow__(self, other):
         from nujo.autodiff.functions import Power
