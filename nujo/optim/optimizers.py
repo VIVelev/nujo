@@ -4,8 +4,11 @@
     http://ruder.io/optimizing-gradient-descent/index.html
 '''
 
-from numpy import sqrt, square, zeros_like
+from typing import List
 
+from numpy import ndarray, sqrt, square, zeros_like
+
+from nujo.autodiff import Tensor
 from nujo.optim.optimizer import Optimizer
 
 __all__ = [
@@ -19,10 +22,10 @@ __all__ = [
 
 
 class SGD(Optimizer):
-    def __init__(self, params, lr=0.001):
+    def __init__(self, params: List[List[Tensor]], lr=0.001) -> None:
         super(SGD, self).__init__(params, lr)
 
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: ndarray) -> Tensor:
         return param - self.lr * grad
 
 
@@ -30,13 +33,13 @@ class SGD(Optimizer):
 
 
 class Momentum(Optimizer):
-    def __init__(self, params, lr=0.001, beta=0.9):
+    def __init__(self, params: List[List[Tensor]], lr=0.001, beta=0.9) -> None:
         super(Momentum, self).__init__(params, lr)
 
         self.beta = beta
         self._velocity = {}
 
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: ndarray) -> Tensor:
         # Get the corresponding velocity
         key = param.name
         if key not in self._velocity:
@@ -54,14 +57,19 @@ class Momentum(Optimizer):
 
 
 class RMSprop(Optimizer):
-    def __init__(self, params, lr=0.001, beta=0.999, eps=1e-08):
+    def __init__(self,
+                 params: List[List[Tensor]],
+                 lr=0.001,
+                 beta=0.999,
+                 eps=1e-08) -> None:
+
         super(RMSprop, self).__init__(params, lr)
 
         self.beta = beta
         self.eps = eps
         self._squared = {}
 
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: ndarray) -> Tensor:
         # Get the corresponding squared gradient
         key = param.name
         if key not in self._squared:
@@ -79,7 +87,12 @@ class RMSprop(Optimizer):
 
 
 class Adam(Optimizer):
-    def __init__(self, params, lr=0.001, betas=(0.9, 0.999), eps=1e-08):
+    def __init__(self,
+                 params: List[List[Tensor]],
+                 lr=0.001,
+                 betas=(0.9, 0.999),
+                 eps=1e-08) -> None:
+
         super(Adam, self).__init__(params, lr)
 
         self.betas = betas
@@ -89,7 +102,7 @@ class Adam(Optimizer):
         self._squared = {}
         self._t = 1
 
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: ndarray) -> Tensor:
         # Get the corresponding velocity and squared gradient
         key = param.name
         if key not in self._velocity:

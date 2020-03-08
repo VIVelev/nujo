@@ -1,6 +1,9 @@
 from abc import abstractmethod
+from typing import List
 
-from nujo.autodiff import no_diff
+from numpy import ndarray
+
+from nujo.autodiff import Tensor, no_diff
 
 
 class Optimizer:
@@ -14,15 +17,15 @@ class Optimizer:
     lr : float, the learning rate
 
     '''
-    def __init__(self, params, lr):
+    def __init__(self, params: List[List[Tensor]], lr: float) -> None:
         self.params = params
         self.lr = lr
 
     @abstractmethod
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: ndarray) -> Tensor:
         pass
 
-    def step(self):
+    def step(self) -> None:
         with no_diff():
             # Iterate over layers
             for l in range(len(self.params)):
@@ -33,7 +36,7 @@ class Optimizer:
                     self.params[l][i] = self.update_rule(
                         self.params[l][i], self.params[l][i].grad)
 
-    def zero_grad(self):
+    def zero_grad(self) -> None:
         # Iterate over layers
         for l in range(len(self.params)):
             # Iterate over params in layer `l`
