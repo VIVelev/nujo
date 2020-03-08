@@ -6,7 +6,7 @@
 
 from numpy import sqrt, square, zeros_like
 
-from nujo.optim.base import Optimizer
+from nujo.optim.optimizer import Optimizer
 
 __all__ = [
     'SGD',
@@ -25,8 +25,8 @@ class SGD(Optimizer):
     def __init__(self, params, lr=0.001):
         super(SGD, self).__init__(params, lr)
 
-    def _single_step(self, l, i):
-        self.params[l][i] -= self.lr * self.params[l][i].grad
+    def update_rule(self, param, grad):
+        return param - self.lr * grad
 
 
 # ====================================================================================================
@@ -39,18 +39,20 @@ class Momentum(Optimizer):
         self.beta = beta
         self._velocity = {}
 
-    def _single_step(self, l, i):
-
+    def update_rule(self, param, grad):
         # Get the corresponding velocity
-        key = f'Layer[{l}]-Param[{i}]'
+        key = param.id
+        print(f'{key} there')
         if key not in self._velocity:
-            self._velocity[key] = zeros_like(self.params[l][i])
+            print(f'{key} Here')
+            self._velocity[key] = zeros_like(param)
 
         # Exponentially Weighted Moving Average
         self._velocity[key] = self.beta * self._velocity[key] +\
-            (1 - self.beta) * self.params[l][i].grad
+            (1 - self.beta) * grad
+
         # Update
-        self.params[l][i] -= self.lr * self._velocity[key]
+        return param - self.lr * self._velocity[key]
 
 
 # ====================================================================================================
@@ -64,19 +66,18 @@ class RMSprop(Optimizer):
         self.eps = eps
         self._squared = {}
 
-    def _single_step(self, l, i):
-
+    def update_rule(self, param, grad):
         # Get the corresponding squared gradient
-        key = f'Layer[{l}]-Param[{i}]'
+        key = param.id
         if key not in self._squared:
-            self._squared[key] = zeros_like(self.params[l][i])
+            self._squared[key] = zeros_like(param)
 
         # Exponentially Weighted Moving Average
         self._squared[key] = self.beta * self._squared[key] +\
-            (1 - self.beta) * square(self.params[l][i].grad)
+            (1 - self.beta) * square(grad)
+
         # Update
-        self.params[l][i] -= self.lr * self.params[l][i].grad /\
-            (sqrt(self._squared[key]) + self.eps)
+        return param - self.lr * grad / (sqrt(self._squared[key]) + self.eps)
 
 
 # ====================================================================================================
@@ -93,20 +94,19 @@ class Adam(Optimizer):
         self._squared = {}
         self._t = 1
 
-    def _single_step(self, l, i):
-
+    def update_rule(self, param, grad):
         # Get the corresponding velocity and squared gradient
-        key = f'Layer[{l}]-Param[{i}]'
+        key = param.id
         if key not in self._velocity:
-            self._velocity[key] = zeros_like(self.params[l][i])
-            self._squared[key] = zeros_like(self.params[l][i])
+            self._velocity[key] = zeros_like(param)
+            self._squared[key] = zeros_like(param)
 
         # Exponentially Weighted Moving Average
         self._velocity[key] = self.betas[0]*self._velocity[key] +\
-            (1 - self.betas[0]) * self.params[l][i].grad
+            (1 - self.betas[0]) * grad
 
         self._squared[key] = self.betas[1] * self._squared[key] +\
-            (1 - self.betas[1]) * square(self.params[l][i].grad)
+            (1 - self.betas[1]) * square(grad)
 
         # Bias correction
         v_corrected = self._velocity[key] /\
@@ -116,8 +116,7 @@ class Adam(Optimizer):
         self._t += 1
 
         # Update
-        self.params[l][i] -= self.lr * v_corrected /\
-            (sqrt(s_corrected) + self.eps)
+        return param - self.lr * v_corrected / (sqrt(s_corrected) + self.eps)
 
 
 # ====================================================================================================

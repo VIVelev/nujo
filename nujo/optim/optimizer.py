@@ -19,7 +19,7 @@ class Optimizer:
         self.lr = lr
 
     @abstractmethod
-    def _single_step(self, l, i):
+    def update_rule(self, param, grad):
         pass
 
     def step(self):
@@ -28,7 +28,8 @@ class Optimizer:
 
                 # Iterate over params in layer `l`
                 for i in range(len(self.params[l])):
-                    self._single_step(l, i)
+                    self.params[l][i] = self.update_rule(
+                        self.params[l][i], self.params[l][i].grad)
 
     def zero_grad(self):
         for l in range(len(self.params)):  # Iterate over layers
