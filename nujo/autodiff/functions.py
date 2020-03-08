@@ -1,9 +1,6 @@
-from numpy import array
+from numpy import ones
 
 from nujo.autodiff.function import Function
-from nujo.autodiff.misc import (generate_tensor_name,
-                                matrix_dotprod_differentiation)
-from nujo.autodiff.tensor import Tensor
 
 __all__ = [
     'Addition',
@@ -11,7 +8,7 @@ __all__ = [
     'Multiplication',
     'Reciprocal',
     'Power',
-    'MatrixMultiplication',
+    'MatrixMul',
 ]
 
 # ===================================================================================================
@@ -22,12 +19,10 @@ class Addition(Function):
         super(Addition, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
-        return Tensor(self.children[0].value + self.children[1].value,
-                      children=[self],
-                      name=generate_tensor_name(self.id, self.name))
+        return self.children[0].value + self.children[1].value
 
     def backward(self):
-        return array(1), array(1)
+        return 1, 1
 
 
 # ===================================================================================================
@@ -38,12 +33,10 @@ class Negation(Function):
         super(Negation, self).__init__(input, name=name)
 
     def forward(self):
-        return Tensor(-self.children[0].value,
-                      children=[self],
-                      name=generate_tensor_name(self.id, self.name))
+        return -self.children[0].value
 
     def backward(self):
-        return (array(-1), )
+        return -1,
 
 
 # ===================================================================================================
@@ -54,12 +47,10 @@ class Multiplication(Function):
         super(Multiplication, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
-        return Tensor(self.children[0].value * self.children[1].value,
-                      children=[self],
-                      name=generate_tensor_name(self.id, self.name))
+        return self.children[0].value * self.children[1].value
 
     def backward(self):
-        return (self.children[1].value, self.children[0].value)
+        return self.children[1].value, self.children[0].value
 
 
 # ===================================================================================================
@@ -70,12 +61,10 @@ class Reciprocal(Function):
         super(Reciprocal, self).__init__(input, name=name)
 
     def forward(self):
-        return Tensor(1 / (self.children[0].value + Reciprocal.epsilon),
-                      children=[self],
-                      name=generate_tensor_name(self.id, self.name))
+        return 1 / (self.children[0].value + Reciprocal.epsilon)
 
     def backward(self):
-        return (-1 / ((self.children[0].value + Reciprocal.epsilon)**2), )
+        return -1 / ((self.children[0].value + Reciprocal.epsilon)**2),
 
 
 # ===================================================================================================
@@ -86,35 +75,89 @@ class Power(Function):
         super(Power, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
-        return Tensor(self.children[0].value**self.children[1].value,
-                      children=[self],
-                      name=generate_tensor_name(self.id, self.name))
+        return self.children[0].value**self.children[1].value
 
     def backward(self):
-        return ((self.children[1].value *
-                 self.children[0].value**(self.children[1].value - 1)),
-                array(1))  # TODO: FIX (wrong partial)
+        # TODO: FIX wrong partial - the second
+
+        return (self.children[1].value *
+                self.children[0].value**(self.children[1].value - 1), 1)
 
 
 # ===================================================================================================
 
 
-class MatrixMultiplication(Function):
+# TODO: rename misc to utils
+class MatrixMul(Function):
     def __init__(self, input_a, input_b, name='<MatMul>'):
-        super(MatrixMultiplication, self).__init__(input_a, input_b, name=name)
+        super(MatrixMul, self).__init__(input_a, input_b, name=name)
+
+    @staticmethod
+    def differentiate(X, W):
+        ''' Calculate Matrix partial derivatives
+
+        Given Z = XW, Calculate:
+            - dX = dZ/dX
+            - dW = dZ/dW
+
+        Parameters:
+        -----------
+        X : matrix, left hand multiplier
+        W : matrix, right hand multiplier
+
+        Returns:
+        --------
+        dX : partial derivative of Z w.r.t. X
+        dW : partial derivative of Z w.r.t. W
+
+        '''
+
+        # ------------------------------------------------------------
+        dX = ones((X.shape[0]**2, W.shape[1] * X.shape[1]))
+
+        i, j = 0, 0  # indecies of Z
+        k, m = 0, 0  # indecies of X
+        # p, q : indecies of dX
+
+        for p in range(dX.shape[0]):
+            for q in range(dX.shape[1]):
+                if k == i:
+                    dX[p, q] = W[m, j]
+
+                j = q % W.shape[1]
+                m = q % X.shape[1]
+
+            i = q % X.shape[0]
+            k = p % X.shape[0]
+
+        # ------------------------------------------------------------
+        dW = ones((X.shape[0] * W.shape[0], W.shape[1]**2))
+
+        i, j = 0, 0  # indecies of Z
+        k, m = 0, 0  # indecies of W
+        # p, q : indecies of dW
+
+        for p in range(dW.shape[0]):
+            for q in range(dW.shape[1]):
+                if m == j:
+                    dW[p, q] = X[i, k]
+
+                j = q % W.shape[1]
+                m = q % W.shape[1]
+
+            i = q % X.shape[0]
+            k = p % W.shape[0]
+
+        ##############################################################
+
+        return dX, dW
 
     def forward(self):
         assert self.children[0].shape[1] == self.children[1].shape[0]
-
-        return Tensor(self.children[0].value @ self.children[1].value,
-                      children=[self],
-                      name=generate_tensor_name(self.id, self.name))
+        return self.children[0].value @ self.children[1].value
 
     def backward(self):
-        dinput0, dinput1 = matrix_dotprod_differentiation(
-            self.children[0].value, self.children[1].value)
-
-        return dinput0, dinput1
+        return MatrixMul.differentiate(*self.children)
 
 
 # ===================================================================================================

@@ -130,9 +130,9 @@ def test_power(get_tensors):
 # Unit Testing MatrixMultiplication
 
 
-def test_matrixmultiplication(get_tensors):
+def test_MatrixMul(get_tensors):
     A, B = get_tensors
-    matmul = funcs.MatrixMultiplication(A, B)
+    matmul = funcs.MatrixMul(A, B)
 
     # Test Forwardprop
     C = matmul.forward()

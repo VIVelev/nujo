@@ -5,15 +5,20 @@ from nujo.autodiff.node import Node
 
 
 class Tensor(Node):
-    ''' Tensor - multi-dimensional array
+    ''' Tensor - a multi-dimensional array
 
-    Tensors are the basic blocks of computation in Nujo.
+    Tensors are the main units of data and computation in Nujo.
+    They "flow" in the computation graph. :)
+
+    Tensors can be either constants or trainable weights,
+    depending on whether gradients are computed for the given tensor.
 
     Parameters:
     -----------
     value : value, numerical value of the tensor
-    diff : boolean, whether to compute gradients for the current tensor
-    children : list, the tensors form which this tensor is produced
+    diff : boolean, whether to compute gradients for the tensor
+    children : list, the nodes form which this tensor is produced,
+    usually it's a single node - the creator function
     name : string, representation of the tensor
 
     '''
@@ -115,6 +120,39 @@ class Tensor(Node):
             for child in self.creator.children:
                 child.backward()
 
+    # Useful methods
+
+    def all(self):
+        return self.value.all()
+
+    def any(self):
+        return self.value.any()
+
+    def __getitem__(self, position):
+        return self.value[position]
+
+    # Comparison operations
+
+    def __lt__(self, other):
+        return self.value < getattr(other, 'value', other)
+
+    def __le__(self, other):
+        return self.value <= getattr(other, 'value', other)
+
+    def __eq__(self, other):
+        return self.value == getattr(other, 'value', other)
+
+    def __ne__(self, other):
+        return self.value != getattr(other, 'value', other)
+
+    def __gt__(self, other):
+        return self.value > getattr(other, 'value', other)
+
+    def __ge__(self, other):
+        return self.value >= getattr(other, 'value', other)
+
+    # Arithmetic operations
+
     def __add__(self, other):
         from nujo.autodiff.functions import Addition
         return Addition(self, other)()
@@ -141,23 +179,27 @@ class Tensor(Node):
 
     def __truediv__(self, other):
         from nujo.autodiff.functions import Reciprocal
-        return self.__mul__(Reciprocal(other))
+        return self.__mul__(Reciprocal(other)())
 
     def __rtruediv__(self, other):
         from nujo.autodiff.functions import Reciprocal
-        return Reciprocal(self).__mul__(other)
+        return Reciprocal(self)().__mul__(other)
 
     def __pow__(self, other):
         from nujo.autodiff.functions import Power
         return Power(self, other)()
 
+    # More complex arithmetic operations
+
     def __matmul__(self, other):
-        from nujo.autodiff.functions import MatrixMultiplication
-        return MatrixMultiplication(self, other)()
+        from nujo.autodiff.functions import MatrixMul
+        return MatrixMul(self, other)()
 
     def __rmatmul__(self, other):
-        from nujo.autodiff.functions import MatrixMultiplication
-        return MatrixMultiplication(other, self)()
+        from nujo.autodiff.functions import MatrixMul
+        return MatrixMul(other, self)()
+
+    # Representation
 
     def __repr__(self):
         return self.name

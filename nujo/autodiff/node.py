@@ -1,8 +1,8 @@
-from nujo.autodiff.misc import counter
+from nujo.autodiff.utils import counter
 
 
 class Node:
-    ''' A Node in the computation graph.
+    ''' A Node in the computation graph
 
     Can be either a Function or a Tensor.
 
