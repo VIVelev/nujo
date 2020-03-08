@@ -24,16 +24,16 @@ class Optimizer:
 
     def step(self):
         with no_diff():
-            for l in range(len(self.params)):  # Iterate over layers
-
+            # Iterate over layers
+            for l in range(len(self.params)):
                 # Iterate over params in layer `l`
                 for i in range(len(self.params[l])):
                     self.params[l][i] = self.update_rule(
-                        self.params[l][i], self.params[l][i].grad)
+                        self.params[l][i], self.params[l][i].grad, l, i)
 
     def zero_grad(self):
-        for l in range(len(self.params)):  # Iterate over layers
-
+        # Iterate over layers
+        for l in range(len(self.params)):
             # Iterate over params in layer `l`
             for i in range(len(self.params[l])):
                 self.params[l][i].zero_grad()

@@ -42,9 +42,7 @@ class Momentum(Optimizer):
     def update_rule(self, param, grad):
         # Get the corresponding velocity
         key = param.id
-        print(f'{key} there')
         if key not in self._velocity:
-            print(f'{key} Here')
             self._velocity[key] = zeros_like(param)
 
         # Exponentially Weighted Moving Average
