@@ -3,7 +3,6 @@ from numpy import ndarray
 
 import nujo.autodiff.functions as funcs
 from nujo import Tensor
-from nujo.autodiff.misc import matrix_dotprod_differentiation
 
 # ===================================================================================================
 # Unit Testing Addition
@@ -147,7 +146,7 @@ def test_MatrixMul(get_tensors):
     assert isinstance(grad[1], ndarray)
 
     # Test Derivative computation
-    dA, dB = matrix_dotprod_differentiation(A.value, B.value)
+    dA, dB = funcs.MatrixMul.differentiate(A, B)
     assert (grad[0] == dA).all()
     assert (grad[1] == dB).all()
 
