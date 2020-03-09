@@ -1,6 +1,7 @@
 from abc import abstractmethod
+from typing import Union
 
-from numpy import array
+from numpy import array, ndarray
 
 from nujo.autodiff.modes import DIFF_ENABLED
 from nujo.autodiff.node import Node
@@ -23,21 +24,21 @@ class Function(Node):
     name : string, the name of the function
 
     '''
-    def __init__(self, *children, name='<Function>'):
+    def __init__(self, *children: Tensor, name='<Function>') -> None:
         super(Function, self).__init__(*children, name=name)
 
-    def _generate_tensor_name(self):
+    def _generate_tensor_name(self) -> str:
         return f'Z:{self.id}{self.name}'
 
     @abstractmethod
-    def forward(self):
+    def forward(self) -> Union[float, ndarray, Tensor]:
         pass
 
     @abstractmethod
-    def backward(self):
+    def backward(self) -> Union[float, ndarray, Tensor]:
         pass
 
-    def __call__(self):
+    def __call__(self) -> Tensor:
         z = self.forward()
         if not isinstance(z, Tensor):
             z = Tensor(z, children=[self], name=self._generate_tensor_name())
