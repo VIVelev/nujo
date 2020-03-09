@@ -1,36 +1,36 @@
 from os import mkdir
-from os.path import exists, expanduser
+from os.path import exists
 
-import requests
+from requests import get
+
+from nujo.utils.data.nujo_dir import HOME_DIR
 
 
 class DataLoader:
     '''
-
-
 
     Parameters:
     -----------
     name : will be downloaded from the UCI ML repo
     '''
     _UCI_REPO_URL = 'https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}.data'
-    _HOME_DIR = expanduser('~/.nujo')
 
     def __init__(self, name):
-        self._name = name
-        self._line = self._UCI_REPO_URL.format(self._name)
+        self.name = name
+        self._link = self._UCI_REPO_URL.format(self.name)
 
     def download(self):
-        r = requests.get(self._link)
-        file = self._HOME_DIR + self._name + '.data'
-        if not exists(self._HOME_DIR):
-            mkdir(self._HOME_DIR)
+        r = get(self._link)
+        file = HOME_DIR + self.name + '.data'
+        if not exists(HOME_DIR):
+            mkdir(HOME_DIR)
             print('Directory "~/.nujo" Created ')
         else:
             print('Directory "~/.nujo" already exists')
-        print(f'File {self._name} has been created.')
+        print(f'File {self.name} has been created.')
         with open(file) as f:
             f.write(r.content)
 
 
-DataLoader('iris').download()
+if __name__ == '__main__':
+    DataLoader('iris').download()
