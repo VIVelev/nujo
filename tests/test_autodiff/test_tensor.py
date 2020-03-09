@@ -61,6 +61,17 @@ def test_tensor_zero_grad(get_tensors):
     assert A._T is None
 
 
+def test_tensor_inplace_assignment(get_tensors):
+    A, _, C = get_tensors
+
+    A <<= C
+    assert A.id != C.id
+
+    assert A.children == C.children or A.children is None
+    assert A.creator == C.creator or A.creator is None
+    assert (A.value == C.value).all()
+
+
 @pytest.fixture
 def get_tensors():
     A = Tensor([[1, 2], [3, 4]])

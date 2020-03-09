@@ -147,6 +147,8 @@ class Tensor(Node):
         self.creator = getattr(other, 'creator', None)
         self.value = getattr(other, 'value', other)
 
+        return self
+
     # Comparison operations
 
     def __lt__(self, other):
