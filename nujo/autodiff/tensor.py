@@ -134,6 +134,19 @@ class Tensor(Node):
     def __hash__(self):
         return hash(self.name)
 
+    # Static evaluation operator
+
+    def __ilshift__(self, other):
+        '''Inplace assignment
+
+        Essentially used to achieve static evaluation.
+
+        '''
+
+        self.children = getattr(other, 'children', None)
+        self.creator = getattr(other, 'creator', None)
+        self.value = getattr(other, 'value', other)
+
     # Comparison operations
 
     def __lt__(self, other):
