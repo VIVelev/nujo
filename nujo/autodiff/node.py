@@ -1,3 +1,5 @@
+from typing import Any
+
 from nujo.autodiff.utils import counter
 
 
@@ -16,7 +18,7 @@ class Node:
     epsilon = 1e-18
     id_generator = counter()
 
-    def __init__(self, *children, name='<Node>'):
+    def __init__(self, *children: Any, name='<Node>') -> None:
         self.children = []
         for child in children:
             self.add_child(child)
@@ -27,7 +29,7 @@ class Node:
     def __eq__(self, other):
         return self.id == other.id
 
-    def add_child(self, child):
+    def add_child(self, child: Any) -> None:
         from nujo.autodiff.tensor import Tensor
 
         self.children.append(

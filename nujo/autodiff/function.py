@@ -42,7 +42,7 @@ class Function(Node):
     def __call__(self) -> Tensor:
         z = self.forward()
         if not isinstance(z, Tensor):
-            z = Tensor(z, children=[self], name=self._generate_tensor_name())
+            z = Tensor(z, creator=self, name=self._generate_tensor_name())
 
         if DIFF_ENABLED:
             for tensor, derivative in zip(self.children, self.backward()):

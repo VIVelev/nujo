@@ -1,5 +1,6 @@
 __all__ = [
     'counter',
+    'if_not_none',
 ]
 
 
@@ -14,3 +15,7 @@ class counter:
     @classmethod
     def reset(cls):
         cls.n = 0
+
+
+def if_not_none(*args):
+    return [arg for arg in args if arg is not None]
