@@ -1,3 +1,5 @@
+from numbers import Number
+
 import pytest
 from numpy import ndarray
 
@@ -21,8 +23,8 @@ def test_addition(get_tensors):
     grad = add.backward()
     assert len(grad) == 2
 
-    assert type(grad[0]) in [ndarray, int, float]
-    assert type(grad[1]) in [ndarray, int, float]
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
     assert grad[0] == 1
@@ -46,7 +48,7 @@ def test_negation(get_tensors):
     grad = neg.backward()
     assert len(grad) == 1
 
-    assert type(grad[0]) in [ndarray, int, float]
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
 
     # Test Derivative computation
     assert grad[0] == -1
@@ -69,8 +71,8 @@ def test_multiplication(get_tensors):
     grad = mul.backward()
     assert len(grad) == 2
 
-    assert type(grad[0]) in [ndarray, int, float]
-    assert type(grad[1]) in [ndarray, int, float]
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
     assert (grad[0] == B.value).all()
@@ -94,7 +96,7 @@ def test_reciprocal(get_tensors):
     grad = recipr.backward()
     assert len(grad) == 1
 
-    assert type(grad[0]) in [ndarray, int, float]
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
 
     # Test Derivative computation
     assert (grad[0] == -1 / (A.value**2)).all()
@@ -117,8 +119,8 @@ def test_power(get_tensors):
     grad = pow.backward()
     assert len(grad) == 2
 
-    assert type(grad[0]) in [ndarray, int, float]
-    assert type(grad[1]) in [ndarray, int, float]
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
     assert (grad[0] == 2 * A.value).all()
@@ -142,8 +144,8 @@ def test_MatrixMul(get_tensors):
     grad = matmul.backward()
     assert len(grad) == 2
 
-    assert type(grad[0]) in [ndarray, int, float]
-    assert type(grad[1]) in [ndarray, int, float]
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
     dA, dB = funcs.MatrixMul.differentiate(A, B)
