@@ -1,27 +1,32 @@
 # Neural Dojo: A Reverse-mode Automatic Differentiation library for Neural Networks
 
+[![lint_and_test_workflow](https://github.com/VIVelev/nujo/workflows/Lint%20and%20Test/badge.svg)](https://github.com/VIVelev/nujo/actions?query=workflow%3A%22Lint+and+Test%22)
+
 ### Prerequisites
 
--   [Python](https://www.python.org/) - The Programming Language used.
+-   [Python](https://www.python.org/) - The Programming Language used
 -   [Poetry](https://python-poetry.org/) - Dependency and Virtual Environment Management
 
-**_Download for Mac OSX using Homebrew_**
+***Download for Mac OSX using Homebrew***
 
 ```bash
-$ brew install python
-$ brew install poetry
+$ brew install python poetry
 ```
 
-### Installing
+### Installing and setting up for development
 
 ```bash
-$ git clone https://github.com/VIVele/nujo && cd nujo
+$ git clone https://github.com/VIVelev/nujo && cd nujo
 $ poetry install && poetry shell
 ```
 
 ## Running the tests
 
-Coming soon...
+Once you have **Installed and set up** Nujo, run the following in the terminal:
+
+```bash
+$ pytest
+```
 
 ## Built With
 
