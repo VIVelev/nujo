@@ -22,7 +22,7 @@ class Addition(Function):
         return self.children[0].value + self.children[1].value
 
     def backward(self):
-        return 1, 1
+        return ones((1, 1)), ones((1, 1))
 
 
 # ===================================================================================================
@@ -36,7 +36,7 @@ class Negation(Function):
         return -self.children[0].value
 
     def backward(self):
-        return -1,
+        return -ones((1, 1))
 
 
 # ===================================================================================================

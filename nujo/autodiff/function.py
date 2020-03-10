@@ -1,6 +1,6 @@
+from __future__ import annotations
+
 from abc import abstractmethod
-from numbers import Number
-from typing import Union
 
 from numpy import array, ndarray
 
@@ -32,11 +32,11 @@ class Function(Node):
         return f'Z:{self.id}{self.name}'
 
     @abstractmethod
-    def forward(self) -> Union[Number, ndarray, Tensor]:
+    def forward(self) -> ndarray:
         pass
 
     @abstractmethod
-    def backward(self) -> Union[Number, ndarray, Tensor]:
+    def backward(self) -> tuple[ndarray]:
         pass
 
     def __call__(self) -> Tensor:
