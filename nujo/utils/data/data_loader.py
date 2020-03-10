@@ -1,9 +1,8 @@
 from os import mkdir
 from os.path import exists
 
+from nujo.utils.data.constants import HOME_DIR
 from requests import get
-
-from nujo.utils.data.nujo_dir import HOME_DIR
 
 
 class DataLoader:

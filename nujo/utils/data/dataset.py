@@ -1,7 +1,7 @@
 from numpy import array, empty, float32, vstack
 
+from nujo.utils.data.constants import HOME_DIR
 from nujo.utils.data.dataset_iterator import DatasetIterator
-from nujo.utils.data.nujo_dir import HOME_DIR
 
 
 class Dataset:
@@ -18,15 +18,15 @@ class Dataset:
     - np array with labels
     '''
     def __init__(self, name):
-        # self.name = expanduser('~/.nujo/') + name
+        self.name = HOME_DIR + name
         if '.data' not in name:
             self.name += '.data'
+        self.X = empty((0, 4))
+        self.y = empty((0, 1))
 
     def _load_from_file(self):
         with open(self.name, 'r+') as data:
             lines = data.readlines()
-            self.X = empty((0, 4))
-            self.y = empty((0, 1))
 
         for line in lines[:-1]:
             x = array([line.split(',')[:4]], dtype=float32)
