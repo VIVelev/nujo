@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
+from numbers import Number
 
 from numpy import array, ndarray
 
@@ -36,7 +37,7 @@ class Function(Node):
         pass
 
     @abstractmethod
-    def backward(self) -> tuple[ndarray]:
+    def backward(self) -> tuple[Number or ndarray]:
         pass
 
     def __call__(self) -> Tensor:
