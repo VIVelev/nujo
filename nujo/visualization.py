@@ -1,10 +1,13 @@
 from graphviz import Digraph
 
-from nujo.autodiff import Variable
+from nujo.autodiff.node import Node
+from nujo.autodiff.tensor import Tensor
 
 __all__ = [
     'ComputationGraphPlotter',
 ]
+
+# TODO: Fix visualization.
 
 
 class ComputationGraphPlotter:
@@ -12,8 +15,8 @@ class ComputationGraphPlotter:
         self.computation_graph = Digraph(**kwargs)
 
     @staticmethod
-    def get_color(node):
-        if isinstance(node, Variable):
+    def get_color(node) -> str:
+        if isinstance(node, Tensor):
             if len(node.children) > 0:
                 return 'lightblue'
             return 'indianred1'
@@ -21,13 +24,13 @@ class ComputationGraphPlotter:
             return 'gray'
 
     @staticmethod
-    def get_shape(node):
-        if isinstance(node, Variable) and len(node.children) == 0:
+    def get_shape(node) -> str:
+        if isinstance(node, Tensor) and len(node.children) == 0:
             return 'box'
         else:
             return 'oval'
 
-    def create(self, root):
+    def create(self, root: Node) -> None:
         if len(root.children) == 0:
             return
 
@@ -45,5 +48,5 @@ class ComputationGraphPlotter:
             self.computation_graph.edge(repr(child), repr(root))
             self.create(child)
 
-    def view(self):
+    def view(self) -> None:
         self.computation_graph.view()
