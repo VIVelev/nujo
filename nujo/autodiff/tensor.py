@@ -1,4 +1,6 @@
-from typing import Any, List, Tuple
+from __future__ import annotations
+
+from typing import Any
 
 from numpy import array, eye, ndarray, tile
 
@@ -39,7 +41,7 @@ class Tensor(Node):
 
         # (Tensor, weight) pair, used to backpropagate through the network
         # See: `Chain Rule` Wikipedia page for more info
-        self._grad_dependencies: List[Tuple('Tensor', ndarray)] = []
+        self._grad_dependencies: list[tuple['Tensor', ndarray]] = []
 
         # Gradient cache
         self._grad: ndarray = None
@@ -66,7 +68,7 @@ class Tensor(Node):
         return self._T
 
     @property
-    def shape(self) -> Tuple[int]:
+    def shape(self):
         return self.value.shape
 
     def add_grad_dependency(self, wrt: 'Tensor', weight: ndarray) -> None:

@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Any
+
 __all__ = [
     'counter',
     'if_not_none',
@@ -8,14 +12,14 @@ class counter:
     n = 0
 
     @classmethod
-    def get(cls):
+    def get(cls) -> int:
         cls.n += 1
         return cls.n
 
     @classmethod
-    def reset(cls):
+    def reset(cls) -> None:
         cls.n = 0
 
 
-def if_not_none(*args):
+def if_not_none(*args: Any) -> list[Any]:
     return [arg for arg in args if arg is not None]
