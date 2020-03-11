@@ -1,7 +1,3 @@
-from __future__ import annotations
-
-from typing import Any
-
 from numpy import array, eye, ndarray, tile
 
 from nujo.autodiff.modes import DIFF_ENABLED
@@ -28,10 +24,10 @@ class Tensor(Node):
 
     '''
     def __init__(self,
-                 value: Any,
+                 value,
                  diff=True,
                  creator: Node = None,
-                 name='<Tensor>') -> None:
+                 name='<Tensor>'):
 
         super(Tensor, self).__init__(*if_not_none(creator), name=name)
 
@@ -41,7 +37,7 @@ class Tensor(Node):
 
         # (Tensor, weight) pair, used to backpropagate through the network
         # See: `Chain Rule` Wikipedia page for more info
-        self._grad_dependencies: list[tuple['Tensor', ndarray]] = []
+        self._grad_dependencies = []
 
         # Gradient cache
         self._grad: ndarray = None

@@ -1,7 +1,3 @@
-from __future__ import annotations
-
-from typing import Any
-
 __all__ = [
     'counter',
     'if_not_none',
@@ -21,5 +17,5 @@ class counter:
         cls.n = 0
 
 
-def if_not_none(*args: Any) -> list[Any]:
+def if_not_none(*args) -> list:
     return [arg for arg in args if arg is not None]
