@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import List
 
 from numpy import ndarray
 
@@ -13,11 +12,11 @@ class Optimizer:
 
     Parameters:
     -----------
-    params : ndarray, the parameters which to update
+    params : list of ndarray(s), the parameters which to update
     lr : float, the learning rate
 
     '''
-    def __init__(self, params: List[List[Tensor]], lr: float) -> None:
+    def __init__(self, params: list, lr: float) -> None:
         self.params = params
         self.lr = lr
 
