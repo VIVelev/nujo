@@ -19,6 +19,16 @@ __all__ = [
 
 
 class SGD(Optimizer):
+    ''' SGD: Stochastic Gradient Descent
+
+    An iterative method for optimizing an objective function.
+
+    Parameters:
+    -----------
+    params : list of ndarray(s), the parameters which to update
+    lr : float, the learning rate
+
+    '''
     def __init__(self, params, lr=0.001):
         super(SGD, self).__init__(params, lr)
 
@@ -30,6 +40,20 @@ class SGD(Optimizer):
 
 
 class Momentum(Optimizer):
+    ''' Momentum
+
+    A method that helps accelerate SGD in the relevant direction and
+    dampens oscillations. It does this by adding a fraction of the
+    update vector of the past time step to the current update vector.
+
+    Parameters:
+    -----------
+    params : list of ndarray(s), the parameters which to update
+    lr : float, the learning rate
+    beta : float, the fraction of the update vector of the past
+    time step to be added to the current update vector
+
+    '''
     def __init__(self, params, lr=0.001, beta=0.9):
         super(Momentum, self).__init__(params, lr)
 
@@ -54,7 +78,21 @@ class Momentum(Optimizer):
 
 
 class RMSprop(Optimizer):
-    def __init__(self, params, lr=0.001, beta=0.999, eps=1e-08):
+    ''' RMSprop
+
+    A gradient-based optimization technique proposed by Geoffrey Hinton
+    at his Neural Networks Coursera course. It uses a moving average
+    of squared gradients to normalize the gradient itself.
+
+    Parameters:
+    -----------
+    params : list of ndarray(s), the parameters which to update
+    lr : float, the learning rate
+    beta : float, the squared gradient coefficients
+    eps : float, added for numerical stability
+
+    '''
+    def __init__(self, params, lr=0.001, beta=0.999, eps=1e-09):
         super(RMSprop, self).__init__(params, lr)
 
         self.beta = beta
@@ -79,7 +117,22 @@ class RMSprop(Optimizer):
 
 
 class Adam(Optimizer):
-    def __init__(self, params, lr=0.001, betas=(0.9, 0.999), eps=1e-08):
+    ''' Adam: Adaptive Moment Estimation
+
+    Another method that computes adaptive learning rates
+    for each parameter. It basically combines Momentum
+    and RMSprop into one update rule.
+
+    Parameters:
+    -----------
+    params : list of ndarray(s), the parameters which to update
+    lr : float, the learning rate
+    betas : tuple of 2 floats, the velocity (Momentum) and
+    squared gradient (RMSprop) coefficients
+    eps : float, added for numerical stability
+
+    '''
+    def __init__(self, params, lr=0.001, betas=(0.9, 0.999), eps=1e-09):
         super(Adam, self).__init__(params, lr)
 
         self.betas = betas
@@ -104,10 +157,8 @@ class Adam(Optimizer):
             (1 - self.betas[1]) * square(grad)
 
         # Bias correction
-        v_corrected = self._velocity[key] /\
-            (1 - self.betas[0]**self._t)
-        s_corrected = self._squared[key] /\
-            (1 - self.betas[1]**self._t)
+        v_corrected = self._velocity[key] / (1 - self.betas[0]**self._t)
+        s_corrected = self._squared[key] / (1 - self.betas[1]**self._t)
         self._t += 1
 
         # Update rule
