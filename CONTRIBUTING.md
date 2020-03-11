@@ -20,6 +20,9 @@ We have the following branches:
 
 [Gitflow reference](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
 
+### Python type hints
+>TODO ...
+
 ## Getting started
 >coming soon...
 

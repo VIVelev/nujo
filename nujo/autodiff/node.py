@@ -27,7 +27,7 @@ class Node:
     def __eq__(self, other):
         return self.id == other.id
 
-    def add_child(self, child):
+    def add_child(self, child) -> None:
         from nujo.autodiff.tensor import Tensor
 
         self.children.append(
