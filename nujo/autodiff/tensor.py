@@ -23,12 +23,7 @@ class Tensor(Node):
     name : string, representation of the tensor
 
     '''
-    def __init__(self,
-                 value,
-                 diff=True,
-                 creator: Node = None,
-                 name='<Tensor>'):
-
+    def __init__(self, value, diff=True, creator=None, name='<Tensor>'):
         super(Tensor, self).__init__(*if_not_none(creator), name=name)
 
         self.value = array(value)
