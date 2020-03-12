@@ -130,6 +130,9 @@ class Tensor(Node):
     def __getitem__(self, position):
         return self.value[position]
 
+    def __hash__(self):
+        return hash(self.name)
+
     # Comparison operations
 
     def __lt__(self, other):

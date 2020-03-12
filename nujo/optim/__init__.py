@@ -1,8 +1,8 @@
-from nujo.optim.optimizers import Adam, GradientDescent, Momentum, RMSprop
+from nujo.optim.optimizers import SGD, Adam, Momentum, RMSprop
 
 __all__ = [
+    'SGD',
     'Adam',
-    'GradientDescent',
     'Momentum',
     'RMSprop',
 ]
