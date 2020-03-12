@@ -1,10 +1,10 @@
 from nujo.autodiff import Tensor, no_diff
-from nujo.math import sum
+from nujo.math import mean, sum
 
 __all__ = [
     'Tensor'
     'no_diff',
-
+    'mean',
     'sum',
 ]
 

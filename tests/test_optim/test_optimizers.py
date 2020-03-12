@@ -172,7 +172,7 @@ def matrix_mse_loss():
                    [12]], diff=False)
 
     def compute(params):
-        return nj.sum((y - X @ params[1][0])**2) / X.shape[0]
+        return nj.mean((y - X @ params[1][0])**2)
 
     return compute
 
