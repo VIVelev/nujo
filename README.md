@@ -32,6 +32,7 @@ $ pytest
 
 -   [NumPy](http://www.numpy.org/) - Fundamental package for scientific computing with Python
 -   [Graphviz](https://www.graphviz.org/) - Open source graph visualization software
+-   [Requests](https://requests.readthedocs.io/en/master/) - HTTP for Humans
 
 ## Contributing
 
