@@ -1,13 +1,16 @@
+from numpy import sum as np_sum
+
 from nujo.autodiff import Tensor
 
 __all__ = [
-    '_sum',
+    'nj_sum',
 ]
 
 
-def _sum(*args: Tensor) -> Tensor:
+def nj_sum(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     if len(args) > 1:
-        return sum(args)
+        return np_sum(args, axis=dim, keepdims=keepdim)
 
     else:
-        return Tensor(sum(args[0]), creator=args[0].creator)
+        return Tensor(np_sum(args[0].value, axis=dim, keepdims=keepdim),
+                      creator=args[0].creator)

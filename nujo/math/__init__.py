@@ -1,6 +1,6 @@
-from nujo.math.basic import _sum
+from nujo.math.basic import nj_sum
 
-sum = _sum
+sum = nj_sum
 
 __all__ = [
     'sum',
