@@ -1,21 +1,16 @@
 from nujo.autodiff import Tensor, no_diff
-from nujo.math import (add, matmul, max, mean, median, min, mul, neg, pow,
-                       prod, recipr, sum)
+from nujo.math import abs, max, mean, median, min, prod, sqrt, sum
 
 __all__ = [
     'Tensor'
     'no_diff',
-    'add',
-    'matmul',
+    'abs',
     'max',
     'mean',
     'median',
     'min',
-    'mul',
-    'neg',
-    'pow',
     'prod',
-    'recipr',
+    'sqrt',
     'sum',
 ]
 

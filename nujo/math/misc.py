@@ -2,11 +2,25 @@ from numpy import prod as np_prod
 from numpy import sum as np_sum
 
 from nujo.autodiff import Tensor
+from nujo.autodiff.functions import Power
 
 __all__ = [
+    'sqrt',
+    'abs',
     'sum',
     'prod',
 ]
+
+# ====================================================================================================
+
+
+def sqrt(input: Tensor) -> Tensor:
+    return Power(input, 1 / 2)()
+
+
+def abs(input: Tensor) -> Tensor:
+    return sqrt(input**2)
+
 
 # ====================================================================================================
 
