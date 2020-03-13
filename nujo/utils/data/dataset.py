@@ -1,8 +1,8 @@
 from numpy import array
 
+from nujo.utils.data.constants import HOME_DIR
 from nujo.utils.data.dataset_iterator import DatasetIterator
 from nujo.utils.data.dataset_loader import DatasetLoader
-from nujo.utils.data.nujo_dir import HOME_DIR
 
 
 class Dataset:
