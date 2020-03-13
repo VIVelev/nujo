@@ -1,44 +1,43 @@
-from numpy import array, empty, float32, vstack
+from numpy import array
 
 from nujo.utils.data.dataset_iterator import DatasetIterator
+from nujo.utils.data.dataset_loader import DatasetLoader
 from nujo.utils.data.nujo_dir import HOME_DIR
 
 
 class Dataset:
-    '''
+    ''' Dataset
+
+    A class made for easy access and manipulation
+    to online or local datasets
 
     Parameters:
     -----------
-    name : will be downloaded from the UCI ML repo
+    name : will be downloaded from the UCI ML repo (for now)
 
     Returns:
     --------
-    tuple : stores the csv dataset,
-    - np array with floating point integers
-    - np array with labels
+    array : stores the csv dataset,
+    - floating point integers
+    - last column -> labels
+
     '''
-    def __init__(self, name):
-        # self.name = expanduser('~/.nujo/') + name
+    def __init__(self, name: str):
+        self.name = HOME_DIR + name
         if '.data' not in name:
             self.name += '.data'
-
-    def _load_from_file(self):
-        with open(self.name, 'r+') as data:
-            lines = data.readlines()
-            self.X = empty((0, 4))
-            self.y = empty((0, 1))
-
-        for line in lines[:-1]:
-            x = array([line.split(',')[:4]], dtype=float32)
-            self.X = vstack((self.X, x))
-            y = array([line.split(',')[-1][:-1]], dtype='U')
-            self.y = vstack((self.y, y))
+        DatasetLoader(self)
 
     def __iter__(self):
         return DatasetIterator(self)
 
+    def __getitem__(self, position) -> array:
+        if isinstance(position, int):
+            return self.X[position]
+        row, col = position
+        return self.X[row][col]
+
 
 if __name__ == '__main__':
     data = Dataset('iris')
-    for line in data:
-        print(line)
+    print(data[2])
