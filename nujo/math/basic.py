@@ -4,14 +4,14 @@ from numpy import sum as np_sum
 from nujo.autodiff import Tensor
 
 __all__ = [
-    'nj_sum',
-    'nj_prod',
+    'sum',
+    'prod',
 ]
 
 # ====================================================================================================
 
 
-def nj_sum(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def sum(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Summation of tensors
 
     Parameters:
@@ -38,7 +38,7 @@ def nj_sum(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def nj_prod(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def prod(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Product of tensors
 
     Parameters:

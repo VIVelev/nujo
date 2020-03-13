@@ -6,22 +6,21 @@ from numpy import min as np_min
 from nujo.autodiff import Tensor
 
 __all__ = [
-    'nj_mean',
-    'nj_median',
-    'nj_min',
-    'nj_max',
+    'mean',
+    'median',
+    'min',
+    'max',
 ]
 
 # TODO:
 # Add __doc__ [x]
 # implement some more functions
-# is `nj_` prefix necessary ?
 # add reshape op to Tensor
 
 # ====================================================================================================
 
 
-def nj_mean(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def mean(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Mean of tensors
 
     Parameters:
@@ -48,7 +47,7 @@ def nj_mean(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def nj_median(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def median(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Median of tensors
 
     Parameters:
@@ -75,7 +74,7 @@ def nj_median(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def nj_min(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def min(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Min of tensors
 
     Parameters:
@@ -102,7 +101,7 @@ def nj_min(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def nj_max(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def max(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Max of tensors
 
     Parameters:

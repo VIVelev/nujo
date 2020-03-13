@@ -1,11 +1,5 @@
-from nujo.math.basic import nj_sum
-from nujo.math.statistics import nj_max, nj_mean, nj_median, nj_min
-
-sum = nj_sum
-mean = nj_mean
-median = nj_median
-min = nj_min
-max = nj_max
+from nujo.math.basic import sum
+from nujo.math.statistics import max, mean, median, min
 
 __all__ = [
     'sum',
