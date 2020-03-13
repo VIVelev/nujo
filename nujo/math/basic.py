@@ -8,6 +8,21 @@ __all__ = [
 
 
 def nj_sum(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+    ''' Summation of tensors
+
+    Parameters:
+    -----------
+    args : varargs, tensors to be summed;
+    if a single tensor is passed, its elements will be summed
+    dim : int, dimensional to reduce
+    keepdim : bool, whether to keep `dim`
+
+    Returns:
+    --------
+    result : Tensor
+
+    '''
+
     if len(args) > 1:
         return np_sum(args, axis=dim, keepdims=keepdim)
 
