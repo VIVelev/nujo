@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 # TODO:
-# Add __doc__
+# Add __doc__ [x]
 # implement some more functions
 # is `nj_` prefix necessary ?
 # add reshape op to Tensor
@@ -26,8 +26,8 @@ def nj_mean(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     Parameters:
     -----------
-    args : varargs, tensors to be summed;
-    if a single tensor is passed, its elements will be summed
+    args : varargs, tensors to compute the mean of;
+    if a single tensor is passed, the mean of its elements will be computed
     dim : int, dimensional to reduce
     keepdim : bool, whether to keep `dim`
 
@@ -53,8 +53,8 @@ def nj_median(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     Parameters:
     -----------
-    args : varargs, tensors to be summed;
-    if a single tensor is passed, its elements will be summed
+    args : varargs, tensors to compute the median of;
+    if a single tensor is passed, the median of its elements will be computed
     dim : int, dimensional to reduce
     keepdim : bool, whether to keep `dim`
 
@@ -80,8 +80,8 @@ def nj_min(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     Parameters:
     -----------
-    args : varargs, tensors to be summed;
-    if a single tensor is passed, its elements will be summed
+    args : varargs, tensors to compute the min of;
+    if a single tensor is passed, the min of its elements will be computed
     dim : int, dimensional to reduce
     keepdim : bool, whether to keep `dim`
 
@@ -107,8 +107,8 @@ def nj_max(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     Parameters:
     -----------
-    args : varargs, tensors to be summed;
-    if a single tensor is passed, its elements will be summed
+    args : varargs, tensors to compute the max of;
+    if a single tensor is passed, the max of its elements will be computed
     dim : int, dimensional to reduce
     keepdim : bool, whether to keep `dim`
 
