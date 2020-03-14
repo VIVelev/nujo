@@ -2,6 +2,8 @@ from numpy import max as np_max
 from numpy import mean as np_mean
 from numpy import median as np_median
 from numpy import min as np_min
+from numpy import std as np_stddev
+from numpy import var as np_variance
 
 from nujo.autodiff import Tensor
 
@@ -10,11 +12,11 @@ __all__ = [
     'median',
     'min',
     'max',
+    'stddev',
+    'variance',
 ]
 
 # TODO:
-# Add __doc__ [x]
-# implement some more functions
 # add reshape op to Tensor
 
 # ====================================================================================================
@@ -122,6 +124,60 @@ def max(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     else:
         return Tensor(np_max(args[0].value, axis=dim, keepdims=keepdim),
+                      creator=args[0].creator)
+
+
+# ====================================================================================================
+
+
+def stddev(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+    ''' Standard Deviation of tensors
+
+    Parameters:
+    -----------
+    args : varargs, tensors to compute the std dev of;
+    if a single tensor is passed, the std dev of its elements will be computed
+    dim : int, dimensional to reduce
+    keepdim : bool, whether to keep `dim`
+
+    Returns:
+    --------
+    result : Tensor
+
+    '''
+
+    if len(args) > 1:
+        return np_stddev(args, axis=dim, keepdims=keepdim)
+
+    else:
+        return Tensor(np_stddev(args[0].value, axis=dim, keepdims=keepdim),
+                      creator=args[0].creator)
+
+
+# ====================================================================================================
+
+
+def variance(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+    ''' Variance of tensors
+
+    Parameters:
+    -----------
+    args : varargs, tensors to compute the variance of;
+    if a single tensor is passed, the variance of its elements will be computed
+    dim : int, dimensional to reduce
+    keepdim : bool, whether to keep `dim`
+
+    Returns:
+    --------
+    result : Tensor
+
+    '''
+
+    if len(args) > 1:
+        return np_variance(args, axis=dim, keepdims=keepdim)
+
+    else:
+        return Tensor(np_variance(args[0].value, axis=dim, keepdims=keepdim),
                       creator=args[0].creator)
 
 
