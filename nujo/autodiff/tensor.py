@@ -1,7 +1,8 @@
-from numpy import array, eye, tile
+from numpy import array, eye, ndarray, tile
 
 from nujo.autodiff.modes import DIFF_ENABLED
 from nujo.autodiff.node import Node
+from nujo.autodiff.utils import if_not_none
 
 
 class Tensor(Node):
@@ -17,29 +18,27 @@ class Tensor(Node):
     -----------
     value : value, numerical value of the tensor
     diff : boolean, whether to compute gradients for the tensor
-    children : list, the nodes form which this tensor is produced,
-    usually it's a single node - the creator function
+    creator : Nujo Function, that created this tensor;
+    the only child of a tensor
     name : string, representation of the tensor
 
     '''
-    def __init__(self, value, diff=True, children=[], name='<Tensor>'):
-        super(Tensor, self).__init__(*children, name=name)
+    def __init__(self, value, diff=True, creator=None, name='<Tensor>'):
+        super(Tensor, self).__init__(*if_not_none(creator), name=name)
 
         self.value = array(value)
         self.diff = diff
-
-        # The Nujo Function that created this tensor
-        self.creator = children[-1] if len(children) else None
+        self.creator = creator
 
         # (Tensor, weight) pair, used to backpropagate through the network
         # See: `Chain Rule` Wikipedia page for more info
         self._grad_dependencies = []
 
         # Gradient cache
-        self._grad = None
+        self._grad: ndarray = None
 
         # Transposed tensor cache
-        self._T = None
+        self._T: ndarray = None
 
     @property
     def grad(self):
@@ -63,10 +62,10 @@ class Tensor(Node):
     def shape(self):
         return self.value.shape
 
-    def add_grad_dependency(self, wrt, weight):
+    def add_grad_dependency(self, wrt: 'Tensor', weight: ndarray) -> None:
         self._grad_dependencies.append((wrt, weight))
 
-    def compute_grad(self, debug=False):
+    def compute_grad(self, debug=False) -> None:
         if self.diff and DIFF_ENABLED:
             if debug:
                 print()
@@ -105,7 +104,7 @@ class Tensor(Node):
                 print('-' * 5)
                 print()
 
-    def zero_grad(self):
+    def zero_grad(self) -> None:
         # `zero_grad` is called after an iteration.
         # The value of weight tensors is updated after an iteration.
 
@@ -113,7 +112,7 @@ class Tensor(Node):
         self._grad = None
         self._T = None
 
-    def backward(self):
+    def backward(self) -> None:
         self.compute_grad()
 
         if self.creator:
@@ -122,10 +121,10 @@ class Tensor(Node):
 
     # Useful methods
 
-    def all(self):
+    def all(self) -> ndarray:
         return self.value.all()
 
-    def any(self):
+    def any(self) -> ndarray:
         return self.value.any()
 
     def __getitem__(self, position):

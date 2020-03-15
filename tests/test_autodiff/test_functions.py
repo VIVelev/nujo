@@ -1,10 +1,12 @@
+from numbers import Number
+
 import pytest
 from numpy import ndarray
 
 import nujo.autodiff.functions as funcs
 from nujo import Tensor
 
-# ===================================================================================================
+# ====================================================================================================
 # Unit Testing Addition
 
 
@@ -21,15 +23,15 @@ def test_addition(get_tensors):
     grad = add.backward()
     assert len(grad) == 2
 
-    assert type(grad[0]) in [ndarray, int, float]
-    assert type(grad[1]) in [ndarray, int, float]
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
     assert grad[0] == 1
     assert grad[1] == 1
 
 
-# ===================================================================================================
+# ====================================================================================================
 # Unit Testing Negation
 
 
@@ -46,13 +48,13 @@ def test_negation(get_tensors):
     grad = neg.backward()
     assert len(grad) == 1
 
-    assert type(grad[0]) in [ndarray, int, float]
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
 
     # Test Derivative computation
     assert grad[0] == -1
 
 
-# ===================================================================================================
+# ====================================================================================================
 # Unit Testing Multiplication
 
 
@@ -69,15 +71,15 @@ def test_multiplication(get_tensors):
     grad = mul.backward()
     assert len(grad) == 2
 
-    assert type(grad[0]) in [ndarray, int, float]
-    assert type(grad[1]) in [ndarray, int, float]
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
     assert (grad[0] == B.value).all()
     assert (grad[1] == A.value).all()
 
 
-# ===================================================================================================
+# ====================================================================================================
 # Unit Testing Reciprocal
 
 
@@ -94,13 +96,13 @@ def test_reciprocal(get_tensors):
     grad = recipr.backward()
     assert len(grad) == 1
 
-    assert type(grad[0]) in [ndarray, int, float]
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
 
     # Test Derivative computation
     assert (grad[0] == -1 / (A.value**2)).all()
 
 
-# ===================================================================================================
+# ====================================================================================================
 # Unit Testing Power
 
 
@@ -117,15 +119,15 @@ def test_power(get_tensors):
     grad = pow.backward()
     assert len(grad) == 2
 
-    assert type(grad[0]) in [ndarray, int, float]
-    assert type(grad[1]) in [ndarray, int, float]
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
     assert (grad[0] == 2 * A.value).all()
     assert grad[1] == 1
 
 
-# ===================================================================================================
+# ====================================================================================================
 # Unit Testing Matrix Multiplication
 
 
@@ -142,8 +144,8 @@ def test_matrixmul(get_tensors):
     grad = matmul.backward()
     assert len(grad) == 2
 
-    assert type(grad[0]) in [ndarray, int, float]
-    assert type(grad[1]) in [ndarray, int, float]
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
     dA, dB = funcs.MatrixMul.differentiate(A, B)
@@ -151,7 +153,7 @@ def test_matrixmul(get_tensors):
     assert (grad[1] == dB).all()
 
 
-# ===================================================================================================
+# ====================================================================================================
 # Unit Test fixtures
 
 
@@ -163,4 +165,4 @@ def get_tensors():
     return A, B
 
 
-# ===================================================================================================
+# ====================================================================================================
