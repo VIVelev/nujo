@@ -136,7 +136,7 @@ class Tensor(Node):
     # Static evaluation operator
 
     def __ilshift__(self, other):
-        '''Inplace assignment
+        ''' In-place assignment
 
         Essentially used to achieve static evaluation.
 
