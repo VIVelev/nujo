@@ -143,7 +143,19 @@ class Tensor(Node):
         '''
 
         self.children = getattr(other, 'children', None)
+        if self.children:
+            try:
+                self.children.remove(self)
+            except ValueError:  # self is not in children
+                pass
+
         self.creator = getattr(other, 'creator', None)
+        if self.creator:
+            try:
+                self.creator.children.remove(self)
+            except ValueError:  # self is not in children
+                pass
+
         self.value = getattr(other, 'value', other)
 
         return self
