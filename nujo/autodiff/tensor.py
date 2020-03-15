@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from numpy import array, expand_dims, eye, ndarray, tile
+from numpy import array, eye, ndarray, tile
 
 from nujo.autodiff.modes import DIFF_ENABLED
 from nujo.autodiff.node import Node
@@ -74,32 +74,38 @@ class Tensor(Node):
 
         else:
             reshaped = deepcopy(self)
+            reshaped.name += ' (reshaped)'
             reshaped.value = new_val
             return reshaped
 
     def squeeze(self, dim=-1, inplace=False) -> 'Tensor':
-        new_val = self.value.squeeze(dim)
+        if dim < 0:
+            num_dims = len(self.shape)
 
-        if inplace:
-            self.value = new_val
-            return self
+            if dim < -num_dims:
+                dim = num_dims
+            else:
+                dim += num_dims
 
-        else:
-            squeezed = deepcopy(self)
-            squeezed.value = new_val
-            return squeezed
+        return self.reshape(*self.shape[:dim],
+                            *self.shape[dim + 1:],
+                            inplace=inplace)
 
     def unsqueeze(self, dim=-1, inplace=False) -> 'Tensor':
-        new_val = expand_dims(self.value, dim)
+        if dim < 0:
+            num_dims = len(self.shape)
 
-        if inplace:
-            self.value = new_val
-            return self
+            if dim < -num_dims:
+                dim = 0
+            else:
+                if dim == -1:
+                    dim += 1
+                dim += num_dims
 
-        else:
-            unsqueezed = deepcopy(self)
-            unsqueezed.value = new_val
-            return unsqueezed
+        return self.reshape(*self.shape[:dim],
+                            1,
+                            *self.shape[dim:],
+                            inplace=inplace)
 
     # Gradient computation
 
