@@ -65,7 +65,7 @@ class Tensor(Node):
     def shape(self):
         return self.value.shape
 
-    def reshape(self, *args: int, inplace=False):
+    def reshape(self, *args: int, inplace=False) -> 'Tensor':
         new_val = self.value.reshape(*args)
 
         if inplace:
@@ -77,7 +77,7 @@ class Tensor(Node):
             reshaped.value = new_val
             return reshaped
 
-    def squeeze(self, dim=-1, inplace=False):
+    def squeeze(self, dim=-1, inplace=False) -> 'Tensor':
         new_val = self.value.squeeze(dim)
 
         if inplace:
@@ -89,7 +89,7 @@ class Tensor(Node):
             squeezed.value = new_val
             return squeezed
 
-    def unsqueeze(self, dim=-1, inplace=False):
+    def unsqueeze(self, dim=-1, inplace=False) -> 'Tensor':
         new_val = expand_dims(self.value, dim)
 
         if inplace:

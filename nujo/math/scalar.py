@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from numpy import around as np_round
 from numpy import ceil as np_ceil
 from numpy import floor as np_floor
@@ -25,21 +27,21 @@ def abs(input: Tensor) -> Tensor:
 
 
 def round(input: Tensor) -> Tensor:
-    ''' In-place function '''
-    np_round(input.value, out=input.value)
-    return input
+    input_copy = deepcopy(input)
+    np_round(input.value, out=input_copy.value)
+    return input_copy
 
 
 def ceil(input: Tensor) -> Tensor:
-    ''' In-place function '''
-    np_ceil(input.value, out=input.value)
-    return input
+    input_copy = deepcopy(input)
+    np_ceil(input.value, out=input_copy.value)
+    return input_copy
 
 
 def floor(input: Tensor) -> Tensor:
-    ''' In-place function '''
-    np_floor(input.value, out=input.value)
-    return input
+    input_copy = deepcopy(input)
+    np_floor(input.value, out=input_copy.value)
+    return input_copy
 
 
 # ====================================================================================================
