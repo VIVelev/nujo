@@ -30,7 +30,7 @@ def sum(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     -----------
     args : varargs, tensors to be summed;
     if a single tensor is passed, its elements will be summed
-    dim : int, dimensional to reduce
+    dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
 
     Returns:
@@ -58,7 +58,7 @@ def prod(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     -----------
     args : varargs, tensors to be multiplied;
     if a single tensor is passed, its elements will be multiplied
-    dim : int, dimensional to reduce
+    dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
 
     Returns:
@@ -86,7 +86,7 @@ def mean(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     -----------
     args : varargs, tensors to compute the mean of;
     if a single tensor is passed, the mean of its elements will be computed
-    dim : int, dimensional to reduce
+    dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
 
     Returns:
@@ -114,7 +114,7 @@ def median(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     -----------
     args : varargs, tensors to compute the median of;
     if a single tensor is passed, the median of its elements will be computed
-    dim : int, dimensional to reduce
+    dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
 
     Returns:
@@ -142,7 +142,7 @@ def min(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     -----------
     args : varargs, tensors to compute the min of;
     if a single tensor is passed, the min of its elements will be computed
-    dim : int, dimensional to reduce
+    dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
 
     Returns:
@@ -170,7 +170,7 @@ def max(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     -----------
     args : varargs, tensors to compute the max of;
     if a single tensor is passed, the max of its elements will be computed
-    dim : int, dimensional to reduce
+    dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
 
     Returns:
@@ -198,7 +198,7 @@ def stddev(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     -----------
     args : varargs, tensors to compute the std dev of;
     if a single tensor is passed, the std dev of its elements will be computed
-    dim : int, dimensional to reduce
+    dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
 
     Returns:
@@ -226,7 +226,7 @@ def variance(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     -----------
     args : varargs, tensors to compute the variance of;
     if a single tensor is passed, the variance of its elements will be computed
-    dim : int, dimensional to reduce
+    dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
 
     Returns:
