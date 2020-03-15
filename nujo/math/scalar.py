@@ -27,21 +27,27 @@ def abs(input: Tensor) -> Tensor:
 
 
 def round(input: Tensor) -> Tensor:
-    input_copy = deepcopy(input)
-    np_round(input.value, out=input_copy.value)
-    return input_copy
+    rounded = deepcopy(input)
+    rounded.name += ' (rounded)'
+    rounded.value = np_round(input.value)
+
+    return rounded
 
 
 def ceil(input: Tensor) -> Tensor:
-    input_copy = deepcopy(input)
-    np_ceil(input.value, out=input_copy.value)
-    return input_copy
+    ceiled = deepcopy(input)
+    ceiled.name += ' (ceiled)'
+    ceiled.value = np_ceil(input.value)
+
+    return ceiled
 
 
 def floor(input: Tensor) -> Tensor:
-    input_copy = deepcopy(input)
-    np_floor(input.value, out=input_copy.value)
-    return input_copy
+    floored = deepcopy(input)
+    floored.name += ' (floored)'
+    floored.value = np_floor(input.value)
+
+    return floored
 
 
 # ====================================================================================================
