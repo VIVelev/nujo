@@ -1,7 +1,16 @@
-from nujo.math.misc import abs, prod, sqrt, sum
-from nujo.math.statistics import max, mean, median, min, stddev, variance
+from nujo.math.aggregate import (max, mean, median, min, prod, stddev, sum,
+                                 variance)
+from nujo.math.scalar import abs, sqrt
 
 __all__ = [
-    'abs', 'prod', 'sqrt', 'sum',
-    'max', 'mean', 'median', 'min', 'stddev', 'variance',
+    'max',
+    'mean',
+    'median',
+    'min',
+    'prod',
+    'stddev',
+    'sum',
+    'variance',
+    'abs',
+    'sqrt',
 ]
