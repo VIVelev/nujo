@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from numpy import array, eye, ndarray, tile
 
 from nujo.autodiff.modes import DIFF_ENABLED
@@ -50,7 +52,6 @@ class Tensor(Node):
     @property
     def T(self):
         if self._T is None:
-            from copy import deepcopy
             transposed = deepcopy(self)
             transposed.value = self.value.T
 
@@ -58,9 +59,55 @@ class Tensor(Node):
 
         return self._T
 
+    # Shape and shape transformations
+
     @property
     def shape(self):
         return self.value.shape
+
+    def reshape(self, *args: int, inplace=False) -> 'Tensor':
+        new_val = self.value.reshape(*args)
+
+        if inplace:
+            self.value = new_val
+            return self
+
+        else:
+            reshaped = deepcopy(self)
+            reshaped.name += ' (reshaped)'
+            reshaped.value = new_val
+            return reshaped
+
+    def squeeze(self, dim=-1, inplace=False) -> 'Tensor':
+        if dim < 0:
+            num_dims = len(self.shape)
+
+            if dim < -num_dims:
+                dim = num_dims
+            else:
+                dim += num_dims
+
+        return self.reshape(*self.shape[:dim],
+                            *self.shape[dim + 1:],
+                            inplace=inplace)
+
+    def unsqueeze(self, dim=-1, inplace=False) -> 'Tensor':
+        if dim < 0:
+            num_dims = len(self.shape)
+
+            if dim < -num_dims:
+                dim = 0
+            else:
+                if dim == -1:
+                    dim += 1
+                dim += num_dims
+
+        return self.reshape(*self.shape[:dim],
+                            1,
+                            *self.shape[dim:],
+                            inplace=inplace)
+
+    # Gradient computation
 
     def add_grad_dependency(self, wrt: 'Tensor', weight: ndarray) -> None:
         self._grad_dependencies.append((wrt, weight))
