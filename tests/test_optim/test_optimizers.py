@@ -1,7 +1,7 @@
 import pytest
 
-import nujo as nj
 import nujo.optim as optim
+from nujo import Tensor, mean
 
 # ====================================================================================================
 # Test Stochastic Gradient Descent (SGD)
@@ -144,8 +144,8 @@ def test_adam_matrix(params, num_iters, matrix_mse_loss):
 
 @pytest.fixture
 def params():
-    return [[nj.Tensor(10)],
-            [nj.Tensor([[1], [2], [3]])]]
+    return [[Tensor(10)],
+            [Tensor([[1], [2], [3]])]]
 
 
 @pytest.fixture
@@ -163,16 +163,16 @@ def quadratic_loss():
 
 @pytest.fixture
 def matrix_mse_loss():
-    X = nj.Tensor([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]], diff=False)
+    X = Tensor([[1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9]], diff=False)
 
-    y = nj.Tensor([[10],
-                   [11],
-                   [12]], diff=False)
+    y = Tensor([[10],
+                [11],
+                [12]], diff=False)
 
     def compute(params):
-        return nj.mean((y - X @ params[1][0])**2)
+        return mean((y - X @ params[1][0])**2)
 
     return compute
 
