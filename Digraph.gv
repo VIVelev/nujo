@@ -1,47 +1,47 @@
 digraph {
-	<nujo.autodiff.functions.Addition object at 0x11bf56a10> [color=gray shape=oval style=filled]
+	<nujo.autodiff.functions.Addition object at 0x11eb78e50> [color=gray shape=oval style=filled]
 	"Z:14<Add>" [color=lightblue shape=oval style=filled]
-	<nujo.autodiff.functions.Addition object at 0x11bf56a10> -> Z:"14<Add>"
+	<nujo.autodiff.functions.Addition object at 0x11eb78e50> -> Z:"14<Add>"
 	"Z:11<Add>" [color=lightblue shape=oval style=filled]
-	<nujo.autodiff.functions.Addition object at 0x11bf56a10> [color=gray shape=oval style=filled]
-	Z:"11<Add>" -> <nujo.autodiff.functions.Addition object at 0x11bf56a10>
-	<nujo.autodiff.functions.Addition object at 0x11bf56850> [color=gray shape=oval style=filled]
+	<nujo.autodiff.functions.Addition object at 0x11eb78e50> [color=gray shape=oval style=filled]
+	Z:"11<Add>" -> <nujo.autodiff.functions.Addition object at 0x11eb78e50>
+	<nujo.autodiff.functions.Addition object at 0x11eb73850> [color=gray shape=oval style=filled]
 	"Z:11<Add>" [color=lightblue shape=oval style=filled]
-	<nujo.autodiff.functions.Addition object at 0x11bf56850> -> Z:"11<Add>"
+	<nujo.autodiff.functions.Addition object at 0x11eb73850> -> Z:"11<Add>"
 	"Z:6<Mul>" [color=lightblue shape=oval style=filled]
-	<nujo.autodiff.functions.Addition object at 0x11bf56850> [color=gray shape=oval style=filled]
-	Z:"6<Mul>" -> <nujo.autodiff.functions.Addition object at 0x11bf56850>
-	<nujo.autodiff.functions.Multiplication object at 0x11bf4db10> [color=gray shape=oval style=filled]
+	<nujo.autodiff.functions.Addition object at 0x11eb73850> [color=gray shape=oval style=filled]
+	Z:"6<Mul>" -> <nujo.autodiff.functions.Addition object at 0x11eb73850>
+	<nujo.autodiff.functions.Multiplication object at 0x11eb6ba50> [color=gray shape=oval style=filled]
 	"Z:6<Mul>" [color=lightblue shape=oval style=filled]
-	<nujo.autodiff.functions.Multiplication object at 0x11bf4db10> -> Z:"6<Mul>"
+	<nujo.autodiff.functions.Multiplication object at 0x11eb6ba50> -> Z:"6<Mul>"
 	"Z:3<Pow>" [color=lightblue shape=oval style=filled]
-	<nujo.autodiff.functions.Multiplication object at 0x11bf4db10> [color=gray shape=oval style=filled]
-	Z:"3<Pow>" -> <nujo.autodiff.functions.Multiplication object at 0x11bf4db10>
-	<nujo.autodiff.functions.Power object at 0x10ef07bd0> [color=gray shape=oval style=filled]
+	<nujo.autodiff.functions.Multiplication object at 0x11eb6ba50> [color=gray shape=oval style=filled]
+	Z:"3<Pow>" -> <nujo.autodiff.functions.Multiplication object at 0x11eb6ba50>
+	<nujo.autodiff.functions.Power object at 0x10fa20b90> [color=gray shape=oval style=filled]
 	"Z:3<Pow>" [color=lightblue shape=oval style=filled]
-	<nujo.autodiff.functions.Power object at 0x10ef07bd0> -> Z:"3<Pow>"
+	<nujo.autodiff.functions.Power object at 0x10fa20b90> -> Z:"3<Pow>"
 	"<Tensor> X" [color=indianred1 shape=box style=filled]
-	<nujo.autodiff.functions.Power object at 0x10ef07bd0> [color=gray shape=oval style=filled]
-	"<Tensor> X" -> <nujo.autodiff.functions.Power object at 0x10ef07bd0>
+	<nujo.autodiff.functions.Power object at 0x10fa20b90> [color=gray shape=oval style=filled]
+	"<Tensor> X" -> <nujo.autodiff.functions.Power object at 0x10fa20b90>
 	<Tensor> [color=indianred1 shape=box style=filled]
-	<nujo.autodiff.functions.Power object at 0x10ef07bd0> [color=gray shape=oval style=filled]
-	<Tensor> -> <nujo.autodiff.functions.Power object at 0x10ef07bd0>
+	<nujo.autodiff.functions.Power object at 0x10fa20b90> [color=gray shape=oval style=filled]
+	<Tensor> -> <nujo.autodiff.functions.Power object at 0x10fa20b90>
 	<Tensor> [color=indianred1 shape=box style=filled]
-	<nujo.autodiff.functions.Multiplication object at 0x11bf4db10> [color=gray shape=oval style=filled]
-	<Tensor> -> <nujo.autodiff.functions.Multiplication object at 0x11bf4db10>
+	<nujo.autodiff.functions.Multiplication object at 0x11eb6ba50> [color=gray shape=oval style=filled]
+	<Tensor> -> <nujo.autodiff.functions.Multiplication object at 0x11eb6ba50>
 	"Z:9<Mul>" [color=lightblue shape=oval style=filled]
-	<nujo.autodiff.functions.Addition object at 0x11bf56850> [color=gray shape=oval style=filled]
-	Z:"9<Mul>" -> <nujo.autodiff.functions.Addition object at 0x11bf56850>
-	<nujo.autodiff.functions.Multiplication object at 0x11bf4dfd0> [color=gray shape=oval style=filled]
+	<nujo.autodiff.functions.Addition object at 0x11eb73850> [color=gray shape=oval style=filled]
+	Z:"9<Mul>" -> <nujo.autodiff.functions.Addition object at 0x11eb73850>
+	<nujo.autodiff.functions.Multiplication object at 0x11eb734d0> [color=gray shape=oval style=filled]
 	"Z:9<Mul>" [color=lightblue shape=oval style=filled]
-	<nujo.autodiff.functions.Multiplication object at 0x11bf4dfd0> -> Z:"9<Mul>"
+	<nujo.autodiff.functions.Multiplication object at 0x11eb734d0> -> Z:"9<Mul>"
 	"<Tensor> X" [color=indianred1 shape=box style=filled]
-	<nujo.autodiff.functions.Multiplication object at 0x11bf4dfd0> [color=gray shape=oval style=filled]
-	"<Tensor> X" -> <nujo.autodiff.functions.Multiplication object at 0x11bf4dfd0>
+	<nujo.autodiff.functions.Multiplication object at 0x11eb734d0> [color=gray shape=oval style=filled]
+	"<Tensor> X" -> <nujo.autodiff.functions.Multiplication object at 0x11eb734d0>
 	<Tensor> [color=indianred1 shape=box style=filled]
-	<nujo.autodiff.functions.Multiplication object at 0x11bf4dfd0> [color=gray shape=oval style=filled]
-	<Tensor> -> <nujo.autodiff.functions.Multiplication object at 0x11bf4dfd0>
+	<nujo.autodiff.functions.Multiplication object at 0x11eb734d0> [color=gray shape=oval style=filled]
+	<Tensor> -> <nujo.autodiff.functions.Multiplication object at 0x11eb734d0>
 	<Tensor> [color=indianred1 shape=box style=filled]
-	<nujo.autodiff.functions.Addition object at 0x11bf56a10> [color=gray shape=oval style=filled]
-	<Tensor> -> <nujo.autodiff.functions.Addition object at 0x11bf56a10>
+	<nujo.autodiff.functions.Addition object at 0x11eb78e50> [color=gray shape=oval style=filled]
+	<Tensor> -> <nujo.autodiff.functions.Addition object at 0x11eb78e50>
 }

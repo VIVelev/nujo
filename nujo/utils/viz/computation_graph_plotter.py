@@ -3,14 +3,15 @@ from graphviz import Digraph
 from nujo.autodiff.node import Node
 from nujo.autodiff.tensor import Tensor
 
-__all__ = [
-    'ComputationGraphPlotter',
-]
-
 # TODO: Fix visualization.
 
 
 class ComputationGraphPlotter:
+    ''' Computation Graph Plotter
+
+        Uses graphviz.
+
+    '''
     def __init__(self, **kwargs):
         self.computation_graph = Digraph(**kwargs)
 
