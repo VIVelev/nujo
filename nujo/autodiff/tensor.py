@@ -277,5 +277,8 @@ class Tensor(Node):
 
     # Representation
 
+    def __str__(self):
+        return self.name + '\n' + '-' * 32 + '\n' + str(self.value)
+
     def __repr__(self):
         return self.name

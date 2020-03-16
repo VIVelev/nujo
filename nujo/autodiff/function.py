@@ -26,8 +26,11 @@ class Function(Node):
     def __init__(self, *children: Tensor, name='<Function>') -> None:
         super(Function, self).__init__(*children, name=name)
 
+    def __repr__(self) -> str:
+        return self.name + f'#{self.id}'
+
     def _generate_tensor_name(self) -> str:
-        return f'Z:{self.id}{self.name}'
+        return 'Z' + self.__repr__()
 
     @abstractmethod
     def forward(self) -> ndarray:

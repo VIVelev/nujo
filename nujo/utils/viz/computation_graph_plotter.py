@@ -3,8 +3,6 @@ from graphviz import Digraph
 from nujo.autodiff.node import Node
 from nujo.autodiff.tensor import Tensor
 
-# TODO: Fix visualization.
-
 
 class ComputationGraphPlotter:
     ''' Computation Graph Plotter
@@ -36,17 +34,17 @@ class ComputationGraphPlotter:
             return
 
         for child in root.children:
-            self.computation_graph.node(repr(child),
+            self.computation_graph.node(str(child),
                                         color=self.get_color(child),
                                         shape=self.get_shape(child),
                                         style='filled')
 
-            self.computation_graph.node(repr(root),
+            self.computation_graph.node(str(root),
                                         color=self.get_color(root),
                                         shape=self.get_shape(root),
                                         style='filled')
 
-            self.computation_graph.edge(repr(child), repr(root))
+            self.computation_graph.edge(str(child), str(root))
             self.create(child)
 
         return self
