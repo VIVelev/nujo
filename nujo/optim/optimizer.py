@@ -30,9 +30,9 @@ class Optimizer:
             for l in range(len(self.params)):
                 # Iterate over params in layer `l`
                 for i in range(len(self.params[l])):
-                    self.params[l][i].name = f'layer[{l}]-param[{i}]'
+                    # self.params[l][i].name = f'layer[{l}]-param[{i}]'
 
-                    self.params[l][i] = self.update_rule(
+                    self.params[l][i] <<= self.update_rule(
                         self.params[l][i], self.params[l][i].grad)
 
     def zero_grad(self) -> None:

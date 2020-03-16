@@ -133,6 +133,33 @@ class Tensor(Node):
     def __hash__(self):
         return hash(self.name)
 
+    # Static evaluation operator
+
+    def __ilshift__(self, other):
+        ''' In-place assignment operator: `<<=`
+
+        Essentially used to achieve static evaluation.
+
+        '''
+
+        self.children = getattr(other, 'children', None)
+        if self.children:
+            try:
+                self.children.remove(self)
+            except ValueError:  # self is not in children
+                pass
+
+        self.creator = getattr(other, 'creator', None)
+        if self.creator:
+            try:
+                self.creator.children.remove(self)
+            except ValueError:  # self is not in children
+                pass
+
+        self.value = getattr(other, 'value', other)
+
+        return self
+
     # Comparison operations
 
     def __lt__(self, other):
