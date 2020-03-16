@@ -275,10 +275,10 @@ class Tensor(Node):
         from nujo.autodiff.functions import MatrixMul
         return MatrixMul(other, self)()
 
-    # Representation
-
-    def __str__(self):
-        return self.name + '\n' + '-' * 32 + '\n' + str(self.value)
+    # Representations
 
     def __repr__(self):
         return self.name
+
+    def __str__(self):
+        return self.__repr__() + '\n' + '-' * 32 + '\n' + str(self.value)
