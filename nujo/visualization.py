@@ -30,7 +30,7 @@ class ComputationGraphPlotter:
         else:
             return 'oval'
 
-    def create(self, root: Node) -> None:
+    def create(self, root: Node) -> 'ComputationGraphPlotter':
         if len(root.children) == 0:
             return
 
@@ -47,6 +47,8 @@ class ComputationGraphPlotter:
 
             self.computation_graph.edge(repr(child), repr(root))
             self.create(child)
+
+        return self
 
     def view(self) -> None:
         self.computation_graph.view()
