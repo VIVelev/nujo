@@ -14,17 +14,17 @@ class ComputationGraphPlotter:
         self.computation_graph = Digraph(**kwargs)
 
     @staticmethod
-    def get_color(node) -> str:
+    def get_color(node: Node) -> str:
         if isinstance(node, Tensor):
             if len(node.children) > 0:
                 return 'lightblue'
             return 'indianred1'
         else:
-            return 'gray'
+            return 'gold2'
 
     @staticmethod
-    def get_shape(node) -> str:
-        if isinstance(node, Tensor) and len(node.children) == 0:
+    def get_shape(node: Node) -> str:
+        if isinstance(node, Tensor):
             return 'box'
         else:
             return 'oval'
