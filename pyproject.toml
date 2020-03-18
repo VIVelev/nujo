@@ -2,7 +2,8 @@
 name = "nujo"
 version = "0.1.0"
 description = "A Reverse-mode Automatic Differentiation library for Neural Networks"
-authors = ["Victor Velev <victorivelev@gmail.com>"]
+authors = ["Victor Velev <victorivelev@gmail.com>",
+           "Victor Gorchilov <victor@gorchilov.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
