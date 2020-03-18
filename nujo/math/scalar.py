@@ -1,13 +1,17 @@
 from copy import deepcopy
+from math import e
 
 from numpy import around as np_round
 from numpy import ceil as np_ceil
 from numpy import floor as np_floor
 
 from nujo.autodiff import Tensor
-from nujo.autodiff.functions import Power
+from nujo.autodiff.functions import Logarithm, Power
 
 __all__ = [
+    'log',
+    'log2',
+    'log10',
     'sqrt',
     'abs',
     'round',
@@ -18,12 +22,30 @@ __all__ = [
 # ====================================================================================================
 
 
+def log(x, base=e):
+    return Logarithm(x, base)()
+
+
+def log2(x):
+    return Logarithm(x, 2, name='<Log2>')()
+
+
+def log10(x):
+    return Logarithm(x, 10, name='<Log10>')()
+
+
+# ====================================================================================================
+
+
 def sqrt(input: Tensor) -> Tensor:
     return Power(input, 1 / 2)()
 
 
 def abs(input: Tensor) -> Tensor:
     return sqrt(input**2)
+
+
+# ====================================================================================================
 
 
 def round(input: Tensor) -> Tensor:
