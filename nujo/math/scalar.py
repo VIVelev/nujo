@@ -24,30 +24,30 @@ __all__ = [
 # ====================================================================================================
 
 
-def log(x: Tensor or Number, base: float = e) -> Tensor:
+def log(x: Number or Tensor, base: float = e) -> Tensor:
     return Logarithm(x, base)()
 
 
-def log2(x: Tensor or Number) -> Tensor:
+def log2(x: Number or Tensor) -> Tensor:
     return Logarithm(x, 2, name='<Log2>')()
 
 
-def log10(x: Tensor or Number) -> Tensor:
+def log10(x: Number or Tensor) -> Tensor:
     return Logarithm(x, 10, name='<Log10>')()
 
 
 # ====================================================================================================
 
 
-def exp(x: Tensor or Number) -> Tensor:
+def exp(x: Number or Tensor) -> Tensor:
     return Power(e, x, name='<Exp>')()
 
 
-def sqrt(x: Tensor or Number) -> Tensor:
+def sqrt(x: Number or Tensor) -> Tensor:
     return Power(x, 1 / 2, name='<Sqrt>')()
 
 
-def abs(x: Tensor or Number) -> Tensor:
+def abs(x: Number or Tensor) -> Tensor:
     func = sqrt(x**2)
     func.name = '<Abs>'
     return func
@@ -56,7 +56,7 @@ def abs(x: Tensor or Number) -> Tensor:
 # ====================================================================================================
 
 
-def round(x: Tensor or Number) -> Tensor:
+def round(x: Number or Tensor) -> Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
@@ -67,7 +67,7 @@ def round(x: Tensor or Number) -> Tensor:
     return rounded
 
 
-def ceil(x: Tensor or Number) -> Tensor:
+def ceil(x: Number or Tensor) -> Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
@@ -78,7 +78,7 @@ def ceil(x: Tensor or Number) -> Tensor:
     return ceiled
 
 
-def floor(x: Tensor or Number) -> Tensor:
+def floor(x: Number or Tensor) -> Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 

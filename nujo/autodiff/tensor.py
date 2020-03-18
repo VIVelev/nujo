@@ -28,7 +28,7 @@ class Tensor(Node):
     def __init__(self, value, diff=True, creator=None, name='<Tensor>'):
         super(Tensor, self).__init__(*if_not_none(creator), name=name)
 
-        self.value = array(value)
+        self.value = value.value if isinstance(value, Tensor) else array(value)
         self.diff = diff
         self.creator = creator
 
