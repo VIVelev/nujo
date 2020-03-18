@@ -87,11 +87,12 @@ class Power(Function):
 
 # ====================================================================================================
 
-# TODO: Numerical stability
-
 
 class Logarithm(Function):
     def __init__(self, input_a, input_b, name='<Log>'):
+        assert input_a > 0  # argument value limits
+        assert input_b > 0 and input_b != 1  # base value limits
+
         super(Logarithm, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
