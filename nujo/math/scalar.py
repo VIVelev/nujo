@@ -12,6 +12,7 @@ __all__ = [
     'log',
     'log2',
     'log10',
+    'exp',
     'sqrt',
     'abs',
     'round',
@@ -22,52 +23,56 @@ __all__ = [
 # ====================================================================================================
 
 
-def log(x, base=e):
+def log(x: Tensor, base: float = e) -> Tensor:
     return Logarithm(x, base)()
 
 
-def log2(x):
+def log2(x: Tensor) -> Tensor:
     return Logarithm(x, 2, name='<Log2>')()
 
 
-def log10(x):
+def log10(x: Tensor) -> Tensor:
     return Logarithm(x, 10, name='<Log10>')()
 
 
 # ====================================================================================================
 
 
-def sqrt(input: Tensor) -> Tensor:
-    return Power(input, 1 / 2)()
+def exp(x: Tensor) -> Tensor:
+    return Power(e, x, name='<Exp>')()
 
 
-def abs(input: Tensor) -> Tensor:
-    return sqrt(input**2)
+def sqrt(x: Tensor) -> Tensor:
+    return Power(x, 1 / 2, name='<Sqrt>')()
+
+
+def abs(x: Tensor) -> Tensor:
+    return sqrt(x**2)
 
 
 # ====================================================================================================
 
 
-def round(input: Tensor) -> Tensor:
-    rounded = deepcopy(input)
+def round(x: Tensor) -> Tensor:
+    rounded = deepcopy(x)
     rounded.name += ' (rounded)'
-    rounded.value = np_round(input.value)
+    rounded.value = np_round(x.value)
 
     return rounded
 
 
-def ceil(input: Tensor) -> Tensor:
-    ceiled = deepcopy(input)
+def ceil(x: Tensor) -> Tensor:
+    ceiled = deepcopy(x)
     ceiled.name += ' (ceiled)'
-    ceiled.value = np_ceil(input.value)
+    ceiled.value = np_ceil(x.value)
 
     return ceiled
 
 
-def floor(input: Tensor) -> Tensor:
-    floored = deepcopy(input)
+def floor(x: Tensor) -> Tensor:
+    floored = deepcopy(x)
     floored.name += ' (floored)'
-    floored.value = np_floor(input.value)
+    floored.value = np_floor(x.value)
 
     return floored
 

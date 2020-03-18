@@ -87,6 +87,8 @@ class Power(Function):
 
 # ====================================================================================================
 
+# TODO: Numerical stability
+
 
 class Logarithm(Function):
     def __init__(self, input_a, input_b, name='<Log>'):

@@ -1,6 +1,6 @@
 from nujo.autodiff import Tensor, no_diff
-from nujo.math import (abs, ceil, floor, max, mean, median, min, prod, round,
-                       sqrt, stddev, sum, variance)
+from nujo.math import (abs, ceil, exp, floor, log, log2, log10, max, mean,
+                       median, min, prod, round, sqrt, stddev, sum, variance)
 
 __all__ = [
     'Tensor',
