@@ -26,7 +26,6 @@ $ python
 >>> import nujo as nj
 >>> nj.__version__
 '0.1.0'
->>> 
 ```
 
 ### For developers:

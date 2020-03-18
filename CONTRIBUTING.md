@@ -21,13 +21,10 @@ We have the following branches:
 [Gitflow reference](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
 
 ### When and how to write Unit Tests?
->TODO ...
+>coming soon...
 
-### Python type hints
->TODO ...
-
-### Task organisation
-The Kanban system used for this project is [Trello](https://trello.com/b/fObyuiWt/nujo-develop)
+### Task Management Tool
+The Kanban tool used for this project is [Trello](https://trello.com/b/fObyuiWt/nujo-develop)
 
 ## Getting started
 >coming soon...
