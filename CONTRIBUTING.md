@@ -20,13 +20,39 @@ We have the following branches:
 
 [Gitflow reference](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
 
-### When and how to write Unit Tests?
->coming soon...
-
 ### Task Management Tool
 The Kanban tool used for this project is [Trello](https://trello.com/b/fObyuiWt/nujo-develop)
 
 ## Getting started
+
+### Prerequisites
+
+-   [Python](https://www.python.org/) - The Programming Language used
+-   [Poetry](https://python-poetry.org/) - Dependency and Virtual Environment Management
+
+***Download for Mac OSX using Homebrew***
+
+```bash
+$ brew install python poetry
+```
+
+### Installing and setting up nujo
+
+Run the following in the terminal:
+```bash
+$ git clone https://github.com/VIVelev/nujo && cd nujo
+$ poetry install && poetry shell
+```
+
+## Running the tests
+
+Once you have **Installed and set up** nujo, run:
+
+```bash
+$ pytest
+```
+
+### When and how to write unit tests?
 >coming soon...
 
 ## Your First Contribution
