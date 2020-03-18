@@ -13,7 +13,23 @@
 $ brew install python poetry
 ```
 
-### Installing and setting up for development
+## Installing and setting up
+
+### For users:
+```bash
+$ pip install nujo
+```
+
+Now run the following to make sure nujo was installed properly:
+```bash
+$ python                                                                                                                       
+>>> import nujo as nj
+>>> nj.__version__
+'0.1.0'
+>>> 
+```
+
+### For developers:
 
 ```bash
 $ git clone https://github.com/VIVelev/nujo && cd nujo
