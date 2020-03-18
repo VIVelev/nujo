@@ -1,6 +1,6 @@
-# Contributing to Nujo
+# Contributing to nujo
 
-First off, thank you for considering contributing to Nujo. It's people like you that make Nujo such a great tool.
+First off, thank you for considering contributing to nujo. It's people like you that make nujo such a great tool.
 
 ## Ground Rules
 
