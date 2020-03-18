@@ -1,4 +1,5 @@
 from copy import deepcopy
+from numbers import Number
 
 from numpy import array, eye, ndarray, tile
 
@@ -25,7 +26,12 @@ class Tensor(Node):
     name : string, representation of the tensor
 
     '''
-    def __init__(self, value, diff=True, creator=None, name='<Tensor>'):
+    def __init__(self,
+                 value: Number or 'Tensor',
+                 diff=True,
+                 creator=None,
+                 name='<Tensor>'):
+
         super(Tensor, self).__init__(*if_not_none(creator), name=name)
 
         self.value = value.value if isinstance(value, Tensor) else array(value)
