@@ -1,6 +1,5 @@
 from numpy import array
 
-from nujo.utils.data.nujo_dir import HOME_DIR
 from nujo.utils.data.dataset_iterator import DatasetIterator
 from nujo.utils.data.dataset_loader import DatasetLoader
 
@@ -23,10 +22,11 @@ class Dataset:
 
     '''
     def __init__(self, name: str):
-        self.name = HOME_DIR + name
+        self.name = name
         if '.data' not in name:
             self.name += '.data'
-        DatasetLoader(self)
+        loader = DatasetLoader(self.name)
+        loader.install(self)
 
     def __iter__(self):
         return DatasetIterator(self)
@@ -37,7 +37,10 @@ class Dataset:
         row, col = position
         return self.X[row][col]
 
+    def __repr__(self):
+        return self.X.__str__()
+
 
 if __name__ == '__main__':
     data = Dataset('iris')
-    print(data[2])
+    print(data)

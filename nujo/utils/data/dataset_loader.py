@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from os import mkdir
 from os.path import exists
 
@@ -13,13 +14,23 @@ class DatasetLoader:
     Parameters:
     -----------
     name : will be downloaded from the UCI ML repo
+    override : if this file exists, does it get downloaded again
     '''
-    _UCI_REPO_URL = 'archive.ics.uci.edu/ml/machine-learning-databases/{}/{}'
+    _UCI_REPO_URL = '''
+    https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}
+    '''
 
-    def __init__(self, dataset):
-        self.name = dataset.name  # with .data
-        self._link = self._UCI_REPO_URL.format(self.name[:-4], self.name)
-        with open(self.name, 'r+') as data:
+    def __init__(self, name, override=False):
+        self.name = name  # with .data
+        self._file = HOME_DIR + self.name
+        if exists(HOME_DIR + name) and not override:
+            return
+        self._link = self._UCI_REPO_URL.format(
+            self.name.split('.')[0], self.name).strip()
+        self.download()
+
+    def install(self, dataset):
+        with open(self._file, 'r+') as data:
             lines = data.readlines()
 
         dataset.X = empty((0, len(lines[0].split(','))))
@@ -30,16 +41,11 @@ class DatasetLoader:
 
     def download(self) -> None:
         r = get(self._link)
-        file = HOME_DIR + self.name + '.data'
         if not exists(HOME_DIR):
             mkdir(HOME_DIR)
-            print('Directory "~/.nujo" Created ')
+            print('Directory "~/.nujo" created')
         else:
             print('Directory "~/.nujo" already exists')
         print(f'File {self.name} has been created.')
-        with open(file) as f:
+        with open(self._file, 'wb') as f:
             f.write(r.content)
-
-
-if __name__ == '__main__':
-    DatasetLoader('iris').download()
