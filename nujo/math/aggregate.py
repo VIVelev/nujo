@@ -9,7 +9,7 @@ from numpy import std as np_stddev
 from numpy import sum as np_sum
 from numpy import var as np_variance
 
-from nujo.autodiff import Tensor
+from nujo.autodiff.tensor import Tensor
 
 __all__ = [
     'sum',
