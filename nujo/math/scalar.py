@@ -48,9 +48,7 @@ def sqrt(x: Number or Tensor) -> Tensor:
 
 
 def abs(x: Number or Tensor) -> Tensor:
-    func = sqrt(x**2)
-    func.name = '<Abs>'
-    return func
+    return sqrt(x**2)
 
 
 # ====================================================================================================

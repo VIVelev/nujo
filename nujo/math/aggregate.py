@@ -1,3 +1,5 @@
+from numbers import Number
+
 from numpy import max as np_max
 from numpy import mean as np_mean
 from numpy import median as np_median
@@ -23,7 +25,7 @@ __all__ = [
 # ====================================================================================================
 
 
-def sum(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def sum(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Summation of tensors
 
     Parameters:
@@ -39,6 +41,8 @@ def sum(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
+    args = list(map(Tensor, args))
+
     if len(args) > 1:
         return np_sum(args, axis=dim, keepdims=keepdim)
 
@@ -51,7 +55,7 @@ def sum(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def prod(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def prod(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Product of tensors
 
     Parameters:
@@ -67,6 +71,8 @@ def prod(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
+    args = list(map(Tensor, args))
+
     if len(args) > 1:
         return np_prod(args, axis=dim, keepdims=keepdim)
 
@@ -79,7 +85,7 @@ def prod(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def mean(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def mean(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Mean of tensors
 
     Parameters:
@@ -95,6 +101,8 @@ def mean(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
+    args = list(map(Tensor, args))
+
     if len(args) > 1:
         return np_mean(args, axis=dim, keepdims=keepdim)
 
@@ -107,7 +115,7 @@ def mean(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def median(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def median(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Median of tensors
 
     Parameters:
@@ -123,6 +131,8 @@ def median(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
+    args = list(map(Tensor, args))
+
     if len(args) > 1:
         return np_median(args, axis=dim, keepdims=keepdim)
 
@@ -135,7 +145,7 @@ def median(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def min(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def min(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Min of tensors
 
     Parameters:
@@ -151,6 +161,8 @@ def min(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
+    args = list(map(Tensor, args))
+
     if len(args) > 1:
         return np_min(args, axis=dim, keepdims=keepdim)
 
@@ -163,7 +175,7 @@ def min(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def max(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def max(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Max of tensors
 
     Parameters:
@@ -179,6 +191,8 @@ def max(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
+    args = list(map(Tensor, args))
+
     if len(args) > 1:
         return np_max(args, axis=dim, keepdims=keepdim)
 
@@ -191,7 +205,7 @@ def max(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def stddev(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def stddev(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Standard Deviation of tensors
 
     Parameters:
@@ -207,6 +221,8 @@ def stddev(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
+    args = list(map(Tensor, args))
+
     if len(args) > 1:
         return np_stddev(args, axis=dim, keepdims=keepdim)
 
@@ -219,7 +235,9 @@ def stddev(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def variance(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def variance(*args: Number or Tensor,
+             dim: int = None,
+             keepdim=False) -> Tensor:
     ''' Variance of tensors
 
     Parameters:
@@ -234,6 +252,8 @@ def variance(*args: Tensor, dim: int = None, keepdim=False) -> Tensor:
     result : Tensor
 
     '''
+
+    args = list(map(Tensor, args))
 
     if len(args) > 1:
         return np_variance(args, axis=dim, keepdims=keepdim)
