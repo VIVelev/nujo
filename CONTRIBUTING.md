@@ -1,13 +1,13 @@
-# Contibuting to Nujo
+# Contributing to Nujo
 
 First off, thank you for considering contributing to Nujo. It's people like you that make Nujo such a great tool.
 
 ## Ground Rules
 
 ### Commit messages
-  - "[Update] ..." - creating bugs
-  - "[Fix] ..." - correcting bugs
-  - "[Remove] ..." - rage quit
+  - "[up:*branch*] *commit-message*" - creating bugs
+  - "[fix:*branch*] *commit-message*" - correcting bugs
+  - "[rm:*branch*] *commit-message*" - rage quit
 
 ### Branching strategy
 We are using *Gitflow* as a branching strategy.
