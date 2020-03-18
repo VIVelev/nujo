@@ -90,10 +90,11 @@ class Power(Function):
 
 class Logarithm(Function):
     def __init__(self, input_a, input_b, name='<Log>'):
-        assert input_a > 0  # argument value limits
-        assert input_b > 0 and input_b != 1  # base value limits
-
         super(Logarithm, self).__init__(input_a, input_b, name=name)
+
+        assert (self.children[0] > 0).all()  # argument value limit
+        assert (self.children[1] > 0).all()  # base value limit
+        assert (self.children[1] != 0).all()  # base value limit
 
     def forward(self):
         return log(self.children[0].value) / log(self.children[1].value)
