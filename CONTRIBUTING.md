@@ -23,6 +23,9 @@ We have the following branches:
 ### Python type hints
 >TODO ...
 
+### Task organisation
+The Kanban system used for this project is [Trello](https://trello.com/b/fObyuiWt/nujo-develop)
+
 ## Getting started
 >coming soon...
 
