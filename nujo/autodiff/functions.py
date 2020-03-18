@@ -1,4 +1,4 @@
-from numpy import ones
+from numpy import log, ones
 
 from nujo.autodiff.function import Function
 
@@ -8,6 +8,7 @@ __all__ = [
     'Multiplication',
     'Reciprocal',
     'Power',
+    'Logarithm',
     'MatrixMul',
 ]
 
@@ -82,6 +83,20 @@ class Power(Function):
 
         return (self.children[1].value *
                 self.children[0].value**(self.children[1].value - 1), 1)
+
+
+# ====================================================================================================
+
+
+class Logarithm(Function):
+    def __init__(self, input_a, input_b, name='<Log>'):
+        super(Logarithm, self).__init__(input_a, input_b, name=name)
+
+    def forward(self):
+        return log(self.children[0].value) / log(self.children[1].value)
+
+    def backward(self):
+        return 1 / (self.children[0].value * log(self.children[1].value)), 1
 
 
 # ====================================================================================================

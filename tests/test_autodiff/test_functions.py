@@ -1,7 +1,7 @@
 from numbers import Number
 
 import pytest
-from numpy import ndarray
+from numpy import allclose, log, log2, ndarray
 
 import nujo.autodiff.functions as funcs
 from nujo import Tensor
@@ -124,6 +124,31 @@ def test_power(get_tensors):
 
     # Test Derivative computation
     assert (grad[0] == 2 * A.value).all()
+    assert grad[1] == 1
+
+
+# ====================================================================================================
+# Unit Testing Logarithm
+
+
+def test_logarithm(get_tensors):
+    A, _ = get_tensors
+    log_2 = funcs.Logarithm(A, 2)  # log_2(A)
+
+    # Test Forwardprop
+    C = log_2()
+    assert isinstance(C, Tensor)
+    assert allclose(log2(A.value), C.value)
+
+    # Test Backprop
+    grad = log_2.backward()
+    assert len(grad) == 2
+
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
+
+    # Test Derivative computation
+    assert allclose(grad[0], 1 / (A.value * log(2)))
     assert grad[1] == 1
 
 
