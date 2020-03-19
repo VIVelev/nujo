@@ -1,7 +1,8 @@
 from nujo.autodiff import Tensor, no_diff
+from nujo.math import *
 
 __all__ = [
-    'Tensor'
+    'Tensor',
     'no_diff',
 ]
 

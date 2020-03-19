@@ -1,36 +1,34 @@
-# Neural Dojo: A Reverse-mode Automatic Differentiation library for Neural Networks
+# nujo: A Reverse-mode Automatic Differentiation library for Neural Networks
 
-### Prerequisites
+[![lint_and_test_workflow](https://github.com/VIVelev/nujo/workflows/Lint%20and%20Test/badge.svg)](https://github.com/VIVelev/nujo/actions?query=workflow%3A%22Lint+and+Test%22)
 
--   [Python](https://www.python.org/) - The Programming Language used.
--   [Poetry](https://python-poetry.org/) - Dependency and Virtual Environment Management
-
-**_Download for Mac OSX using Homebrew_**
+## Installing and setting up
 
 ```bash
-$ brew install python
-$ brew install poetry
+$ pip install nujo
 ```
 
-### Installing
-
+Now run the following to make sure nujo was installed properly:
 ```bash
-$ git clone https://github.com/VIVele/nujo && cd nujo
-$ poetry install && poetry shell
+$ python
+>>> import nujo as nj
+>>> nj.__version__
+'0.1.0'
 ```
 
-## Running the tests
+## Examples
 
-Coming soon...
+Check out the [examples/](examples/) folder.
 
 ## Built With
 
 -   [NumPy](http://www.numpy.org/) - Fundamental package for scientific computing with Python
 -   [Graphviz](https://www.graphviz.org/) - Open source graph visualization software
+-   [Requests](https://requests.readthedocs.io/en/master/) - HTTP for Humans
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://github.com/VIVelev/nujo/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](https://github.com/VIVelev/nujo/blob/master/CONTRIBUTING.md) if you wish to become a contributor.
 
 ## Authors
 

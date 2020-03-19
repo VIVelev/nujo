@@ -1,6 +1,6 @@
 from numpy.random import randn
 
-from nujo.autodiff import Tensor
+from nujo.autodiff.tensor import Tensor
 from nujo.nn.base import Transformation
 
 __all__ = [
