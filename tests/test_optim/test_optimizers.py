@@ -144,7 +144,7 @@ def test_adam_matrix(params, num_iters, matrix_mse_loss):
 
 @pytest.fixture
 def params():
-    return [[rand()], [randn(3, 1) * 10]]
+    return [[rand()], [randn(3, 1)]]
 
 
 @pytest.fixture
