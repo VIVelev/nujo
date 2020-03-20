@@ -12,7 +12,7 @@ __all__ = [
 
 
 def rand(*shape: int, diff=True, name='<rand::Tensor>') -> Tensor:
-    ''' Return a sample (or samples) from the "standard normal" distribution.
+    ''' Random values in a given shape.
     '''
 
     return Tensor(np_rand(*shape), diff=diff, name=name)
