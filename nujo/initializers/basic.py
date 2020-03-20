@@ -11,13 +11,13 @@ __all__ = [
 ]
 
 
-def empty(shape: tuple, diff=True, name='<empty::Tensor>') -> Tensor:
+def empty(*shape: int, diff=True, name='<empty::Tensor>') -> Tensor:
     return Tensor(np_empty(shape), diff=diff, name=name)
 
 
-def ones(shape: tuple, diff=True, name='<ones::Tensor>') -> Tensor:
+def ones(*shape: int, diff=True, name='<ones::Tensor>') -> Tensor:
     return Tensor(np_ones(shape), diff=diff, name=name)
 
 
-def zeros(shape: tuple, diff=True, name='<zeros::Tensor>') -> Tensor:
+def zeros(*shape: int, diff=True, name='<zeros::Tensor>') -> Tensor:
     return Tensor(np_zeros(shape), diff=diff, name=name)
