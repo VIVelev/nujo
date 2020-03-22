@@ -2,5 +2,5 @@
     around `numpy` functions.
 '''
 
-from nujo.math.aggregate import *
-from nujo.math.scalar import *
+from nujo.initializers.basic import *
+from nujo.initializers.random import *

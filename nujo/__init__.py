@@ -1,4 +1,5 @@
 from nujo.autodiff import Tensor, no_diff
+from nujo.initializers import *
 from nujo.math import *
 
 __all__ = [
