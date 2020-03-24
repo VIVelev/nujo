@@ -61,8 +61,8 @@ class Flow(metaclass=FlowSetup):
 
         return output_x
 
-    def __call__(self, x):
-        return self.forward(x)
+    def __call__(self, *args, **kwargs):
+        return self.forward(*args, **kwargs)
 
     def __rshift__(self, other):
         return Flow(subflows=[self, other])
