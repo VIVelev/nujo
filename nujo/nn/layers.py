@@ -1,6 +1,5 @@
-from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
-from nujo.initializers.random import randn
+from nujo.initializers import randn, zeros
 
 __all__ = [
     'Linear',
@@ -19,9 +18,9 @@ class Linear(Flow):
         self.W = randn(in_features, out_features, name=self.name + '.W')
 
         if bias:
-            self.b = Tensor(randn(1, out_features), name=self.name + '.bias')
+            self.b = randn(1, out_features, name=self.name + '.bias')
         else:
-            self.b = Tensor(0)
+            self.b = zeros(diff=False)
 
     def forward(self, x):
         return x @ self.W + self.b
