@@ -8,6 +8,7 @@ __all__ = [
 
 class FlowSetup(type):
     def __call__(cls, *args, **kwargs):
+        ''' Called after Flow.__init__ '''
         obj = type.__call__(cls, *args, **kwargs)
         obj._register_parameters()
         return obj
@@ -26,13 +27,16 @@ class Flow(metaclass=FlowSetup):
     '''
     def __init__(self, name='<Flow>', subflows=[]):
         self.name = name
+        self.is_supflow = True if len(subflows) > 0 else False
 
-        self.subflows = []
         self.parameters = []
 
-        self.append(*subflows)
+        if self.is_supflow:
+            self.subflows = []
+            self.append(*subflows)
 
     def _register_parameters(self):
+        ''' Called after Flow.__init__ '''
         for prop_name in dir(self):
             prop = getattr(self, prop_name)
             if isinstance(prop, Tensor):
@@ -44,6 +48,8 @@ class Flow(metaclass=FlowSetup):
             self.subflows.append(flow)
 
             if getattr(flow, 'parameters', False):
+                if flow.is_supflow:
+                    flow.parameters = flow.parameters[0]
                 self.parameters.append(flow.parameters)
 
     def forward(self, x):
@@ -54,7 +60,7 @@ class Flow(metaclass=FlowSetup):
         return output_x
 
     def __call__(self, x):
-        self.forward(x)
+        return self.forward(x)
 
     def __rshift__(self, other):
         return Flow(subflows=[self, other])
