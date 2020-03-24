@@ -42,15 +42,16 @@ class Flow(metaclass=FlowSetup):
             if isinstance(prop, Tensor):
                 self.parameters.append(prop)
 
-    def append(self, *flows: 'Flow') -> None:
+    def append(self, *flows):
         for flow in flows:
-            self.name += ' >> ' + flow.name
             self.subflows.append(flow)
 
             if getattr(flow, 'parameters', False):
                 if flow.is_supflow:
-                    flow.parameters = flow.parameters[0]
-                self.parameters.append(flow.parameters)
+                    for params in flow.parameters:
+                        self.parameters.append(params)
+                else:
+                    self.parameters.append(flow.parameters)
 
     def forward(self, x):
         output_x = x
