@@ -5,7 +5,6 @@ import nujo.optim as optim
 # Define the net and optimizer
 net = nn.Linear(3, 6) >> nn.Linear(6, 2) >> nn.Linear(2, 1)
 print('Defined net:', net)
-print(net.parameters)
 optimizer = optim.Adam(net.parameters, lr=0.1)
 
 
