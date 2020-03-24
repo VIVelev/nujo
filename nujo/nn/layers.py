@@ -1,5 +1,5 @@
 from nujo.flow import Flow
-from nujo.initializers import randn, zeros
+from nujo.init import randn, zeros
 
 __all__ = [
     'Linear',

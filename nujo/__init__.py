@@ -1,6 +1,6 @@
 from nujo.autodiff import Tensor, no_diff
 from nujo.flow import Flow
-from nujo.initializers import *
+from nujo.init import *
 from nujo.math import *
 
 __all__ = [
