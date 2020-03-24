@@ -34,6 +34,7 @@ class Flow(metaclass=FlowSetup):
         if self.is_supflow:
             self.subflows = []
             self.append(*subflows)
+            self.name = ' >> '.join(map(lambda x: x.name, self.subflows))
 
     def _register_parameters(self):
         ''' Called after Flow.__init__ '''
@@ -52,6 +53,8 @@ class Flow(metaclass=FlowSetup):
                         self.parameters.append(params)
                 else:
                     self.parameters.append(flow.parameters)
+
+        return self
 
     def forward(self, x):
         output_x = x
