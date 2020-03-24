@@ -1,4 +1,5 @@
+from nujo.flow import Flow
 
 
-class Loss:
+class Loss(Flow):
     pass

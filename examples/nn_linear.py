@@ -1,5 +1,6 @@
 import nujo as nj
 import nujo.nn as nn
+import nujo.objective as obj
 import nujo.optim as optim
 
 # Define the net and optimizer
@@ -15,7 +16,7 @@ def train(net, x, y, num_epochs):
         # Forward
         output = net(x)
         # Compute Loss
-        loss = nj.mean((output - y)**2)
+        loss = obj.mean_sq_err(output, y)
 
         # Print the loss every 10th epoch for monitoring
         if epoch % 10 == 0:
