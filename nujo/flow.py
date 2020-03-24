@@ -1,28 +1,26 @@
 from nujo.autodiff.tensor import Tensor
 
-__all__ = [
-    'FlowSetup',
-    'Flow',
-]
-
 
 class FlowSetup(type):
+    ''' Flow's metaclass used to setup the flow
+    '''
     def __call__(cls, *args, **kwargs):
         ''' Called after Flow.__init__ '''
         obj = type.__call__(cls, *args, **kwargs)
         obj._register_parameters()
+
         return obj
 
 
 class Flow(metaclass=FlowSetup):
     ''' A computational Flow
 
-    Flow of nujo functions.
+    Flow of tensors through nujo functions.
 
     Parameters:
     -----------
     name : string
-    subflows : list of flows
+    subflows : list of flows, only if the current flow is a supflow
 
     '''
     def __init__(self, name='<Flow>', subflows=[]):
