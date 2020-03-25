@@ -21,7 +21,13 @@ class Loss(Flow):
         super(Loss, self).__init__(name=self.__class__.__name__)
         self.dim = dim
         self.keepdim = keepdim
-        self.reduction_fn = mean if reduction == 'mean' else sum
+
+        if reduction == 'sum':
+            self.reduction_fn = sum
+        elif reduction == 'mean':
+            self.reduction_fn = mean
+        else:
+            self.reduction_fn = lambda x: x
 
 
 # ====================================================================================================
