@@ -1,4 +1,5 @@
-''' More details here: https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html
+''' More details here:
+    https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html
 '''
 
 from numpy import clip
@@ -23,7 +24,7 @@ class Loss(Flow):
         super(Loss, self).__init__(name=self.__class__.__name__)
         self.dim = dim
         self.keepdim = keepdim
-        self.reduction = mean if reduction == 'mean' else sum
+        self.reduction_fn = mean if reduction == 'mean' else sum
 
 
 # ====================================================================================================
@@ -34,9 +35,9 @@ class L1Loss(Loss):
         super(L1Loss, self).__init__(dim, keepdim, reduction)
 
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
-        return self.reduction(abs(input - target),
-                              dim=self.dim,
-                              keepdim=self.keepdim)
+        return self.reduction_fn(abs(input - target),
+                                 dim=self.dim,
+                                 keepdim=self.keepdim)
 
 
 # ====================================================================================================
@@ -47,9 +48,9 @@ class L2Loss(Loss):
         super(L2Loss, self).__init__(dim, keepdim, reduction)
 
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
-        return self.reduction((input - target)**2,
-                              dim=self.dim,
-                              keepdim=self.keepdim)
+        return self.reduction_fn((input - target)**2,
+                                 dim=self.dim,
+                                 keepdim=self.keepdim)
 
 
 # ====================================================================================================
@@ -62,10 +63,10 @@ class BinaryCrossEntropy(Loss):
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         # Avoid division by zero
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
-        return self.reduction(-target * log(input) -
-                              (1 - target) * log(1 - input),
-                              dim=self.dim,
-                              keepdim=self.keepdim)
+        return self.reduction_fn(-target * log(input) -
+                                 (1 - target) * log(1 - input),
+                                 dim=self.dim,
+                                 keepdim=self.keepdim)
 
 
 # ====================================================================================================
@@ -78,9 +79,9 @@ class CrossEntropy(Loss):
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         # Avoid division by zero
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
-        return -self.reduction(sum(target * log(input), dim=1),
-                               dim=self.dim,
-                               keepdim=self.keepdim)
+        return -self.reduction_fn(sum(target * log(input), dim=1),
+                                  dim=self.dim,
+                                  keepdim=self.keepdim)
 
 
 # ====================================================================================================
