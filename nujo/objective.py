@@ -53,7 +53,10 @@ class BinaryCrossEntropy(Loss):
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         # Avoid division by zero
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
-        return sum(-target * log(input) - (1 - target) * log(1 - input))
+        return self.reduction(-target * log(input) -
+                              (1 - target) * log(1 - input),
+                              dim=self.dim,
+                              keepdim=self.keepdim)
 
 
 # ====================================================================================================
