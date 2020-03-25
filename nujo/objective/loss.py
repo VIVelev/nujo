@@ -26,7 +26,7 @@ class Loss(Flow):
             self.reduction_fn = sum
         elif reduction == 'mean':
             self.reduction_fn = mean
-        else:
+        else:  # if None
             self.reduction_fn = lambda x: x
 
 
