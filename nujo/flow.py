@@ -23,7 +23,7 @@ class Flow(metaclass=FlowSetup):
     subflows : list of flows, only if the current flow is a supflow
 
     '''
-    def __init__(self, name='<Flow>', subflows=[]):
+    def __init__(self, name='Flow', subflows=[]):
         self.name = name
         self.is_supflow = True if len(subflows) > 0 else False
 
@@ -74,4 +74,4 @@ class Flow(metaclass=FlowSetup):
         return iter(self.subflows)
 
     def __repr__(self):
-        return self.name
+        return '<|' + self.name + '>'

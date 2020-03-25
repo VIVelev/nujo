@@ -16,7 +16,7 @@ __all__ = [
 
 
 class Addition(Function):
-    def __init__(self, input_a, input_b, name='<Add>'):
+    def __init__(self, input_a, input_b, name='Add'):
         super(Addition, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
@@ -30,7 +30,7 @@ class Addition(Function):
 
 
 class Negation(Function):
-    def __init__(self, input, name='<Neg>'):
+    def __init__(self, input, name='Neg'):
         super(Negation, self).__init__(input, name=name)
 
     def forward(self):
@@ -44,7 +44,7 @@ class Negation(Function):
 
 
 class Multiplication(Function):
-    def __init__(self, input_a, input_b, name='<Mul>'):
+    def __init__(self, input_a, input_b, name='Mul'):
         super(Multiplication, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
@@ -58,7 +58,7 @@ class Multiplication(Function):
 
 
 class Reciprocal(Function):
-    def __init__(self, input, name='<Recipr>'):
+    def __init__(self, input, name='Recipr'):
         super(Reciprocal, self).__init__(input, name=name)
 
     def forward(self):
@@ -72,7 +72,7 @@ class Reciprocal(Function):
 
 
 class Power(Function):
-    def __init__(self, input_a, input_b, name='<Pow>'):
+    def __init__(self, input_a, input_b, name='Pow'):
         super(Power, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
@@ -89,7 +89,7 @@ class Power(Function):
 
 
 class Logarithm(Function):
-    def __init__(self, input_a, input_b, name='<Log>'):
+    def __init__(self, input_a, input_b, name='Log'):
         super(Logarithm, self).__init__(input_a, input_b, name=name)
 
         assert (self.children[0] > 0).all()  # argument value limit
@@ -107,7 +107,7 @@ class Logarithm(Function):
 
 
 class MatrixMul(Function):
-    def __init__(self, input_a, input_b, name='<MatMul>'):
+    def __init__(self, input_a, input_b, name='MatMul'):
         super(MatrixMul, self).__init__(input_a, input_b, name=name)
 
     @staticmethod

@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 
-def empty(*shape: int, diff=True, name='<empty::Tensor>') -> Tensor:
+def empty(*shape: int, diff=True, name='empty::Tensor') -> Tensor:
     ''' Return a new array of given shape, without initializing entries.
     '''
 
@@ -23,21 +23,21 @@ def empty(*shape: int, diff=True, name='<empty::Tensor>') -> Tensor:
 def full(*shape: int,
          fill_value=0,
          diff=True,
-         name='<empty::Tensor>') -> Tensor:
+         name='empty::Tensor') -> Tensor:
     ''' Return a new array of given shape, filled with `fill_value`.
     '''
 
     return Tensor(np_full(shape, fill_value), diff=diff, name=name)
 
 
-def ones(*shape: int, diff=True, name='<ones::Tensor>') -> Tensor:
+def ones(*shape: int, diff=True, name='ones::Tensor') -> Tensor:
     ''' Return a new array of given shape, filled with ones.
     '''
 
     return Tensor(np_ones(shape), diff=diff, name=name)
 
 
-def zeros(*shape: int, diff=True, name='<zeros::Tensor>') -> Tensor:
+def zeros(*shape: int, diff=True, name='zeros::Tensor') -> Tensor:
     ''' Return a new array of given shape, filled with zeros.
     '''
 

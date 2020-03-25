@@ -23,11 +23,11 @@ class Function(Node):
     name : string, the name of the function
 
     '''
-    def __init__(self, *children: Tensor, name='<Function>') -> None:
+    def __init__(self, *children: Tensor, name='Function') -> None:
         super(Function, self).__init__(*children, name=name)
 
-    def __repr__(self) -> str:
-        return self.name + f'#{self.id}'
+    def __repr__(self):
+        return super(Function, self).__repr__() + f'#{self.id}'
 
     def _generate_tensor_name(self) -> str:
         return 'Z' + self.__repr__()
