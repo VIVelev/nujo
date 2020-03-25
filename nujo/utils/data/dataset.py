@@ -35,6 +35,10 @@ class Dataset:
         if isinstance(position, int):
             return self.X[position]
         row, col = position
+        if (col != self._cols):
+            # if not the last col, then return a float
+            return float(self.X[row][col])
+        # last col is a string
         return self.X[row][col]
 
     def __repr__(self):
@@ -43,4 +47,4 @@ class Dataset:
 
 if __name__ == '__main__':
     data = Dataset('iris')
-    print(data)
+    print(data[1, 2])

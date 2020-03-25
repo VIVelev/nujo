@@ -32,8 +32,8 @@ class DatasetLoader:
     def install(self, dataset):
         with open(self._file, 'r+') as data:
             lines = data.readlines()
-
-        dataset.X = empty((0, len(lines[0].split(','))))
+        dataset._cols = len(lines[0].split(','))
+        dataset.X = empty((0, dataset._cols))
         # number of columns
         for line in lines[:-1]:  # last row is \n
             x = array(line.strip().split(','))
