@@ -1,10 +1,17 @@
+''' More details here: https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html
+'''
+
+from numpy import clip
+
 from nujo.flow import Flow
-from nujo.math import abs, mean, sum
+from nujo.math import abs, log, mean, sum
 
 __all__ = [
     'Loss',
     'L1Loss',
     'L2Loss',
+    'BinaryCrossEntropy',
+    'CrossEntropy',
 ]
 
 # ====================================================================================================
@@ -36,6 +43,24 @@ class L2Loss(Loss):
         return self.reduction((input - target)**2,
                               dim=self.dim,
                               keepdim=self.keepdim)
+
+
+# ====================================================================================================
+
+
+class BinaryCrossEntropy(Loss):
+    def forward(self, input, target):
+        # Avoid division by zero
+        input.value = clip(input.value, 1e-16, 1 - 1e-16)
+        return sum(-target * log(input) - (1 - target) * log(1 - input))
+
+
+# ====================================================================================================
+
+
+class CrossEntropy(Loss):
+    def forward(self, input, target):
+        pass
 
 
 # ====================================================================================================
