@@ -2,7 +2,7 @@ from numpy import clip
 
 from nujo.autodiff.tensor import Tensor
 from nujo.math import log, sum
-from nujo.objective.loss import Loss
+from nujo.objective.loss import QualitativeLoss
 
 __all__ = [
     'BinaryCrossEntropy',
@@ -12,15 +12,12 @@ __all__ = [
 # ====================================================================================================
 
 
-class BinaryCrossEntropy(Loss):
+class BinaryCrossEntropy(QualitativeLoss):
     ''' Binary Cross-Entropy loss
 
         −(y * log(p) + (1−y) * log(1 − p))
 
     '''
-    def __init__(self, dim: int = None, keepdim=False, reduction='sum'):
-        super(BinaryCrossEntropy, self).__init__(dim, keepdim, reduction)
-
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         # Avoid division by zero
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
@@ -33,12 +30,9 @@ class BinaryCrossEntropy(Loss):
 # ====================================================================================================
 
 
-class CrossEntropy(Loss):
+class CrossEntropy(QualitativeLoss):
     ''' Multi-class Cross-Entropy loss
     '''
-    def __init__(self, dim: int = None, keepdim=False, reduction='sum'):
-        super(CrossEntropy, self).__init__(dim, keepdim, reduction)
-
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         # Avoid division by zero
         input.value = clip(input.value, 1e-16, 1 - 1e-16)

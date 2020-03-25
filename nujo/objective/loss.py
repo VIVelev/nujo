@@ -5,6 +5,14 @@
 from nujo.flow import Flow
 from nujo.math.aggregate import mean, sum
 
+__all__ = [
+    'Loss',
+    'QualitativeLoss',
+    'QuantitativeLoss',
+]
+
+# ====================================================================================================
+
 
 class Loss(Flow):
     ''' Base loss class
@@ -14,3 +22,26 @@ class Loss(Flow):
         self.dim = dim
         self.keepdim = keepdim
         self.reduction_fn = mean if reduction == 'mean' else sum
+
+
+# ====================================================================================================
+
+
+class QualitativeLoss(Loss):
+    ''' Base qualitative loss class
+    '''
+    def __init__(self, dim: int = None, keepdim=False, reduction='sum'):
+        super(QualitativeLoss, self).__init__(dim, keepdim, reduction)
+
+
+# ====================================================================================================
+
+
+class QuantitativeLoss(Loss):
+    ''' Base quantitative loss class
+    '''
+    def __init__(self, dim: int = None, keepdim=False, reduction='mean'):
+        super(QuantitativeLoss, self).__init__(dim, keepdim, reduction)
+
+
+# ====================================================================================================
