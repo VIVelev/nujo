@@ -3,6 +3,7 @@
 
 from numpy import clip
 
+from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 from nujo.math import abs, log, mean, sum
 
@@ -18,7 +19,7 @@ __all__ = [
 
 
 class Loss(Flow):
-    def __init__(self, dim=None, keepdim=False, reduction='mean'):
+    def __init__(self, dim: int = None, keepdim=False, reduction='mean'):
         super(Loss, self).__init__(name=self.__class__.__name__)
         self.dim = dim
         self.keepdim = keepdim
@@ -29,7 +30,7 @@ class Loss(Flow):
 
 
 class L1Loss(Loss):
-    def forward(self, input, target):
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:
         return self.reduction(abs(input - target),
                               dim=self.dim,
                               keepdim=self.keepdim)
@@ -39,7 +40,7 @@ class L1Loss(Loss):
 
 
 class L2Loss(Loss):
-    def forward(self, input, target):
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:
         return self.reduction((input - target)**2,
                               dim=self.dim,
                               keepdim=self.keepdim)
@@ -49,7 +50,7 @@ class L2Loss(Loss):
 
 
 class BinaryCrossEntropy(Loss):
-    def forward(self, input, target):
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:
         # Avoid division by zero
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
         return sum(-target * log(input) - (1 - target) * log(1 - input))
@@ -59,7 +60,7 @@ class BinaryCrossEntropy(Loss):
 
 
 class CrossEntropy(Loss):
-    def forward(self, input, target):
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:
         pass
 
 

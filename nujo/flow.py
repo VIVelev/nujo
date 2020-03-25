@@ -34,14 +34,14 @@ class Flow(metaclass=FlowSetup):
             self.append(*subflows)
             self.name = ' >> '.join(map(lambda x: x.name, self.subflows))
 
-    def _register_parameters(self):
+    def _register_parameters(self) -> None:
         ''' Called after Flow.__init__ '''
         for prop_name in dir(self):
             prop = getattr(self, prop_name)
             if isinstance(prop, Tensor):
                 self.parameters.append(prop)
 
-    def append(self, *flows):
+    def append(self, *flows: 'Flow') -> 'Flow':
         for flow in flows:
             self.subflows.append(flow)
 
@@ -54,20 +54,20 @@ class Flow(metaclass=FlowSetup):
 
         return self
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         output_x = x
         for subflow in self:
             output_x = subflow.forward(output_x)
 
         return output_x
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> Tensor:
         return self.forward(*args, **kwargs)
 
-    def __rshift__(self, other):
+    def __rshift__(self, other: 'Flow') -> 'Flow':
         return Flow(subflows=[self, other])
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: int) -> 'Flow':
         return self.subflows[key]
 
     def __iter__(self):
