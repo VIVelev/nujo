@@ -6,7 +6,12 @@ import nujo.optim as optim
 # Define the net and optimizer
 net = nn.Linear(3, 6) >> nn.Linear(6, 2) >> nn.Linear(2, 1)
 print('Defined net:', net)
+
+l2_loss = obj.L2Loss()
+print('Loss:', l2_loss)
+
 optimizer = optim.Adam(net.parameters, lr=0.1)
+print('Optimizer:', optimizer)
 
 
 # Training loop
@@ -16,7 +21,7 @@ def train(net, x, y, num_epochs):
         # Forward
         output = net(x)
         # Compute Loss
-        loss = obj.mean_sq_err(output, y)
+        loss = l2_loss(output, y)
 
         # Print the loss every 10th epoch for monitoring
         if epoch % 10 == 0:

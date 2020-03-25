@@ -1,5 +1,5 @@
 from nujo.flow import Flow
-from nujo.math.scalar import abs, mean, sum
+from nujo.math import abs, mean, sum
 
 __all__ = [
     'Loss',
@@ -12,6 +12,7 @@ __all__ = [
 
 class Loss(Flow):
     def __init__(self, dim=None, keepdim=False, reduction='mean'):
+        super(Loss, self).__init__(name='<' + self.__class__.__name__ + '>')
         self.dim = dim
         self.keepdim = keepdim
         self.reduction = mean if reduction == 'mean' else sum
