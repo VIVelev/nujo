@@ -20,6 +20,8 @@ __all__ = [
 
 
 class Loss(Flow):
+    ''' Base loss class
+    '''
     def __init__(self, dim: int = None, keepdim=False, reduction: str = None):
         super(Loss, self).__init__(name=self.__class__.__name__)
         self.dim = dim
@@ -31,6 +33,8 @@ class Loss(Flow):
 
 
 class L1Loss(Loss):
+    ''' L1 loss (or Mean Absolute Error)
+    '''
     def __init__(self, dim: int = None, keepdim=False, reduction='mean'):
         super(L1Loss, self).__init__(dim, keepdim, reduction)
 
@@ -44,6 +48,8 @@ class L1Loss(Loss):
 
 
 class L2Loss(Loss):
+    ''' L2 loss (or Mean Squared Error)
+    '''
     def __init__(self, dim: int = None, keepdim=False, reduction='mean'):
         super(L2Loss, self).__init__(dim, keepdim, reduction)
 
@@ -57,6 +63,11 @@ class L2Loss(Loss):
 
 
 class BinaryCrossEntropy(Loss):
+    ''' Binary Cross-Entropy loss
+
+        −(y * log(p) + (1−y) * log(1 − p))
+
+    '''
     def __init__(self, dim: int = None, keepdim=False, reduction='sum'):
         super(BinaryCrossEntropy, self).__init__(dim, keepdim, reduction)
 
@@ -73,6 +84,8 @@ class BinaryCrossEntropy(Loss):
 
 
 class CrossEntropy(Loss):
+    ''' Multi-class Cross-Entropy loss
+    '''
     def __init__(self, dim: int = None, keepdim=False, reduction='sum'):
         super(CrossEntropy, self).__init__(dim, keepdim, reduction)
 
