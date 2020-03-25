@@ -19,7 +19,7 @@ __all__ = [
 
 
 class Loss(Flow):
-    def __init__(self, dim: int = None, keepdim=False, reduction='mean'):
+    def __init__(self, dim: int = None, keepdim=False, reduction: str = None):
         super(Loss, self).__init__(name=self.__class__.__name__)
         self.dim = dim
         self.keepdim = keepdim
@@ -30,6 +30,9 @@ class Loss(Flow):
 
 
 class L1Loss(Loss):
+    def __init__(self, dim: int = None, keepdim=False, reduction='mean'):
+        super(L1Loss, self).__init__(dim, keepdim, reduction)
+
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         return self.reduction(abs(input - target),
                               dim=self.dim,
@@ -40,6 +43,9 @@ class L1Loss(Loss):
 
 
 class L2Loss(Loss):
+    def __init__(self, dim: int = None, keepdim=False, reduction='mean'):
+        super(L2Loss, self).__init__(dim, keepdim, reduction)
+
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         return self.reduction((input - target)**2,
                               dim=self.dim,
