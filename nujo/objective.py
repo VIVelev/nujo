@@ -50,6 +50,9 @@ class L2Loss(Loss):
 
 
 class BinaryCrossEntropy(Loss):
+    def __init__(self, dim: int = None, keepdim=False, reduction='sum'):
+        super(BinaryCrossEntropy, self).__init__(dim, keepdim, reduction)
+
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         # Avoid division by zero
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
@@ -63,8 +66,15 @@ class BinaryCrossEntropy(Loss):
 
 
 class CrossEntropy(Loss):
+    def __init__(self, dim: int = None, keepdim=False, reduction='sum'):
+        super(CrossEntropy, self).__init__(dim, keepdim, reduction)
+
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
-        pass
+        # Avoid division by zero
+        input.value = clip(input.value, 1e-16, 1 - 1e-16)
+        return -self.reduction(sum(target * log(input), dim=1),
+                               dim=self.dim,
+                               keepdim=self.keepdim)
 
 
 # ====================================================================================================
