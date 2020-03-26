@@ -4,7 +4,7 @@
     http://ruder.io/optimizing-gradient-descent/index.html
 '''
 
-from numpy import sqrt, square, zeros_like
+from numpy import sqrt, zeros_like
 
 from nujo.optim.optimizer import Optimizer
 
@@ -107,7 +107,7 @@ class RMSprop(Optimizer):
 
         # Exponentially Weighted Moving Average
         self._squared[key] = self.beta * self._squared[key] +\
-            (1 - self.beta) * square(grad)
+            (1 - self.beta) * grad**2
 
         # Update rule
         return param - self.lr * grad / (sqrt(self._squared[key]) + self.eps)
@@ -154,7 +154,7 @@ class Adam(Optimizer):
             (1 - self.betas[0]) * grad
 
         self._squared[key] = self.betas[1] * self._squared[key] +\
-            (1 - self.betas[1]) * square(grad)
+            (1 - self.betas[1]) * grad**2
 
         # Bias correction
         v_corrected = self._velocity[key] / (1 - self.betas[0]**self._t)
