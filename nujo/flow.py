@@ -2,7 +2,7 @@ from nujo.autodiff.tensor import Tensor
 
 
 class FlowSetup(type):
-    ''' Flow's metaclass used to setup the flow
+    ''' Flow's metaclass used to setup the computational flow
     '''
     def __call__(cls, *args, **kwargs):
         ''' Called after Flow.__init__ '''
@@ -65,10 +65,16 @@ class Flow(metaclass=FlowSetup):
         return self.forward(*args, **kwargs)
 
     def __rshift__(self, other: 'Flow') -> 'Flow':
-        return Flow(subflows=[self, other])
+        self_subflows = self.subflows if self.is_supflow else [self]
+        other_subflows = other.subflows if other.is_supflow else [other]
 
-    def __getitem__(self, key: int) -> 'Flow':
-        return self.subflows[key]
+        return Flow(subflows=[*self_subflows, *other_subflows])
+
+    def __getitem__(self, key: int or str) -> 'Flow':
+        if type(key) is str:
+            return next((x for x in self.subflows if x.name == key), None)
+        else:
+            return self.subflows[key]
 
     def __iter__(self):
         return iter(self.subflows)
