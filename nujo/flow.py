@@ -45,7 +45,7 @@ class Flow(metaclass=FlowSetup):
         for flow in flows:
             self.subflows.append(flow)
 
-            if getattr(flow, 'parameters', False):
+            if flow.parameters:
                 if flow.is_supflow:
                     for params in flow.parameters:
                         self.parameters.append(params)
@@ -60,7 +60,7 @@ class Flow(metaclass=FlowSetup):
     def forward(self, x: Tensor) -> Tensor:
         output_x = x
         for subflow in self:
-            output_x = subflow.forward(output_x)
+            output_x = subflow(output_x)
 
         return output_x
 
