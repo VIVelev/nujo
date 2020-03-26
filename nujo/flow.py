@@ -54,6 +54,9 @@ class Flow(metaclass=FlowSetup):
 
         return self
 
+    def pop(self, idx=-1):
+        return self.subflows.pop(idx)
+
     def forward(self, x: Tensor) -> Tensor:
         output_x = x
         for subflow in self:
