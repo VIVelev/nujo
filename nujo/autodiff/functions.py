@@ -58,14 +58,15 @@ class Multiplication(Function):
 
 
 class Reciprocal(Function):
-    def __init__(self, input, name='Recipr'):
+    def __init__(self, input, name='Recipr', eps=1e-18):
         super(Reciprocal, self).__init__(input, name=name)
+        self.eps = eps
 
     def forward(self):
-        return 1 / (self.children[0].value + Reciprocal.epsilon)
+        return 1 / (self.children[0].value + self.eps)
 
     def backward(self):
-        return -1 / ((self.children[0].value + Reciprocal.epsilon)**2),
+        return -1 / ((self.children[0].value + self.eps)**2),
 
 
 # ====================================================================================================
