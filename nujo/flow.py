@@ -5,7 +5,7 @@ class FlowSetup(type):
     ''' Flow's metaclass used to setup the computational flow
     '''
     def __call__(cls, *args, **kwargs):
-        ''' Called after Flow.__init__ '''
+        ''' Flow() init call '''
         obj = type.__call__(cls, *args, **kwargs)
         obj._register_parameters()
 
@@ -38,7 +38,7 @@ class Flow(metaclass=FlowSetup):
         ''' Called after Flow.__init__ '''
         for prop_name in dir(self):
             prop = getattr(self, prop_name)
-            if isinstance(prop, Tensor):
+            if isinstance(prop, Tensor) and prop.diff:
                 self.parameters.append(prop)
 
     def append(self, *flows: 'Flow') -> 'Flow':
