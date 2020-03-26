@@ -75,7 +75,11 @@ class Flow(metaclass=FlowSetup):
 
     def __getitem__(self, key: int or str) -> 'Flow':
         if type(key) is str:
-            return next((x for x in self.subflows if x.name == key), None)
+            flow = next((x for x in self.subflows if x.name == key), None)
+            if flow is not None:
+                return flow
+            else:
+                raise ValueError(f'Could not find a flow named: {key}')
         else:
             return self.subflows[key]
 
