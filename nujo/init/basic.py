@@ -9,7 +9,9 @@ __all__ = [
     'empty',
     'full',
     'ones',
+    'ones_like',
     'zeros',
+    'zeros_like',
 ]
 
 
@@ -20,10 +22,7 @@ def empty(*shape: int, diff=True, name='empty::Tensor') -> Tensor:
     return Tensor(np_empty(shape), diff=diff, name=name)
 
 
-def full(*shape: int,
-         fill_value=0,
-         diff=True,
-         name='empty::Tensor') -> Tensor:
+def full(*shape: int, fill_value=0, diff=True, name='full::Tensor') -> Tensor:
     ''' Return a new array of given shape, filled with `fill_value`.
     '''
 
@@ -37,8 +36,16 @@ def ones(*shape: int, diff=True, name='ones::Tensor') -> Tensor:
     return Tensor(np_ones(shape), diff=diff, name=name)
 
 
+def ones_like(x: Tensor, diff=True, name='ones::Tensor') -> Tensor:
+    return ones(*x.shape, diff=diff, name=name)
+
+
 def zeros(*shape: int, diff=True, name='zeros::Tensor') -> Tensor:
     ''' Return a new array of given shape, filled with zeros.
     '''
 
     return Tensor(np_zeros(shape), diff=diff, name=name)
+
+
+def zeros_like(x: Tensor, diff=True, name='zeros::Tensor') -> Tensor:
+    return zeros(*x.shape, diff=diff, name=name)

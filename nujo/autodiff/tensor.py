@@ -27,14 +27,15 @@ class Tensor(Node):
 
     '''
     def __init__(self,
-                 value: Number or 'Tensor',
+                 value: Number or list or ndarray or 'Tensor',
                  diff=True,
                  creator=None,
                  name='Tensor'):
 
         super(Tensor, self).__init__(*if_not_none(creator), name=name)
 
-        self.value = value.value if isinstance(value, Tensor) else array(value)
+        self.value: ndarray = value.value if isinstance(
+            value, Tensor) else array(value)
         self.diff = diff
         self.creator = creator
 
@@ -182,6 +183,9 @@ class Tensor(Node):
 
     def __getitem__(self, position):
         return self.value[position]
+
+    def __setitem__(self, position, value):
+        self.value[position] = value
 
     def __hash__(self):
         return hash(self.name)
