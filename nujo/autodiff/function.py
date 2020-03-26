@@ -45,7 +45,7 @@ class Function(Node):
         if not isinstance(z, Tensor):
             z = Tensor(z, creator=self, name=self._generate_tensor_name())
 
-        if DIFF_ENABLED:  # TODO: check children's diff
+        if DIFF_ENABLED and any([x.diff for x in self.children]):
             for tensor, derivative in zip(self.children, self.backward()):
                 tensor.add_grad_dependency(z, array(derivative))
 
