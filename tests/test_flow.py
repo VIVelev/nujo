@@ -29,12 +29,14 @@ def test_append(flows):
 
 
 def test_pop(flows):
-    _, B, C = flows
+    A, B, C = flows
 
     poped = C.pop()
     assert poped is B
-    assert not C.is_supflow
-    assert repr(C) == '<|A>'
+    assert C.is_supflow
+
+    assert C.name is A.name
+    assert C(42) == A(42) == 42
 
 
 @pytest.fixture

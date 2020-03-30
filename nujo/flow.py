@@ -65,11 +65,7 @@ class Flow(metaclass=FlowSetup):
 
     def pop(self, idx=-1) -> 'Flow':
         retflow = self.subflows.pop(idx)
-
-        if len(self.subflows) == 1:
-            self.__dict__ = self.subflows[-1].__dict__.copy()
-        else:
-            self.name = self._generate_supflow_name()
+        self.name = self._generate_supflow_name()
 
         return retflow
 
