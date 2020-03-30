@@ -27,10 +27,10 @@ class Flow(metaclass=FlowSetup):
         self.name = name
         self.is_supflow = True if len(subflows) > 0 else False
 
+        self.subflows = []
         self.parameters = []
 
         if self.is_supflow:
-            self.subflows = []
             self.append(*subflows)
             self.name = ' >> '.join(map(lambda x: x.name, self.subflows))
 
@@ -52,10 +52,16 @@ class Flow(metaclass=FlowSetup):
                 else:
                     self.parameters.append(flow.parameters)
 
+        self.is_supflow = True
         return self
 
-    def pop(self, idx=-1):
-        return self.subflows.pop(idx)
+    def pop(self, idx=-1) -> 'Flow':
+        retflow = self.subflows.pop(idx)
+
+        if len(self.subflows) == 0:
+            self.is_supflow = False
+
+        return retflow
 
     def forward(self, x: Tensor) -> Tensor:
         output_x = x
