@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from nujo.autodiff.tensor import Tensor
 
 
@@ -32,7 +34,6 @@ class Flow(metaclass=FlowSetup):
 
         if self.is_supflow:
             self.append(*subflows)
-            self.name = ' >> '.join(map(lambda x: x.name, self.subflows))
 
     def _register_parameters(self) -> None:
         ''' Called after Flow.__init__ '''
@@ -41,7 +42,14 @@ class Flow(metaclass=FlowSetup):
             if isinstance(prop, Tensor) and prop.diff:
                 self.parameters.append(prop)
 
+    def _generate_supflow_name(self) -> str:
+        return ' >> '.join(map(lambda x: x.name, self.subflows))
+
     def append(self, *flows: 'Flow') -> 'Flow':
+        if not self.is_supflow:
+            self.subflows.append(deepcopy(self))
+            self.is_supflow = True
+
         for flow in flows:
             self.subflows.append(flow)
 
@@ -52,7 +60,7 @@ class Flow(metaclass=FlowSetup):
                 else:
                     self.parameters.append(flow.parameters)
 
-        self.is_supflow = True
+        self.name = self._generate_supflow_name()
         return self
 
     def pop(self, idx=-1) -> 'Flow':
