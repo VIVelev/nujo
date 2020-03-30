@@ -47,7 +47,7 @@ class Flow(metaclass=FlowSetup):
 
     def append(self, *flows: 'Flow') -> 'Flow':
         if not self.is_supflow:
-            self.subflows.append(deepcopy(self))
+            self.subflows.append(self.copy())
             self.is_supflow = True
 
         for flow in flows:
@@ -67,7 +67,7 @@ class Flow(metaclass=FlowSetup):
         retflow = self.subflows.pop(idx)
 
         if len(self.subflows) == 1:
-            self.__dict__ = deepcopy(self.subflows[-1].__dict__)
+            self.__dict__ = self.subflows[-1].__dict__.copy()
         else:
             self.name = self._generate_supflow_name()
 
@@ -79,6 +79,9 @@ class Flow(metaclass=FlowSetup):
             output_x = subflow(output_x)
 
         return output_x
+
+    def copy(self):
+        return deepcopy(self)
 
     def __call__(self, *args, **kwargs) -> Tensor:
         return self.forward(*args, **kwargs)
