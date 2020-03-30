@@ -27,7 +27,7 @@ class Flow(metaclass=FlowSetup):
     '''
     def __init__(self, name='Flow', subflows=[]):
         self.name = name
-        self.is_supflow = True if len(subflows) > 0 else False
+        self.is_supflow = True if len(subflows) >= 2 else False
 
         self.subflows = []
         self.parameters = []
@@ -66,8 +66,10 @@ class Flow(metaclass=FlowSetup):
     def pop(self, idx=-1) -> 'Flow':
         retflow = self.subflows.pop(idx)
 
-        if len(self.subflows) == 0:
-            self.is_supflow = False
+        if len(self.subflows) == 1:
+            self.__dict__ = deepcopy(self.subflows[-1].__dict__)
+        else:
+            self.name = self._generate_supflow_name()
 
         return retflow
 
