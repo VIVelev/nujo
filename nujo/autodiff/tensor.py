@@ -56,6 +56,14 @@ class Tensor(Node):
 
         return self._grad
 
+    @grad.setter
+    def grad(self, value: Number or list or ndarray or 'Tensor'):
+        self._grad = value.value if isinstance(value, Tensor) else array(value)
+
+    @grad.deleter
+    def grad(self):
+        del self._grad
+
     @property
     def T(self):
         if self._T is None:
