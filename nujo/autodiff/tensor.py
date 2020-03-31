@@ -30,7 +30,7 @@ class Tensor(Node):
                  value: Number or 'Tensor',
                  diff=True,
                  creator=None,
-                 name='<Tensor>'):
+                 name='Tensor'):
 
         super(Tensor, self).__init__(*if_not_none(creator), name=name)
 
@@ -282,9 +282,6 @@ class Tensor(Node):
         return MatrixMul(other, self)()
 
     # Representations
-
-    def __repr__(self):
-        return self.name
 
     def __str__(self):
         return self.__repr__() + '\n' + '-' * 32 + '\n' + str(self.value)
