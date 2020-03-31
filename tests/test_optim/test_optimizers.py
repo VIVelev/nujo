@@ -26,14 +26,15 @@ def test_sgd_matrix(params, num_iters, matrix_mse_loss):
     optimizer = optim.SGD(params)
 
     prev_loss = 1e6
-    for _ in range(num_iters):
+    for i in range(num_iters):
         loss = matrix_mse_loss(params)
 
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
 
-        assert loss < prev_loss
+        if (i + 1) % 10 == 0:
+            assert loss < (prev_loss + loss / 16)
         prev_loss = loss
 
 
@@ -60,14 +61,15 @@ def test_momentum_matrix(params, num_iters, matrix_mse_loss):
     optimizer = optim.Momentum(params)
 
     prev_loss = 1e6
-    for _ in range(num_iters):
+    for i in range(num_iters):
         loss = matrix_mse_loss(params)
 
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
 
-        assert loss < prev_loss
+        if (i + 1) % 10 == 0:
+            assert loss < (prev_loss + loss / 16)
         prev_loss = loss
 
 
@@ -94,14 +96,15 @@ def test_rmsprop_matrix(params, num_iters, matrix_mse_loss):
     optimizer = optim.RMSprop(params)
 
     prev_loss = 1e6
-    for _ in range(num_iters):
+    for i in range(num_iters):
         loss = matrix_mse_loss(params)
 
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
 
-        assert loss < prev_loss
+        if (i + 1) % 10 == 0:
+            assert loss < (prev_loss + loss / 16)
         prev_loss = loss
 
 
@@ -128,14 +131,15 @@ def test_adam_matrix(params, num_iters, matrix_mse_loss):
     optimizer = optim.Adam(params)
 
     prev_loss = 1e6
-    for _ in range(num_iters):
+    for i in range(num_iters):
         loss = matrix_mse_loss(params)
 
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
 
-        assert loss < prev_loss
+        if (i + 1) % 10 == 0:
+            assert loss < (prev_loss + loss / 16)
         prev_loss = loss
 
 
@@ -149,7 +153,7 @@ def params():
 
 @pytest.fixture
 def num_iters():
-    return 42
+    return 100
 
 
 @pytest.fixture

@@ -54,7 +54,7 @@ class Momentum(Optimizer):
     time step to be added to the current update vector
 
     '''
-    def __init__(self, params, lr=0.001, beta=0.9):
+    def __init__(self, params, lr=0.003, beta=0.9):
         super(Momentum, self).__init__(params, lr)
 
         self.beta = beta
@@ -92,7 +92,7 @@ class RMSprop(Optimizer):
     eps : float, added for numerical stability
 
     '''
-    def __init__(self, params, lr=0.001, beta=0.999, eps=1e-09):
+    def __init__(self, params, lr=0.005, beta=0.999, eps=1e-09):
         super(RMSprop, self).__init__(params, lr)
 
         self.beta = beta
