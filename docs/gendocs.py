@@ -16,11 +16,16 @@ def extract_docs():
     print('Extracting documentation...')
 
     source = os.path.join(os.path.dirname(__file__), 'nujo')
-    dest1 = os.path.join(os.path.dirname(__file__), '.')
+    dest = os.path.join(os.path.dirname(__file__), '.')
 
     for f in os.listdir(source):
-        shutil.move(source + '/' + f, dest1)
+        current_dest = dest + '/' + f
+        if os.path.isdir(current_dest):
+            shutil.rmtree(current_dest)
 
+        shutil.move(source + '/' + f, current_dest)
+
+    shutil.rmtree(source)
     print('Done.\n')
 
 
