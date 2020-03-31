@@ -6,13 +6,13 @@ import shutil
 
 
 def gen_docs():
-    print('Generating HTML documentation for nujo out of docstrings...\n')
+    print('Generating HTML documentation for nujo out of docstrings...')
 
     nujo = os.path.join(os.path.dirname(__file__), '../nujo')
     docs = os.path.join(os.path.dirname(__file__), '.')
 
     os.system(f'pdoc3 --html {nujo} --output-dir {docs} --force')
-    print('\nDone.\n')
+    print('Done.\n')
 
 
 def extract_docs():
