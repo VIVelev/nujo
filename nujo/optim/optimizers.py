@@ -29,7 +29,7 @@ class SGD(Optimizer):
     lr : float, the learning rate
 
     '''
-    def __init__(self, params, lr=0.01):
+    def __init__(self, params, lr=0.005):
         super(SGD, self).__init__(params, lr)
 
     def update_rule(self, param, grad):
@@ -92,7 +92,7 @@ class RMSprop(Optimizer):
     eps : float, added for numerical stability
 
     '''
-    def __init__(self, params, lr=0.005, beta=0.999, eps=1e-09):
+    def __init__(self, params, lr=0.0005, beta=0.999, eps=1e-09):
         super(RMSprop, self).__init__(params, lr)
 
         self.beta = beta

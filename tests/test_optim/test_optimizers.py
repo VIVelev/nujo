@@ -10,7 +10,7 @@ from nujo import mean, rand, randn
 def test_sgd_basic(params, num_iters, quadratic_loss):
     optimizer = optim.SGD(params)
 
-    prev_loss = 1e6
+    prev_loss = 1e3
     for _ in range(num_iters):
         loss = quadratic_loss(params)
 
@@ -25,7 +25,7 @@ def test_sgd_basic(params, num_iters, quadratic_loss):
 def test_sgd_matrix(params, num_iters, matrix_mse_loss):
     optimizer = optim.SGD(params)
 
-    prev_loss = 1e6
+    moving_avrg_loss = 1e4
     for i in range(num_iters):
         loss = matrix_mse_loss(params)
 
@@ -33,9 +33,9 @@ def test_sgd_matrix(params, num_iters, matrix_mse_loss):
         optimizer.step()
         optimizer.zero_grad()
 
-        if (i + 1) % 10 == 0:
-            assert loss < (prev_loss + loss / 16)
-        prev_loss = loss
+        if (i + 1) % 4 == 0:
+            assert loss < moving_avrg_loss
+        moving_avrg_loss = 0.9 * moving_avrg_loss + 0.1 * loss
 
 
 # ====================================================================================================
@@ -45,7 +45,7 @@ def test_sgd_matrix(params, num_iters, matrix_mse_loss):
 def test_momentum_basic(params, num_iters, quadratic_loss):
     optimizer = optim.Momentum(params)
 
-    prev_loss = 1e6
+    prev_loss = 1e3
     for _ in range(num_iters):
         loss = quadratic_loss(params)
 
@@ -60,7 +60,7 @@ def test_momentum_basic(params, num_iters, quadratic_loss):
 def test_momentum_matrix(params, num_iters, matrix_mse_loss):
     optimizer = optim.Momentum(params)
 
-    prev_loss = 1e6
+    moving_avrg_loss = 1e4
     for i in range(num_iters):
         loss = matrix_mse_loss(params)
 
@@ -68,9 +68,9 @@ def test_momentum_matrix(params, num_iters, matrix_mse_loss):
         optimizer.step()
         optimizer.zero_grad()
 
-        if (i + 1) % 10 == 0:
-            assert loss < (prev_loss + loss / 16)
-        prev_loss = loss
+        if (i + 1) % 4 == 0:
+            assert loss < moving_avrg_loss
+        moving_avrg_loss = 0.9 * moving_avrg_loss + 0.1 * loss
 
 
 # ====================================================================================================
@@ -80,7 +80,7 @@ def test_momentum_matrix(params, num_iters, matrix_mse_loss):
 def test_rmsprop_basic(params, num_iters, quadratic_loss):
     optimizer = optim.RMSprop(params)
 
-    prev_loss = 1e6
+    prev_loss = 1e3
     for _ in range(num_iters):
         loss = quadratic_loss(params)
 
@@ -95,7 +95,7 @@ def test_rmsprop_basic(params, num_iters, quadratic_loss):
 def test_rmsprop_matrix(params, num_iters, matrix_mse_loss):
     optimizer = optim.RMSprop(params)
 
-    prev_loss = 1e6
+    moving_avrg_loss = 1e4
     for i in range(num_iters):
         loss = matrix_mse_loss(params)
 
@@ -103,9 +103,9 @@ def test_rmsprop_matrix(params, num_iters, matrix_mse_loss):
         optimizer.step()
         optimizer.zero_grad()
 
-        if (i + 1) % 10 == 0:
-            assert loss < (prev_loss + loss / 16)
-        prev_loss = loss
+        if (i + 1) % 4 == 0:
+            assert loss < moving_avrg_loss
+        moving_avrg_loss = 0.9 * moving_avrg_loss + 0.1 * loss
 
 
 # ====================================================================================================
@@ -115,7 +115,7 @@ def test_rmsprop_matrix(params, num_iters, matrix_mse_loss):
 def test_adam_basic(params, num_iters, quadratic_loss):
     optimizer = optim.Adam(params)
 
-    prev_loss = 1e6
+    prev_loss = 1e3
     for _ in range(num_iters):
         loss = quadratic_loss(params)
 
@@ -130,7 +130,7 @@ def test_adam_basic(params, num_iters, quadratic_loss):
 def test_adam_matrix(params, num_iters, matrix_mse_loss):
     optimizer = optim.Adam(params)
 
-    prev_loss = 1e6
+    moving_avrg_loss = 1e4
     for i in range(num_iters):
         loss = matrix_mse_loss(params)
 
@@ -138,12 +138,13 @@ def test_adam_matrix(params, num_iters, matrix_mse_loss):
         optimizer.step()
         optimizer.zero_grad()
 
-        if (i + 1) % 10 == 0:
-            assert loss < (prev_loss + loss / 16)
-        prev_loss = loss
+        if (i + 1) % 4 == 0:
+            assert loss < moving_avrg_loss
+        moving_avrg_loss = 0.9 * moving_avrg_loss + 0.1 * loss
 
 
 # ====================================================================================================
+# PyTest Fixtures
 
 
 @pytest.fixture
@@ -153,7 +154,7 @@ def params():
 
 @pytest.fixture
 def num_iters():
-    return 100
+    return 128
 
 
 @pytest.fixture
