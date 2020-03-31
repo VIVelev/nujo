@@ -3,21 +3,6 @@ import pytest
 from nujo.flow import Flow
 
 
-def test_chaining(flows):
-    _, _, supflow = flows
-
-    assert supflow.is_supflow
-    assert supflow.name == 'mul2 >> add1'
-    assert len(supflow.subflows) == 2
-
-
-def test_forward(flows):
-    mul2, _, supflow = flows
-
-    assert mul2(42) == 42 * 2
-    assert supflow(42) == 42 * 2 + 1
-
-
 def test_append(flows):
     mul2, add1, supflow = flows
 
@@ -45,6 +30,33 @@ def test_pop(flows):
 
     assert supflow.name is mul2.name
     assert supflow(42) == mul2(42) == 42 * 2
+
+
+def test_forward(flows):
+    mul2, add1, supflow = flows
+
+    assert mul2(42) == 42 * 2
+    assert add1(42) == 42 + 1
+    assert supflow(42) == 42 * 2 + 1
+
+
+def test_chaining(flows):
+    _, _, supflow = flows
+
+    assert supflow.is_supflow
+    assert supflow.name == 'mul2 >> add1'
+    assert repr(supflow) == '<|mul2 >> add1>'
+    assert len(supflow.subflows) == 2
+
+
+def test_getitem(flows):
+    mul2, add1, supflow = flows
+
+    assert supflow[0] is mul2
+    assert supflow[1] is add1
+
+    assert supflow['mul2'] is mul2
+    assert supflow['add1'] is add1
 
 
 @pytest.fixture
