@@ -4,45 +4,61 @@ from nujo.flow import Flow
 
 
 def test_chaining(flows):
-    _, _, C = flows
+    _, _, supflow = flows
 
-    assert repr(C) == '<|A >> B>'
-    assert len(C.subflows) == 2
+    assert supflow.is_supflow
+    assert supflow.name == 'mul2 >> add1'
+    assert len(supflow.subflows) == 2
 
 
 def test_forward(flows):
-    A, _, C = flows
+    mul2, _, supflow = flows
 
-    assert A(42) == 42
-    assert C(42) == 42
+    assert mul2(42) == 42 * 2
+    assert supflow(42) == 42 * 2 + 1
 
 
 def test_append(flows):
-    A, B, _ = flows
+    mul2, add1, supflow = flows
 
-    assert not A.is_supflow
-    A.append(B)
-    assert A.is_supflow
+    assert not mul2.is_supflow
+    mul2_add1 = mul2.append(add1)
+    assert mul2_add1.is_supflow
 
-    assert repr(A) == '<|A >> B>'
-    assert A(42) == 42
+    assert mul2_add1.name == 'mul2 >> add1'
+    assert mul2_add1(42) == 42 * 2 + 1
+
+    assert supflow.is_supflow
+    supflow = supflow.append(mul2)
+    assert supflow.is_supflow
+
+    assert supflow.name == 'mul2 >> add1 >> mul2'
+    assert supflow(42) == (42 * 2 + 1) * 2
 
 
 def test_pop(flows):
-    A, B, C = flows
+    mul2, add1, supflow = flows
 
-    poped = C.pop()
-    assert poped is B
-    assert C.is_supflow
+    poped = supflow.pop()
+    assert poped is add1
+    assert supflow.is_supflow
 
-    assert C.name is A.name
-    assert C(42) == A(42) == 42
+    assert supflow.name is mul2.name
+    assert supflow(42) == mul2(42) == 42 * 2
 
 
 @pytest.fixture
 def flows():
-    A = Flow('A')
-    B = Flow('B')
-    C = A >> B
+    class Mul2(Flow):
+        def forward(self, x):
+            return x * 2
 
-    return A, B, C
+    class Add1(Flow):
+        def forward(self, x):
+            return x + 1
+
+    mul2 = Mul2('mul2')
+    add1 = Add1('add1')
+    supflow = mul2 >> add1
+
+    return mul2, add1, supflow

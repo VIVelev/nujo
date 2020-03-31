@@ -27,7 +27,7 @@ class Flow(metaclass=FlowSetup):
     '''
     def __init__(self, name='Flow', subflows=[]):
         self.name = name
-        self.is_supflow = True if len(subflows) >= 2 else False
+        self.is_supflow = True if subflows else False
 
         self.subflows = []
         self.parameters = []
@@ -47,8 +47,9 @@ class Flow(metaclass=FlowSetup):
 
     def append(self, *flows: 'Flow') -> 'Flow':
         if not self.is_supflow:
-            self.subflows.append(self.copy())
-            self.is_supflow = True
+            flows = list(flows)
+            flows.insert(0, self)
+            return Flow(subflows=flows)
 
         for flow in flows:
             self.subflows.append(flow)
