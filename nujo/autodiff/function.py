@@ -2,12 +2,12 @@ from abc import abstractmethod
 
 from numpy import array, ndarray
 
+from nujo.autodiff._node import _Node
 from nujo.autodiff.modes import DIFF_ENABLED
-from nujo.autodiff.node import Node
 from nujo.autodiff.tensor import Tensor
 
 
-class Function(Node):
+class Function(_Node):
     ''' Base Class for functions
 
     Functions are applied to tensors.

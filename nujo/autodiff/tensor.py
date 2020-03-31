@@ -3,12 +3,12 @@ from numbers import Number
 
 from numpy import array, eye, ndarray, tile
 
+from nujo.autodiff._node import _Node
 from nujo.autodiff.modes import DIFF_ENABLED
-from nujo.autodiff.node import Node
 from nujo.autodiff.utils import if_not_none
 
 
-class Tensor(Node):
+class Tensor(_Node):
     ''' Tensor - a multi-dimensional array
 
     Tensors are the main units of data and computation in Nujo.
