@@ -3,6 +3,22 @@ import pytest
 from nujo.flow import Flow
 
 
+def test_custom_flow_creation():
+    class CustomFlow(Flow):
+        def forward(self, x):
+            return x**2 + 42
+
+    flow = CustomFlow('SomeFlowName')
+
+    assert flow.name == 'SomeFlowName'
+    assert repr(flow) == '<|SomeFlowName>'
+    assert not flow.is_supflow
+    assert not flow.subflows
+    assert not flow.parameters
+
+    assert flow(9) == 9**2 + 42
+
+
 def test_append(flows):
     mul2, add1, supflow = flows
 
