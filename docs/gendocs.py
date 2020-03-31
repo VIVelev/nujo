@@ -1,3 +1,6 @@
+''' Documentation generation and update procedure
+'''
+
 import os
 import shutil
 
