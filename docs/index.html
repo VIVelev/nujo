@@ -24,12 +24,13 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from nujo.autodiff import Tensor, no_diff
+<pre><code class="python">from nujo.autodiff import Function, Tensor, no_diff
 from nujo.flow import Flow
 from nujo.init import *
 from nujo.math import *
 
 __all__ = [
+    &#39;Function&#39;,
     &#39;Tensor&#39;,
     &#39;no_diff&#39;,
     &#39;Flow&#39;,
@@ -73,7 +74,7 @@ around <code>numpy</code> functions.</p></section>
 </dd>
 <dt><code class="name"><a title="nujo.utils" href="utils/index.html">nujo.utils</a></code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>nujo utils</p></section>
 </dd>
 </dl>
 </section>
@@ -98,7 +99,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Flow(metaclass=FlowSetup):
+<pre><code class="python">class Flow(metaclass=_FlowSetup):
     &#39;&#39;&#39; A computational Flow
 
     Flow of tensors through nujo functions.
@@ -266,7 +267,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="nujo.nn.layers.Linear" href="nn/layers.html#nujo.nn.layers.Linear">Linear</a></li>
-<li><a title="nujo.objective.loss.Loss" href="objective/loss.html#nujo.objective.loss.Loss">Loss</a></li>
+<li>nujo.objective.loss._Loss</li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -412,6 +413,113 @@ No mather how many subflows it contains.</p>
 </dd>
 </dl>
 </dd>
+<dt id="nujo.Function"><code class="flex name class">
+<span>class <span class="ident">Function</span></span>
+<span>(</span><span>*children, name='Function')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Base Class for functions</p>
+<p>Functions are applied to tensors.</p>
+<p>A Function takes multiple tensors as input
+and produces only one tensor as output.</p>
+<p>Functions do not change tensors in-place.</p>
+<h2 id="parameters">Parameters:</h2>
+<p>children : varargs, the inpute tensors
+name : string, the name of the function</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Function(_Node):
+    &#39;&#39;&#39; Base Class for functions
+
+    Functions are applied to tensors.
+
+    A Function takes multiple tensors as input
+    and produces only one tensor as output.
+
+    Functions do not change tensors in-place.
+
+    Parameters:
+    -----------
+    children : varargs, the inpute tensors
+    name : string, the name of the function
+
+    &#39;&#39;&#39;
+    def __init__(self, *children: Tensor, name=&#39;Function&#39;) -&gt; None:
+        super(Function, self).__init__(*children, name=name)
+
+    def __repr__(self):
+        return super(Function, self).__repr__() + f&#39;#{self.id}&#39;
+
+    def _generate_tensor_name(self) -&gt; str:
+        return &#39;Z&#39; + self.__repr__()
+
+    @abstractmethod
+    def forward(self) -&gt; ndarray:
+        pass
+
+    @abstractmethod
+    def backward(self) -&gt; tuple:
+        pass
+
+    def __call__(self) -&gt; Tensor:
+        z = self.forward()
+        if not isinstance(z, Tensor):
+            z = Tensor(z, creator=self, name=self._generate_tensor_name())
+
+        if DIFF_ENABLED and any([x.diff for x in self.children]):
+            for tensor, derivative in zip(self.children, self.backward()):
+                tensor.add_grad_dependency(z, array(derivative))
+
+        return z</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>nujo.autodiff._node._Node</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li>nujo.autodiff._functions._Addition</li>
+<li>nujo.autodiff._functions._Logarithm</li>
+<li>nujo.autodiff._functions._MatrixMul</li>
+<li>nujo.autodiff._functions._Multiplication</li>
+<li>nujo.autodiff._functions._Negation</li>
+<li>nujo.autodiff._functions._Power</li>
+<li>nujo.autodiff._functions._Reciprocal</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="nujo.Function.backward"><code class="name flex">
+<span>def <span class="ident">backward</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def backward(self) -&gt; tuple:
+    pass</code></pre>
+</details>
+</dd>
+<dt id="nujo.Function.forward"><code class="name flex">
+<span>def <span class="ident">forward</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def forward(self) -&gt; ndarray:
+    pass</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 <dt id="nujo.Tensor"><code class="flex name class">
 <span>class <span class="ident">Tensor</span></span>
 <span>(</span><span>value, diff=True, creator=None, name='Tensor')</span>
@@ -432,7 +540,7 @@ name : string, representation of the tensor</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Tensor(Node):
+<pre><code class="python">class Tensor(_Node):
     &#39;&#39;&#39; Tensor - a multi-dimensional array
 
     Tensors are the main units of data and computation in Nujo.
@@ -456,7 +564,7 @@ name : string, representation of the tensor</p></section>
                  creator=None,
                  name=&#39;Tensor&#39;):
 
-        super(Tensor, self).__init__(*if_not_none(creator), name=name)
+        super(Tensor, self).__init__(*_if_not_none(creator), name=name)
 
         self.value: ndarray = value.value if isinstance(
             value, Tensor) else array(value)
@@ -672,15 +780,15 @@ name : string, representation of the tensor</p></section>
     # Arithmetic operations
 
     def __add__(self, other):
-        from nujo.autodiff.functions import Addition
-        return Addition(self, other)()
+        from nujo.autodiff._functions import _Addition
+        return _Addition(self, other)()
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __neg__(self):
-        from nujo.autodiff.functions import Negation
-        return Negation(self)()
+        from nujo.autodiff._functions import _Negation
+        return _Negation(self)()
 
     def __sub__(self, other):
         return self.__add__(other.__neg__())
@@ -689,33 +797,33 @@ name : string, representation of the tensor</p></section>
         return self.__neg__().__add__(other)
 
     def __mul__(self, other):
-        from nujo.autodiff.functions import Multiplication
-        return Multiplication(self, other)()
+        from nujo.autodiff._functions import _Multiplication
+        return _Multiplication(self, other)()
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        from nujo.autodiff.functions import Reciprocal
-        return self.__mul__(Reciprocal(other)())
+        from nujo.autodiff._functions import _Reciprocal
+        return self.__mul__(_Reciprocal(other)())
 
     def __rtruediv__(self, other):
-        from nujo.autodiff.functions import Reciprocal
-        return Reciprocal(self)().__mul__(other)
+        from nujo.autodiff._functions import _Reciprocal
+        return _Reciprocal(self)().__mul__(other)
 
     def __pow__(self, other):
-        from nujo.autodiff.functions import Power
-        return Power(self, other)()
+        from nujo.autodiff._functions import _Power
+        return _Power(self, other)()
 
     # More complex arithmetic operations
 
     def __matmul__(self, other):
-        from nujo.autodiff.functions import MatrixMul
-        return MatrixMul(self, other)()
+        from nujo.autodiff._functions import _MatrixMul
+        return _MatrixMul(self, other)()
 
     def __rmatmul__(self, other):
-        from nujo.autodiff.functions import MatrixMul
-        return MatrixMul(other, self)()
+        from nujo.autodiff._functions import _MatrixMul
+        return _MatrixMul(other, self)()
 
     # Representations
 
@@ -724,7 +832,7 @@ name : string, representation of the tensor</p></section>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="nujo.autodiff.node.Node" href="autodiff/node.html#nujo.autodiff.node.Node">Node</a></li>
+<li>nujo.autodiff._node._Node</li>
 </ul>
 <h3>Instance variables</h3>
 <dl>
@@ -1030,6 +1138,13 @@ a.k.a. No gradients are computed for whatever tensor.</p></section>
 <li><code><a title="nujo.Flow.copy" href="#nujo.Flow.copy">copy</a></code></li>
 <li><code><a title="nujo.Flow.forward" href="#nujo.Flow.forward">forward</a></code></li>
 <li><code><a title="nujo.Flow.pop" href="#nujo.Flow.pop">pop</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="nujo.Function" href="#nujo.Function">Function</a></code></h4>
+<ul class="">
+<li><code><a title="nujo.Function.backward" href="#nujo.Function.backward">backward</a></code></li>
+<li><code><a title="nujo.Function.forward" href="#nujo.Function.forward">forward</a></code></li>
 </ul>
 </li>
 <li>

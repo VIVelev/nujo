@@ -29,12 +29,13 @@
     &#39;no_diff&#39;,
 ]
 
-# This variable controls whether nujo to compute gradients
-# for the tensors in the computation graph:
-#     - True = differentiation enabled, compute gradients
-#       for the diff enabled (diff=True) tensors.
-#     - False = differentiation disabled, do NOT compute gradients.
 DIFF_ENABLED = True
+&#39;&#39;&#39; This variable controls whether nujo to compute gradients
+for the tensors in the computation graph:
+    - True = differentiation enabled, compute gradients
+      for the diff enabled (diff=True) tensors.
+    - False = differentiation disabled, do NOT compute gradients.
+&#39;&#39;&#39;
 
 
 class no_diff():
@@ -56,6 +57,17 @@ class no_diff():
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="nujo.autodiff.modes.DIFF_ENABLED"><code class="name">var <span class="ident">DIFF_ENABLED</span></code></dt>
+<dd>
+<section class="desc"><p>This variable controls whether nujo to compute gradients
+for the tensors in the computation graph:
+- True = differentiation enabled, compute gradients
+for the diff enabled (diff=True) tensors.
+- False = differentiation disabled, do NOT compute gradients.</p></section>
+</dd>
+</dl>
 </section>
 <section>
 </section>
@@ -101,6 +113,11 @@ a.k.a. No gradients are computed for whatever tensor.</p></section>
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="nujo.autodiff" href="index.html">nujo.autodiff</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="nujo.autodiff.modes.DIFF_ENABLED" href="#nujo.autodiff.modes.DIFF_ENABLED">DIFF_ENABLED</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

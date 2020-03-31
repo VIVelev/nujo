@@ -28,12 +28,12 @@
 
 from numpy import array, ndarray
 
+from nujo.autodiff._node import _Node
 from nujo.autodiff.modes import DIFF_ENABLED
-from nujo.autodiff.node import Node
 from nujo.autodiff.tensor import Tensor
 
 
-class Function(Node):
+class Function(_Node):
     &#39;&#39;&#39; Base Class for functions
 
     Functions are applied to tensors.
@@ -104,7 +104,7 @@ name : string, the name of the function</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Function(Node):
+<pre><code class="python">class Function(_Node):
     &#39;&#39;&#39; Base Class for functions
 
     Functions are applied to tensors.
@@ -150,17 +150,17 @@ name : string, the name of the function</p></section>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="nujo.autodiff.node.Node" href="node.html#nujo.autodiff.node.Node">Node</a></li>
+<li>nujo.autodiff._node._Node</li>
 </ul>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li><a title="nujo.autodiff.functions.Addition" href="functions.html#nujo.autodiff.functions.Addition">Addition</a></li>
-<li><a title="nujo.autodiff.functions.Logarithm" href="functions.html#nujo.autodiff.functions.Logarithm">Logarithm</a></li>
-<li><a title="nujo.autodiff.functions.MatrixMul" href="functions.html#nujo.autodiff.functions.MatrixMul">MatrixMul</a></li>
-<li><a title="nujo.autodiff.functions.Multiplication" href="functions.html#nujo.autodiff.functions.Multiplication">Multiplication</a></li>
-<li><a title="nujo.autodiff.functions.Negation" href="functions.html#nujo.autodiff.functions.Negation">Negation</a></li>
-<li><a title="nujo.autodiff.functions.Power" href="functions.html#nujo.autodiff.functions.Power">Power</a></li>
-<li><a title="nujo.autodiff.functions.Reciprocal" href="functions.html#nujo.autodiff.functions.Reciprocal">Reciprocal</a></li>
+<li>nujo.autodiff._functions._Addition</li>
+<li>nujo.autodiff._functions._Logarithm</li>
+<li>nujo.autodiff._functions._MatrixMul</li>
+<li>nujo.autodiff._functions._Multiplication</li>
+<li>nujo.autodiff._functions._Negation</li>
+<li>nujo.autodiff._functions._Power</li>
+<li>nujo.autodiff._functions._Reciprocal</li>
 </ul>
 <h3>Methods</h3>
 <dl>

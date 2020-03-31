@@ -35,7 +35,6 @@ from nujo.flow import Flow
 from nujo.math.aggregate import mean, sum
 
 __all__ = [
-    &#39;Loss&#39;,
     &#39;QualitativeLoss&#39;,
     &#39;QuantitativeLoss&#39;,
 ]
@@ -43,11 +42,11 @@ __all__ = [
 # ====================================================================================================
 
 
-class Loss(Flow):
+class _Loss(Flow):
     &#39;&#39;&#39; Base loss class
     &#39;&#39;&#39;
     def __init__(self, dim: int = None, keepdim=False, reduction: str = None):
-        super(Loss, self).__init__(name=self.__class__.__name__)
+        super(_Loss, self).__init__(name=self.__class__.__name__)
         self.dim = dim
         self.keepdim = keepdim
 
@@ -62,7 +61,7 @@ class Loss(Flow):
 # ====================================================================================================
 
 
-class QualitativeLoss(Loss):
+class QualitativeLoss(_Loss):
     &#39;&#39;&#39; Base qualitative loss class
     &#39;&#39;&#39;
     def __init__(self, dim: int = None, keepdim=False, reduction=&#39;sum&#39;):
@@ -72,7 +71,7 @@ class QualitativeLoss(Loss):
 # ====================================================================================================
 
 
-class QuantitativeLoss(Loss):
+class QuantitativeLoss(_Loss):
     &#39;&#39;&#39; Base quantitative loss class
     &#39;&#39;&#39;
     def __init__(self, dim: int = None, keepdim=False, reduction=&#39;mean&#39;):
@@ -91,52 +90,6 @@ class QuantitativeLoss(Loss):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="nujo.objective.loss.Loss"><code class="flex name class">
-<span>class <span class="ident">Loss</span></span>
-<span>(</span><span>*args, **kwargs)</span>
-</code></dt>
-<dd>
-<section class="desc"><p>Base loss class</p></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class Loss(Flow):
-    &#39;&#39;&#39; Base loss class
-    &#39;&#39;&#39;
-    def __init__(self, dim: int = None, keepdim=False, reduction: str = None):
-        super(Loss, self).__init__(name=self.__class__.__name__)
-        self.dim = dim
-        self.keepdim = keepdim
-
-        if reduction == &#39;sum&#39;:
-            self.reduction_fn = sum
-        elif reduction == &#39;mean&#39;:
-            self.reduction_fn = mean
-        else:  # if None
-            self.reduction_fn = lambda x: x</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></li>
-</ul>
-<h3>Subclasses</h3>
-<ul class="hlist">
-<li><a title="nujo.objective.loss.QualitativeLoss" href="#nujo.objective.loss.QualitativeLoss">QualitativeLoss</a></li>
-<li><a title="nujo.objective.loss.QuantitativeLoss" href="#nujo.objective.loss.QuantitativeLoss">QuantitativeLoss</a></li>
-</ul>
-<h3>Inherited members</h3>
-<ul class="hlist">
-<li><code><b><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></b></code>:
-<ul class="hlist">
-<li><code><a title="nujo.flow.Flow.append" href="../flow.html#nujo.flow.Flow.append">append</a></code></li>
-<li><code><a title="nujo.flow.Flow.copy" href="../flow.html#nujo.flow.Flow.copy">copy</a></code></li>
-<li><code><a title="nujo.flow.Flow.forward" href="../flow.html#nujo.flow.Flow.forward">forward</a></code></li>
-<li><code><a title="nujo.flow.Flow.pop" href="../flow.html#nujo.flow.Flow.pop">pop</a></code></li>
-</ul>
-</li>
-</ul>
-</dd>
 <dt id="nujo.objective.loss.QualitativeLoss"><code class="flex name class">
 <span>class <span class="ident">QualitativeLoss</span></span>
 <span>(</span><span>*args, **kwargs)</span>
@@ -147,7 +100,7 @@ class QuantitativeLoss(Loss):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class QualitativeLoss(Loss):
+<pre><code class="python">class QualitativeLoss(_Loss):
     &#39;&#39;&#39; Base qualitative loss class
     &#39;&#39;&#39;
     def __init__(self, dim: int = None, keepdim=False, reduction=&#39;sum&#39;):
@@ -155,7 +108,7 @@ class QuantitativeLoss(Loss):
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="nujo.objective.loss.Loss" href="#nujo.objective.loss.Loss">Loss</a></li>
+<li>nujo.objective.loss._Loss</li>
 <li><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></li>
 </ul>
 <h3>Subclasses</h3>
@@ -165,12 +118,12 @@ class QuantitativeLoss(Loss):
 </ul>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="nujo.objective.loss.Loss" href="#nujo.objective.loss.Loss">Loss</a></b></code>:
+<li><code><b><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></b></code>:
 <ul class="hlist">
-<li><code><a title="nujo.objective.loss.Loss.append" href="../flow.html#nujo.flow.Flow.append">append</a></code></li>
-<li><code><a title="nujo.objective.loss.Loss.copy" href="../flow.html#nujo.flow.Flow.copy">copy</a></code></li>
-<li><code><a title="nujo.objective.loss.Loss.forward" href="../flow.html#nujo.flow.Flow.forward">forward</a></code></li>
-<li><code><a title="nujo.objective.loss.Loss.pop" href="../flow.html#nujo.flow.Flow.pop">pop</a></code></li>
+<li><code><a title="nujo.flow.Flow.append" href="../flow.html#nujo.flow.Flow.append">append</a></code></li>
+<li><code><a title="nujo.flow.Flow.copy" href="../flow.html#nujo.flow.Flow.copy">copy</a></code></li>
+<li><code><a title="nujo.flow.Flow.forward" href="../flow.html#nujo.flow.Flow.forward">forward</a></code></li>
+<li><code><a title="nujo.flow.Flow.pop" href="../flow.html#nujo.flow.Flow.pop">pop</a></code></li>
 </ul>
 </li>
 </ul>
@@ -185,7 +138,7 @@ class QuantitativeLoss(Loss):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class QuantitativeLoss(Loss):
+<pre><code class="python">class QuantitativeLoss(_Loss):
     &#39;&#39;&#39; Base quantitative loss class
     &#39;&#39;&#39;
     def __init__(self, dim: int = None, keepdim=False, reduction=&#39;mean&#39;):
@@ -193,7 +146,7 @@ class QuantitativeLoss(Loss):
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="nujo.objective.loss.Loss" href="#nujo.objective.loss.Loss">Loss</a></li>
+<li>nujo.objective.loss._Loss</li>
 <li><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></li>
 </ul>
 <h3>Subclasses</h3>
@@ -203,12 +156,12 @@ class QuantitativeLoss(Loss):
 </ul>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="nujo.objective.loss.Loss" href="#nujo.objective.loss.Loss">Loss</a></b></code>:
+<li><code><b><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></b></code>:
 <ul class="hlist">
-<li><code><a title="nujo.objective.loss.Loss.append" href="../flow.html#nujo.flow.Flow.append">append</a></code></li>
-<li><code><a title="nujo.objective.loss.Loss.copy" href="../flow.html#nujo.flow.Flow.copy">copy</a></code></li>
-<li><code><a title="nujo.objective.loss.Loss.forward" href="../flow.html#nujo.flow.Flow.forward">forward</a></code></li>
-<li><code><a title="nujo.objective.loss.Loss.pop" href="../flow.html#nujo.flow.Flow.pop">pop</a></code></li>
+<li><code><a title="nujo.flow.Flow.append" href="../flow.html#nujo.flow.Flow.append">append</a></code></li>
+<li><code><a title="nujo.flow.Flow.copy" href="../flow.html#nujo.flow.Flow.copy">copy</a></code></li>
+<li><code><a title="nujo.flow.Flow.forward" href="../flow.html#nujo.flow.Flow.forward">forward</a></code></li>
+<li><code><a title="nujo.flow.Flow.pop" href="../flow.html#nujo.flow.Flow.pop">pop</a></code></li>
 </ul>
 </li>
 </ul>
@@ -229,9 +182,6 @@ class QuantitativeLoss(Loss):
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
-<li>
-<h4><code><a title="nujo.objective.loss.Loss" href="#nujo.objective.loss.Loss">Loss</a></code></h4>
-</li>
 <li>
 <h4><code><a title="nujo.objective.loss.QualitativeLoss" href="#nujo.objective.loss.QualitativeLoss">QualitativeLoss</a></code></h4>
 </li>

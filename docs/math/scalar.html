@@ -33,7 +33,7 @@ from numpy import ceil as np_ceil
 from numpy import floor as np_floor
 from numpy import where
 
-from nujo.autodiff.functions import Logarithm, Power
+from nujo.autodiff._functions import _Logarithm, _Power
 from nujo.autodiff.tensor import Tensor
 
 __all__ = [
@@ -52,26 +52,26 @@ __all__ = [
 
 
 def log(x: Number or Tensor, base: float = e) -&gt; Tensor:
-    return Logarithm(x, base)()
+    return _Logarithm(x, base)()
 
 
 def log2(x: Number or Tensor) -&gt; Tensor:
-    return Logarithm(x, 2, name=&#39;Log2&#39;)()
+    return _Logarithm(x, 2, name=&#39;Log2&#39;)()
 
 
 def log10(x: Number or Tensor) -&gt; Tensor:
-    return Logarithm(x, 10, name=&#39;Log10&#39;)()
+    return _Logarithm(x, 10, name=&#39;Log10&#39;)()
 
 
 # ====================================================================================================
 
 
 def exp(x: Number or Tensor) -&gt; Tensor:
-    return Power(e, x, name=&#39;Exp&#39;)()
+    return _Power(e, x, name=&#39;Exp&#39;)()
 
 
 def sqrt(x: Number or Tensor) -&gt; Tensor:
-    return Power(x, 1 / 2, name=&#39;Sqrt&#39;)()
+    return _Power(x, 1 / 2, name=&#39;Sqrt&#39;)()
 
 
 def abs(x: Number or Tensor) -&gt; Tensor:
@@ -167,7 +167,7 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def exp(x: Number or Tensor) -&gt; Tensor:
-    return Power(e, x, name=&#39;Exp&#39;)()</code></pre>
+    return _Power(e, x, name=&#39;Exp&#39;)()</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.scalar.floor"><code class="name flex">
@@ -200,7 +200,7 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def log(x: Number or Tensor, base: float = e) -&gt; Tensor:
-    return Logarithm(x, base)()</code></pre>
+    return _Logarithm(x, base)()</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.scalar.log10"><code class="name flex">
@@ -213,7 +213,7 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def log10(x: Number or Tensor) -&gt; Tensor:
-    return Logarithm(x, 10, name=&#39;Log10&#39;)()</code></pre>
+    return _Logarithm(x, 10, name=&#39;Log10&#39;)()</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.scalar.log2"><code class="name flex">
@@ -226,7 +226,7 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def log2(x: Number or Tensor) -&gt; Tensor:
-    return Logarithm(x, 2, name=&#39;Log2&#39;)()</code></pre>
+    return _Logarithm(x, 2, name=&#39;Log2&#39;)()</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.scalar.round"><code class="name flex">
@@ -259,7 +259,7 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def sqrt(x: Number or Tensor) -&gt; Tensor:
-    return Power(x, 1 / 2, name=&#39;Sqrt&#39;)()</code></pre>
+    return _Power(x, 1 / 2, name=&#39;Sqrt&#39;)()</code></pre>
 </details>
 </dd>
 </dl>

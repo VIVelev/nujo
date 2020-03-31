@@ -29,7 +29,7 @@
 from nujo.autodiff.tensor import Tensor
 
 
-class FlowSetup(type):
+class _FlowSetup(type):
     &#39;&#39;&#39; Flow&#39;s metaclass used to setup the computational flow
     &#39;&#39;&#39;
     def __call__(cls, *args, **kwargs):
@@ -40,7 +40,7 @@ class FlowSetup(type):
         return obj
 
 
-class Flow(metaclass=FlowSetup):
+class Flow(metaclass=_FlowSetup):
     &#39;&#39;&#39; A computational Flow
 
     Flow of tensors through nujo functions.
@@ -229,7 +229,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Flow(metaclass=FlowSetup):
+<pre><code class="python">class Flow(metaclass=_FlowSetup):
     &#39;&#39;&#39; A computational Flow
 
     Flow of tensors through nujo functions.
@@ -397,7 +397,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="nujo.nn.layers.Linear" href="nn/layers.html#nujo.nn.layers.Linear">Linear</a></li>
-<li><a title="nujo.objective.loss.Loss" href="objective/loss.html#nujo.objective.loss.Loss">Loss</a></li>
+<li>nujo.objective.loss._Loss</li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -543,31 +543,6 @@ No mather how many subflows it contains.</p>
 </dd>
 </dl>
 </dd>
-<dt id="nujo.flow.FlowSetup"><code class="flex name class">
-<span>class <span class="ident">FlowSetup</span></span>
-<span>(</span><span>...)</span>
-</code></dt>
-<dd>
-<section class="desc"><p>Flow's metaclass used to setup the computational flow</p></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class FlowSetup(type):
-    &#39;&#39;&#39; Flow&#39;s metaclass used to setup the computational flow
-    &#39;&#39;&#39;
-    def __call__(cls, *args, **kwargs):
-        &#39;&#39;&#39; Flow() init call &#39;&#39;&#39;
-        obj = type.__call__(cls, *args, **kwargs)
-        obj._register_parameters()
-
-        return obj</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>builtins.type</li>
-</ul>
-</dd>
 </dl>
 </section>
 </article>
@@ -592,9 +567,6 @@ No mather how many subflows it contains.</p>
 <li><code><a title="nujo.flow.Flow.forward" href="#nujo.flow.Flow.forward">forward</a></code></li>
 <li><code><a title="nujo.flow.Flow.pop" href="#nujo.flow.Flow.pop">pop</a></code></li>
 </ul>
-</li>
-<li>
-<h4><code><a title="nujo.flow.FlowSetup" href="#nujo.flow.FlowSetup">FlowSetup</a></code></h4>
 </li>
 </ul>
 </li>
