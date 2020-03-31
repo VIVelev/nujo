@@ -1,4 +1,4 @@
-from nujo.autodiff.utils import counter
+from nujo.autodiff._utils import _counter
 
 
 class _Node:
@@ -13,7 +13,7 @@ class _Node:
 
     '''
 
-    id_generator = counter()
+    id_generator = _counter()
 
     def __init__(self, *children, name='Node'):
         self.children = []

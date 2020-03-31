@@ -4,8 +4,8 @@ from numbers import Number
 from numpy import array, eye, ndarray, tile
 
 from nujo.autodiff._node import _Node
+from nujo.autodiff._utils import _if_not_none
 from nujo.autodiff.modes import DIFF_ENABLED
-from nujo.autodiff.utils import if_not_none
 
 
 class Tensor(_Node):
@@ -32,7 +32,7 @@ class Tensor(_Node):
                  creator=None,
                  name='Tensor'):
 
-        super(Tensor, self).__init__(*if_not_none(creator), name=name)
+        super(Tensor, self).__init__(*_if_not_none(creator), name=name)
 
         self.value: ndarray = value.value if isinstance(
             value, Tensor) else array(value)
