@@ -60,8 +60,27 @@ Once you have **Installed and set up** nujo, run:
 $ pytest
 ```
 
+## Your First Contribution
+>coming soon...
+
 ### When and how to write unit tests?
 >coming soon...
 
-## Your First Contribution
->coming soon...
+### Pyhton Docstrings format
+Use the following format to document python code.
+
+```
+''' Name of the Pyhton object you are documenting
+
+Short description
+
+Parameters:
+-----------
+param_name : param type, description...
+
+Returns:
+--------
+return_name : return type, description...
+
+'''
+```
