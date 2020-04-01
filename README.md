@@ -1,6 +1,11 @@
 # nujo: A Reverse-mode Automatic Differentiation library for Neural Networks
 
-[![lint_and_test_workflow](https://github.com/VIVelev/nujo/workflows/Lint%20and%20Test/badge.svg)](https://github.com/VIVelev/nujo/actions?query=workflow%3A%22Lint+and+Test%22)
+[![codecov](https://codecov.io/gh/VIVelev/nujo/branch/master/graph/badge.svg)](https://codecov.io/gh/VIVelev/nujo)
+[![lint](https://github.com/VIVelev/nujo/workflows/lint/badge.svg)](https://github.com/VIVelev/nujo/actions?query=workflow%3A%22lint)
+[![test](https://github.com/VIVelev/nujo/workflows/test/badge.svg)](https://github.com/VIVelev/nujo/actions?query=workflow%3A%22test)
+[![code-size](https://img.shields.io/github/languages/code-size/VIVelev/nujo)](https://github.com/VIVelev/nujo)
+[![downloads](https://img.shields.io/pypi/dm/nujo)](https://pypi.org/project/nujo)
+[![license](https://img.shields.io/github/license/VIVelev/nujo)](LICENSE)
 
 ## Installing and setting up
 
@@ -15,6 +20,8 @@ $ python
 >>> nj.__version__
 '0.1.0'
 ```
+
+***Read the docs at [vivelev.github.io/nujo](https://vivelev.github.io/nujo/)***
 
 ## Examples
 
