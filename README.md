@@ -1,6 +1,7 @@
 # nujo: A Reverse-mode Automatic Differentiation library for Neural Networks
 
 [![lint_and_test_workflow](https://github.com/VIVelev/nujo/workflows/Lint%20and%20Test/badge.svg)](https://github.com/VIVelev/nujo/actions?query=workflow%3A%22Lint+and+Test%22)
+[![codecov](https://codecov.io/gh/VIVelev/nujo/branch/master/graph/badge.svg)](https://codecov.io/gh/VIVelev/nujo)
 
 ## Installing and setting up
 
