@@ -5,12 +5,12 @@ First off, thank you for considering contributing to nujo. It's people like you 
 ## Reporting issues
   - Describe what you expect to happen
   - Describe what happened
-  - If you could, include a minimal reproducible example
+  - If you could, include a [minimal reproducible example](https://stackoverflow.com/help/minimal-reproducible-example)
   - List vesions of your Python, NumPy, Requests and GarphViz
 
 ## Submiting code
   - It is recommended to use [Visual Studio Code](https://code.visualstudio.com/) 
-  - All commits will be tested for formatting using flake8, so make sure to romat it properly
+  - All commits will be tested for formatting using flake8, so make sure to format it properly
   
 ### Commit messages
   - "[up:*branch*] *commit-message*" - creating bugs
