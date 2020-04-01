@@ -1,9 +1,11 @@
-from numpy import array, save, load
+from numpy import array, load, save
 
 from nujo.flow import Flow
 
+__all__ = ['save_flow', 'load_flow']
 
-def save_flow(self, flow: Flow) -> None:
+
+def save_flow(flow: Flow) -> None:
     '''Save flow
 
     Saves the parameters of a network to a file named:\n
@@ -15,12 +17,12 @@ def save_flow(self, flow: Flow) -> None:
 
 
     '''
-    self.name = flow.name
-    self.params = array(flow.params)
-    save(f'{self.name}_parameters', self.params)
+    name = flow.name
+    params = array(flow.parameters)
+    save(f'{name}_parameters', params, allow_pickle=True)
 
 
-def load_flow(self, flow: Flow, filename: str):
+def load_flow(filename: str) -> Flow:
     '''Load flow
 
     Load the parameters as an array of a network from a file
@@ -31,4 +33,6 @@ def load_flow(self, flow: Flow, filename: str):
     - filename : the file path to get array from
 
     '''
-    load(filename, flow.parameters)
+    flow = Flow()
+    flow.parameters = load(filename, allow_pickle=True).tolist()
+    return flow
