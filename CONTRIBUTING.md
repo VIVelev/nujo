@@ -10,7 +10,7 @@ First off, thank you for considering contributing to nujo. It's people like you 
 
 ## Submiting code
   - It is recommended to use [Visual Studio Code](https://code.visualstudio.com/) 
-  - All commits will be tested for formatting using flake8, so make sure to format it properly
+  - All commits will be tested against flake8 linter, so make sure to abide by PEP8
   
 ### Commit messages
   - "[up:*branch*] *commit-message*" - creating bugs
