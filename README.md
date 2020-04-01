@@ -3,9 +3,9 @@
 [![codecov](https://codecov.io/gh/VIVelev/nujo/branch/master/graph/badge.svg)](https://codecov.io/gh/VIVelev/nujo)
 [![lint](https://github.com/VIVelev/nujo/workflows/lint/badge.svg)](https://github.com/VIVelev/nujo/actions?query=workflow%3A%22lint)
 [![test](https://github.com/VIVelev/nujo/workflows/test/badge.svg)](https://github.com/VIVelev/nujo/actions?query=workflow%3A%22test)
-![code-size](https://img.shields.io/github/languages/code-size/VIVelev/nujo)
-![downloads](https://img.shields.io/pypi/dm/nujo)
-![license](https://img.shields.io/github/license/VIVelev/nujo)
+[![code-size](https://img.shields.io/github/languages/code-size/VIVelev/nujo)](https://github.com/VIVelev/nujo)
+[![downloads](https://img.shields.io/pypi/dm/nujo)](https://pypi.org/project/nujo)
+[![license](https://img.shields.io/github/license/VIVelev/nujo)](LICENSE)
 
 ## Installing and setting up
 
