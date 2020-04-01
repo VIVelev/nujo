@@ -2,7 +2,8 @@
 name = "nujo"
 version = "0.1.0"
 description = "A Reverse-mode Automatic Differentiation library for Neural Networks"
-authors = ["Victor Velev <victorivelev@gmail.com>"]
+authors = ["Victor Velev <victorivelev@gmail.com>",
+           "Victor Gorchilov <victor@gorchilov.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
@@ -15,6 +16,8 @@ requests = "^2.23.0"
 pytest = "^5.3.4"
 flake8 = "^3.7.9"
 yapf = "^0.29.0"
+pdoc3 = "^0.7.5"
+pytest-cov = "^2.8.1"
 
 [build-system]
 requires = ["poetry>=0.12"]

@@ -1,100 +1,139 @@
-''' SGD Optimizers
+''' Stochastic Gradient Descent (SGD) Optimizers
 
-    Check out the following link for more info about the optimizers: 
-    http://ruder.io/optimizing-gradient-descent/index.html
+Check out the following link for more info about the optimizers:
+http://ruder.io/optimizing-gradient-descent/index.html
+
 '''
 
-import numpy as np
+from numpy import sqrt, zeros_like
 
-from nujo.autodiff import no_diff
-from nujo.optim.base import Optimizer
+from nujo.optim.optimizer import Optimizer
 
 __all__ = [
-    'GradientDescent',
+    'SGD',
     'Momentum',
     'RMSprop',
     'Adam',
 ]
 
 # ====================================================================================================
-# ====================================================================================================
 
 
-class GradientDescent(Optimizer):
-    def __init__(self, params, lr=0.001):
-        super(GradientDescent, self).__init__(params, lr)
+class SGD(Optimizer):
+    ''' SGD: Stochastic Gradient Descent
 
-    def step(self):
-        with no_diff():
-            for l in range(len(self.params)):  # Iterate over layers
-                for i in range(len(
-                        self.params[l])):  # Iterate over params in layer `l`
-                    self.params[l][i] -= self.lr * self.params[l][i].grad
+    An iterative method for optimizing an objective function.
+
+    Parameters:
+    -----------
+    params : list of ndarray(s), the parameters which to update
+    lr : float, the learning rate
+
+    '''
+    def __init__(self, params, lr=0.005):
+        super(SGD, self).__init__(params, lr)
+
+    def update_rule(self, param, grad):
+        return param - self.lr * grad
 
 
 # ====================================================================================================
 
 
 class Momentum(Optimizer):
-    def __init__(self, params, lr=0.001, beta=0.9):
+    ''' Momentum
+
+    A method that helps accelerate SGD in the relevant direction and
+    dampens oscillations. It does this by adding a fraction of the
+    update vector of the past time step to the current update vector.
+
+    Parameters:
+    -----------
+    params : list of ndarray(s), the parameters which to update
+    lr : float, the learning rate
+    beta : float, the fraction of the update vector of the past
+    time step to be added to the current update vector
+
+    '''
+    def __init__(self, params, lr=0.003, beta=0.9):
         super(Momentum, self).__init__(params, lr)
 
         self.beta = beta
         self._velocity = {}
 
-    def step(self):
-        with no_diff():
-            for l in range(len(self.params)):  # Iterate over layers
-                for i in range(len(
-                        self.params[l])):  # Iterate over params in layer `l`
+    def update_rule(self, param, grad):
+        # Get the corresponding velocity
+        key = param.name
+        if key not in self._velocity:
+            self._velocity[key] = zeros_like(param)
 
-                    # Get the corresponding velocity
-                    key = f'Layer[{l}]-Param[{i}]'
-                    if key not in self._velocity:
-                        self._velocity[key] = np.zeros_like(self.params[l][i])
+        # Exponentially Weighted Moving Average
+        self._velocity[key] = self.beta * self._velocity[key] +\
+            (1 - self.beta) * grad
 
-                    # Exponentially Weighted Moving Average
-                    self._velocity[key] = self.beta * self._velocity[key] \
-                                            + (1 - self.beta) * self.params[l][i].grad
-                    # Update
-                    self.params[l][i] -= self.lr * self._velocity[key]
+        # Update rule
+        return param - self.lr * self._velocity[key]
 
 
 # ====================================================================================================
 
 
 class RMSprop(Optimizer):
-    def __init__(self, params, lr=0.001, beta=0.999, eps=1e-08):
+    ''' RMSprop
+
+    A gradient-based optimization technique proposed by Geoffrey Hinton
+    at his Neural Networks Coursera course. It uses a moving average
+    of squared gradients to normalize the gradient itself.
+
+    Parameters:
+    -----------
+    params : list of ndarray(s), the parameters which to update
+    lr : float, the learning rate
+    beta : float, the squared gradient coefficients
+    eps : float, added for numerical stability
+
+    '''
+    def __init__(self, params, lr=0.0005, beta=0.999, eps=1e-09):
         super(RMSprop, self).__init__(params, lr)
 
         self.beta = beta
         self.eps = eps
         self._squared = {}
 
-    def step(self):
-        with no_diff():
-            for l in range(len(self.params)):  # Iterate over layers
-                for i in range(len(
-                        self.params[l])):  # Iterate over params in layer `l`
+    def update_rule(self, param, grad):
+        # Get the corresponding squared gradient
+        key = param.name
+        if key not in self._squared:
+            self._squared[key] = zeros_like(param)
 
-                    # Get the corresponding squared gradient
-                    key = f'Layer[{l}]-Param[{i}]'
-                    if key not in self._squared:
-                        self._squared[key] = np.zeros_like(self.params[l][i])
+        # Exponentially Weighted Moving Average
+        self._squared[key] = self.beta * self._squared[key] +\
+            (1 - self.beta) * grad**2
 
-                    # Exponentially Weighted Moving Average
-                    self._squared[key] = self.beta * self._squared[key] \
-                                            + (1 - self.beta) * np.square(self.params[l][i].grad)
-                    # Update
-                    self.params[l][i] -= self.lr * self.params[l][i].grad \
-                                            / (np.sqrt(self._squared[key]) + self.eps)
+        # Update rule
+        return param - self.lr * grad / (sqrt(self._squared[key]) + self.eps)
 
 
 # ====================================================================================================
 
 
 class Adam(Optimizer):
-    def __init__(self, params, lr=0.001, betas=(0.9, 0.999), eps=1e-08):
+    ''' Adam: Adaptive Moment Estimation
+
+    Another method that computes adaptive learning rates
+    for each parameter. It basically combines Momentum
+    and RMSprop into one update rule.
+
+    Parameters:
+    -----------
+    params : list of ndarray(s), the parameters which to update
+    lr : float, the learning rate
+    betas : tuple of 2 floats, the velocity (Momentum) and
+    squared gradient (RMSprop) coefficients
+    eps : float, added for numerical stability
+
+    '''
+    def __init__(self, params, lr=0.001, betas=(0.9, 0.999), eps=1e-09):
         super(Adam, self).__init__(params, lr)
 
         self.betas = betas
@@ -104,35 +143,27 @@ class Adam(Optimizer):
         self._squared = {}
         self._t = 1
 
-    def step(self):
-        with no_diff():
-            for l in range(len(self.params)):  # Iterate over layers
-                for i in range(len(
-                        self.params[l])):  # Iterate over params in layer `l`
+    def update_rule(self, param, grad):
+        # Get the corresponding velocity and squared gradient
+        key = param.name
+        if key not in self._velocity:
+            self._velocity[key] = zeros_like(param)
+            self._squared[key] = zeros_like(param)
 
-                    # Get the corresponding velocity and squared gradient
-                    key = f'Layer[{l}]-Param[{i}]'
-                    if key not in self._velocity:
-                        self._velocity[key] = np.zeros_like(self.params[l][i])
-                        self._squared[key] = np.zeros_like(self.params[l][i])
+        # Exponentially Weighted Moving Average
+        self._velocity[key] = self.betas[0]*self._velocity[key] +\
+            (1 - self.betas[0]) * grad
 
-                    # Exponentially Weighted Moving Average
-                    self._velocity[key] = self.betas[0] * self._velocity[key] \
-                                            + (1 - self.betas[0]) * self.params[l][i].grad
+        self._squared[key] = self.betas[1] * self._squared[key] +\
+            (1 - self.betas[1]) * grad**2
 
-                    self._squared[key] = self.betas[1] * self._squared[key] \
-                                            + (1 - self.betas[1]) * np.square(self.params[l][i].grad)
+        # Bias correction
+        v_corrected = self._velocity[key] / (1 - self.betas[0]**self._t)
+        s_corrected = self._squared[key] / (1 - self.betas[1]**self._t)
+        self._t += 1
 
-                    # Bias correction
-                    v_corrected = self._velocity[key] / (
-                        1 - self.betas[0]**self._t)
-                    s_corrected = self._squared[key] / (1 -
-                                                        self.betas[1]**self._t)
-                    self._t += 1
-
-                    # Update
-                    self.params[l][i] -= self.lr * v_corrected \
-                                            / (np.sqrt(s_corrected) + self.eps)
+        # Update rule
+        return param - self.lr * v_corrected / (sqrt(s_corrected) + self.eps)
 
 
 # ====================================================================================================

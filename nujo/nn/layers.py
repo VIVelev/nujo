@@ -1,15 +1,13 @@
-from numpy.random import randn
-
-from nujo.autodiff import Tensor
-from nujo.nn.base import Transformation
+from nujo.flow import Flow
+from nujo.init import randn, zeros
 
 __all__ = [
     'Linear',
 ]
 
 
-class Linear(Transformation):
-    '''Linear Transformation
+class Linear(Flow):
+    '''Linear Layer
 
         f(x) = xW + b
     '''
@@ -17,15 +15,12 @@ class Linear(Transformation):
         super(Linear,
               self).__init__(name=f'{name}({in_features}, {out_features})')
 
-        weights = Tensor(randn(in_features, out_features),
-                         name=self.name + '.weights')
+        self.W = randn(in_features, out_features, name=self.name + '.W')
 
         if bias:
-            bias = Tensor(randn(1, out_features), name=self.name + '.bias')
+            self.b = randn(1, out_features, name=self.name + '.bias')
         else:
-            bias = Tensor(0)
+            self.b = zeros(diff=False)
 
-        self.parameters = [weights, bias]
-
-    def forward(self, input):
-        return input @ self.parameters[0] + self.parameters[1]
+    def forward(self, x):
+        return x @ self.W + self.b

@@ -1,5 +1,7 @@
-from .layers import Linear
+''' nujo's Neural Network module
 
-__all__ = [
-    'Linear',
-]
+Neural Network utilities are defined here.
+
+'''
+
+from nujo.nn.layers import *

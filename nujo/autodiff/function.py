@@ -1,13 +1,13 @@
 from abc import abstractmethod
 
-from numpy import array
+from numpy import array, ndarray
 
+from nujo.autodiff._node import _Node
 from nujo.autodiff.modes import DIFF_ENABLED
-from nujo.autodiff.node import Node
 from nujo.autodiff.tensor import Tensor
 
 
-class Function(Node):
+class Function(_Node):
     ''' Base Class for functions
 
     Functions are applied to tensors.
@@ -23,26 +23,29 @@ class Function(Node):
     name : string, the name of the function
 
     '''
-    def __init__(self, *children, name='<Function>'):
+    def __init__(self, *children: Tensor, name='Function') -> None:
         super(Function, self).__init__(*children, name=name)
 
-    def _generate_tensor_name(self):
-        return f'Z:{self.id}{self.name}'
+    def __repr__(self):
+        return super(Function, self).__repr__() + f'#{self.id}'
+
+    def _generate_tensor_name(self) -> str:
+        return 'Z' + self.__repr__()
 
     @abstractmethod
-    def forward(self):
+    def forward(self) -> ndarray:
         pass
 
     @abstractmethod
-    def backward(self):
+    def backward(self) -> tuple:
         pass
 
-    def __call__(self):
+    def __call__(self) -> Tensor:
         z = self.forward()
         if not isinstance(z, Tensor):
-            z = Tensor(z, children=[self], name=self._generate_tensor_name())
+            z = Tensor(z, creator=self, name=self._generate_tensor_name())
 
-        if DIFF_ENABLED:
+        if DIFF_ENABLED and any([x.diff for x in self.children]):
             for tensor, derivative in zip(self.children, self.backward()):
                 tensor.add_grad_dependency(z, array(derivative))
 
