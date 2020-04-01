@@ -1,10 +1,11 @@
 ''' Stochastic Gradient Descent (SGD) Optimizers
 
-    Check out the following link for more info about the optimizers:
-    http://ruder.io/optimizing-gradient-descent/index.html
+Check out the following link for more info about the optimizers:
+http://ruder.io/optimizing-gradient-descent/index.html
+
 '''
 
-from numpy import sqrt, square, zeros_like
+from numpy import sqrt, zeros_like
 
 from nujo.optim.optimizer import Optimizer
 
@@ -29,7 +30,7 @@ class SGD(Optimizer):
     lr : float, the learning rate
 
     '''
-    def __init__(self, params, lr=0.01):
+    def __init__(self, params, lr=0.005):
         super(SGD, self).__init__(params, lr)
 
     def update_rule(self, param, grad):
@@ -54,7 +55,7 @@ class Momentum(Optimizer):
     time step to be added to the current update vector
 
     '''
-    def __init__(self, params, lr=0.0005, beta=0.9):
+    def __init__(self, params, lr=0.003, beta=0.9):
         super(Momentum, self).__init__(params, lr)
 
         self.beta = beta
@@ -92,7 +93,7 @@ class RMSprop(Optimizer):
     eps : float, added for numerical stability
 
     '''
-    def __init__(self, params, lr=0.01, beta=0.999, eps=1e-09):
+    def __init__(self, params, lr=0.0005, beta=0.999, eps=1e-09):
         super(RMSprop, self).__init__(params, lr)
 
         self.beta = beta
@@ -107,7 +108,7 @@ class RMSprop(Optimizer):
 
         # Exponentially Weighted Moving Average
         self._squared[key] = self.beta * self._squared[key] +\
-            (1 - self.beta) * square(grad)
+            (1 - self.beta) * grad**2
 
         # Update rule
         return param - self.lr * grad / (sqrt(self._squared[key]) + self.eps)
@@ -154,7 +155,7 @@ class Adam(Optimizer):
             (1 - self.betas[0]) * grad
 
         self._squared[key] = self.betas[1] * self._squared[key] +\
-            (1 - self.betas[1]) * square(grad)
+            (1 - self.betas[1]) * grad**2
 
         # Bias correction
         v_corrected = self._velocity[key] / (1 - self.betas[0]**self._t)

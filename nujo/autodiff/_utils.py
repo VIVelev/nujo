@@ -1,10 +1,10 @@
 __all__ = [
-    'counter',
-    'if_not_none',
+    '_counter',
+    '_if_not_none',
 ]
 
 
-class counter:
+class _counter:
     n = 0
 
     @classmethod
@@ -17,5 +17,5 @@ class counter:
         cls.n = 0
 
 
-def if_not_none(*args) -> list:
+def _if_not_none(*args) -> list:
     return [arg for arg in args if arg is not None]

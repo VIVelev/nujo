@@ -30,7 +30,7 @@ class DatasetLoader:
 
     def download(self) -> None:
         r = get(self._link)
-        file = HOME_DIR + self.name + '.data'
+        file = f'{HOME_DIR}{self.name}.data'
         if not exists(HOME_DIR):
             mkdir(HOME_DIR)
             print('Directory "~/.nujo" Created ')

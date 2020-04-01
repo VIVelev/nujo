@@ -5,8 +5,9 @@ from numbers import Number
 from numpy import around as np_round
 from numpy import ceil as np_ceil
 from numpy import floor as np_floor
+from numpy import where
 
-from nujo.autodiff.functions import Logarithm, Power
+from nujo.autodiff._functions import _Logarithm, _Power
 from nujo.autodiff.tensor import Tensor
 
 __all__ = [
@@ -25,30 +26,30 @@ __all__ = [
 
 
 def log(x: Number or Tensor, base: float = e) -> Tensor:
-    return Logarithm(x, base)()
+    return _Logarithm(x, base)()
 
 
 def log2(x: Number or Tensor) -> Tensor:
-    return Logarithm(x, 2, name='<Log2>')()
+    return _Logarithm(x, 2, name='Log2')()
 
 
 def log10(x: Number or Tensor) -> Tensor:
-    return Logarithm(x, 10, name='<Log10>')()
+    return _Logarithm(x, 10, name='Log10')()
 
 
 # ====================================================================================================
 
 
 def exp(x: Number or Tensor) -> Tensor:
-    return Power(e, x, name='<Exp>')()
+    return _Power(e, x, name='Exp')()
 
 
 def sqrt(x: Number or Tensor) -> Tensor:
-    return Power(x, 1 / 2, name='<Sqrt>')()
+    return _Power(x, 1 / 2, name='Sqrt')()
 
 
 def abs(x: Number or Tensor) -> Tensor:
-    return sqrt(x**2)
+    return x * where(x < 0, -1, 1)
 
 
 # ====================================================================================================

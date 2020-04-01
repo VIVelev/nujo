@@ -3,21 +3,21 @@ from numpy import log, ones
 from nujo.autodiff.function import Function
 
 __all__ = [
-    'Addition',
-    'Negation',
-    'Multiplication',
-    'Reciprocal',
-    'Power',
-    'Logarithm',
-    'MatrixMul',
+    '_Addition',
+    '_Negation',
+    '_Multiplication',
+    '_Reciprocal',
+    '_Power',
+    '_Logarithm',
+    '_MatrixMul',
 ]
 
 # ====================================================================================================
 
 
-class Addition(Function):
-    def __init__(self, input_a, input_b, name='<Add>'):
-        super(Addition, self).__init__(input_a, input_b, name=name)
+class _Addition(Function):
+    def __init__(self, input_a, input_b, name='Add'):
+        super(_Addition, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
         return self.children[0].value + self.children[1].value
@@ -29,9 +29,9 @@ class Addition(Function):
 # ====================================================================================================
 
 
-class Negation(Function):
-    def __init__(self, input, name='<Neg>'):
-        super(Negation, self).__init__(input, name=name)
+class _Negation(Function):
+    def __init__(self, input, name='Neg'):
+        super(_Negation, self).__init__(input, name=name)
 
     def forward(self):
         return -self.children[0].value
@@ -43,9 +43,9 @@ class Negation(Function):
 # ====================================================================================================
 
 
-class Multiplication(Function):
-    def __init__(self, input_a, input_b, name='<Mul>'):
-        super(Multiplication, self).__init__(input_a, input_b, name=name)
+class _Multiplication(Function):
+    def __init__(self, input_a, input_b, name='Mul'):
+        super(_Multiplication, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
         return self.children[0].value * self.children[1].value
@@ -57,23 +57,24 @@ class Multiplication(Function):
 # ====================================================================================================
 
 
-class Reciprocal(Function):
-    def __init__(self, input, name='<Recipr>'):
-        super(Reciprocal, self).__init__(input, name=name)
+class _Reciprocal(Function):
+    def __init__(self, input, name='Recipr', eps=1e-18):
+        super(_Reciprocal, self).__init__(input, name=name)
+        self.eps = eps
 
     def forward(self):
-        return 1 / (self.children[0].value + Reciprocal.epsilon)
+        return 1 / (self.children[0].value + self.eps)
 
     def backward(self):
-        return -1 / ((self.children[0].value + Reciprocal.epsilon)**2),
+        return -1 / ((self.children[0].value + self.eps)**2),
 
 
 # ====================================================================================================
 
 
-class Power(Function):
-    def __init__(self, input_a, input_b, name='<Pow>'):
-        super(Power, self).__init__(input_a, input_b, name=name)
+class _Power(Function):
+    def __init__(self, input_a, input_b, name='Pow'):
+        super(_Power, self).__init__(input_a, input_b, name=name)
 
     def forward(self):
         return self.children[0].value**self.children[1].value
@@ -88,9 +89,9 @@ class Power(Function):
 # ====================================================================================================
 
 
-class Logarithm(Function):
-    def __init__(self, input_a, input_b, name='<Log>'):
-        super(Logarithm, self).__init__(input_a, input_b, name=name)
+class _Logarithm(Function):
+    def __init__(self, input_a, input_b, name='Log'):
+        super(_Logarithm, self).__init__(input_a, input_b, name=name)
 
         assert (self.children[0] > 0).all()  # argument value limit
         assert (self.children[1] > 0).all()  # base value limit
@@ -106,9 +107,9 @@ class Logarithm(Function):
 # ====================================================================================================
 
 
-class MatrixMul(Function):
-    def __init__(self, input_a, input_b, name='<MatMul>'):
-        super(MatrixMul, self).__init__(input_a, input_b, name=name)
+class _MatrixMul(Function):
+    def __init__(self, input_a, input_b, name='MatMul'):
+        super(_MatrixMul, self).__init__(input_a, input_b, name=name)
 
     @staticmethod
     def differentiate(X, W):
@@ -175,7 +176,7 @@ class MatrixMul(Function):
         return self.children[0].value @ self.children[1].value
 
     def backward(self):
-        return MatrixMul.differentiate(*self.children)
+        return _MatrixMul.differentiate(*self.children)
 
 
 # ====================================================================================================
