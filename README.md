@@ -21,6 +21,8 @@ $ python
 '0.1.0'
 ```
 
+***Read the docs at [vivelev.github.io/nujo](https://vivelev.github.io/nujo/)***
+
 ## Examples
 
 Check out the [examples/](examples/) folder.
