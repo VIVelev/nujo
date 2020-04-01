@@ -52,6 +52,10 @@ Once you have **Installed and set up** nujo, run:
 $ pytest
 ```
 
+### Naming conventions
+
+- everything that is not ment to be used by the user (a.k.a. private) must start with a leading underscore.
+
 ### When and how to write unit tests?
 >coming soon...
 

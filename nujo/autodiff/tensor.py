@@ -3,12 +3,12 @@ from numbers import Number
 
 from numpy import array, eye, ndarray, tile
 
+from nujo.autodiff._node import _Node
+from nujo.autodiff._utils import _if_not_none
 from nujo.autodiff.modes import DIFF_ENABLED
-from nujo.autodiff.node import Node
-from nujo.autodiff.utils import if_not_none
 
 
-class Tensor(Node):
+class Tensor(_Node):
     ''' Tensor - a multi-dimensional array
 
     Tensors are the main units of data and computation in Nujo.
@@ -32,7 +32,7 @@ class Tensor(Node):
                  creator=None,
                  name='Tensor'):
 
-        super(Tensor, self).__init__(*if_not_none(creator), name=name)
+        super(Tensor, self).__init__(*_if_not_none(creator), name=name)
 
         self.value: ndarray = value.value if isinstance(
             value, Tensor) else array(value)
@@ -248,15 +248,15 @@ class Tensor(Node):
     # Arithmetic operations
 
     def __add__(self, other):
-        from nujo.autodiff.functions import Addition
-        return Addition(self, other)()
+        from nujo.autodiff._functions import _Addition
+        return _Addition(self, other)()
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __neg__(self):
-        from nujo.autodiff.functions import Negation
-        return Negation(self)()
+        from nujo.autodiff._functions import _Negation
+        return _Negation(self)()
 
     def __sub__(self, other):
         return self.__add__(other.__neg__())
@@ -265,33 +265,33 @@ class Tensor(Node):
         return self.__neg__().__add__(other)
 
     def __mul__(self, other):
-        from nujo.autodiff.functions import Multiplication
-        return Multiplication(self, other)()
+        from nujo.autodiff._functions import _Multiplication
+        return _Multiplication(self, other)()
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        from nujo.autodiff.functions import Reciprocal
-        return self.__mul__(Reciprocal(other)())
+        from nujo.autodiff._functions import _Reciprocal
+        return self.__mul__(_Reciprocal(other)())
 
     def __rtruediv__(self, other):
-        from nujo.autodiff.functions import Reciprocal
-        return Reciprocal(self)().__mul__(other)
+        from nujo.autodiff._functions import _Reciprocal
+        return _Reciprocal(self)().__mul__(other)
 
     def __pow__(self, other):
-        from nujo.autodiff.functions import Power
-        return Power(self, other)()
+        from nujo.autodiff._functions import _Power
+        return _Power(self, other)()
 
     # More complex arithmetic operations
 
     def __matmul__(self, other):
-        from nujo.autodiff.functions import MatrixMul
-        return MatrixMul(self, other)()
+        from nujo.autodiff._functions import _MatrixMul
+        return _MatrixMul(self, other)()
 
     def __rmatmul__(self, other):
-        from nujo.autodiff.functions import MatrixMul
-        return MatrixMul(other, self)()
+        from nujo.autodiff._functions import _MatrixMul
+        return _MatrixMul(other, self)()
 
     # Representations
 

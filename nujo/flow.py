@@ -1,9 +1,12 @@
+''' a computational Flow
+'''
+
 from copy import deepcopy
 
 from nujo.autodiff.tensor import Tensor
 
 
-class FlowSetup(type):
+class _FlowSetup(type):
     ''' Flow's metaclass used to setup the computational flow
     '''
     def __call__(cls, *args, **kwargs):
@@ -14,7 +17,7 @@ class FlowSetup(type):
         return obj
 
 
-class Flow(metaclass=FlowSetup):
+class Flow(metaclass=_FlowSetup):
     ''' A computational Flow
 
     Flow of tensors through nujo functions.
