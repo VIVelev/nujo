@@ -2,12 +2,20 @@
 
 First off, thank you for considering contributing to nujo. It's people like you that make nujo such a great tool.
 
-## Ground Rules
+## Reporting issues
+  - Describe what you expect to happen
+  - Describe what happened
+  - If you could, include a minimal reproducible example
+  - List vesions of your Python, NumPy, Requests and GarphViz
 
+## Submiting code
+  - It is recommended to use [Visual Studio Code](https://code.visualstudio.com/) 
+  - All commits will be tested for formatting using flake8, so make sure to romat it properly
+  
 ### Commit messages
   - "[up:*branch*] *commit-message*" - creating bugs
   - "[fix:*branch*] *commit-message*" - correcting bugs
-  - "[rm:*branch*] *commit-message*" - rage quit
+  - "[rm:*branch*] *commit-message*" - delete files
 
 ### Branching strategy
 We are using *Gitflow* as a branching strategy.
@@ -51,10 +59,6 @@ Once you have **Installed and set up** nujo, run:
 ```bash
 $ pytest
 ```
-
-### Naming conventions
-
-- everything that is not ment to be used by the user (a.k.a. private) must start with a leading underscore.
 
 ### When and how to write unit tests?
 >coming soon...
