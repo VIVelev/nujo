@@ -16,6 +16,7 @@ First off, thank you for considering contributing to nujo. It's people like you 
   - "[up:*branch*] *commit-message*" - creating bugs
   - "[fix:*branch*] *commit-message*" - correcting bugs
   - "[rm:*branch*] *commit-message*" - delete files
+  - For the branch name, skip the type(feature, release, hotfix)
 
 ### Branching strategy
 We are using *Gitflow* as a branching strategy.
