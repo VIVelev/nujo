@@ -1,4 +1,4 @@
-''' A computational Flow
+''' a computational Flow
 '''
 
 from copy import deepcopy
