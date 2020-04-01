@@ -1,7 +1,3 @@
-''' More details here:
-    https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html
-'''
-
 from nujo.flow import Flow
 from nujo.math.aggregate import mean, sum
 

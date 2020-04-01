@@ -1,7 +1,8 @@
 ''' Stochastic Gradient Descent (SGD) Optimizers
 
-    Check out the following link for more info about the optimizers:
-    http://ruder.io/optimizing-gradient-descent/index.html
+Check out the following link for more info about the optimizers:
+http://ruder.io/optimizing-gradient-descent/index.html
+
 '''
 
 from numpy import sqrt, zeros_like
