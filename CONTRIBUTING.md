@@ -36,7 +36,7 @@ The Kanban tool used for this project is [Trello](https://trello.com/b/fObyuiWt/
 
 ### Prerequisites
 
--   [Python](https://www.python.org/) - The Programming Language used
+-   [Python](https://www.python.org/) - The Programming Language used (version 3.6+)
 -   [Poetry](https://python-poetry.org/) - Dependency and Virtual Environment Management
 
 ***Download for Mac OSX using Homebrew***
