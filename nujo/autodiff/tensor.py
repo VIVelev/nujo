@@ -52,7 +52,7 @@ class Tensor(_Node):
     @property
     def grad(self):
         if self._grad is None:
-            self.compute_grad()
+            self._compute_grad()
 
         return self._grad
 
@@ -127,9 +127,9 @@ class Tensor(_Node):
     def add_grad_dependency(self, wrt: 'Tensor', weight: ndarray) -> None:
         self._grad_dependencies.append((wrt, weight))
 
-    def compute_grad(self, debug=False) -> None:
+    def _compute_grad(self, _debug=False) -> None:
         if self.diff and DIFF_ENABLED:
-            if debug:
+            if _debug:
                 print()
                 print('=' * 30)
                 print(self, self.shape, '- dependencies')
@@ -140,7 +140,7 @@ class Tensor(_Node):
 
             self._grad = 0
             for z, weight in self._grad_dependencies:
-                if debug:
+                if _debug:
                     print('-' * 10)
                     print('Weight of `Z_prev Grad`:', weight)
                     print('Shape:', weight.shape)
@@ -160,7 +160,7 @@ class Tensor(_Node):
                     accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
                     self._grad += accumulated_grad / z.grad.shape[0]
 
-            if debug:
+            if _debug:
                 print('Current Grad:', self._grad)
                 print('Shape:', self._grad.shape)
                 print('-' * 5)
@@ -175,7 +175,7 @@ class Tensor(_Node):
         self._T = None
 
     def backward(self) -> None:
-        self.compute_grad()
+        self._compute_grad()
 
         if self.creator:
             for child in self.creator.children:
