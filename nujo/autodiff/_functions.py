@@ -1,3 +1,5 @@
+from math import e
+
 from numpy import log, ones
 
 from nujo.autodiff.function import Function
@@ -10,6 +12,8 @@ __all__ = [
     '_Power',
     '_Logarithm',
     '_MatrixMul',
+    '_Sigmoid',
+    '_TanH',
 ]
 
 # ====================================================================================================
@@ -177,6 +181,46 @@ class _MatrixMul(Function):
 
     def backward(self):
         return _MatrixMul.differentiate(*self.children)
+
+
+# ====================================================================================================
+# Built-in Neural Activation Functions
+
+
+class _Sigmoid(Function):
+    def __init__(self, input, name='Sigmoid'):
+        super(_Sigmoid, self).__init__(input, name=name)
+        self._output = 0  # Used to compute the derivative
+
+    def forward(self):
+        self._output = 1 / (1 + e**-self.input)
+        return self._output
+
+    def backward(self):
+        if self._output == 0:
+            print('WARNING: The forward pass of Sigmoid resulted in a zero!')
+
+        return self._output * (1 - self._output)
+
+
+# ====================================================================================================
+
+
+class _TanH(Function):
+    def __init__(self, input, name='TanH'):
+        super(_TanH, self).__init__(input, name=name)
+        self._output = 0  # Used to compute the derivative
+
+    def forward(self):
+        ''' (2 / (1 + e ^ -2x)) - 1 is equivalent to (e ^ x - e ^ -x) / (e ^ x + e ^ -x)
+        it is just a more optimal way to compute the TanH function.
+        '''
+
+        self._output = (2 / (1 + e**(-2 * self.input))) - 1
+        return self._output
+
+    def backward(self):
+        return 1 - self._output**2
 
 
 # ====================================================================================================
