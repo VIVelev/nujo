@@ -3,7 +3,7 @@
 More info here: https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-activation-functions-right/
 '''
 
-from nujo.autodiff._functions import _Sigmoid, _TanH
+from nujo.autodiff._functions import _LeakyReLU, _ReLU, _Sigmoid, _TanH
 from nujo.flow import Flow
 
 __all__ = [
@@ -69,6 +69,39 @@ class TanH(Flow):
 
     def forward(self, x):
         return _TanH(x)()
+
+
+# ====================================================================================================
+
+
+class ReLU(Flow):
+    ''' ReLU (Rectified Linear Unit) activation function
+
+        relu(x) = max(0, x)
+
+    '''
+    def __init__(self, name='ReLU'):
+        super(ReLU, self).__init__(name=name)
+
+    def forward(self, x):
+        return _ReLU(x)()
+
+
+# ====================================================================================================
+
+
+class LeakyReLU(Flow):
+    ''' Leaky ReLU activation function
+
+        leaky_relu = max(eps * x, x)
+
+    '''
+    def __init__(self, eps=0.1, name='LeakyReLU'):
+        super(Leaky, self).__init__(name=name)
+        self.eps = eps
+
+    def forward(self, x):
+        return _LeakyReLU(x, eps=self.eps)()
 
 
 # ====================================================================================================

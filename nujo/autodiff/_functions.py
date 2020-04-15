@@ -14,6 +14,8 @@ __all__ = [
     '_MatrixMul',
     '_Sigmoid',
     '_TanH',
+    '_ReLU',
+    '_LeakyReLU',
 ]
 
 # ====================================================================================================
@@ -224,6 +226,39 @@ class _TanH(Function):
             print('WARNING: The forward pass of TanH resulted in a zero!')
 
         return 1 - self._output**2,
+
+
+# ====================================================================================================
+
+
+class _ReLU(Function):
+    def __init__(self, input, name='ReLU'):
+        super(_ReLU, self).__init__(input, name=name)
+
+    def forward(self) -> ndarray:
+        return self.children[0].value * (self.children[0].value > 0)
+
+    def backward(self) -> tuple:
+        return ones(self.children[0].shape) * (self.children[0].value > 0),
+
+
+# ====================================================================================================
+
+
+class _LeakyReLU(Function):
+    def __init__(self, input, eps=0.1, name='LeakyReLU'):
+        super(_LeakyReLU, self).__init__(input, name=name)
+        self.eps = eps
+
+    def forward(self) -> ndarray:
+        # TODO: Can this be done in a more efficient way?
+        return np.maximum(self.eps * self.children[0].value,
+                          self.children[0].value)
+
+    def backward(self) -> ndarray:
+        dinput = ones(self.children[0].shape)
+        dinput[self.children[0].value < 0] = self.eps
+        return dinput
 
 
 # ====================================================================================================
