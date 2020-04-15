@@ -283,6 +283,10 @@ class Tensor(_Node):
         from nujo.autodiff._functions import _Power
         return _Power(self, other)()
 
+    def __rpow__(self, other):
+        from nujo.autodiff._functions import _Power
+        return _Power(other, self)()
+
     # More complex arithmetic operations
 
     def __matmul__(self, other):
