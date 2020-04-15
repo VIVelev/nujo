@@ -16,17 +16,30 @@ __all__ = [
     'Swish',
 ]
 
+# ====================================================================================================
+
 
 class BinaryStep(Flow):
+    ''' Binary step function
+
+        if val > threshold:
+            return 1
+        else:
+            return 0
+
+    '''
     def __init__(self, threshold=0.5, name='BinaryStep'):
         super(BinaryStep, self).__init__(name=name)
         self.threshold = threshold
 
     def forward(self, x):
-        if x < self.threshold:
-            return 0
-        else:
+        if x > self.threshold:
             return 1
+        else:
+            return 0
+
+
+# ====================================================================================================
 
 
 class Sigmoid(Flow):
@@ -42,6 +55,9 @@ class Sigmoid(Flow):
         return _Sigmoid(x)()
 
 
+# ====================================================================================================
+
+
 class TanH(Flow):
     ''' TanH activation function
 
@@ -52,4 +68,7 @@ class TanH(Flow):
         super(TanH, self).__init__(name=name)
 
     def forward(self, x):
-        return _TanH(x)
+        return _TanH(x)()
+
+
+# ====================================================================================================

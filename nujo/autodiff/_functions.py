@@ -1,6 +1,6 @@
 from math import e
 
-from numpy import log, ones
+from numpy import log, ndarray, ones
 
 from nujo.autodiff.function import Function
 
@@ -23,10 +23,10 @@ class _Addition(Function):
     def __init__(self, input_a, input_b, name='Add'):
         super(_Addition, self).__init__(input_a, input_b, name=name)
 
-    def forward(self):
+    def forward(self) -> ndarray:
         return self.children[0].value + self.children[1].value
 
-    def backward(self):
+    def backward(self) -> tuple:
         return 1, 1
 
 
@@ -37,10 +37,10 @@ class _Negation(Function):
     def __init__(self, input, name='Neg'):
         super(_Negation, self).__init__(input, name=name)
 
-    def forward(self):
+    def forward(self) -> ndarray:
         return -self.children[0].value
 
-    def backward(self):
+    def backward(self) -> tuple:
         return -1,
 
 
@@ -51,10 +51,10 @@ class _Multiplication(Function):
     def __init__(self, input_a, input_b, name='Mul'):
         super(_Multiplication, self).__init__(input_a, input_b, name=name)
 
-    def forward(self):
+    def forward(self) -> ndarray:
         return self.children[0].value * self.children[1].value
 
-    def backward(self):
+    def backward(self) -> tuple:
         return self.children[1].value, self.children[0].value
 
 
@@ -66,10 +66,10 @@ class _Reciprocal(Function):
         super(_Reciprocal, self).__init__(input, name=name)
         self.eps = eps
 
-    def forward(self):
+    def forward(self) -> ndarray:
         return 1 / (self.children[0].value + self.eps)
 
-    def backward(self):
+    def backward(self) -> tuple:
         return -1 / ((self.children[0].value + self.eps)**2),
 
 
@@ -80,10 +80,10 @@ class _Power(Function):
     def __init__(self, input_a, input_b, name='Pow'):
         super(_Power, self).__init__(input_a, input_b, name=name)
 
-    def forward(self):
+    def forward(self) -> ndarray:
         return self.children[0].value**self.children[1].value
 
-    def backward(self):
+    def backward(self) -> tuple:
         # TODO: FIX wrong partial - the second
 
         return (self.children[1].value *
@@ -101,10 +101,10 @@ class _Logarithm(Function):
         assert (self.children[1] > 0).all()  # base value limit
         assert (self.children[1] != 0).all()  # base value limit
 
-    def forward(self):
+    def forward(self) -> ndarray:
         return log(self.children[0].value) / log(self.children[1].value)
 
-    def backward(self):
+    def backward(self) -> tuple:
         return 1 / (self.children[0].value * log(self.children[1].value)), 1
 
 
@@ -175,11 +175,11 @@ class _MatrixMul(Function):
 
         return dX, dW
 
-    def forward(self):
+    def forward(self) -> ndarray:
         assert self.children[0].shape[1] == self.children[1].shape[0]
         return self.children[0].value @ self.children[1].value
 
-    def backward(self):
+    def backward(self) -> tuple:
         return _MatrixMul.differentiate(*self.children)
 
 
@@ -190,17 +190,17 @@ class _MatrixMul(Function):
 class _Sigmoid(Function):
     def __init__(self, input, name='Sigmoid'):
         super(_Sigmoid, self).__init__(input, name=name)
-        self._output = 0  # Used to compute the derivative
+        self._output: ndarray = None  # Used to compute the derivative
 
-    def forward(self):
-        self._output = 1 / (1 + e**-self.input)
+    def forward(self) -> ndarray:
+        self._output = 1 / (1 + e**-self.children[0].value)
         return self._output
 
-    def backward(self):
-        if self._output == 0:
+    def backward(self) -> tuple:
+        if (self._output == 0).all():
             print('WARNING: The forward pass of Sigmoid resulted in a zero!')
 
-        return self._output * (1 - self._output)
+        return self._output * (1 - self._output),
 
 
 # ====================================================================================================
@@ -209,18 +209,21 @@ class _Sigmoid(Function):
 class _TanH(Function):
     def __init__(self, input, name='TanH'):
         super(_TanH, self).__init__(input, name=name)
-        self._output = 0  # Used to compute the derivative
+        self._output: ndarray = None  # Used to compute the derivative
 
-    def forward(self):
+    def forward(self) -> ndarray:
         ''' (2 / (1 + e ^ -2x)) - 1 is equivalent to (e ^ x - e ^ -x) / (e ^ x + e ^ -x)
         it is just a more optimal way to compute the TanH function.
         '''
 
-        self._output = (2 / (1 + e**(-2 * self.input))) - 1
+        self._output = (2 / (1 + e**(-2 * self.children[0].value))) - 1
         return self._output
 
-    def backward(self):
-        return 1 - self._output**2
+    def backward(self) -> tuple:
+        if (self._output == 0).all():
+            print('WARNING: The forward pass of TanH resulted in a zero!')
+
+        return 1 - self._output**2,
 
 
 # ====================================================================================================

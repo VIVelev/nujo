@@ -134,7 +134,8 @@ class Flow(metaclass=_FlowSetup):
         return deepcopy(self)
 
     def __call__(self, *args, **kwargs) -> Tensor:
-        return self.forward(*args, **kwargs)
+        output = self.forward(*args, **kwargs)
+        return output if isinstance(output, Tensor) else Tensor(output)
 
     def __rshift__(self, other: 'Flow') -> 'Flow':
         ''' Chaining operator
