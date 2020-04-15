@@ -19,7 +19,9 @@ def test_binary_step(input_value):
 def test_sigmoid(input_value):
     # Test Forward pass
     output = Sigmoid()(input_value)
-    assert output == 1 / (1 + e**-input_value)
+
+    x = input_value.value
+    assert output == 1 / (1 + e**-x)
 
     # Test Backward pass
     output.backward()
@@ -29,8 +31,9 @@ def test_sigmoid(input_value):
 def test_tanh(input_value):
     # Test Forward pass
     output = TanH()(input_value)
-    assert output == (e**input_value - e**-input_value) /\
-                     (e**input_value + e**-input_value)
+
+    x = input_value.value
+    assert output == (e**x - e**-x) / (e**x + e**-x)
 
     # Test Backward pass
     output.backward()
