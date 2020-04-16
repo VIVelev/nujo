@@ -5,6 +5,7 @@ More info here: https://missinglink.ai/guides/neural-network-concepts/7-types-ne
 
 from nujo.autodiff._functions import _LeakyReLU, _ReLU, _Sigmoid, _TanH
 from nujo.flow import Flow
+from nujo.init.basic import zeros_like
 
 __all__ = [
     'BinaryStep',
@@ -33,10 +34,9 @@ class BinaryStep(Flow):
         self.threshold = threshold
 
     def forward(self, x):
-        if x > self.threshold:
-            return 1
-        else:
-            return 0
+        output = zeros_like(x)
+        output[x > self.threshold] = 1
+        return output
 
 
 # ====================================================================================================
@@ -97,7 +97,7 @@ class LeakyReLU(Flow):
 
     '''
     def __init__(self, eps=0.1, name='LeakyReLU'):
-        super(Leaky, self).__init__(name=name)
+        super(LeakyReLU, self).__init__(name=name)
         self.eps = eps
 
     def forward(self, x):

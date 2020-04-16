@@ -1,6 +1,6 @@
 from math import e
 
-from numpy import log, ndarray, ones
+from numpy import log, maximum, ndarray, ones
 
 from nujo.autodiff.function import Function
 
@@ -187,6 +187,7 @@ class _MatrixMul(Function):
 
 # ====================================================================================================
 # Built-in Neural Activation Functions
+# ====================================================================================================
 
 
 class _Sigmoid(Function):
@@ -252,13 +253,13 @@ class _LeakyReLU(Function):
 
     def forward(self) -> ndarray:
         # TODO: Can this be done in a more efficient way?
-        return np.maximum(self.eps * self.children[0].value,
-                          self.children[0].value)
+        return maximum(self.eps * self.children[0].value,
+                       self.children[0].value)
 
     def backward(self) -> ndarray:
         dinput = ones(self.children[0].shape)
         dinput[self.children[0].value < 0] = self.eps
-        return dinput
+        return dinput,
 
 
 # ====================================================================================================
