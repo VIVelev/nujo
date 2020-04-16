@@ -16,6 +16,7 @@ __all__ = [
     '_TanH',
     '_ReLU',
     '_LeakyReLU',
+    '_Swish',
 ]
 
 # ====================================================================================================
@@ -262,10 +263,31 @@ class _LeakyReLU(Function):
         return maximum(self.eps * self.children[0].value,
                        self.children[0].value)
 
-    def backward(self) -> ndarray:
+    def backward(self) -> tuple:
         dinput = ones(self.children[0].shape)
         dinput[self.children[0].value < 0] = self.eps
         return dinput,
+
+
+# ====================================================================================================
+
+
+class _Swish(Function):
+    # TODO: add more documentation
+
+    def __init__(self, input, beta=1, name='Swish'):
+        super(_Swish, self).__init__(input, name=name)
+        self.beta = beta
+
+        self._sigmoid = _Sigmoid(beta * input)
+        self._output: ndarray = None  # Used to compute the derivative
+
+    def forward(self) -> ndarray:
+        self._output = self.children[0].value * self.sigmoid.forward()
+        return self._output
+
+    def backward(self) -> tuple:
+        return self._output + self.sigmoid._output * (1 - self._output),
 
 
 # ====================================================================================================

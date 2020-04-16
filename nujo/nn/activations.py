@@ -3,7 +3,7 @@
 More info here: https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-activation-functions-right/
 '''
 
-from nujo.autodiff._functions import _LeakyReLU, _ReLU, _Sigmoid, _TanH
+from nujo.autodiff._functions import _LeakyReLU, _ReLU, _Sigmoid, _Swish, _TanH
 from nujo.flow import Flow
 from nujo.init.basic import zeros_like
 
@@ -13,8 +13,8 @@ __all__ = [
     'TanH',
     'ReLU',
     'LeakyReLU',
-    'Softmax',
     'Swish',
+    'Softmax',
 ]
 
 # ====================================================================================================
@@ -102,6 +102,24 @@ class LeakyReLU(Flow):
 
     def forward(self, x):
         return _LeakyReLU(x, eps=self.eps)()
+
+
+# ====================================================================================================
+
+
+class Swish(Flow):
+    # TODO: Add reference to the paper.
+    ''' Swish activation function
+
+        swish(x) = x * sigmoid(beta * x) = x / (1 + e ^ (-beta * x))
+
+    '''
+    def __init__(self, beta=1, name='Swish'):
+        super(Swish, self).__init__(name=name)
+        self.beta = beta
+
+    def forward(self, x):
+        return _Swish(x, beta=self.beta)()
 
 
 # ====================================================================================================
