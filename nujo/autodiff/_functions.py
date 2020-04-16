@@ -186,7 +186,8 @@ class _MatrixMul(Function):
 
 
 # ====================================================================================================
-# Built-in Neural Activation Functions
+# Built-in Neural Network Activation Functions
+#  - efficient implementation of various neural activation functions
 # ====================================================================================================
 
 
@@ -201,7 +202,11 @@ class _Sigmoid(Function):
 
     def backward(self) -> tuple:
         if (self._output == 0).all():
-            print('WARNING: The forward pass of Sigmoid resulted in a zero!')
+            print('WARNING: The forward pass of Sigmoid resulted in a zero! \
+                The gradient will be zero!')
+        elif (self._output == 1).all():
+            print('WARNING: The forward pass of Sigmoid resulted in a one! \
+                The gradient will be zero!')
 
         return self._output * (1 - self._output),
 
@@ -223,8 +228,9 @@ class _TanH(Function):
         return self._output
 
     def backward(self) -> tuple:
-        if (self._output == 0).all():
-            print('WARNING: The forward pass of TanH resulted in a zero!')
+        if (self._output == 1).all():
+            print('WARNING: The forward pass of TanH resulted in a one! \
+                The gradient will be zero!')
 
         return 1 - self._output**2,
 
