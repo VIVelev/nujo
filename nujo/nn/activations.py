@@ -4,6 +4,7 @@ More info here: https://missinglink.ai/guides/neural-network-concepts/7-types-ne
 '''
 
 from nujo.autodiff._functions import _LeakyReLU, _ReLU, _Sigmoid, _Swish, _TanH
+from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 from nujo.init.basic import zeros_like
 
@@ -33,7 +34,7 @@ class BinaryStep(Flow):
         super(BinaryStep, self).__init__(name=name)
         self.threshold = threshold
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         output = zeros_like(x)
         output[x > self.threshold] = 1
         return output
@@ -51,7 +52,7 @@ class Sigmoid(Flow):
     def __init__(self, name='Sigmoid'):
         super(Sigmoid, self).__init__(name=name)
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         return _Sigmoid(x)()
 
 
@@ -67,7 +68,7 @@ class TanH(Flow):
     def __init__(self, name='TanH'):
         super(TanH, self).__init__(name=name)
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         return _TanH(x)()
 
 
@@ -83,7 +84,7 @@ class ReLU(Flow):
     def __init__(self, name='ReLU'):
         super(ReLU, self).__init__(name=name)
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         return _ReLU(x)()
 
 
@@ -100,7 +101,7 @@ class LeakyReLU(Flow):
         super(LeakyReLU, self).__init__(name=name)
         self.eps = eps
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         return _LeakyReLU(x, eps=self.eps)()
 
 
@@ -121,7 +122,7 @@ class Swish(Flow):
         super(Swish, self).__init__(name=name)
         self.beta = beta
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         return _Swish(x, beta=self.beta)()
 
 
