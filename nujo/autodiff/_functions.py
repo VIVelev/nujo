@@ -135,7 +135,7 @@ class _MatrixMul(Function):
         super(_MatrixMul, self).__init__(input_a, input_b, name=name)
 
     @staticmethod
-    def differentiate(X, W):
+    def differentiate(X: ndarray, W: ndarray) -> tuple:
         ''' Calculate Matrix partial derivatives
 
         Given Z = XW, Calculate:
