@@ -29,11 +29,11 @@ def test_sigmoid(input_value):
     output = activ.Sigmoid()(input_value)
 
     x = input_value.value
-    assert isclose(output.value, 1 / (1 + e**-x)).all()
+    assert equal(output.value, 1 / (1 + e**-x)).all()
 
     # Test Backward pass
     output.backward()
-    assert isclose(input_value.grad, output.value * (1 - output.value)).all()
+    assert equal(input_value.grad, output.value * (1 - output.value)).all()
 
 
 # ====================================================================================================
@@ -49,7 +49,7 @@ def test_tanh(input_value):
 
     # Test Backward pass
     output.backward()
-    assert isclose(input_value.grad, 1 - output.value**2).all()
+    assert equal(input_value.grad, 1 - output.value**2).all()
 
 
 # ====================================================================================================
@@ -88,12 +88,31 @@ def test_leaky_relu(input_value):
 
 
 # ====================================================================================================
+# Test Swish activation function
+
+
+def test_swish(input_value):
+    # Test Forward pass
+    beta = 1
+    output = activ.Swish(beta=beta)(input_value)
+
+    x = input_value.value
+    sigma = activ.Sigmoid()(beta * x).value
+    assert equal(output.value, x * sigma).all()
+
+    # Test Backward pass
+    output.backward()
+    assert equal(input_value.grad,
+                 output.value + sigma * (1 - output.value)).all()
+
+
+# ====================================================================================================
 # Fixtures
 
 
 @pytest.fixture
 def input_value():
-    return Tensor([[0.42, 0.32], [0.6, 0.1]], name='test')
+    return Tensor([[0.42, 0.32], [0.6, 0.1]], name='test_input')
 
 
 # ====================================================================================================

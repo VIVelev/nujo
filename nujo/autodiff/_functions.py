@@ -278,15 +278,15 @@ class _Swish(Function):
         self.beta = beta
 
         self._sigmoid = _Sigmoid(
-            beta * input)  # Reuse the sigmoid activation function
+            beta * input.value)  # Reuse the sigmoid activation function
         self._output: ndarray = None  # Used to compute the derivative
 
     def forward(self) -> ndarray:
-        self._output = self.children[0].value * self.sigmoid.forward()
+        self._output = self.children[0].value * self._sigmoid.forward()
         return self._output
 
     def backward(self) -> tuple:
-        return self._output + self.sigmoid._output * (1 - self._output),
+        return self._output + self._sigmoid._output * (1 - self._output),
 
 
 # ====================================================================================================

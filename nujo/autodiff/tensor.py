@@ -132,7 +132,9 @@ class Tensor(_Node):
             if _debug:
                 print()
                 print('=' * 30)
-                print(self, self.shape, '- dependencies')
+                print(self)
+                print('Shape:', self.shape)
+                print(f'Has {len(self._grad_dependencies)} dependencies:\n')
 
             if len(self._grad_dependencies) == 0:
                 self._grad = array(1)
