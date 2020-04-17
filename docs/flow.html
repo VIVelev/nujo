@@ -29,6 +29,9 @@
 &#39;&#39;&#39;
 
 from copy import deepcopy
+from numbers import Number
+
+from numpy import ndarray
 
 from nujo.autodiff.tensor import Tensor
 
@@ -55,12 +58,12 @@ class Flow(metaclass=_FlowSetup):
     subflows : list of flows, only if the current flow is a supflow
 
     &#39;&#39;&#39;
-    def __init__(self, name=&#39;Flow&#39;, subflows=[]):
+    def __init__(self, name=&#39;Flow&#39;, subflows: &#39;Flow&#39; = []):
         self.name = name
         self.is_supflow = True if subflows else False
 
-        self.subflows = []
-        self.parameters = []
+        self.subflows: &#39;Flow&#39; = []
+        self.parameters: Tensor = []
 
         if self.is_supflow:
             self.append(*subflows)
@@ -133,7 +136,7 @@ class Flow(metaclass=_FlowSetup):
 
         return retflow
 
-    def forward(self, x: Tensor) -&gt; Tensor:
+    def forward(self, x: Tensor) -&gt; Tensor or ndarray or Number:
         &#39;&#39;&#39; Flow Forward
 
         The flow computation is defined here.
@@ -144,7 +147,7 @@ class Flow(metaclass=_FlowSetup):
 
         Returns:
         --------
-        res : Tensor, computed result
+        res : Tensor or ndarray or Number, computed result
 
         &#39;&#39;&#39;
 
@@ -154,14 +157,15 @@ class Flow(metaclass=_FlowSetup):
 
         return output_x
 
-    def copy(self):
+    def copy(self) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Make a copy of the current flow
         &#39;&#39;&#39;
 
         return deepcopy(self)
 
     def __call__(self, *args, **kwargs) -&gt; Tensor:
-        return self.forward(*args, **kwargs)
+        output = self.forward(*args, **kwargs)
+        return output if isinstance(output, Tensor) else Tensor(output)
 
     def __rshift__(self, other: &#39;Flow&#39;) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Chaining operator
@@ -244,12 +248,12 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
     subflows : list of flows, only if the current flow is a supflow
 
     &#39;&#39;&#39;
-    def __init__(self, name=&#39;Flow&#39;, subflows=[]):
+    def __init__(self, name=&#39;Flow&#39;, subflows: &#39;Flow&#39; = []):
         self.name = name
         self.is_supflow = True if subflows else False
 
-        self.subflows = []
-        self.parameters = []
+        self.subflows: &#39;Flow&#39; = []
+        self.parameters: Tensor = []
 
         if self.is_supflow:
             self.append(*subflows)
@@ -322,7 +326,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         return retflow
 
-    def forward(self, x: Tensor) -&gt; Tensor:
+    def forward(self, x: Tensor) -&gt; Tensor or ndarray or Number:
         &#39;&#39;&#39; Flow Forward
 
         The flow computation is defined here.
@@ -333,7 +337,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         Returns:
         --------
-        res : Tensor, computed result
+        res : Tensor or ndarray or Number, computed result
 
         &#39;&#39;&#39;
 
@@ -343,14 +347,15 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         return output_x
 
-    def copy(self):
+    def copy(self) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Make a copy of the current flow
         &#39;&#39;&#39;
 
         return deepcopy(self)
 
     def __call__(self, *args, **kwargs) -&gt; Tensor:
-        return self.forward(*args, **kwargs)
+        output = self.forward(*args, **kwargs)
+        return output if isinstance(output, Tensor) else Tensor(output)
 
     def __rshift__(self, other: &#39;Flow&#39;) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Chaining operator
@@ -400,6 +405,13 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
+<li><a title="nujo.nn.activations.BinaryStep" href="nn/activations.html#nujo.nn.activations.BinaryStep">BinaryStep</a></li>
+<li><a title="nujo.nn.activations.LeakyReLU" href="nn/activations.html#nujo.nn.activations.LeakyReLU">LeakyReLU</a></li>
+<li><a title="nujo.nn.activations.ReLU" href="nn/activations.html#nujo.nn.activations.ReLU">ReLU</a></li>
+<li><a title="nujo.nn.activations.Sigmoid" href="nn/activations.html#nujo.nn.activations.Sigmoid">Sigmoid</a></li>
+<li><a title="nujo.nn.activations.Softmax" href="nn/activations.html#nujo.nn.activations.Softmax">Softmax</a></li>
+<li><a title="nujo.nn.activations.Swish" href="nn/activations.html#nujo.nn.activations.Swish">Swish</a></li>
+<li><a title="nujo.nn.activations.TanH" href="nn/activations.html#nujo.nn.activations.TanH">TanH</a></li>
 <li><a title="nujo.nn.layers.Linear" href="nn/layers.html#nujo.nn.layers.Linear">Linear</a></li>
 <li>nujo.objective.loss._Loss</li>
 </ul>
@@ -462,7 +474,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def copy(self):
+<pre><code class="python">def copy(self) -&gt; &#39;Flow&#39;:
     &#39;&#39;&#39; Make a copy of the current flow
     &#39;&#39;&#39;
 
@@ -478,12 +490,12 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <h2 id="parameters">Parameters:</h2>
 <p>x : Tensor, input tensor</p>
 <h2 id="returns">Returns:</h2>
-<p>res : Tensor, computed result</p></section>
+<p>res : Tensor or ndarray or Number, computed result</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def forward(self, x: Tensor) -&gt; Tensor:
+<pre><code class="python">def forward(self, x: Tensor) -&gt; Tensor or ndarray or Number:
     &#39;&#39;&#39; Flow Forward
 
     The flow computation is defined here.
@@ -494,7 +506,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
     Returns:
     --------
-    res : Tensor, computed result
+    res : Tensor or ndarray or Number, computed result
 
     &#39;&#39;&#39;
 
