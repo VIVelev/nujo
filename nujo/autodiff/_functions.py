@@ -3,6 +3,7 @@ from math import e
 from numpy import log, maximum, ndarray, ones
 
 from nujo.autodiff.function import Function
+from nujo.autodiff.tensor import Tensor
 
 __all__ = [
     '_Addition',
@@ -23,7 +24,10 @@ __all__ = [
 
 
 class _Addition(Function):
-    def __init__(self, input_a, input_b, name='Add'):
+    def __init__(self,
+                 input_a: Tensor or ndarray,
+                 input_b: Tensor or ndarray,
+                 name='Add'):
         super(_Addition, self).__init__(input_a, input_b, name=name)
 
     def forward(self) -> ndarray:
@@ -37,7 +41,7 @@ class _Addition(Function):
 
 
 class _Negation(Function):
-    def __init__(self, input, name='Neg'):
+    def __init__(self, input: Tensor or ndarray, name='Neg'):
         super(_Negation, self).__init__(input, name=name)
 
     def forward(self) -> ndarray:
@@ -51,7 +55,10 @@ class _Negation(Function):
 
 
 class _Multiplication(Function):
-    def __init__(self, input_a, input_b, name='Mul'):
+    def __init__(self,
+                 input_a: Tensor or ndarray,
+                 input_b: Tensor or ndarray,
+                 name='Mul'):
         super(_Multiplication, self).__init__(input_a, input_b, name=name)
 
     def forward(self) -> ndarray:
@@ -65,7 +72,7 @@ class _Multiplication(Function):
 
 
 class _Reciprocal(Function):
-    def __init__(self, input, name='Recipr', eps=1e-18):
+    def __init__(self, input: Tensor or ndarray, name='Recipr', eps=1e-18):
         super(_Reciprocal, self).__init__(input, name=name)
         self.eps = eps
 
@@ -80,7 +87,10 @@ class _Reciprocal(Function):
 
 
 class _Power(Function):
-    def __init__(self, input_a, input_b, name='Pow'):
+    def __init__(self,
+                 input_a: Tensor or ndarray,
+                 input_b: Tensor or ndarray,
+                 name='Pow'):
         super(_Power, self).__init__(input_a, input_b, name=name)
 
     def forward(self) -> ndarray:
@@ -97,7 +107,10 @@ class _Power(Function):
 
 
 class _Logarithm(Function):
-    def __init__(self, input_a, input_b, name='Log'):
+    def __init__(self,
+                 input_a: Tensor or ndarray,
+                 input_b: Tensor or ndarray,
+                 name='Log'):
         super(_Logarithm, self).__init__(input_a, input_b, name=name)
 
         assert (self.children[0] > 0).all()  # argument value limit
@@ -115,7 +128,10 @@ class _Logarithm(Function):
 
 
 class _MatrixMul(Function):
-    def __init__(self, input_a, input_b, name='MatMul'):
+    def __init__(self,
+                 input_a: Tensor or ndarray,
+                 input_b: Tensor or ndarray,
+                 name='MatMul'):
         super(_MatrixMul, self).__init__(input_a, input_b, name=name)
 
     @staticmethod
@@ -193,7 +209,7 @@ class _MatrixMul(Function):
 
 
 class _Sigmoid(Function):
-    def __init__(self, input, name='Sigmoid'):
+    def __init__(self, input: Tensor or ndarray, name='Sigmoid'):
         super(_Sigmoid, self).__init__(input, name=name)
         self._output: ndarray = None  # Used to compute the derivative
 
@@ -216,7 +232,7 @@ class _Sigmoid(Function):
 
 
 class _TanH(Function):
-    def __init__(self, input, name='TanH'):
+    def __init__(self, input: Tensor or ndarray, name='TanH'):
         super(_TanH, self).__init__(input, name=name)
         self._output: ndarray = None  # Used to compute the derivative
 
@@ -240,7 +256,7 @@ class _TanH(Function):
 
 
 class _ReLU(Function):
-    def __init__(self, input, name='ReLU'):
+    def __init__(self, input: Tensor or ndarray, name='ReLU'):
         super(_ReLU, self).__init__(input, name=name)
 
     def forward(self) -> ndarray:
@@ -254,7 +270,7 @@ class _ReLU(Function):
 
 
 class _LeakyReLU(Function):
-    def __init__(self, input, eps=0.1, name='LeakyReLU'):
+    def __init__(self, input: Tensor or ndarray, eps=0.1, name='LeakyReLU'):
         super(_LeakyReLU, self).__init__(input, name=name)
         self.eps = eps
 
@@ -273,7 +289,7 @@ class _LeakyReLU(Function):
 
 
 class _Swish(Function):
-    def __init__(self, input, beta=1, name='Swish'):
+    def __init__(self, input: Tensor or ndarray, beta=1, name='Swish'):
         super(_Swish, self).__init__(input, name=name)
         self.beta = beta
 
