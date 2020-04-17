@@ -108,10 +108,13 @@ class LeakyReLU(Flow):
 
 
 class Swish(Flow):
-    # TODO: Add reference to the paper.
     ''' Swish activation function
 
         swish(x) = x * sigmoid(beta * x) = x / (1 + e ^ (-beta * x))
+
+    Implementation of the activation function presented in:
+    "Searching for Activation Functions" - Prajit Ramachandran, Barret Zoph, Quoc V. Le
+    (https://arxiv.org/abs/1710.05941)
 
     '''
     def __init__(self, beta=1, name='Swish'):

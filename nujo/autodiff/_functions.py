@@ -273,13 +273,12 @@ class _LeakyReLU(Function):
 
 
 class _Swish(Function):
-    # TODO: add more documentation
-
     def __init__(self, input, beta=1, name='Swish'):
         super(_Swish, self).__init__(input, name=name)
         self.beta = beta
 
-        self._sigmoid = _Sigmoid(beta * input)
+        self._sigmoid = _Sigmoid(
+            beta * input)  # Reuse the sigmoid activation function
         self._output: ndarray = None  # Used to compute the derivative
 
     def forward(self) -> ndarray:
