@@ -1,6 +1,6 @@
 from math import e
 
-from numpy import log, maximum, ndarray, ones
+from numpy import log, maximum, ndarray, ones, zeros
 
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
@@ -13,6 +13,7 @@ __all__ = [
     '_Power',
     '_Logarithm',
     '_MatrixMul',
+    '_BinaryStep',
     '_Sigmoid',
     '_TanH',
     '_ReLU',
@@ -205,6 +206,26 @@ class _MatrixMul(Function):
 # ====================================================================================================
 # Built-in Neural Network Activation Functions
 #  - efficient implementation of various neural activation functions
+# ====================================================================================================
+
+
+class _BinaryStep(Function):
+    def __init__(self,
+                 input: Tensor or ndarray,
+                 threshold=0.5,
+                 name='BinaryStep'):
+        super(_BinaryStep, self).__init__(input, name=name)
+        self.threshold = threshold
+
+    def forward(self) -> ndarray:
+        output = zeros(self.children[0].shape)
+        output[self.children[0].value > self.threshold] = 1
+        return output
+
+    def backward(self) -> tuple:
+        return zeros(self.children[0].shape),
+
+
 # ====================================================================================================
 
 

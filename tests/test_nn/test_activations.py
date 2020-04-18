@@ -17,7 +17,7 @@ def test_binary_step(input_value):
 
     # Test Backward pass
     output.backward()
-    assert not equal(input_value.grad, 0).all()
+    assert equal(input_value.grad, 0).all()
 
 
 # ====================================================================================================

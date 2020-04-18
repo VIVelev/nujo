@@ -3,10 +3,10 @@
 More info here: https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-activation-functions-right/
 '''
 
-from nujo.autodiff._functions import _LeakyReLU, _ReLU, _Sigmoid, _Swish, _TanH
+from nujo.autodiff._functions import (_BinaryStep, _LeakyReLU, _ReLU, _Sigmoid,
+                                      _Swish, _TanH)
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
-from nujo.init.basic import zeros_like
 
 __all__ = [
     'BinaryStep',
@@ -37,9 +37,7 @@ class BinaryStep(Flow):
         self.threshold = threshold
 
     def forward(self, x: Tensor) -> Tensor:
-        output = zeros_like(x)
-        output[x > self.threshold] = 1
-        return output
+        return _BinaryStep(x, threshold=self.threshold)()
 
 
 # ====================================================================================================
