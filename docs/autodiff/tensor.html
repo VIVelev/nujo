@@ -162,6 +162,7 @@ class Tensor(_Node):
                 print(&#39;Shape:&#39;, self.shape)
                 print(f&#39;Has {len(self._grad_dependencies)} dependencies:\n&#39;)
 
+            # Top-parent grad
             if len(self._grad_dependencies) == 0:
                 self._grad = array(1)
                 return
@@ -170,29 +171,37 @@ class Tensor(_Node):
             for z, weight in self._grad_dependencies:
                 if _debug:
                     print(&#39;-&#39; * 10)
-                    print(&#39;Weight of `Z_prev Grad`:&#39;, weight)
-                    print(&#39;Shape:&#39;, weight.shape)
-                    print(&#39;-&#39; * 5)
                     print(&#39;Z_prev Grad:&#39;, z.grad)
                     print(&#39;Shape:&#39;, z.grad.shape)
                     print(&#39;-&#39; * 5)
+                    print(&#39;Weight of `Z_prev Grad`:&#39;, weight)
+                    print(&#39;Shape:&#39;, weight.shape)
+                    print(&#39;-&#39; * 5)
 
-                if weight.shape == () or z.grad.shape == ():
-                    self._grad += weight * z.grad
+                if z.grad.shape == () or weight.shape == ():  # Is scalar
+                    self._accumulate_grad_scalar(z, weight)
                 else:
-                    weight = weight.reshape(z.grad.shape[0], self.shape[0],
-                                            z.grad.shape[1] * self.shape[1])
-                    z_grad = z.grad.repeat(self.shape[1], axis=1).reshape(
-                        z.grad.shape[0], 1, -1)
-                    sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
-                    accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
-                    self._grad += accumulated_grad / z.grad.shape[0]
+                    self._accumulate_grad_matrix(z, weight)
 
             if _debug:
                 print(&#39;Current Grad:&#39;, self._grad)
                 print(&#39;Shape:&#39;, self._grad.shape)
                 print(&#39;-&#39; * 5)
                 print()
+
+    def _accumulate_grad_scalar(self, z: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
+        self._grad += z.grad * weight
+
+    def _accumulate_grad_matrix(self, z: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
+        weight = weight.reshape(z.grad.shape[0], self.shape[0],
+                                z.grad.shape[1] * self.shape[1])
+        z_grad = z.grad.repeat(self.shape[1],
+                               axis=1).reshape(z.grad.shape[0], 1, -1)
+
+        sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
+        accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
+
+        self._grad += accumulated_grad / z.grad.shape[0]
 
     def zero_grad(self) -&gt; None:
         # `zero_grad` is called after an iteration.
@@ -488,6 +497,7 @@ name : string, representation of the tensor</p></section>
                 print(&#39;Shape:&#39;, self.shape)
                 print(f&#39;Has {len(self._grad_dependencies)} dependencies:\n&#39;)
 
+            # Top-parent grad
             if len(self._grad_dependencies) == 0:
                 self._grad = array(1)
                 return
@@ -496,29 +506,37 @@ name : string, representation of the tensor</p></section>
             for z, weight in self._grad_dependencies:
                 if _debug:
                     print(&#39;-&#39; * 10)
-                    print(&#39;Weight of `Z_prev Grad`:&#39;, weight)
-                    print(&#39;Shape:&#39;, weight.shape)
-                    print(&#39;-&#39; * 5)
                     print(&#39;Z_prev Grad:&#39;, z.grad)
                     print(&#39;Shape:&#39;, z.grad.shape)
                     print(&#39;-&#39; * 5)
+                    print(&#39;Weight of `Z_prev Grad`:&#39;, weight)
+                    print(&#39;Shape:&#39;, weight.shape)
+                    print(&#39;-&#39; * 5)
 
-                if weight.shape == () or z.grad.shape == ():
-                    self._grad += weight * z.grad
+                if z.grad.shape == () or weight.shape == ():  # Is scalar
+                    self._accumulate_grad_scalar(z, weight)
                 else:
-                    weight = weight.reshape(z.grad.shape[0], self.shape[0],
-                                            z.grad.shape[1] * self.shape[1])
-                    z_grad = z.grad.repeat(self.shape[1], axis=1).reshape(
-                        z.grad.shape[0], 1, -1)
-                    sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
-                    accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
-                    self._grad += accumulated_grad / z.grad.shape[0]
+                    self._accumulate_grad_matrix(z, weight)
 
             if _debug:
                 print(&#39;Current Grad:&#39;, self._grad)
                 print(&#39;Shape:&#39;, self._grad.shape)
                 print(&#39;-&#39; * 5)
                 print()
+
+    def _accumulate_grad_scalar(self, z: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
+        self._grad += z.grad * weight
+
+    def _accumulate_grad_matrix(self, z: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
+        weight = weight.reshape(z.grad.shape[0], self.shape[0],
+                                z.grad.shape[1] * self.shape[1])
+        z_grad = z.grad.repeat(self.shape[1],
+                               axis=1).reshape(z.grad.shape[0], 1, -1)
+
+        sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
+        accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
+
+        self._grad += accumulated_grad / z.grad.shape[0]
 
     def zero_grad(self) -&gt; None:
         # `zero_grad` is called after an iteration.
