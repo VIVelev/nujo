@@ -108,12 +108,12 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
     subflows : list of flows, only if the current flow is a supflow
 
     &#39;&#39;&#39;
-    def __init__(self, name=&#39;Flow&#39;, subflows: &#39;Flow&#39; = []):
+    def __init__(self, name=&#39;Flow&#39;, subflows=[]):
         self.name = name
         self.is_supflow = True if subflows else False
 
-        self.subflows: &#39;Flow&#39; = []
-        self.parameters: Tensor = []
+        self.subflows = []
+        self.parameters = []
 
         if self.is_supflow:
             self.append(*subflows)
@@ -487,6 +487,7 @@ name : string, the name of the function</p></section>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li>nujo.autodiff._functions._Addition</li>
+<li>nujo.autodiff._functions._BinaryStep</li>
 <li>nujo.autodiff._functions._LeakyReLU</li>
 <li>nujo.autodiff._functions._Logarithm</li>
 <li>nujo.autodiff._functions._MatrixMul</li>
