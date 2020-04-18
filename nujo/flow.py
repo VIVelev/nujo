@@ -31,12 +31,12 @@ class Flow(metaclass=_FlowSetup):
     subflows : list of flows, only if the current flow is a supflow
 
     '''
-    def __init__(self, name='Flow', subflows: 'Flow' = []):
+    def __init__(self, name='Flow', subflows=[]):
         self.name = name
         self.is_supflow = True if subflows else False
 
-        self.subflows: 'Flow' = []
-        self.parameters: Tensor = []
+        self.subflows = []
+        self.parameters = []
 
         if self.is_supflow:
             self.append(*subflows)
