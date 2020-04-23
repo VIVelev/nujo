@@ -23,7 +23,7 @@ class Function(_Node):
     name : string, the name of the function
 
     '''
-    def __init__(self, *children: Tensor, name='Function') -> None:
+    def __init__(self, *children: Tensor or ndarray, name='Function') -> None:
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):

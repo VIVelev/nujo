@@ -49,7 +49,7 @@ class Function(_Node):
     name : string, the name of the function
 
     &#39;&#39;&#39;
-    def __init__(self, *children: Tensor, name=&#39;Function&#39;) -&gt; None:
+    def __init__(self, *children: Tensor or ndarray, name=&#39;Function&#39;) -&gt; None:
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):
@@ -120,7 +120,7 @@ name : string, the name of the function</p></section>
     name : string, the name of the function
 
     &#39;&#39;&#39;
-    def __init__(self, *children: Tensor, name=&#39;Function&#39;) -&gt; None:
+    def __init__(self, *children: Tensor or ndarray, name=&#39;Function&#39;) -&gt; None:
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):
@@ -155,12 +155,18 @@ name : string, the name of the function</p></section>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li>nujo.autodiff._functions._Addition</li>
+<li>nujo.autodiff._functions._BinaryStep</li>
+<li>nujo.autodiff._functions._LeakyReLU</li>
 <li>nujo.autodiff._functions._Logarithm</li>
 <li>nujo.autodiff._functions._MatrixMul</li>
 <li>nujo.autodiff._functions._Multiplication</li>
 <li>nujo.autodiff._functions._Negation</li>
 <li>nujo.autodiff._functions._Power</li>
+<li>nujo.autodiff._functions._ReLU</li>
 <li>nujo.autodiff._functions._Reciprocal</li>
+<li>nujo.autodiff._functions._Sigmoid</li>
+<li>nujo.autodiff._functions._Swish</li>
+<li>nujo.autodiff._functions._TanH</li>
 </ul>
 <h3>Methods</h3>
 <dl>

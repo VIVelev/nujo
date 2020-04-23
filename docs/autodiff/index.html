@@ -96,7 +96,7 @@ name : string, the name of the function</p></section>
     name : string, the name of the function
 
     &#39;&#39;&#39;
-    def __init__(self, *children: Tensor, name=&#39;Function&#39;) -&gt; None:
+    def __init__(self, *children: Tensor or ndarray, name=&#39;Function&#39;) -&gt; None:
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):
@@ -131,12 +131,18 @@ name : string, the name of the function</p></section>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li>nujo.autodiff._functions._Addition</li>
+<li>nujo.autodiff._functions._BinaryStep</li>
+<li>nujo.autodiff._functions._LeakyReLU</li>
 <li>nujo.autodiff._functions._Logarithm</li>
 <li>nujo.autodiff._functions._MatrixMul</li>
 <li>nujo.autodiff._functions._Multiplication</li>
 <li>nujo.autodiff._functions._Negation</li>
 <li>nujo.autodiff._functions._Power</li>
+<li>nujo.autodiff._functions._ReLU</li>
 <li>nujo.autodiff._functions._Reciprocal</li>
+<li>nujo.autodiff._functions._Sigmoid</li>
+<li>nujo.autodiff._functions._Swish</li>
+<li>nujo.autodiff._functions._TanH</li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -234,7 +240,7 @@ name : string, representation of the tensor</p></section>
     @property
     def grad(self):
         if self._grad is None:
-            self.compute_grad()
+            self._compute_grad()
 
         return self._grad
 
@@ -309,44 +315,55 @@ name : string, representation of the tensor</p></section>
     def add_grad_dependency(self, wrt: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
         self._grad_dependencies.append((wrt, weight))
 
-    def compute_grad(self, debug=False) -&gt; None:
+    def _compute_grad(self, _debug=False) -&gt; None:
         if self.diff and DIFF_ENABLED:
-            if debug:
+            if _debug:
                 print()
                 print(&#39;=&#39; * 30)
-                print(self, self.shape, &#39;- dependencies&#39;)
+                print(self)
+                print(&#39;Shape:&#39;, self.shape)
+                print(f&#39;Has {len(self._grad_dependencies)} dependencies:\n&#39;)
 
+            # Top-parent grad
             if len(self._grad_dependencies) == 0:
                 self._grad = array(1)
                 return
 
             self._grad = 0
             for z, weight in self._grad_dependencies:
-                if debug:
+                if _debug:
                     print(&#39;-&#39; * 10)
-                    print(&#39;Weight of `Z_prev Grad`:&#39;, weight)
-                    print(&#39;Shape:&#39;, weight.shape)
-                    print(&#39;-&#39; * 5)
                     print(&#39;Z_prev Grad:&#39;, z.grad)
                     print(&#39;Shape:&#39;, z.grad.shape)
                     print(&#39;-&#39; * 5)
+                    print(&#39;Weight of `Z_prev Grad`:&#39;, weight)
+                    print(&#39;Shape:&#39;, weight.shape)
+                    print(&#39;-&#39; * 5)
 
-                if weight.shape == () or z.grad.shape == ():
-                    self._grad += weight * z.grad
+                if z.grad.shape == () or weight.shape == ():  # Is scalar
+                    self._accumulate_grad_scalar(z, weight)
                 else:
-                    weight = weight.reshape(z.grad.shape[0], self.shape[0],
-                                            z.grad.shape[1] * self.shape[1])
-                    z_grad = z.grad.repeat(self.shape[1], axis=1).reshape(
-                        z.grad.shape[0], 1, -1)
-                    sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
-                    accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
-                    self._grad += accumulated_grad / z.grad.shape[0]
+                    self._accumulate_grad_matrix(z, weight)
 
-            if debug:
+            if _debug:
                 print(&#39;Current Grad:&#39;, self._grad)
                 print(&#39;Shape:&#39;, self._grad.shape)
                 print(&#39;-&#39; * 5)
                 print()
+
+    def _accumulate_grad_scalar(self, z: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
+        self._grad += z.grad * weight
+
+    def _accumulate_grad_matrix(self, z: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
+        weight = weight.reshape(z.grad.shape[0], self.shape[0],
+                                z.grad.shape[1] * self.shape[1])
+        z_grad = z.grad.repeat(self.shape[1],
+                               axis=1).reshape(z.grad.shape[0], 1, -1)
+
+        sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
+        accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
+
+        self._grad += accumulated_grad / z.grad.shape[0]
 
     def zero_grad(self) -&gt; None:
         # `zero_grad` is called after an iteration.
@@ -357,7 +374,7 @@ name : string, representation of the tensor</p></section>
         self._T = None
 
     def backward(self) -&gt; None:
-        self.compute_grad()
+        self._compute_grad()
 
         if self.creator:
             for child in self.creator.children:
@@ -465,6 +482,10 @@ name : string, representation of the tensor</p></section>
         from nujo.autodiff._functions import _Power
         return _Power(self, other)()
 
+    def __rpow__(self, other):
+        from nujo.autodiff._functions import _Power
+        return _Power(other, self)()
+
     # More complex arithmetic operations
 
     def __matmul__(self, other):
@@ -514,7 +535,7 @@ def T(self):
 <pre><code class="python">@property
 def grad(self):
     if self._grad is None:
-        self.compute_grad()
+        self._compute_grad()
 
     return self._grad</code></pre>
 </details>
@@ -583,60 +604,11 @@ def shape(self):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def backward(self) -&gt; None:
-    self.compute_grad()
+    self._compute_grad()
 
     if self.creator:
         for child in self.creator.children:
             child.backward()</code></pre>
-</details>
-</dd>
-<dt id="nujo.autodiff.Tensor.compute_grad"><code class="name flex">
-<span>def <span class="ident">compute_grad</span></span>(<span>self, debug=False)</span>
-</code></dt>
-<dd>
-<section class="desc"></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def compute_grad(self, debug=False) -&gt; None:
-    if self.diff and DIFF_ENABLED:
-        if debug:
-            print()
-            print(&#39;=&#39; * 30)
-            print(self, self.shape, &#39;- dependencies&#39;)
-
-        if len(self._grad_dependencies) == 0:
-            self._grad = array(1)
-            return
-
-        self._grad = 0
-        for z, weight in self._grad_dependencies:
-            if debug:
-                print(&#39;-&#39; * 10)
-                print(&#39;Weight of `Z_prev Grad`:&#39;, weight)
-                print(&#39;Shape:&#39;, weight.shape)
-                print(&#39;-&#39; * 5)
-                print(&#39;Z_prev Grad:&#39;, z.grad)
-                print(&#39;Shape:&#39;, z.grad.shape)
-                print(&#39;-&#39; * 5)
-
-            if weight.shape == () or z.grad.shape == ():
-                self._grad += weight * z.grad
-            else:
-                weight = weight.reshape(z.grad.shape[0], self.shape[0],
-                                        z.grad.shape[1] * self.shape[1])
-                z_grad = z.grad.repeat(self.shape[1], axis=1).reshape(
-                    z.grad.shape[0], 1, -1)
-                sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
-                accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
-                self._grad += accumulated_grad / z.grad.shape[0]
-
-        if debug:
-            print(&#39;Current Grad:&#39;, self._grad)
-            print(&#39;Shape:&#39;, self._grad.shape)
-            print(&#39;-&#39; * 5)
-            print()</code></pre>
 </details>
 </dd>
 <dt id="nujo.autodiff.Tensor.reshape"><code class="name flex">
@@ -796,7 +768,6 @@ a.k.a. No gradients are computed for whatever tensor.</p></section>
 <li><code><a title="nujo.autodiff.Tensor.all" href="#nujo.autodiff.Tensor.all">all</a></code></li>
 <li><code><a title="nujo.autodiff.Tensor.any" href="#nujo.autodiff.Tensor.any">any</a></code></li>
 <li><code><a title="nujo.autodiff.Tensor.backward" href="#nujo.autodiff.Tensor.backward">backward</a></code></li>
-<li><code><a title="nujo.autodiff.Tensor.compute_grad" href="#nujo.autodiff.Tensor.compute_grad">compute_grad</a></code></li>
 <li><code><a title="nujo.autodiff.Tensor.grad" href="#nujo.autodiff.Tensor.grad">grad</a></code></li>
 <li><code><a title="nujo.autodiff.Tensor.reshape" href="#nujo.autodiff.Tensor.reshape">reshape</a></code></li>
 <li><code><a title="nujo.autodiff.Tensor.shape" href="#nujo.autodiff.Tensor.shape">shape</a></code></li>

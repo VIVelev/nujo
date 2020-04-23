@@ -2,6 +2,9 @@
 '''
 
 from copy import deepcopy
+from numbers import Number
+
+from numpy import ndarray
 
 from nujo.autodiff.tensor import Tensor
 
@@ -106,7 +109,7 @@ class Flow(metaclass=_FlowSetup):
 
         return retflow
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x: Tensor) -> Tensor or ndarray or Number:
         ''' Flow Forward
 
         The flow computation is defined here.
@@ -117,7 +120,7 @@ class Flow(metaclass=_FlowSetup):
 
         Returns:
         --------
-        res : Tensor, computed result
+        res : Tensor or ndarray or Number, computed result
 
         '''
 
@@ -127,14 +130,15 @@ class Flow(metaclass=_FlowSetup):
 
         return output_x
 
-    def copy(self):
+    def copy(self) -> 'Flow':
         ''' Make a copy of the current flow
         '''
 
         return deepcopy(self)
 
     def __call__(self, *args, **kwargs) -> Tensor:
-        return self.forward(*args, **kwargs)
+        output = self.forward(*args, **kwargs)
+        return output if isinstance(output, Tensor) else Tensor(output)
 
     def __rshift__(self, other: 'Flow') -> 'Flow':
         ''' Chaining operator

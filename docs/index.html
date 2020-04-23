@@ -186,7 +186,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         return retflow
 
-    def forward(self, x: Tensor) -&gt; Tensor:
+    def forward(self, x: Tensor) -&gt; Tensor or ndarray or Number:
         &#39;&#39;&#39; Flow Forward
 
         The flow computation is defined here.
@@ -197,7 +197,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         Returns:
         --------
-        res : Tensor, computed result
+        res : Tensor or ndarray or Number, computed result
 
         &#39;&#39;&#39;
 
@@ -207,14 +207,15 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         return output_x
 
-    def copy(self):
+    def copy(self) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Make a copy of the current flow
         &#39;&#39;&#39;
 
         return deepcopy(self)
 
     def __call__(self, *args, **kwargs) -&gt; Tensor:
-        return self.forward(*args, **kwargs)
+        output = self.forward(*args, **kwargs)
+        return output if isinstance(output, Tensor) else Tensor(output)
 
     def __rshift__(self, other: &#39;Flow&#39;) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Chaining operator
@@ -264,6 +265,13 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
+<li><a title="nujo.nn.activations.BinaryStep" href="nn/activations.html#nujo.nn.activations.BinaryStep">BinaryStep</a></li>
+<li><a title="nujo.nn.activations.LeakyReLU" href="nn/activations.html#nujo.nn.activations.LeakyReLU">LeakyReLU</a></li>
+<li><a title="nujo.nn.activations.ReLU" href="nn/activations.html#nujo.nn.activations.ReLU">ReLU</a></li>
+<li><a title="nujo.nn.activations.Sigmoid" href="nn/activations.html#nujo.nn.activations.Sigmoid">Sigmoid</a></li>
+<li><a title="nujo.nn.activations.Softmax" href="nn/activations.html#nujo.nn.activations.Softmax">Softmax</a></li>
+<li><a title="nujo.nn.activations.Swish" href="nn/activations.html#nujo.nn.activations.Swish">Swish</a></li>
+<li><a title="nujo.nn.activations.TanH" href="nn/activations.html#nujo.nn.activations.TanH">TanH</a></li>
 <li><a title="nujo.nn.layers.Linear" href="nn/layers.html#nujo.nn.layers.Linear">Linear</a></li>
 <li>nujo.objective.loss._Loss</li>
 </ul>
@@ -326,7 +334,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def copy(self):
+<pre><code class="python">def copy(self) -&gt; &#39;Flow&#39;:
     &#39;&#39;&#39; Make a copy of the current flow
     &#39;&#39;&#39;
 
@@ -342,12 +350,12 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <h2 id="parameters">Parameters:</h2>
 <p>x : Tensor, input tensor</p>
 <h2 id="returns">Returns:</h2>
-<p>res : Tensor, computed result</p></section>
+<p>res : Tensor or ndarray or Number, computed result</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def forward(self, x: Tensor) -&gt; Tensor:
+<pre><code class="python">def forward(self, x: Tensor) -&gt; Tensor or ndarray or Number:
     &#39;&#39;&#39; Flow Forward
 
     The flow computation is defined here.
@@ -358,7 +366,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
     Returns:
     --------
-    res : Tensor, computed result
+    res : Tensor or ndarray or Number, computed result
 
     &#39;&#39;&#39;
 
@@ -444,7 +452,7 @@ name : string, the name of the function</p></section>
     name : string, the name of the function
 
     &#39;&#39;&#39;
-    def __init__(self, *children: Tensor, name=&#39;Function&#39;) -&gt; None:
+    def __init__(self, *children: Tensor or ndarray, name=&#39;Function&#39;) -&gt; None:
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):
@@ -479,12 +487,18 @@ name : string, the name of the function</p></section>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li>nujo.autodiff._functions._Addition</li>
+<li>nujo.autodiff._functions._BinaryStep</li>
+<li>nujo.autodiff._functions._LeakyReLU</li>
 <li>nujo.autodiff._functions._Logarithm</li>
 <li>nujo.autodiff._functions._MatrixMul</li>
 <li>nujo.autodiff._functions._Multiplication</li>
 <li>nujo.autodiff._functions._Negation</li>
 <li>nujo.autodiff._functions._Power</li>
+<li>nujo.autodiff._functions._ReLU</li>
 <li>nujo.autodiff._functions._Reciprocal</li>
+<li>nujo.autodiff._functions._Sigmoid</li>
+<li>nujo.autodiff._functions._Swish</li>
+<li>nujo.autodiff._functions._TanH</li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -582,7 +596,7 @@ name : string, representation of the tensor</p></section>
     @property
     def grad(self):
         if self._grad is None:
-            self.compute_grad()
+            self._compute_grad()
 
         return self._grad
 
@@ -657,44 +671,55 @@ name : string, representation of the tensor</p></section>
     def add_grad_dependency(self, wrt: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
         self._grad_dependencies.append((wrt, weight))
 
-    def compute_grad(self, debug=False) -&gt; None:
+    def _compute_grad(self, _debug=False) -&gt; None:
         if self.diff and DIFF_ENABLED:
-            if debug:
+            if _debug:
                 print()
                 print(&#39;=&#39; * 30)
-                print(self, self.shape, &#39;- dependencies&#39;)
+                print(self)
+                print(&#39;Shape:&#39;, self.shape)
+                print(f&#39;Has {len(self._grad_dependencies)} dependencies:\n&#39;)
 
+            # Top-parent grad
             if len(self._grad_dependencies) == 0:
                 self._grad = array(1)
                 return
 
             self._grad = 0
             for z, weight in self._grad_dependencies:
-                if debug:
+                if _debug:
                     print(&#39;-&#39; * 10)
-                    print(&#39;Weight of `Z_prev Grad`:&#39;, weight)
-                    print(&#39;Shape:&#39;, weight.shape)
-                    print(&#39;-&#39; * 5)
                     print(&#39;Z_prev Grad:&#39;, z.grad)
                     print(&#39;Shape:&#39;, z.grad.shape)
                     print(&#39;-&#39; * 5)
+                    print(&#39;Weight of `Z_prev Grad`:&#39;, weight)
+                    print(&#39;Shape:&#39;, weight.shape)
+                    print(&#39;-&#39; * 5)
 
-                if weight.shape == () or z.grad.shape == ():
-                    self._grad += weight * z.grad
+                if z.grad.shape == () or weight.shape == ():  # Is scalar
+                    self._accumulate_grad_scalar(z, weight)
                 else:
-                    weight = weight.reshape(z.grad.shape[0], self.shape[0],
-                                            z.grad.shape[1] * self.shape[1])
-                    z_grad = z.grad.repeat(self.shape[1], axis=1).reshape(
-                        z.grad.shape[0], 1, -1)
-                    sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
-                    accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
-                    self._grad += accumulated_grad / z.grad.shape[0]
+                    self._accumulate_grad_matrix(z, weight)
 
-            if debug:
+            if _debug:
                 print(&#39;Current Grad:&#39;, self._grad)
                 print(&#39;Shape:&#39;, self._grad.shape)
                 print(&#39;-&#39; * 5)
                 print()
+
+    def _accumulate_grad_scalar(self, z: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
+        self._grad += z.grad * weight
+
+    def _accumulate_grad_matrix(self, z: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
+        weight = weight.reshape(z.grad.shape[0], self.shape[0],
+                                z.grad.shape[1] * self.shape[1])
+        z_grad = z.grad.repeat(self.shape[1],
+                               axis=1).reshape(z.grad.shape[0], 1, -1)
+
+        sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
+        accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
+
+        self._grad += accumulated_grad / z.grad.shape[0]
 
     def zero_grad(self) -&gt; None:
         # `zero_grad` is called after an iteration.
@@ -705,7 +730,7 @@ name : string, representation of the tensor</p></section>
         self._T = None
 
     def backward(self) -&gt; None:
-        self.compute_grad()
+        self._compute_grad()
 
         if self.creator:
             for child in self.creator.children:
@@ -813,6 +838,10 @@ name : string, representation of the tensor</p></section>
         from nujo.autodiff._functions import _Power
         return _Power(self, other)()
 
+    def __rpow__(self, other):
+        from nujo.autodiff._functions import _Power
+        return _Power(other, self)()
+
     # More complex arithmetic operations
 
     def __matmul__(self, other):
@@ -862,7 +891,7 @@ def T(self):
 <pre><code class="python">@property
 def grad(self):
     if self._grad is None:
-        self.compute_grad()
+        self._compute_grad()
 
     return self._grad</code></pre>
 </details>
@@ -931,60 +960,11 @@ def shape(self):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def backward(self) -&gt; None:
-    self.compute_grad()
+    self._compute_grad()
 
     if self.creator:
         for child in self.creator.children:
             child.backward()</code></pre>
-</details>
-</dd>
-<dt id="nujo.Tensor.compute_grad"><code class="name flex">
-<span>def <span class="ident">compute_grad</span></span>(<span>self, debug=False)</span>
-</code></dt>
-<dd>
-<section class="desc"></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def compute_grad(self, debug=False) -&gt; None:
-    if self.diff and DIFF_ENABLED:
-        if debug:
-            print()
-            print(&#39;=&#39; * 30)
-            print(self, self.shape, &#39;- dependencies&#39;)
-
-        if len(self._grad_dependencies) == 0:
-            self._grad = array(1)
-            return
-
-        self._grad = 0
-        for z, weight in self._grad_dependencies:
-            if debug:
-                print(&#39;-&#39; * 10)
-                print(&#39;Weight of `Z_prev Grad`:&#39;, weight)
-                print(&#39;Shape:&#39;, weight.shape)
-                print(&#39;-&#39; * 5)
-                print(&#39;Z_prev Grad:&#39;, z.grad)
-                print(&#39;Shape:&#39;, z.grad.shape)
-                print(&#39;-&#39; * 5)
-
-            if weight.shape == () or z.grad.shape == ():
-                self._grad += weight * z.grad
-            else:
-                weight = weight.reshape(z.grad.shape[0], self.shape[0],
-                                        z.grad.shape[1] * self.shape[1])
-                z_grad = z.grad.repeat(self.shape[1], axis=1).reshape(
-                    z.grad.shape[0], 1, -1)
-                sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
-                accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
-                self._grad += accumulated_grad / z.grad.shape[0]
-
-        if debug:
-            print(&#39;Current Grad:&#39;, self._grad)
-            print(&#39;Shape:&#39;, self._grad.shape)
-            print(&#39;-&#39; * 5)
-            print()</code></pre>
 </details>
 </dd>
 <dt id="nujo.Tensor.reshape"><code class="name flex">
@@ -1153,7 +1133,6 @@ a.k.a. No gradients are computed for whatever tensor.</p></section>
 <li><code><a title="nujo.Tensor.all" href="#nujo.Tensor.all">all</a></code></li>
 <li><code><a title="nujo.Tensor.any" href="#nujo.Tensor.any">any</a></code></li>
 <li><code><a title="nujo.Tensor.backward" href="#nujo.Tensor.backward">backward</a></code></li>
-<li><code><a title="nujo.Tensor.compute_grad" href="#nujo.Tensor.compute_grad">compute_grad</a></code></li>
 <li><code><a title="nujo.Tensor.grad" href="#nujo.Tensor.grad">grad</a></code></li>
 <li><code><a title="nujo.Tensor.reshape" href="#nujo.Tensor.reshape">reshape</a></code></li>
 <li><code><a title="nujo.Tensor.shape" href="#nujo.Tensor.shape">shape</a></code></li>

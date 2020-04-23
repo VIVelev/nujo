@@ -16,6 +16,7 @@ class _Node:
     id_generator = _counter()
 
     def __init__(self, *children, name='Node'):
+        # Parse all children to Tensors
         self.children = []
         for child in children:
             self.add_child(child)
