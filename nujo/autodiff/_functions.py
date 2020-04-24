@@ -1,6 +1,6 @@
 from math import e
 
-from numpy import log, maximum, ndarray, ones, zeros
+from numpy import exp, log, maximum, ndarray, ones, sum, zeros
 
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
@@ -19,6 +19,7 @@ __all__ = [
     '_ReLU',
     '_LeakyReLU',
     '_Swish',
+    '_Softmax',
 ]
 
 # ====================================================================================================
@@ -313,6 +314,22 @@ class _Swish(Function):
 
     def backward(self) -> tuple:
         return self._output + self._sigmoid._output * (1 - self._output),
+
+
+# ====================================================================================================
+
+
+class _Softmax(Function):
+    def __init__(self, input: Tensor or ndarray, name='Softmax'):
+        super(_Softmax, self).__init__(input, name=name)
+
+    def forward(self) -> ndarray:
+        exps = exp(self.children[0].value)
+        sums = sum(exps)
+        return exps / sums
+
+    def backward(self) -> tuple:
+        pass
 
 
 # ====================================================================================================
