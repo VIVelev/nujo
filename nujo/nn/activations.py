@@ -133,7 +133,16 @@ class Swish(Flow):
 
 
 class Softmax(Flow):
-    pass
+    ''' Softmax activation function
+
+        softmax(z) = e ^ z_i / sum(e ^ z_i)
+
+    '''
+    def __init__(self, name='Softmax'):
+        super(Softmax, self).__init__(name=name)
+
+    def forward(self, x: Tensor) -> Tensor:
+        return _Softmax(x)()
 
 
 # ====================================================================================================
