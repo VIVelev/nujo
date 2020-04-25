@@ -4,7 +4,7 @@ More info here: https://missinglink.ai/guides/neural-network-concepts/7-types-ne
 '''
 
 from nujo.autodiff._functions import (_BinaryStep, _LeakyReLU, _ReLU, _Sigmoid,
-                                      _Swish, _TanH)
+                                      _Softmax, _Swish, _TanH)
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 

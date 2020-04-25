@@ -1,6 +1,7 @@
 from math import e
 
-from numpy import diag, exp, log, maximum, ndarray, ones, sum, tile, zeros
+from numpy import (diag, exp, hstack, log, maximum, ndarray, ones, repeat, sum,
+                   zeros)
 
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
@@ -328,7 +329,7 @@ class _Softmax(Function):
 
     def forward(self) -> ndarray:
         exps = exp(self.children[0].value)
-        sums = sum(exps)
+        sums = sum(exps, axis=0, keepdims=True)
 
         self._output = exps / sums
         return self._output
@@ -340,10 +341,22 @@ class _Softmax(Function):
         for more info on how this Jacobian was computed.
         '''
 
-        Si_vector = self._output.reshape(1, -1)
-        Si_matrix = tile(Si_vector, (0, self._output.shape[0]))
+        # TODO: Is there a more optimal way to compute Si matrix?
 
-        return diag(self._output) - Si_matrix * Si_matrix.T
+        k, n = self._output.shape
+
+        # Repeat each activation vector (each sample) k times
+        Sj_matrix = repeat(self._output, k, axis=1)
+
+        # Transpose each k by k matrix individually (for each sample)
+        Si_matrix = hstack(
+            [Sj_matrix[:, (i - k):i].T for i in range(k, (k * n) + 1, k)])
+
+        # Make a global diagonal matrix (where the diag matrix for each sample is contained)
+        Sj_diag = hstack([diag(self._output[:, i]) for i in range(n)])
+
+        # Compute the Jacobian
+        return Sj_diag - Si_matrix * Sj_matrix,
 
 
 # ====================================================================================================

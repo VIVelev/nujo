@@ -107,12 +107,26 @@ def test_swish(input_value):
 
 
 # ====================================================================================================
+# Test Softmax activation function
+
+
+def test_softmax(input_value):
+    # Test Forward pass
+    output = activ.Softmax()(input_value)
+
+    assert output.shape == (2, 3)
+
+    # Test Backward pass
+    assert output.backward()
+
+
+# ====================================================================================================
 # Fixtures
 
 
 @pytest.fixture
 def input_value():
-    return Tensor([[0.42, 0.32], [0.6, 0.1]], name='test_input')
+    return Tensor([[0.42, 0.32, 0.34], [0.6, 0.1, 1.1]], name='test_input')
 
 
 # ====================================================================================================
