@@ -42,7 +42,7 @@ def train(net, x, y, num_epochs):
         optimizer.zero_grad()
 
 
-if __name__ == '__main__'
+if __name__ == '__main__':
     mndata = MNIST('datasets/MNIST', gz=False)
     img, labels = mndata.load_training()
 
