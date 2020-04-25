@@ -1,5 +1,5 @@
 import pytest
-from numpy import equal, exp, isclose, maximum
+from numpy import equal, exp, isclose, maximum, sum
 
 import nujo.nn.activations as activ
 from nujo.autodiff.tensor import Tensor
@@ -112,10 +112,10 @@ def test_softmax(input_value):
     # Test Forward pass
     output = activ.Softmax()(input_value)
 
-    exps = exp(self.children[0].value)
+    exps = exp(input_value.value)
     sums = sum(exps, axis=0, keepdims=True)
 
-    assert equal(output, exps / sums)
+    assert equal(output, exps / sums).all()
 
     # Test Backward pass
     assert output.backward()
