@@ -5,12 +5,18 @@ import nujo.nn as nn
 import nujo.objective as obj
 import nujo.optim as optim
 
+# TODO: The  neural network now is nothing more than a big linear function
+# Use some activations maybe? But which ones?
 net = nn.Linear(28 * 28, 20) >> nn.Linear(20, 10) >> nn.Linear(10, 10)
 print(f'Defined net: {net}')
 
+# TODO: Maybe try different loss?
+# Please look up the difference between classification loss and regression loss
 loss_fn = obj.L2Loss()
 print(f'Loss: {loss_fn}')
 
+# TODO: Play around with the hyperparameters of Adam
+# Maybe try  different optimizers?
 optimizer = optim.Adam(net.parameters, lr=0.1)
 print(f'Optimizer: {optimizer}')
 
@@ -48,4 +54,6 @@ if __name__ == '__main__'
     images = np.array(images).squeeze()
     labels = np.expand_dims(np.array(labels), -1)
 
+    # TODO: 32 is the batch size in this case
+    # Look up what `batch gradient descent` means
     train(net, images[:32, :], labels[:32], 10)
