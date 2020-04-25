@@ -118,13 +118,14 @@ def test_softmax(input_value):
     assert equal(output.value, exps / sums).all()
 
     # Test Backward pass
+    output.backward()
+
     k, n = output.shape
     Sj_matrix = repeat(output.value, k, axis=1)
     Si_matrix = hstack(
         [Sj_matrix[:, (i - k):i].T for i in range(k, (k * n) + 1, k)])
     Sj_diag = hstack([diag(output.value[:, i]) for i in range(n)])
 
-    output.backward()
     assert equal(input_value.grad, Sj_diag - Si_matrix * Sj_matrix).all()
 
 
