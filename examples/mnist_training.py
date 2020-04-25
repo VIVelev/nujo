@@ -51,4 +51,7 @@ if __name__ == '__main__':
 
     images = np.array(images).squeeze()
     labels = np.array(labels)
+
+    print(images.shape)
+
     train(net, images[:100], labels[:100], 100)
