@@ -1,6 +1,6 @@
 from math import e
 
-from numpy import exp, log, maximum, ndarray, ones, sum, zeros
+from numpy import diag, exp, log, maximum, ndarray, ones, sum, tile, zeros
 
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
@@ -300,6 +300,8 @@ class _LeakyReLU(Function):
 
 
 class _Swish(Function):
+    ''' More info here: https://arxiv.org/abs/1710.05941
+    '''
     def __init__(self, input: Tensor or ndarray, beta=1, name='Swish'):
         super(_Swish, self).__init__(input, name=name)
         self.beta = beta
@@ -322,14 +324,26 @@ class _Swish(Function):
 class _Softmax(Function):
     def __init__(self, input: Tensor or ndarray, name='Softmax'):
         super(_Softmax, self).__init__(input, name=name)
+        self._output: ndarray = None  # Used to compute the derivative
 
     def forward(self) -> ndarray:
         exps = exp(self.children[0].value)
         sums = sum(exps)
-        return exps / sums
+
+        self._output = exps / sums
+        return self._output
 
     def backward(self) -> tuple:
-        pass
+        ''' Computes the Jacobian matrix
+
+        See here: https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
+        for more info on how this Jacobian was computed.
+        '''
+
+        Si_vector = self._output.reshape(1, -1)
+        Si_matrix = tile(Si_vector, (0, self._output.shape[0]))
+
+        return diag(self._output) - Si_matrix * Si_matrix.T
 
 
 # ====================================================================================================

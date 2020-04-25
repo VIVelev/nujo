@@ -137,6 +137,7 @@ class Softmax(Flow):
 
         softmax(z) = e ^ z_i / sum(e ^ z_i)
 
+    Nice read here: https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
     '''
     def __init__(self, name='Softmax'):
         super(Softmax, self).__init__(name=name)
