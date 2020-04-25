@@ -129,7 +129,6 @@ class Swish(Flow):
 # ====================================================================================================
 # Vector (Multi-class) activation functions
 # ====================================================================================================
-# TODO: Implement vector (multi-class) activation functions in another branch (another feature).
 
 
 class Softmax(Flow):
