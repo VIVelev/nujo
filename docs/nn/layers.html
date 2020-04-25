@@ -24,7 +24,10 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from nujo.flow import Flow
+<pre><code class="python">from numpy import ndarray
+
+from nujo.autodiff.tensor import Tensor
+from nujo.flow import Flow
 from nujo.init import randn, zeros
 
 __all__ = [
@@ -37,7 +40,11 @@ class Linear(Flow):
 
         f(x) = xW + b
     &#39;&#39;&#39;
-    def __init__(self, in_features, out_features, bias=True, name=&#39;Linear&#39;):
+    def __init__(self,
+                 in_features: int,
+                 out_features: int,
+                 bias=True,
+                 name=&#39;Linear&#39;):
         super(Linear,
               self).__init__(name=f&#39;{name}({in_features}, {out_features})&#39;)
 
@@ -48,7 +55,8 @@ class Linear(Flow):
         else:
             self.b = zeros(diff=False)
 
-    def forward(self, x):
+    def forward(self, x: Tensor or ndarray) -&gt; Tensor:
+        x = x if isinstance(x, Tensor) else Tensor(x, name=&#39;x&#39;, diff=False)
         return x @ self.W + self.b</code></pre>
 </details>
 </section>
@@ -77,7 +85,11 @@ class Linear(Flow):
 
         f(x) = xW + b
     &#39;&#39;&#39;
-    def __init__(self, in_features, out_features, bias=True, name=&#39;Linear&#39;):
+    def __init__(self,
+                 in_features: int,
+                 out_features: int,
+                 bias=True,
+                 name=&#39;Linear&#39;):
         super(Linear,
               self).__init__(name=f&#39;{name}({in_features}, {out_features})&#39;)
 
@@ -88,7 +100,8 @@ class Linear(Flow):
         else:
             self.b = zeros(diff=False)
 
-    def forward(self, x):
+    def forward(self, x: Tensor or ndarray) -&gt; Tensor:
+        x = x if isinstance(x, Tensor) else Tensor(x, name=&#39;x&#39;, diff=False)
         return x @ self.W + self.b</code></pre>
 </details>
 <h3>Ancestors</h3>
