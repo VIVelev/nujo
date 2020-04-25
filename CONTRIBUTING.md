@@ -71,7 +71,7 @@ $ pytest
 Use the following format to document python code.
 
 ```
-''' Name of the Pyhton object you are documenting
+''' Name of the Python object you are documenting
 
 Short description
 
