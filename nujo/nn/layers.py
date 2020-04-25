@@ -23,4 +23,5 @@ class Linear(Flow):
             self.b = zeros(diff=False)
 
     def forward(self, x):
-        return x @ self.W + self.b
+        print(self.W.shape, self.b.shape, x.shape)
+        return x @ self.W  # + self.b

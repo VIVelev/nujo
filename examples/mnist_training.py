@@ -5,7 +5,7 @@ import nujo.nn as nn
 import nujo.objective as obj
 import nujo.optim as optim
 
-net = nn.Linear(3, 6) >> nn.Linear(6, 2) >> nn.Linear(2, 1)
+net = nn.Linear(28 * 28, 512) >> nn.Linear(512, 128) >> nn.Linear(128, 64)
 print(f'Defined net: {net}')
 
 loss_fn = obj.L2Loss()
@@ -49,7 +49,6 @@ if __name__ == '__main__':
         # if i % 100 == 0:
         #     print(i)
 
-    images = np.array(images)
+    images = np.array(images).squeeze()
     labels = np.array(labels)
-
-    train(net, images, labels, 100)
+    train(net, images[:100], labels[:100], 100)
