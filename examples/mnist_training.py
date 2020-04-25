@@ -46,6 +46,6 @@ if __name__ == '__main__':
         images.append(elem)
 
     images = np.array(images).squeeze()
-    labels = np.array(labels)
+    labels = np.expand_dims(np.array(labels), -1)
 
     train(net, images[:32, :], labels[:32], 10)
