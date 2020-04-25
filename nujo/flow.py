@@ -109,14 +109,14 @@ class Flow(metaclass=_FlowSetup):
 
         return retflow
 
-    def forward(self, x: Tensor) -> Tensor or ndarray or Number:
+    def forward(self, x: Tensor or ndarray) -> Tensor or ndarray or Number:
         ''' Flow Forward
 
         The flow computation is defined here.
 
         Parameters:
         -----------
-        x : Tensor, input tensor
+        x : Tensor or ndarray, input tensor
 
         Returns:
         --------
