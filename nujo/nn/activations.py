@@ -4,7 +4,7 @@ More info here: https://missinglink.ai/guides/neural-network-concepts/7-types-ne
 '''
 
 from nujo.autodiff._functions import (_BinaryStep, _LeakyReLU, _ReLU, _Sigmoid,
-                                      _Swish, _TanH)
+                                      _Softmax, _Swish, _TanH)
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 
@@ -129,11 +129,20 @@ class Swish(Flow):
 # ====================================================================================================
 # Vector (Multi-class) activation functions
 # ====================================================================================================
-# TODO: Implement vector (multi-class) activation functions in another branch (another feature).
 
 
 class Softmax(Flow):
-    pass
+    ''' Softmax activation function
+
+        softmax(z) = e ^ z_i / sum(e ^ z_i)
+
+    Nice read here: https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
+    '''
+    def __init__(self, name='Softmax'):
+        super(Softmax, self).__init__(name=name)
+
+    def forward(self, x: Tensor) -> Tensor:
+        return _Softmax(x)()
 
 
 # ====================================================================================================

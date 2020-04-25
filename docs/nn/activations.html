@@ -32,7 +32,7 @@ More info here: https://missinglink.ai/guides/neural-network-concepts/7-types-ne
 &#39;&#39;&#39;
 
 from nujo.autodiff._functions import (_BinaryStep, _LeakyReLU, _ReLU, _Sigmoid,
-                                      _Swish, _TanH)
+                                      _Softmax, _Swish, _TanH)
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 
@@ -157,11 +157,20 @@ class Swish(Flow):
 # ====================================================================================================
 # Vector (Multi-class) activation functions
 # ====================================================================================================
-# TODO: Implement vector (multi-class) activation functions in another branch (another feature).
 
 
 class Softmax(Flow):
-    pass
+    &#39;&#39;&#39; Softmax activation function
+
+        softmax(z) = e ^ z_i / sum(e ^ z_i)
+
+    Nice read here: https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
+    &#39;&#39;&#39;
+    def __init__(self, name=&#39;Softmax&#39;):
+        super(Softmax, self).__init__(name=name)
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        return _Softmax(x)()
 
 
 # ====================================================================================================</code></pre>
@@ -345,17 +354,26 @@ return 0</p></section>
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>A computational Flow</p>
-<p>Flow of tensors through nujo functions.</p>
-<h2 id="parameters">Parameters:</h2>
-<p>name : string
-subflows : list of flows, only if the current flow is a supflow</p></section>
+<section class="desc"><p>Softmax activation function</p>
+<pre><code>softmax(z) = e ^ z_i / sum(e ^ z_i)
+</code></pre>
+<p>Nice read here: <a href="https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/">https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/</a></p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Softmax(Flow):
-    pass</code></pre>
+    &#39;&#39;&#39; Softmax activation function
+
+        softmax(z) = e ^ z_i / sum(e ^ z_i)
+
+    Nice read here: https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
+    &#39;&#39;&#39;
+    def __init__(self, name=&#39;Softmax&#39;):
+        super(Softmax, self).__init__(name=name)
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        return _Softmax(x)()</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">

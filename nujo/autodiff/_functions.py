@@ -1,6 +1,5 @@
-from math import e
-
-from numpy import log, maximum, ndarray, ones, zeros
+from numpy import (diag, exp, hstack, log, maximum, ndarray, ones, repeat, sum,
+                   zeros)
 
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
@@ -19,6 +18,7 @@ __all__ = [
     '_ReLU',
     '_LeakyReLU',
     '_Swish',
+    '_Softmax',
 ]
 
 # ====================================================================================================
@@ -235,7 +235,7 @@ class _Sigmoid(Function):
         self._output: ndarray = None  # Used to compute the derivative
 
     def forward(self) -> ndarray:
-        self._output = 1 / (1 + e**-self.children[0].value)
+        self._output = 1 / (1 + exp(-self.children[0].value))
         return self._output
 
     def backward(self) -> tuple:
@@ -255,7 +255,7 @@ class _TanH(Function):
         it is just a more optimal way to compute the TanH function.
         '''
 
-        self._output = (2 / (1 + e**(-2 * self.children[0].value))) - 1
+        self._output = (2 / (1 + exp(-2 * self.children[0].value))) - 1
         return self._output
 
     def backward(self) -> tuple:
@@ -299,6 +299,8 @@ class _LeakyReLU(Function):
 
 
 class _Swish(Function):
+    ''' More info here: https://arxiv.org/abs/1710.05941
+    '''
     def __init__(self, input: Tensor or ndarray, beta=1, name='Swish'):
         super(_Swish, self).__init__(input, name=name)
         self.beta = beta
@@ -313,6 +315,46 @@ class _Swish(Function):
 
     def backward(self) -> tuple:
         return self._output + self._sigmoid._output * (1 - self._output),
+
+
+# ====================================================================================================
+
+
+class _Softmax(Function):
+    def __init__(self, input: Tensor or ndarray, name='Softmax'):
+        super(_Softmax, self).__init__(input, name=name)
+        self._output: ndarray = None  # Used to compute the derivative
+
+    def forward(self) -> ndarray:
+        exps = exp(self.children[0].value)
+        sums = sum(exps, axis=0, keepdims=True)
+
+        self._output = exps / sums
+        return self._output
+
+    def backward(self) -> tuple:
+        ''' Computes the Jacobian matrix
+
+        See here: https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
+        for more info on how this Jacobian was computed.
+        '''
+
+        # TODO: Is there a more optimal way to compute Si matrix?
+
+        k, n = self._output.shape
+
+        # Repeat each activation vector (each sample) k times
+        Sj_matrix = repeat(self._output, k, axis=1)
+
+        # Transpose each k by k matrix individually (for each sample)
+        Si_matrix = hstack(
+            [Sj_matrix[:, (i - k):i].T for i in range(k, (k * n) + 1, k)])
+
+        # Make a global diagonal matrix (where the diag matrix for each sample is contained)
+        Sj_diag = hstack([diag(self._output[:, i]) for i in range(n)])
+
+        # Compute the Jacobian
+        return Sj_diag - Si_matrix * Sj_matrix,
 
 
 # ====================================================================================================

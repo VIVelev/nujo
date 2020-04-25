@@ -1,7 +1,5 @@
-from math import e
-
 import pytest
-from numpy import equal, isclose, maximum
+from numpy import diag, equal, exp, hstack, isclose, maximum, repeat, sum
 
 import nujo.nn.activations as activ
 from nujo.autodiff.tensor import Tensor
@@ -13,7 +11,7 @@ from nujo.autodiff.tensor import Tensor
 def test_binary_step(input_value):
     # Test Forward pass
     output = activ.BinaryStep()(input_value)
-    assert equal(output.value, [[0, 0], [1, 0]]).all()
+    assert equal(output.value, [[0, 0, 0], [1, 0, 1]]).all()
 
     # Test Backward pass
     output.backward()
@@ -29,7 +27,7 @@ def test_sigmoid(input_value):
     output = activ.Sigmoid()(input_value)
 
     x = input_value.value
-    assert equal(output.value, 1 / (1 + e**-x)).all()
+    assert equal(output.value, 1 / (1 + exp(-x))).all()
 
     # Test Backward pass
     output.backward()
@@ -45,7 +43,7 @@ def test_tanh(input_value):
     output = activ.TanH()(input_value)
 
     x = input_value.value
-    assert isclose(output.value, (e**x - e**-x) / (e**x + e**-x)).all()
+    assert isclose(output.value, (exp(x) - exp(-x)) / (exp(x) + exp(-x))).all()
 
     # Test Backward pass
     output.backward()
@@ -107,12 +105,37 @@ def test_swish(input_value):
 
 
 # ====================================================================================================
+# Test Softmax activation function
+
+
+def test_softmax(input_value):
+    # Test Forward pass
+    output = activ.Softmax()(input_value)
+
+    exps = exp(input_value.value)
+    sums = sum(exps, axis=0, keepdims=True)
+
+    assert equal(output.value, exps / sums).all()
+
+    # Test Backward pass
+    output.backward()
+
+    k, n = output.shape
+    Sj_matrix = repeat(output.value, k, axis=1)
+    Si_matrix = hstack(
+        [Sj_matrix[:, (i - k):i].T for i in range(k, (k * n) + 1, k)])
+    Sj_diag = hstack([diag(output.value[:, i]) for i in range(n)])
+
+    assert equal(input_value.grad, Sj_diag - Si_matrix * Sj_matrix).all()
+
+
+# ====================================================================================================
 # Fixtures
 
 
 @pytest.fixture
 def input_value():
-    return Tensor([[0.42, 0.32], [0.6, 0.1]], name='test_input')
+    return Tensor([[0.42, 0.32, 0.34], [0.6, 0.1, 1.1]], name='test_input')
 
 
 # ====================================================================================================
