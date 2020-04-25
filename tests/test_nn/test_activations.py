@@ -1,7 +1,5 @@
-from math import e
-
 import pytest
-from numpy import equal, isclose, maximum
+from numpy import equal, exp, isclose, maximum
 
 import nujo.nn.activations as activ
 from nujo.autodiff.tensor import Tensor
@@ -29,7 +27,7 @@ def test_sigmoid(input_value):
     output = activ.Sigmoid()(input_value)
 
     x = input_value.value
-    assert equal(output.value, 1 / (1 + e**-x)).all()
+    assert equal(output.value, 1 / (1 + exp(-x))).all()
 
     # Test Backward pass
     output.backward()
@@ -45,7 +43,7 @@ def test_tanh(input_value):
     output = activ.TanH()(input_value)
 
     x = input_value.value
-    assert isclose(output.value, (e**x - e**-x) / (e**x + e**-x)).all()
+    assert isclose(output.value, (exp(x) - exp(-x)) / (exp(x) + exp(-x))).all()
 
     # Test Backward pass
     output.backward()
@@ -114,7 +112,10 @@ def test_softmax(input_value):
     # Test Forward pass
     output = activ.Softmax()(input_value)
 
-    assert output.shape == (2, 3)
+    exps = exp(self.children[0].value)
+    sums = sum(exps, axis=0, keepdims=True)
+
+    assert equal(output, exps / sums)
 
     # Test Backward pass
     assert output.backward()

@@ -1,5 +1,3 @@
-from math import e
-
 from numpy import (diag, exp, hstack, log, maximum, ndarray, ones, repeat, sum,
                    zeros)
 
@@ -237,7 +235,7 @@ class _Sigmoid(Function):
         self._output: ndarray = None  # Used to compute the derivative
 
     def forward(self) -> ndarray:
-        self._output = 1 / (1 + e**-self.children[0].value)
+        self._output = 1 / (1 + exp(-self.children[0].value))
         return self._output
 
     def backward(self) -> tuple:
@@ -257,7 +255,7 @@ class _TanH(Function):
         it is just a more optimal way to compute the TanH function.
         '''
 
-        self._output = (2 / (1 + e**(-2 * self.children[0].value))) - 1
+        self._output = (2 / (1 + exp(-2 * self.children[0].value))) - 1
         return self._output
 
     def backward(self) -> tuple:
