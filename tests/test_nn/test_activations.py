@@ -13,7 +13,7 @@ from nujo.autodiff.tensor import Tensor
 def test_binary_step(input_value):
     # Test Forward pass
     output = activ.BinaryStep()(input_value)
-    assert equal(output.value, [[0, 0], [1, 0]]).all()
+    assert equal(output.value, [[0, 0, 0], [1, 0, 1]]).all()
 
     # Test Backward pass
     output.backward()
