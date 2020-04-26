@@ -176,7 +176,7 @@ def matrix_mse_loss():
     y = X @ randn(3, 1, diff=False) + rand(diff=False)
 
     def compute(params):
-        return mean((y - X @ params[0][0])**2)
+        return mean((y - X @ params[0][0])**2, inplace=True)
 
     return compute
 
