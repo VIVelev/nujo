@@ -26,7 +26,10 @@ __all__ = [
 # ====================================================================================================
 
 
-def sum(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
+def sum(*args: Number or Tensor,
+        dim: int = None,
+        keepdim=False,
+        inplace=False) -> Tensor:
     ''' Summation of tensors
 
     Parameters:
@@ -35,6 +38,9 @@ def sum(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     if a single tensor is passed, its elements will be summed
     dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
+    inplace : bool, whether to make the computation in-place;
+    a.k.a. take the argument by reference instead of by value;
+    (this parameter is taken into account only if a single argument is passed)
 
     Returns:
     --------
@@ -48,7 +54,7 @@ def sum(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_sum(args, axis=dim, keepdims=keepdim)
 
     else:
-        res = deepcopy(args[0])
+        res = args[0] if inplace else deepcopy(args[0])
         res.name += ' (sum)'
         res.value = np_sum(args[0].value, axis=dim, keepdims=keepdim)
 
@@ -58,7 +64,10 @@ def sum(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def prod(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
+def prod(*args: Number or Tensor,
+         dim: int = None,
+         keepdim=False,
+         inplace=False) -> Tensor:
     ''' Product of tensors
 
     Parameters:
@@ -67,6 +76,9 @@ def prod(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     if a single tensor is passed, its elements will be multiplied
     dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
+    inplace : bool, whether to make the computation in-place;
+    a.k.a. take the argument by reference instead of by value;
+    (this parameter is taken into account only if a single argument is passed)
 
     Returns:
     --------
@@ -80,7 +92,7 @@ def prod(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_prod(args, axis=dim, keepdims=keepdim)
 
     else:
-        res = deepcopy(args[0])
+        res = args[0] if inplace else deepcopy(args[0])
         res.name += ' (prod)'
         res.value = np_prod(args[0].value, axis=dim, keepdims=keepdim)
 
@@ -90,7 +102,10 @@ def prod(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def mean(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
+def mean(*args: Number or Tensor,
+         dim: int = None,
+         keepdim=False,
+         inplace=False) -> Tensor:
     ''' Mean of tensors
 
     Parameters:
@@ -99,6 +114,9 @@ def mean(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     if a single tensor is passed, the mean of its elements will be computed
     dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
+    inplace : bool, whether to make the computation in-place;
+    a.k.a. take the argument by reference instead of by value;
+    (this parameter is taken into account only if a single argument is passed)
 
     Returns:
     --------
@@ -112,7 +130,7 @@ def mean(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_mean(args, axis=dim, keepdims=keepdim)
 
     else:
-        res = deepcopy(args[0])
+        res = args[0] if inplace else deepcopy(args[0])
         res.name = ' (mean)'
         res.value = np_mean(args[0].value, axis=dim, keepdims=keepdim)
 
@@ -122,7 +140,10 @@ def mean(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def median(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
+def median(*args: Number or Tensor,
+           dim: int = None,
+           keepdim=False,
+           inplace=False) -> Tensor:
     ''' Median of tensors
 
     Parameters:
@@ -131,6 +152,9 @@ def median(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     if a single tensor is passed, the median of its elements will be computed
     dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
+    inplace : bool, whether to make the computation in-place;
+    a.k.a. take the argument by reference instead of by value;
+    (this parameter is taken into account only if a single argument is passed)
 
     Returns:
     --------
@@ -144,7 +168,7 @@ def median(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_median(args, axis=dim, keepdims=keepdim)
 
     else:
-        res = deepcopy(args[0])
+        res = args[0] if inplace else deepcopy(args[0])
         res.name += ' (median)'
         res.value = np_median(args[0].value, axis=dim, keepdims=keepdim)
 
@@ -154,7 +178,10 @@ def median(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def min(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
+def min(*args: Number or Tensor,
+        dim: int = None,
+        keepdim=False,
+        inplace=False) -> Tensor:
     ''' Min of tensors
 
     Parameters:
@@ -163,6 +190,9 @@ def min(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     if a single tensor is passed, the min of its elements will be computed
     dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
+    inplace : bool, whether to make the computation in-place;
+    a.k.a. take the argument by reference instead of by value;
+    (this parameter is taken into account only if a single argument is passed)
 
     Returns:
     --------
@@ -176,7 +206,7 @@ def min(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_min(args, axis=dim, keepdims=keepdim)
 
     else:
-        res = deepcopy(args[0])
+        res = args[0] if inplace else deepcopy(args[0])
         res.name += ' (min)'
         res.value = np_min(args[0].value, axis=dim, keepdims=keepdim)
 
@@ -186,7 +216,10 @@ def min(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def max(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
+def max(*args: Number or Tensor,
+        dim: int = None,
+        keepdim=False,
+        inplace=False) -> Tensor:
     ''' Max of tensors
 
     Parameters:
@@ -195,6 +228,9 @@ def max(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     if a single tensor is passed, the max of its elements will be computed
     dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
+    inplace : bool, whether to make the computation in-place;
+    a.k.a. take the argument by reference instead of by value;
+    (this parameter is taken into account only if a single argument is passed)
 
     Returns:
     --------
@@ -208,7 +244,7 @@ def max(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_max(args, axis=dim, keepdims=keepdim)
 
     else:
-        res = deepcopy(args[0])
+        res = args[0] if inplace else deepcopy(args[0])
         res.name += ' (max)'
         res.value = np_max(args[0].value, axis=dim, keepdims=keepdim)
 
@@ -218,7 +254,10 @@ def max(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def stddev(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
+def stddev(*args: Number or Tensor,
+           dim: int = None,
+           keepdim=False,
+           inplace=False) -> Tensor:
     ''' Standard Deviation of tensors
 
     Parameters:
@@ -227,6 +266,9 @@ def stddev(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
     if a single tensor is passed, the std dev of its elements will be computed
     dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
+    inplace : bool, whether to make the computation in-place;
+    a.k.a. take the argument by reference instead of by value;
+    (this parameter is taken into account only if a single argument is passed)
 
     Returns:
     --------
@@ -240,7 +282,7 @@ def stddev(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_stddev(args, axis=dim, keepdims=keepdim)
 
     else:
-        res = deepcopy(args[0])
+        res = args[0] if inplace else deepcopy(args[0])
         res.name += ' (stddev)'
         res.value = np_stddev(args[0].value, axis=dim, keepdims=keepdim)
 
@@ -252,7 +294,8 @@ def stddev(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 
 def variance(*args: Number or Tensor,
              dim: int = None,
-             keepdim=False) -> Tensor:
+             keepdim=False,
+             inplace=False) -> Tensor:
     ''' Variance of tensors
 
     Parameters:
@@ -261,6 +304,9 @@ def variance(*args: Number or Tensor,
     if a single tensor is passed, the variance of its elements will be computed
     dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
+    inplace : bool, whether to make the computation in-place;
+    a.k.a. take the argument by reference instead of by value;
+    (this parameter is taken into account only if a single argument is passed)
 
     Returns:
     --------
@@ -274,7 +320,7 @@ def variance(*args: Number or Tensor,
         return np_variance(args, axis=dim, keepdims=keepdim)
 
     else:
-        res = deepcopy(args[0])
+        res = args[0] if inplace else deepcopy(args[0])
         res.name += ' (variance)'
         res.value = np_variance(args[0].value, axis=dim, keepdims=keepdim)
 
