@@ -1,3 +1,4 @@
+from copy import deepcopy
 from numbers import Number
 
 from numpy import max as np_max
@@ -47,8 +48,11 @@ def sum(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_sum(args, axis=dim, keepdims=keepdim)
 
     else:
-        args[0].value = np_sum(args[0].value, axis=dim, keepdims=keepdim)
-        return args[0]
+        res = deepcopy(args[0])
+        res.name += ' (sum)'
+        res.value = np_sum(args[0].value, axis=dim, keepdims=keepdim)
+
+        return res
 
 
 # ====================================================================================================
@@ -76,8 +80,11 @@ def prod(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_prod(args, axis=dim, keepdims=keepdim)
 
     else:
-        args[0].value = np_prod(args[0].value, axis=dim, keepdims=keepdim)
-        return args[0]
+        res = deepcopy(args[0])
+        res.name += ' (prod)'
+        res.value = np_prod(args[0].value, axis=dim, keepdims=keepdim)
+
+        return res
 
 
 # ====================================================================================================
@@ -105,8 +112,11 @@ def mean(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_mean(args, axis=dim, keepdims=keepdim)
 
     else:
-        args[0].value = np_mean(args[0].value, axis=dim, keepdims=keepdim)
-        return args[0]
+        res = deepcopy(args[0])
+        res.name = ' (mean)'
+        res.value = np_mean(args[0].value, axis=dim, keepdims=keepdim)
+
+        return res
 
 
 # ====================================================================================================
@@ -134,8 +144,11 @@ def median(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_median(args, axis=dim, keepdims=keepdim)
 
     else:
-        args[0].value = np_median(args[0].value, axis=dim, keepdims=keepdim)
-        return args[0]
+        res = deepcopy(args[0])
+        res.name += ' (median)'
+        res.value = np_median(args[0].value, axis=dim, keepdims=keepdim)
+
+        return res
 
 
 # ====================================================================================================
@@ -163,8 +176,11 @@ def min(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_min(args, axis=dim, keepdims=keepdim)
 
     else:
-        args[0].value = np_min(args[0].value, axis=dim, keepdims=keepdim)
-        return args[0]
+        res = deepcopy(args[0])
+        res.name += ' (min)'
+        res.value = np_min(args[0].value, axis=dim, keepdims=keepdim)
+
+        return res
 
 
 # ====================================================================================================
@@ -192,8 +208,11 @@ def max(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_max(args, axis=dim, keepdims=keepdim)
 
     else:
-        args[0].value = np_max(args[0].value, axis=dim, keepdims=keepdim)
-        return args[0]
+        res = deepcopy(args[0])
+        res.name += ' (max)'
+        res.value = np_max(args[0].value, axis=dim, keepdims=keepdim)
+
+        return res
 
 
 # ====================================================================================================
@@ -221,8 +240,11 @@ def stddev(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_stddev(args, axis=dim, keepdims=keepdim)
 
     else:
-        args[0].value = np_stddev(args[0].value, axis=dim, keepdims=keepdim)
-        return args[0]
+        res = deepcopy(args[0])
+        res.name += ' (stddev)'
+        res.value = np_stddev(args[0].value, axis=dim, keepdims=keepdim)
+
+        return res
 
 
 # ====================================================================================================
@@ -252,8 +274,11 @@ def variance(*args: Number or Tensor,
         return np_variance(args, axis=dim, keepdims=keepdim)
 
     else:
-        args[0].value = np_variance(args[0].value, axis=dim, keepdims=keepdim)
-        return args[0]
+        res = deepcopy(args[0])
+        res.name += ' (variance)'
+        res.value = np_variance(args[0].value, axis=dim, keepdims=keepdim)
+
+        return res
 
 
 # ====================================================================================================

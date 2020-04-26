@@ -7,3 +7,5 @@ around `numpy` functions.
 
 from nujo.math.aggregate import *
 from nujo.math.scalar import *
+
+# TODO: In-place math functions?
