@@ -55,33 +55,33 @@ def abs(x: Number or Tensor) -> Tensor:
 # ====================================================================================================
 
 
-def round(x: Number or Tensor) -> Tensor:
+def round(x: Number or Tensor, inplace=False) -> Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
-    rounded = deepcopy(x)
+    rounded = x if inplace else deepcopy(x)
     rounded.name += ' (rounded)'
     rounded.value = np_round(x.value)
 
     return rounded
 
 
-def ceil(x: Number or Tensor) -> Tensor:
+def ceil(x: Number or Tensor, inplace=False) -> Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
-    ceiled = deepcopy(x)
+    ceiled = x if inplace else deepcopy(x)
     ceiled.name += ' (ceiled)'
     ceiled.value = np_ceil(x.value)
 
     return ceiled
 
 
-def floor(x: Number or Tensor) -> Tensor:
+def floor(x: Number or Tensor, inplace=False) -> Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
-    floored = deepcopy(x)
+    floored = x if inplace else deepcopy(x)
     floored.name += ' (floored)'
     floored.value = np_floor(x.value)
 
