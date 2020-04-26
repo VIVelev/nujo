@@ -47,9 +47,8 @@ def sum(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_sum(args, axis=dim, keepdims=keepdim)
 
     else:
-        return Tensor(np_sum(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + ' (sum)')
+        args[0].value = np_sum(args[0].value, axis=dim, keepdims=keepdim)
+        return args[0]
 
 
 # ====================================================================================================
@@ -77,9 +76,8 @@ def prod(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_prod(args, axis=dim, keepdims=keepdim)
 
     else:
-        return Tensor(np_prod(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + ' (prod)')
+        args[0].value = np_prod(args[0].value, axis=dim, keepdims=keepdim)
+        return args[0]
 
 
 # ====================================================================================================
@@ -136,9 +134,8 @@ def median(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_median(args, axis=dim, keepdims=keepdim)
 
     else:
-        return Tensor(np_median(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + ' (median)')
+        args[0].value = np_median(args[0].value, axis=dim, keepdims=keepdim)
+        return args[0]
 
 
 # ====================================================================================================
@@ -166,9 +163,8 @@ def min(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_min(args, axis=dim, keepdims=keepdim)
 
     else:
-        return Tensor(np_min(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + ' (min)')
+        args[0].value = np_min(args[0].value, axis=dim, keepdims=keepdim)
+        return args[0]
 
 
 # ====================================================================================================
@@ -196,9 +192,8 @@ def max(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_max(args, axis=dim, keepdims=keepdim)
 
     else:
-        return Tensor(np_max(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + ' (max)')
+        args[0].value = np_max(args[0].value, axis=dim, keepdims=keepdim)
+        return args[0]
 
 
 # ====================================================================================================
@@ -226,9 +221,8 @@ def stddev(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
         return np_stddev(args, axis=dim, keepdims=keepdim)
 
     else:
-        return Tensor(np_stddev(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + ' (stddev)')
+        args[0].value = np_stddev(args[0].value, axis=dim, keepdims=keepdim)
+        return args[0]
 
 
 # ====================================================================================================
@@ -258,9 +252,8 @@ def variance(*args: Number or Tensor,
         return np_variance(args, axis=dim, keepdims=keepdim)
 
     else:
-        return Tensor(np_variance(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + ' (variance)')
+        args[0].value = np_variance(args[0].value, axis=dim, keepdims=keepdim)
+        return args[0]
 
 
 # ====================================================================================================
