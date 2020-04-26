@@ -3,9 +3,9 @@ from numbers import Number
 
 from numpy import array, eye, ndarray, tile
 
+import nujo.autodiff.modes as modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff._utils import _if_not_none
-from nujo.autodiff.modes import DIFF_ENABLED
 
 
 class Tensor(_Node):
@@ -47,25 +47,26 @@ class Tensor(_Node):
         self._grad: ndarray = None
 
         # Transposed tensor cache
-        self._T: ndarray = None
+        self._T: 'Tensor' = None
 
     @property
-    def grad(self):
+    def grad(self) -> ndarray:
         if self._grad is None:
             self._compute_grad()
 
         return self._grad
 
     @grad.setter
-    def grad(self, value: Number or list or ndarray or 'Tensor'):
-        self._grad = value.value if isinstance(value, Tensor) else array(value)
+    def grad(self, value: 'Tensor' or ndarray or list or Number):
+        self._grad = value if isinstance(value, Tensor) else Tensor(
+            value, name=self.name + '::grad')
 
     @grad.deleter
     def grad(self):
         del self._grad
 
     @property
-    def T(self):
+    def T(self) -> 'Tensor':
         if self._T is None:
             transposed = deepcopy(self)
             transposed.value = self.value.T
@@ -92,6 +93,11 @@ class Tensor(_Node):
             reshaped.name += ' (reshaped)'
             reshaped.value = new_val
             return reshaped
+
+    def repeat(self, repeats: int or tuple, axis: int = None) -> 'Tensor':
+        res = deepcopy(self)
+        res.value = self.value.repeat(repeats, axis=axis)
+        return res
 
     def squeeze(self, dim=-1, inplace=False) -> 'Tensor':
         if dim < 0:
@@ -128,7 +134,7 @@ class Tensor(_Node):
         self._grad_dependencies.append((wrt, weight))
 
     def _compute_grad(self, _debug=False) -> None:
-        if self.diff and DIFF_ENABLED:
+        if modes.DIFF_ENABLED and self.diff and self._grad is None:
             if _debug:
                 print()
                 print('=' * 30)
@@ -152,7 +158,7 @@ class Tensor(_Node):
                     print('Shape:', weight.shape)
                     print('-' * 5)
 
-                if z.grad.shape == () or weight.shape == ():  # Is scalar
+                if weight.shape == () or z.grad.shape == ():  # Is scalar
                     self._accumulate_grad_scalar(z, weight)
                 else:
                     self._accumulate_grad_matrix(z, weight)

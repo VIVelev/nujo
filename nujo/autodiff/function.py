@@ -2,8 +2,8 @@ from abc import abstractmethod
 
 from numpy import array, ndarray
 
+import nujo.autodiff.modes as modes
 from nujo.autodiff._node import _Node
-from nujo.autodiff.modes import DIFF_ENABLED
 from nujo.autodiff.tensor import Tensor
 
 
@@ -43,9 +43,12 @@ class Function(_Node):
     def __call__(self) -> Tensor:
         z = self.forward()
         if not isinstance(z, Tensor):
-            z = Tensor(z, creator=self, name=self._generate_tensor_name())
+            z = Tensor(z,
+                       creator=self,
+                       name=self._generate_tensor_name(),
+                       diff=any([x.diff for x in self.children]))
 
-        if DIFF_ENABLED and any([x.diff for x in self.children]):
+        if modes.DIFF_ENABLED and z.diff:
             for tensor, derivative in zip(self.children, self.backward()):
                 tensor.add_grad_dependency(z, array(derivative))
 

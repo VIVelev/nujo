@@ -136,7 +136,7 @@ class _MatrixMul(Function):
         super(_MatrixMul, self).__init__(input_a, input_b, name=name)
 
     @staticmethod
-    def differentiate(X: ndarray, W: ndarray) -> tuple:
+    def differentiate(X: 'Tensor', W: 'Tensor') -> tuple:
         ''' Calculate Matrix partial derivatives
 
         Given Z = XW, Calculate:
@@ -196,7 +196,7 @@ class _MatrixMul(Function):
         return dX, dW
 
     def forward(self) -> ndarray:
-        assert self.children[0].shape[1] == self.children[1].shape[0]
+        assert self.children[0].shape[-1] == self.children[1].shape[0]
         return self.children[0].value @ self.children[1].value
 
     def backward(self) -> tuple:
@@ -251,8 +251,9 @@ class _TanH(Function):
         self._output: ndarray = None  # Used to compute the derivative
 
     def forward(self) -> ndarray:
-        ''' (2 / (1 + e ^ -2x)) - 1 is equivalent to (e ^ x - e ^ -x) / (e ^ x + e ^ -x)
-        it is just a more optimal way to compute the TanH function.
+        ''' (2 / (1 + e ^ -2x)) - 1 is equivalent to
+        (e ^ x - e ^ -x) / (e ^ x + e ^ -x) it is just a
+        more optimal way to compute the TanH function.
         '''
 
         self._output = (2 / (1 + exp(-2 * self.children[0].value))) - 1
@@ -335,7 +336,8 @@ class _Softmax(Function):
     def backward(self) -> tuple:
         ''' Computes the Jacobian matrix
 
-        See here: https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
+        See here:
+        https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
         for more info on how this Jacobian was computed.
         '''
 
@@ -350,7 +352,8 @@ class _Softmax(Function):
         Si_matrix = hstack(
             [Sj_matrix[:, (i - k):i].T for i in range(k, (k * n) + 1, k)])
 
-        # Make a global diagonal matrix (where the diag matrix for each sample is contained)
+        # Make a global diagonal matrix
+        # (where the diag matrix for each sample is contained)
         Sj_diag = hstack([diag(self._output[:, i]) for i in range(n)])
 
         # Compute the Jacobian

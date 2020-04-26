@@ -1,7 +1,5 @@
 from abc import abstractmethod
 
-from numpy import ndarray
-
 from nujo.autodiff import Tensor, no_diff
 
 

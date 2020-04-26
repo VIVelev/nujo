@@ -41,7 +41,7 @@ def sum(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
-    args = list(map(Tensor, args))
+    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
 
     if len(args) > 1:
         return np_sum(args, axis=dim, keepdims=keepdim)
@@ -71,7 +71,7 @@ def prod(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
-    args = list(map(Tensor, args))
+    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
 
     if len(args) > 1:
         return np_prod(args, axis=dim, keepdims=keepdim)
@@ -101,15 +101,14 @@ def mean(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
-    args = list(map(Tensor, args))
+    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
 
     if len(args) > 1:
         return np_mean(args, axis=dim, keepdims=keepdim)
 
     else:
-        return Tensor(np_mean(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + ' (mean)')
+        args[0].value = np_mean(args[0].value, axis=dim, keepdims=keepdim)
+        return args[0]
 
 
 # ====================================================================================================
@@ -131,7 +130,7 @@ def median(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
-    args = list(map(Tensor, args))
+    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
 
     if len(args) > 1:
         return np_median(args, axis=dim, keepdims=keepdim)
@@ -161,7 +160,7 @@ def min(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
-    args = list(map(Tensor, args))
+    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
 
     if len(args) > 1:
         return np_min(args, axis=dim, keepdims=keepdim)
@@ -191,7 +190,7 @@ def max(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
-    args = list(map(Tensor, args))
+    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
 
     if len(args) > 1:
         return np_max(args, axis=dim, keepdims=keepdim)
@@ -221,7 +220,7 @@ def stddev(*args: Number or Tensor, dim: int = None, keepdim=False) -> Tensor:
 
     '''
 
-    args = list(map(Tensor, args))
+    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
 
     if len(args) > 1:
         return np_stddev(args, axis=dim, keepdims=keepdim)
@@ -253,7 +252,7 @@ def variance(*args: Number or Tensor,
 
     '''
 
-    args = list(map(Tensor, args))
+    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
 
     if len(args) > 1:
         return np_variance(args, axis=dim, keepdims=keepdim)
