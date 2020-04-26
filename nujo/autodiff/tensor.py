@@ -3,7 +3,7 @@ from numbers import Number
 
 from numpy import array, eye, ndarray, tile
 
-import nujo.autodiff.modes as modes
+from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff._utils import _if_not_none
 

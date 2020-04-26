@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 from numpy import array, ndarray
 
-import nujo.autodiff.modes as modes
+from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
 
