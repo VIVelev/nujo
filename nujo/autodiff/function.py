@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from numpy import array, ndarray
+from numpy import ndarray
 
 from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
@@ -50,6 +50,10 @@ class Function(_Node):
 
         if modes.DIFF_ENABLED and z.diff:
             for tensor, derivative in zip(self.children, self.backward()):
-                tensor.add_grad_dependency(z, array(derivative))
+                tensor.add_grad_dependency(
+                    z,
+                    Tensor(derivative,
+                           diff=False,
+                           name=tensor.name + '::weight'))
 
         return z

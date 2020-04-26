@@ -44,13 +44,13 @@ class Tensor(_Node):
         self._grad_dependencies = []
 
         # Gradient cache
-        self._grad: ndarray = None
+        self._grad: 'Tensor' = None
 
         # Transposed tensor cache
         self._T: 'Tensor' = None
 
     @property
-    def grad(self) -> ndarray:
+    def grad(self) -> 'Tensor':
         if self._grad is None:
             self._compute_grad()
 
@@ -130,7 +130,7 @@ class Tensor(_Node):
 
     # Gradient computation
 
-    def add_grad_dependency(self, wrt: 'Tensor', weight: ndarray) -> None:
+    def add_grad_dependency(self, wrt: 'Tensor', weight: 'Tensor') -> None:
         self._grad_dependencies.append((wrt, weight))
 
     def _compute_grad(self, _debug=False) -> None:
@@ -144,10 +144,12 @@ class Tensor(_Node):
 
             # Top-parent grad
             if len(self._grad_dependencies) == 0:
-                self._grad = array(1)
+                self._grad = Tensor(array(1),
+                                    diff=False,
+                                    name=self.name + '::grad')
                 return
 
-            self._grad = 0
+            self._grad = Tensor(0, diff=False, name=self.name + '::grad')
             for z, weight in self._grad_dependencies:
                 if _debug:
                     print('-' * 10)
@@ -169,19 +171,23 @@ class Tensor(_Node):
                 print('-' * 5)
                 print()
 
-    def _accumulate_grad_scalar(self, z: 'Tensor', weight: ndarray) -> None:
-        self._grad += z.grad * weight
+    def _accumulate_grad_scalar(self, z: 'Tensor', weight: 'Tensor') -> None:
+        with modes.no_diff():
+            self._grad += z.grad * weight
 
-    def _accumulate_grad_matrix(self, z: 'Tensor', weight: ndarray) -> None:
-        weight = weight.reshape(z.grad.shape[0], self.shape[0],
-                                z.grad.shape[1] * self.shape[1])
-        z_grad = z.grad.repeat(self.shape[1],
-                               axis=1).reshape(z.grad.shape[0], 1, -1)
+    def _accumulate_grad_matrix(self, z: 'Tensor', weight: 'Tensor') -> None:
+        from nujo.math.aggregate import sum
 
-        sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
-        accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
+        with modes.no_diff():
+            weight = weight.reshape(z.grad.shape[0], self.shape[0],
+                                    z.grad.shape[1] * self.shape[1])
+            z_grad = z.grad.repeat(self.shape[1],
+                                   axis=1).reshape(z.grad.shape[0], 1, -1)
 
-        self._grad += accumulated_grad / z.grad.shape[0]
+            sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
+            accumulated_grad = sum((weight * z_grad) @ sum_mask.T, dim=0)
+
+            self._grad += accumulated_grad / z.grad.shape[0]
 
     def zero_grad(self) -> None:
         # `zero_grad` is called after an iteration.
