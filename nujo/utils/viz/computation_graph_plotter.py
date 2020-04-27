@@ -33,10 +33,10 @@ class ComputationGraphPlotter:
         if len(root.children) == 0:
             return
 
-        root_name = root.name.replace(':', ' ')
+        root_name = repr(root).replace(':', ' ')
 
         for child in root.children:
-            child_name = child.name.replace(':', ' ')
+            child_name = repr(child).replace(':', ' ')
 
             self.computation_graph.node(child_name,
                                         color=self.get_color(child),

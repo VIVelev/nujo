@@ -37,7 +37,7 @@ def train(net, x, y, num_epochs):
         # Zero grad
         optimizer.zero_grad()
 
-        return loss
+    return loss
 
 
 if __name__ == '__main__':
