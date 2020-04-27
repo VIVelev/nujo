@@ -57,6 +57,6 @@ class Function(_Node):
             # Compute gradient for this tensor
             for tensor, derivative in zip(self.children, self.backward()):
                 tensor.add_grad_dependency(
-                    z, Tensor(derivative, name=tensor.name + '::weight'))
+                    z, Tensor(derivative, name=f'weight[{tensor.name}]'))
 
         return z

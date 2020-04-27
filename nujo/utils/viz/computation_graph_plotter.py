@@ -33,11 +33,9 @@ class ComputationGraphPlotter:
         if len(root.children) == 0:
             return
 
-        # TODO: Remove `:` from Tensor names
-        root_name = repr(root).replace(':', ' ')
-
+        root_name = repr(root)
         for child in root.children:
-            child_name = repr(child).replace(':', ' ')
+            child_name = repr(child)
 
             self.computation_graph.node(child_name,
                                         color=self.get_color(child),
