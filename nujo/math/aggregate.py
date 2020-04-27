@@ -1,5 +1,4 @@
 from copy import deepcopy
-from numbers import Number
 
 from numpy import max as np_max
 from numpy import mean as np_mean
@@ -10,6 +9,7 @@ from numpy import std as np_stddev
 from numpy import sum as np_sum
 from numpy import var as np_variance
 
+from nujo._typing import Union, _numerical
 from nujo.autodiff.tensor import Tensor
 
 __all__ = [
@@ -26,7 +26,7 @@ __all__ = [
 # ====================================================================================================
 
 
-def sum(*args: Number or Tensor,
+def sum(*args: Union[Tensor, _numerical],
         dim: int = None,
         keepdim=False,
         inplace=False) -> Tensor:
@@ -64,7 +64,7 @@ def sum(*args: Number or Tensor,
 # ====================================================================================================
 
 
-def prod(*args: Number or Tensor,
+def prod(*args: Union[Tensor, _numerical],
          dim: int = None,
          keepdim=False,
          inplace=False) -> Tensor:
@@ -102,7 +102,7 @@ def prod(*args: Number or Tensor,
 # ====================================================================================================
 
 
-def mean(*args: Number or Tensor,
+def mean(*args: Union[Tensor, _numerical],
          dim: int = None,
          keepdim=False,
          inplace=False) -> Tensor:
@@ -140,7 +140,7 @@ def mean(*args: Number or Tensor,
 # ====================================================================================================
 
 
-def median(*args: Number or Tensor,
+def median(*args: Union[Tensor, _numerical],
            dim: int = None,
            keepdim=False,
            inplace=False) -> Tensor:
@@ -178,7 +178,7 @@ def median(*args: Number or Tensor,
 # ====================================================================================================
 
 
-def min(*args: Number or Tensor,
+def min(*args: Union[Tensor, _numerical],
         dim: int = None,
         keepdim=False,
         inplace=False) -> Tensor:
@@ -216,7 +216,7 @@ def min(*args: Number or Tensor,
 # ====================================================================================================
 
 
-def max(*args: Number or Tensor,
+def max(*args: Union[Tensor, _numerical],
         dim: int = None,
         keepdim=False,
         inplace=False) -> Tensor:
@@ -254,7 +254,7 @@ def max(*args: Number or Tensor,
 # ====================================================================================================
 
 
-def stddev(*args: Number or Tensor,
+def stddev(*args: Union[Tensor, _numerical],
            dim: int = None,
            keepdim=False,
            inplace=False) -> Tensor:
@@ -292,7 +292,7 @@ def stddev(*args: Number or Tensor,
 # ====================================================================================================
 
 
-def variance(*args: Number or Tensor,
+def variance(*args: Union[Tensor, _numerical],
              dim: int = None,
              keepdim=False,
              inplace=False) -> Tensor:

@@ -1,8 +1,8 @@
 from copy import deepcopy
-from numbers import Number
 
 from numpy import array, eye, ndarray, tile
 
+from nujo._typing import Union, _numerical
 from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff._utils import _if_not_none
@@ -27,7 +27,7 @@ class Tensor(_Node):
 
     '''
     def __init__(self,
-                 value: 'Tensor' or ndarray or list or Number,
+                 value: Union['Tensor', _numerical],
                  diff=True,
                  creator=None,
                  name='Tensor'):
@@ -57,7 +57,7 @@ class Tensor(_Node):
         return self._grad
 
     @grad.setter
-    def grad(self, value: 'Tensor' or ndarray or list or Number):
+    def grad(self, value: Union['Tensor', _numerical]):
         self._grad = value if isinstance(value, Tensor) else Tensor(
             value, name=f'grad[{self.name}]')
 
