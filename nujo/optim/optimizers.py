@@ -66,7 +66,7 @@ class Momentum(Optimizer):
         # Get the corresponding velocity
         key = param.name
         if key not in self._velocity:
-            self._velocity[key] = zeros_like(param, diff=False)
+            self._velocity[key] = zeros_like(param)
 
         # Exponentially Weighted Moving Average
         self._velocity[key] = self.beta * self._velocity[key] +\
@@ -105,7 +105,7 @@ class RMSprop(Optimizer):
         # Get the corresponding squared gradient
         key = param.name
         if key not in self._squared:
-            self._squared[key] = zeros_like(param, diff=False)
+            self._squared[key] = zeros_like(param)
 
         # Exponentially Weighted Moving Average
         self._squared[key] = self.beta * self._squared[key] +\
@@ -148,8 +148,8 @@ class Adam(Optimizer):
         # Get the corresponding velocity and squared gradient
         key = param.name
         if key not in self._velocity:
-            self._velocity[key] = zeros_like(param, diff=False)
-            self._squared[key] = zeros_like(param, diff=False)
+            self._velocity[key] = zeros_like(param)
+            self._squared[key] = zeros_like(param)
 
         # Exponentially Weighted Moving Average
         self._velocity[key] = self.betas[0]*self._velocity[key] +\
