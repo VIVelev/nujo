@@ -213,13 +213,27 @@ class Tensor(_Node):
         self._grad = None
         self._T = None
 
-    def backward(self) -&gt; None:
-        # TODO: Try BFS instead of DFS ?
-        self._compute_grad()
+    def backward(self, _debug=False) -&gt; None:
+        &#39;&#39;&#39; It uses Breadth First Search to traverse the computation graph
+        and compute the gradient for each differentiable Tensor in the graph.
+        &#39;&#39;&#39;
 
-        if self.creator:
-            for child in self.creator.children:
-                child.backward()
+        nodes_to_visit = [self]
+        if _debug:
+            i = 1
+
+        while nodes_to_visit:
+            node = nodes_to_visit.pop()
+            node._compute_grad()
+
+            if _debug:
+                nstr = f&#39; [{i}]&#39;
+                node.name += nstr if nstr not in node.name else &#39;&#39;
+                i += 1
+
+            if node.creator:
+                for child in node.creator.children:
+                    nodes_to_visit.insert(0, child)
 
     # Useful methods
 
@@ -551,13 +565,27 @@ name : string, representation of the tensor</p></section>
         self._grad = None
         self._T = None
 
-    def backward(self) -&gt; None:
-        # TODO: Try BFS instead of DFS ?
-        self._compute_grad()
+    def backward(self, _debug=False) -&gt; None:
+        &#39;&#39;&#39; It uses Breadth First Search to traverse the computation graph
+        and compute the gradient for each differentiable Tensor in the graph.
+        &#39;&#39;&#39;
 
-        if self.creator:
-            for child in self.creator.children:
-                child.backward()
+        nodes_to_visit = [self]
+        if _debug:
+            i = 1
+
+        while nodes_to_visit:
+            node = nodes_to_visit.pop()
+            node._compute_grad()
+
+            if _debug:
+                nstr = f&#39; [{i}]&#39;
+                node.name += nstr if nstr not in node.name else &#39;&#39;
+                i += 1
+
+            if node.creator:
+                for child in node.creator.children:
+                    nodes_to_visit.insert(0, child)
 
     # Useful methods
 
@@ -777,18 +805,33 @@ def shape(self):
 <span>def <span class="ident">backward</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>It uses Breadth First Search to traverse the computation graph
+and compute the gradient for each differentiable Tensor in the graph.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def backward(self) -&gt; None:
-    # TODO: Try BFS instead of DFS ?
-    self._compute_grad()
+<pre><code class="python">def backward(self, _debug=False) -&gt; None:
+    &#39;&#39;&#39; It uses Breadth First Search to traverse the computation graph
+    and compute the gradient for each differentiable Tensor in the graph.
+    &#39;&#39;&#39;
 
-    if self.creator:
-        for child in self.creator.children:
-            child.backward()</code></pre>
+    nodes_to_visit = [self]
+    if _debug:
+        i = 1
+
+    while nodes_to_visit:
+        node = nodes_to_visit.pop()
+        node._compute_grad()
+
+        if _debug:
+            nstr = f&#39; [{i}]&#39;
+            node.name += nstr if nstr not in node.name else &#39;&#39;
+            i += 1
+
+        if node.creator:
+            for child in node.creator.children:
+                nodes_to_visit.insert(0, child)</code></pre>
 </details>
 </dd>
 <dt id="nujo.autodiff.tensor.Tensor.repeat"><code class="name flex">
