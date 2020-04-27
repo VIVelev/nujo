@@ -131,7 +131,7 @@ def mean(*args: Number or Tensor,
 
     else:
         res = args[0] if inplace else deepcopy(args[0])
-        res.name = ' (mean)'
+        res.name += ' (mean)'
         res.value = np_mean(args[0].value, axis=dim, keepdims=keepdim)
 
         return res
