@@ -187,13 +187,21 @@ class Tensor(_Node):
         self._grad = None
         self._T = None
 
-    def backward(self) -> None:
-        # TODO: Try BFS instead of DFS ?
-        self._compute_grad()
+    def backward(self, _debug=False) -> None:
+        nodes_to_visit = [self]
+        if _debug:
+            i = 1
 
-        if self.creator:
-            for child in self.creator.children:
-                child.backward()
+        while nodes_to_visit:
+            node = nodes_to_visit.pop()
+            node._compute_grad()
+            if _debug:
+                node.name += f' [{i}]'
+                i += 1
+
+            if node.creator:
+                for child in node.creator.children:
+                    nodes_to_visit.insert(0, child)
 
     # Useful methods
 
