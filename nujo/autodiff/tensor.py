@@ -27,7 +27,7 @@ class Tensor(_Node):
 
     '''
     def __init__(self,
-                 value: Number or list or ndarray or 'Tensor',
+                 value: 'Tensor' or ndarray or list or Number,
                  diff=True,
                  creator=None,
                  name='Tensor'):
@@ -59,7 +59,7 @@ class Tensor(_Node):
     @grad.setter
     def grad(self, value: 'Tensor' or ndarray or list or Number):
         self._grad = value if isinstance(value, Tensor) else Tensor(
-            value, name=self.name + '::grad')
+            value, name=f'grad[{self.name}]')
 
     @grad.deleter
     def grad(self):
@@ -81,21 +81,19 @@ class Tensor(_Node):
     def shape(self):
         return self.value.shape
 
-    def reshape(self, *args: int, inplace=False) -> 'Tensor':
+    def reshape(self, *shape: int, inplace=False) -> 'Tensor':
         reshaped = self if inplace else deepcopy(self)
-        reshaped.name += ' (reshaped)'
-        reshaped.value = self.value.reshape(*args)
-
+        reshaped.value = self.value.reshape(shape)
         return reshaped
 
     def repeat(self,
-               repeats: int or tuple,
+               *repeats: int,
                axis: int = None,
                inplace=False) -> 'Tensor':
 
-        res = self if inplace else deepcopy(self)
-        res.value = self.value.repeat(repeats, axis=axis)
-        return res
+        repeated = self if inplace else deepcopy(self)
+        repeated.value = self.value.repeat(repeats, axis=axis)
+        return repeated
 
     def squeeze(self, dim=-1, inplace=False) -> 'Tensor':
         if dim < 0:
@@ -142,10 +140,10 @@ class Tensor(_Node):
 
             # Top-parent grad
             if len(self._grad_dependencies) == 0:
-                self._grad = Tensor(1.0, name=self.name + '::grad')
+                self._grad = Tensor(1, name=f'grad[{self.name}]')
                 return
 
-            self._grad = Tensor(0.0, name=self.name + '::grad')
+            self._grad = Tensor(0, name=f'grad[{self.name}]')
             for z, weight in self._grad_dependencies:
                 if _debug:
                     print('-' * 10)
@@ -190,6 +188,7 @@ class Tensor(_Node):
         self._T = None
 
     def backward(self) -> None:
+        # TODO: Try BFS instead of DFS ?
         self._compute_grad()
 
         if self.creator:
