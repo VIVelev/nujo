@@ -15,7 +15,7 @@ __all__ = [
 class BinaryCrossEntropy(QualitativeLoss):
     ''' Binary Cross-Entropy loss
 
-        −(y * log(p) + (1−y) * log(1 − p))
+        −(y * log(p) + (1 − y) * log(1 − p))
 
     '''
     def forward(self, input: Tensor, target: Tensor) -> Tensor:

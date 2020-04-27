@@ -29,15 +29,16 @@ class ComputationGraphPlotter:
         else:
             return 'oval'
 
-    def create(self, root: _Node) -> 'ComputationGraphPlotter':
+    def create(self,
+               root: _Node,
+               display_values=False) -> 'ComputationGraphPlotter':
+
         if len(root.children) == 0:
             return
 
-        # TODO: Remove `:` from Tensor names
-        root_name = repr(root).replace(':', ' ')
-
+        root_name = str(root) if display_values else repr(root)
         for child in root.children:
-            child_name = repr(child).replace(':', ' ')
+            child_name = str(child) if display_values else repr(child)
 
             self.computation_graph.node(child_name,
                                         color=self.get_color(child),
