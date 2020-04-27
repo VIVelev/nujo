@@ -42,18 +42,19 @@ class Function(_Node):
 
     def __call__(self) -> Tensor:
         ''' This method controls what gets registered in the
-        computation graph. (a.k.a. what gets a gradient)
+        computation graph and what gets a gradient.
         '''
 
         z = self.forward()
         if not isinstance(z, Tensor):
+            # Register in the computation graph only if in diff mode
             z = Tensor(z,
-                       name=self._generate_tensor_name(),
-                       diff=any([x.diff for x in self.children]))
+                       diff=any([x.diff for x in self.children]),
+                       creator=self if modes.DIFF_ENABLED else None,
+                       name=self._generate_tensor_name())
 
         if modes.DIFF_ENABLED and z.diff:
-            z.creator = self  # Register in the computation graph
-
+            # Compute gradient for this tensor
             for tensor, derivative in zip(self.children, self.backward()):
                 tensor.add_grad_dependency(
                     z, Tensor(derivative, name=tensor.name + '::weight'))
