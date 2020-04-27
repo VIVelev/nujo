@@ -81,33 +81,33 @@ def abs(x: Number or Tensor) -&gt; Tensor:
 # ====================================================================================================
 
 
-def round(x: Number or Tensor) -&gt; Tensor:
+def round(x: Number or Tensor, inplace=False) -&gt; Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
-    rounded = deepcopy(x)
+    rounded = x if inplace else deepcopy(x)
     rounded.name += &#39; (rounded)&#39;
     rounded.value = np_round(x.value)
 
     return rounded
 
 
-def ceil(x: Number or Tensor) -&gt; Tensor:
+def ceil(x: Number or Tensor, inplace=False) -&gt; Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
-    ceiled = deepcopy(x)
+    ceiled = x if inplace else deepcopy(x)
     ceiled.name += &#39; (ceiled)&#39;
     ceiled.value = np_ceil(x.value)
 
     return ceiled
 
 
-def floor(x: Number or Tensor) -&gt; Tensor:
+def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
-    floored = deepcopy(x)
+    floored = x if inplace else deepcopy(x)
     floored.name += &#39; (floored)&#39;
     floored.value = np_floor(x.value)
 
@@ -138,7 +138,7 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 </details>
 </dd>
 <dt id="nujo.math.scalar.ceil"><code class="name flex">
-<span>def <span class="ident">ceil</span></span>(<span>x)</span>
+<span>def <span class="ident">ceil</span></span>(<span>x, inplace=False)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
@@ -146,11 +146,11 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def ceil(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def ceil(x: Number or Tensor, inplace=False) -&gt; Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
-    ceiled = deepcopy(x)
+    ceiled = x if inplace else deepcopy(x)
     ceiled.name += &#39; (ceiled)&#39;
     ceiled.value = np_ceil(x.value)
 
@@ -171,7 +171,7 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 </details>
 </dd>
 <dt id="nujo.math.scalar.floor"><code class="name flex">
-<span>def <span class="ident">floor</span></span>(<span>x)</span>
+<span>def <span class="ident">floor</span></span>(<span>x, inplace=False)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
@@ -179,11 +179,11 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def floor(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
-    floored = deepcopy(x)
+    floored = x if inplace else deepcopy(x)
     floored.name += &#39; (floored)&#39;
     floored.value = np_floor(x.value)
 
@@ -230,7 +230,7 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 </details>
 </dd>
 <dt id="nujo.math.scalar.round"><code class="name flex">
-<span>def <span class="ident">round</span></span>(<span>x)</span>
+<span>def <span class="ident">round</span></span>(<span>x, inplace=False)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
@@ -238,11 +238,11 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def round(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def round(x: Number or Tensor, inplace=False) -&gt; Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
-    rounded = deepcopy(x)
+    rounded = x if inplace else deepcopy(x)
     rounded.name += &#39; (rounded)&#39;
     rounded.value = np_round(x.value)
 

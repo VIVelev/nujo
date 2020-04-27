@@ -50,7 +50,8 @@ class BinaryCrossEntropy(QualitativeLoss):
         return self.reduction_fn(-target * log(input) -
                                  (1 - target) * log(1 - input),
                                  dim=self.dim,
-                                 keepdim=self.keepdim)
+                                 keepdim=self.keepdim,
+                                 inplace=True)
 
 
 # ====================================================================================================
@@ -64,7 +65,8 @@ class CrossEntropy(QualitativeLoss):
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
         return -self.reduction_fn(sum(target * log(input), dim=1),
                                   dim=self.dim,
-                                  keepdim=self.keepdim)
+                                  keepdim=self.keepdim,
+                                  inplace=True)
 
 
 # ====================================================================================================</code></pre>
@@ -102,7 +104,8 @@ class CrossEntropy(QualitativeLoss):
         return self.reduction_fn(-target * log(input) -
                                  (1 - target) * log(1 - input),
                                  dim=self.dim,
-                                 keepdim=self.keepdim)</code></pre>
+                                 keepdim=self.keepdim,
+                                 inplace=True)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -140,7 +143,8 @@ class CrossEntropy(QualitativeLoss):
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
         return -self.reduction_fn(sum(target * log(input), dim=1),
                                   dim=self.dim,
-                                  keepdim=self.keepdim)</code></pre>
+                                  keepdim=self.keepdim,
+                                  inplace=True)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
