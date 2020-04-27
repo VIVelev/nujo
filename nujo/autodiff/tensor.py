@@ -188,6 +188,10 @@ class Tensor(_Node):
         self._T = None
 
     def backward(self, _debug=False) -> None:
+        ''' It uses Breadth First Search to traverse the computation graph
+        and compute the gradient for each differentiable Tensor in the graph.
+        '''
+
         nodes_to_visit = [self]
         if _debug:
             i = 1
@@ -195,8 +199,10 @@ class Tensor(_Node):
         while nodes_to_visit:
             node = nodes_to_visit.pop()
             node._compute_grad()
+
             if _debug:
-                node.name += f' [{i}]'
+                nstr = f' [{i}]'
+                node.name += nstr if nstr not in node.name else ''
                 i += 1
 
             if node.creator:
