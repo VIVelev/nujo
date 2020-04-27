@@ -44,7 +44,7 @@ class Function(_Node):
         z = self.forward()
         if not isinstance(z, Tensor):
             z = Tensor(z,
-                       creator=self,
+                       creator=self if modes.DIFF_ENABLED else None,
                        name=self._generate_tensor_name(),
                        diff=any([x.diff for x in self.children]))
 
