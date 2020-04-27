@@ -51,9 +51,6 @@ class Function(_Node):
         if modes.DIFF_ENABLED and z.diff:
             for tensor, derivative in zip(self.children, self.backward()):
                 tensor.add_grad_dependency(
-                    z,
-                    Tensor(derivative,
-                           diff=False,
-                           name=tensor.name + '::weight'))
+                    z, Tensor(derivative, name=tensor.name + '::weight'))
 
         return z
