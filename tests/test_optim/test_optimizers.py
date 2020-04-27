@@ -7,12 +7,12 @@ from nujo import mean, rand, randn
 # Test Stochastic Gradient Descent (SGD)
 
 
-def test_sgd_basic(params, num_iters, quadratic_loss):
-    optimizer = optim.SGD(params)
+def test_sgd_basic(scalar_params, num_iters, quadratic_loss):
+    optimizer = optim.SGD(scalar_params)
 
     prev_loss = 1e3
     for _ in range(num_iters):
-        loss = quadratic_loss(params)
+        loss = quadratic_loss(scalar_params)
 
         loss.backward()
         optimizer.step()
@@ -22,12 +22,12 @@ def test_sgd_basic(params, num_iters, quadratic_loss):
         prev_loss = loss
 
 
-def test_sgd_matrix(params, num_iters, matrix_mse_loss):
-    optimizer = optim.SGD(params)
+def test_sgd_matrix(vec_params, num_iters, matrix_mse_loss):
+    optimizer = optim.SGD(vec_params)
 
     moving_avrg_loss = 1e4
     for i in range(num_iters):
-        loss = matrix_mse_loss(params)
+        loss = matrix_mse_loss(vec_params)
 
         loss.backward()
         optimizer.step()
@@ -42,12 +42,12 @@ def test_sgd_matrix(params, num_iters, matrix_mse_loss):
 # Test Momentum optimizer
 
 
-def test_momentum_basic(params, num_iters, quadratic_loss):
-    optimizer = optim.Momentum(params)
+def test_momentum_basic(scalar_params, num_iters, quadratic_loss):
+    optimizer = optim.Momentum(scalar_params)
 
     prev_loss = 1e3
     for _ in range(num_iters):
-        loss = quadratic_loss(params)
+        loss = quadratic_loss(scalar_params)
 
         loss.backward()
         optimizer.step()
@@ -57,12 +57,12 @@ def test_momentum_basic(params, num_iters, quadratic_loss):
         prev_loss = loss
 
 
-def test_momentum_matrix(params, num_iters, matrix_mse_loss):
-    optimizer = optim.Momentum(params)
+def test_momentum_matrix(vec_params, num_iters, matrix_mse_loss):
+    optimizer = optim.Momentum(vec_params)
 
     moving_avrg_loss = 1e4
     for i in range(num_iters):
-        loss = matrix_mse_loss(params)
+        loss = matrix_mse_loss(vec_params)
 
         loss.backward()
         optimizer.step()
@@ -77,12 +77,12 @@ def test_momentum_matrix(params, num_iters, matrix_mse_loss):
 # Test RMSprop optimizer
 
 
-def test_rmsprop_basic(params, num_iters, quadratic_loss):
-    optimizer = optim.RMSprop(params)
+def test_rmsprop_basic(scalar_params, num_iters, quadratic_loss):
+    optimizer = optim.RMSprop(scalar_params)
 
     prev_loss = 1e3
     for _ in range(num_iters):
-        loss = quadratic_loss(params)
+        loss = quadratic_loss(scalar_params)
 
         loss.backward()
         optimizer.step()
@@ -92,12 +92,12 @@ def test_rmsprop_basic(params, num_iters, quadratic_loss):
         prev_loss = loss
 
 
-def test_rmsprop_matrix(params, num_iters, matrix_mse_loss):
-    optimizer = optim.RMSprop(params)
+def test_rmsprop_matrix(vec_params, num_iters, matrix_mse_loss):
+    optimizer = optim.RMSprop(vec_params)
 
     moving_avrg_loss = 1e4
     for i in range(num_iters):
-        loss = matrix_mse_loss(params)
+        loss = matrix_mse_loss(vec_params)
 
         loss.backward()
         optimizer.step()
@@ -112,12 +112,12 @@ def test_rmsprop_matrix(params, num_iters, matrix_mse_loss):
 # Test Adam optimizer
 
 
-def test_adam_basic(params, num_iters, quadratic_loss):
-    optimizer = optim.Adam(params)
+def test_adam_basic(scalar_params, num_iters, quadratic_loss):
+    optimizer = optim.Adam(scalar_params)
 
     prev_loss = 1e3
     for _ in range(num_iters):
-        loss = quadratic_loss(params)
+        loss = quadratic_loss(scalar_params)
 
         loss.backward()
         optimizer.step()
@@ -127,12 +127,12 @@ def test_adam_basic(params, num_iters, quadratic_loss):
         prev_loss = loss
 
 
-def test_adam_matrix(params, num_iters, matrix_mse_loss):
-    optimizer = optim.Adam(params)
+def test_adam_matrix(vec_params, num_iters, matrix_mse_loss):
+    optimizer = optim.Adam(vec_params)
 
     moving_avrg_loss = 1e4
     for i in range(num_iters):
-        loss = matrix_mse_loss(params)
+        loss = matrix_mse_loss(vec_params)
 
         loss.backward()
         optimizer.step()
@@ -148,8 +148,13 @@ def test_adam_matrix(params, num_iters, matrix_mse_loss):
 
 
 @pytest.fixture
-def params():
-    return [[rand()], [randn(3, 1)]]
+def scalar_params():
+    return [[rand()]]
+
+
+@pytest.fixture
+def vec_params():
+    return [[randn(3, 1)]]
 
 
 @pytest.fixture
@@ -171,7 +176,7 @@ def matrix_mse_loss():
     y = X @ randn(3, 1, diff=False) + rand(diff=False)
 
     def compute(params):
-        return mean((y - X @ params[1][0])**2)
+        return mean((y - X @ params[0][0])**2, inplace=True)
 
     return compute
 

@@ -59,18 +59,23 @@ class ComputationGraphPlotter:
         if len(root.children) == 0:
             return
 
+        # TODO: Remove `:` from Tensor names
+        root_name = repr(root).replace(&#39;:&#39;, &#39; &#39;)
+
         for child in root.children:
-            self.computation_graph.node(str(child),
+            child_name = repr(child).replace(&#39;:&#39;, &#39; &#39;)
+
+            self.computation_graph.node(child_name,
                                         color=self.get_color(child),
                                         shape=self.get_shape(child),
                                         style=&#39;filled&#39;)
 
-            self.computation_graph.node(str(root),
+            self.computation_graph.node(root_name,
                                         color=self.get_color(root),
                                         shape=self.get_shape(root),
                                         style=&#39;filled&#39;)
 
-            self.computation_graph.edge(str(child), str(root))
+            self.computation_graph.edge(child_name, root_name)
             self.create(child)
 
         return self
@@ -128,18 +133,23 @@ class ComputationGraphPlotter:
         if len(root.children) == 0:
             return
 
+        # TODO: Remove `:` from Tensor names
+        root_name = repr(root).replace(&#39;:&#39;, &#39; &#39;)
+
         for child in root.children:
-            self.computation_graph.node(str(child),
+            child_name = repr(child).replace(&#39;:&#39;, &#39; &#39;)
+
+            self.computation_graph.node(child_name,
                                         color=self.get_color(child),
                                         shape=self.get_shape(child),
                                         style=&#39;filled&#39;)
 
-            self.computation_graph.node(str(root),
+            self.computation_graph.node(root_name,
                                         color=self.get_color(root),
                                         shape=self.get_shape(root),
                                         style=&#39;filled&#39;)
 
-            self.computation_graph.edge(str(child), str(root))
+            self.computation_graph.edge(child_name, root_name)
             self.create(child)
 
         return self
@@ -201,18 +211,23 @@ def get_shape(node: _Node) -&gt; str:
     if len(root.children) == 0:
         return
 
+    # TODO: Remove `:` from Tensor names
+    root_name = repr(root).replace(&#39;:&#39;, &#39; &#39;)
+
     for child in root.children:
-        self.computation_graph.node(str(child),
+        child_name = repr(child).replace(&#39;:&#39;, &#39; &#39;)
+
+        self.computation_graph.node(child_name,
                                     color=self.get_color(child),
                                     shape=self.get_shape(child),
                                     style=&#39;filled&#39;)
 
-        self.computation_graph.node(str(root),
+        self.computation_graph.node(root_name,
                                     color=self.get_color(root),
                                     shape=self.get_shape(root),
                                     style=&#39;filled&#39;)
 
-        self.computation_graph.edge(str(child), str(root))
+        self.computation_graph.edge(child_name, root_name)
         self.create(child)
 
     return self</code></pre>

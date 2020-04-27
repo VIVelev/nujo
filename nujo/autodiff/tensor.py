@@ -3,9 +3,9 @@ from numbers import Number
 
 from numpy import array, eye, ndarray, tile
 
+from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff._utils import _if_not_none
-from nujo.autodiff.modes import DIFF_ENABLED
 
 
 class Tensor(_Node):
@@ -27,7 +27,7 @@ class Tensor(_Node):
 
     '''
     def __init__(self,
-                 value: Number or list or ndarray or 'Tensor',
+                 value: 'Tensor' or ndarray or list or Number,
                  diff=True,
                  creator=None,
                  name='Tensor'):
@@ -44,28 +44,29 @@ class Tensor(_Node):
         self._grad_dependencies = []
 
         # Gradient cache
-        self._grad: ndarray = None
+        self._grad: 'Tensor' = None
 
         # Transposed tensor cache
-        self._T: ndarray = None
+        self._T: 'Tensor' = None
 
     @property
-    def grad(self):
+    def grad(self) -> 'Tensor':
         if self._grad is None:
             self._compute_grad()
 
         return self._grad
 
     @grad.setter
-    def grad(self, value: Number or list or ndarray or 'Tensor'):
-        self._grad = value.value if isinstance(value, Tensor) else array(value)
+    def grad(self, value: 'Tensor' or ndarray or list or Number):
+        self._grad = value if isinstance(value, Tensor) else Tensor(
+            value, name=f'grad[{self.name}]')
 
     @grad.deleter
     def grad(self):
         del self._grad
 
     @property
-    def T(self):
+    def T(self) -> 'Tensor':
         if self._T is None:
             transposed = deepcopy(self)
             transposed.value = self.value.T
@@ -80,18 +81,19 @@ class Tensor(_Node):
     def shape(self):
         return self.value.shape
 
-    def reshape(self, *args: int, inplace=False) -> 'Tensor':
-        new_val = self.value.reshape(*args)
+    def reshape(self, *shape: int, inplace=False) -> 'Tensor':
+        reshaped = self if inplace else deepcopy(self)
+        reshaped.value = self.value.reshape(shape)
+        return reshaped
 
-        if inplace:
-            self.value = new_val
-            return self
+    def repeat(self,
+               *repeats: int,
+               axis: int = None,
+               inplace=False) -> 'Tensor':
 
-        else:
-            reshaped = deepcopy(self)
-            reshaped.name += ' (reshaped)'
-            reshaped.value = new_val
-            return reshaped
+        repeated = self if inplace else deepcopy(self)
+        repeated.value = self.value.repeat(repeats, axis=axis)
+        return repeated
 
     def squeeze(self, dim=-1, inplace=False) -> 'Tensor':
         if dim < 0:
@@ -124,11 +126,11 @@ class Tensor(_Node):
 
     # Gradient computation
 
-    def add_grad_dependency(self, wrt: 'Tensor', weight: ndarray) -> None:
+    def add_grad_dependency(self, wrt: 'Tensor', weight: 'Tensor') -> None:
         self._grad_dependencies.append((wrt, weight))
 
     def _compute_grad(self, _debug=False) -> None:
-        if self.diff and DIFF_ENABLED:
+        if modes.DIFF_ENABLED and self.diff and self._grad is None:
             if _debug:
                 print()
                 print('=' * 30)
@@ -138,10 +140,10 @@ class Tensor(_Node):
 
             # Top-parent grad
             if len(self._grad_dependencies) == 0:
-                self._grad = array(1)
+                self._grad = Tensor(1, name=f'grad[{self.name}]')
                 return
 
-            self._grad = 0
+            self._grad = Tensor(0, name=f'grad[{self.name}]')
             for z, weight in self._grad_dependencies:
                 if _debug:
                     print('-' * 10)
@@ -152,7 +154,7 @@ class Tensor(_Node):
                     print('Shape:', weight.shape)
                     print('-' * 5)
 
-                if z.grad.shape == () or weight.shape == ():  # Is scalar
+                if weight.shape == () or z.grad.shape == ():  # Is scalar
                     self._accumulate_grad_scalar(z, weight)
                 else:
                     self._accumulate_grad_matrix(z, weight)
@@ -163,19 +165,19 @@ class Tensor(_Node):
                 print('-' * 5)
                 print()
 
-    def _accumulate_grad_scalar(self, z: 'Tensor', weight: ndarray) -> None:
-        self._grad += z.grad * weight
+    def _accumulate_grad_scalar(self, z: 'Tensor', weight: 'Tensor') -> None:
+        self._grad.value = self._grad.value + z.grad.value * weight.value
 
-    def _accumulate_grad_matrix(self, z: 'Tensor', weight: ndarray) -> None:
-        weight = weight.reshape(z.grad.shape[0], self.shape[0],
-                                z.grad.shape[1] * self.shape[1])
-        z_grad = z.grad.repeat(self.shape[1],
-                               axis=1).reshape(z.grad.shape[0], 1, -1)
+    def _accumulate_grad_matrix(self, z: 'Tensor', weight: 'Tensor') -> None:
+        weight.value = weight.value.reshape(z.grad.shape[0], self.shape[0],
+                                            z.grad.shape[1] * self.shape[1])
+        z_grad = z.grad.value.repeat(self.shape[1],
+                                     axis=1).reshape(z.grad.shape[0], 1, -1)
 
         sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
-        accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
+        accumulated_grad = ((weight.value * z_grad) @ sum_mask.T).sum(0)
 
-        self._grad += accumulated_grad / z.grad.shape[0]
+        self._grad.value = self.grad.value + accumulated_grad / z.grad.shape[0]
 
     def zero_grad(self) -> None:
         # `zero_grad` is called after an iteration.
@@ -186,6 +188,7 @@ class Tensor(_Node):
         self._T = None
 
     def backward(self) -> None:
+        # TODO: Try BFS instead of DFS ?
         self._compute_grad()
 
         if self.creator:

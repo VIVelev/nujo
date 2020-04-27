@@ -1,9 +1,9 @@
 from abc import abstractmethod
 
-from numpy import array, ndarray
+from numpy import ndarray
 
+from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
-from nujo.autodiff.modes import DIFF_ENABLED
 from nujo.autodiff.tensor import Tensor
 
 
@@ -41,12 +41,22 @@ class Function(_Node):
         pass
 
     def __call__(self) -> Tensor:
+        ''' This method controls what gets registered in the
+        computation graph and what gets a gradient.
+        '''
+
         z = self.forward()
         if not isinstance(z, Tensor):
-            z = Tensor(z, creator=self, name=self._generate_tensor_name())
+            # Register in the computation graph only if in diff mode
+            z = Tensor(z,
+                       diff=any([x.diff for x in self.children]),
+                       creator=self if modes.DIFF_ENABLED else None,
+                       name=self._generate_tensor_name())
 
-        if DIFF_ENABLED and any([x.diff for x in self.children]):
+        if modes.DIFF_ENABLED and z.diff:
+            # Compute gradient for this tensor
             for tensor, derivative in zip(self.children, self.backward()):
-                tensor.add_grad_dependency(z, array(derivative))
+                tensor.add_grad_dependency(
+                    z, Tensor(derivative, name=tensor.name + '::weight'))
 
         return z

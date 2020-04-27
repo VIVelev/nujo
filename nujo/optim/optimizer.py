@@ -1,7 +1,5 @@
 from abc import abstractmethod
 
-from numpy import ndarray
-
 from nujo.autodiff import Tensor, no_diff
 
 
@@ -12,7 +10,7 @@ class Optimizer:
 
     Parameters:
     -----------
-    params : list of ndarray(s), the parameters which to update
+    params : list of Tensors, the parameters which to update
     lr : float, the learning rate
 
     '''
@@ -21,7 +19,7 @@ class Optimizer:
         self.lr = lr
 
     @abstractmethod
-    def update_rule(self, param: Tensor, grad: ndarray) -> Tensor:
+    def update_rule(self, param: Tensor, grad: Tensor) -> Tensor:
         pass
 
     def step(self) -> None:

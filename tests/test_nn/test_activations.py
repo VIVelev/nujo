@@ -1,5 +1,5 @@
 import pytest
-from numpy import diag, equal, exp, hstack, isclose, maximum, repeat, sum
+from numpy import diag, exp, hstack, isclose, maximum, repeat, sum
 
 import nujo.nn.activations as activ
 from nujo.autodiff.tensor import Tensor
@@ -11,11 +11,11 @@ from nujo.autodiff.tensor import Tensor
 def test_binary_step(input_value):
     # Test Forward pass
     output = activ.BinaryStep()(input_value)
-    assert equal(output.value, [[0, 0, 0], [1, 0, 1]]).all()
+    assert (output == [[0, 0, 0], [1, 0, 1]]).all()
 
     # Test Backward pass
     output.backward()
-    assert equal(input_value.grad, 0).all()
+    assert (input_value.grad == 0).all()
 
 
 # ====================================================================================================
@@ -27,11 +27,11 @@ def test_sigmoid(input_value):
     output = activ.Sigmoid()(input_value)
 
     x = input_value.value
-    assert equal(output.value, 1 / (1 + exp(-x))).all()
+    assert (output == 1 / (1 + exp(-x))).all()
 
     # Test Backward pass
     output.backward()
-    assert equal(input_value.grad, output.value * (1 - output.value)).all()
+    assert (input_value.grad == output.value * (1 - output.value)).all()
 
 
 # ====================================================================================================
@@ -47,7 +47,7 @@ def test_tanh(input_value):
 
     # Test Backward pass
     output.backward()
-    assert equal(input_value.grad, 1 - output.value**2).all()
+    assert (input_value.grad == 1 - output.value**2).all()
 
 
 # ====================================================================================================
@@ -59,12 +59,12 @@ def test_relu(input_value):
     output = activ.ReLU()(input_value)
 
     x = input_value.value
-    assert equal(output.value, maximum(0, x)).all()
+    assert (output == maximum(0, x)).all()
 
     # Test Backward pass
     output.backward()
-    assert equal(input_value.grad[input_value.grad > 0], 1).all()
-    assert equal(input_value.grad[input_value.grad <= 0], 0).all()
+    assert (input_value.grad[input_value.grad > 0] == 1).all()
+    assert (input_value.grad[input_value.grad <= 0] == 0).all()
 
 
 # ====================================================================================================
@@ -77,12 +77,12 @@ def test_leaky_relu(input_value):
     output = activ.LeakyReLU(eps=eps)(input_value)
 
     x = input_value.value
-    assert equal(output.value, maximum(eps * x, x)).all()
+    assert (output == maximum(eps * x, x)).all()
 
     # Test Backward pass
     output.backward()
-    assert equal(input_value.grad[input_value.grad > 0], 1).all()
-    assert equal(input_value.grad[input_value.grad <= 0], eps).all()
+    assert (input_value.grad[input_value.grad > 0] == 1).all()
+    assert (input_value.grad[input_value.grad <= 0] == eps).all()
 
 
 # ====================================================================================================
@@ -96,12 +96,12 @@ def test_swish(input_value):
 
     x = input_value.value
     sigma = activ.Sigmoid()(beta * x).value
-    assert equal(output.value, x * sigma).all()
+    assert (output == x * sigma).all()
 
     # Test Backward pass
     output.backward()
-    assert equal(input_value.grad,
-                 output.value + sigma * (1 - output.value)).all()
+    assert (input_value.grad == output.value + sigma *
+            (1 - output.value)).all()
 
 
 # ====================================================================================================
@@ -115,7 +115,7 @@ def test_softmax(input_value):
     exps = exp(input_value.value)
     sums = sum(exps, axis=0, keepdims=True)
 
-    assert equal(output.value, exps / sums).all()
+    assert (output == exps / sums).all()
 
     # Test Backward pass
     output.backward()
@@ -126,7 +126,7 @@ def test_softmax(input_value):
         [Sj_matrix[:, (i - k):i].T for i in range(k, (k * n) + 1, k)])
     Sj_diag = hstack([diag(output.value[:, i]) for i in range(n)])
 
-    assert equal(input_value.grad, Sj_diag - Si_matrix * Sj_matrix).all()
+    assert (input_value.grad == Sj_diag - Si_matrix * Sj_matrix).all()
 
 
 # ====================================================================================================
