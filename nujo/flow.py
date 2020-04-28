@@ -2,10 +2,8 @@
 '''
 
 from copy import deepcopy
-from numbers import Number
 
-from numpy import ndarray
-
+from nujo._typing import Union, _numerical
 from nujo.autodiff.tensor import Tensor
 
 
@@ -109,7 +107,7 @@ class Flow(metaclass=_FlowSetup):
 
         return retflow
 
-    def forward(self, x: Tensor) -> Tensor or ndarray or Number:
+    def forward(self, x: Tensor) -> Union[Tensor, _numerical]:
         ''' Flow Forward
 
         The flow computation is defined here.
@@ -120,7 +118,7 @@ class Flow(metaclass=_FlowSetup):
 
         Returns:
         --------
-        res : Tensor or ndarray or Number, computed result
+        res : numerical value, computed result
 
         '''
 
@@ -157,7 +155,7 @@ class Flow(metaclass=_FlowSetup):
 
         return Flow(subflows=[*self_subflows, *other_subflows])
 
-    def __getitem__(self, key: int or str) -> 'Flow':
+    def __getitem__(self, key: Union[int, str]) -> 'Flow':
         ''' Subflow getter of a supflow
 
         Example:

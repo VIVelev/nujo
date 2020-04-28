@@ -1,6 +1,7 @@
 from numpy import (diag, exp, hstack, log, maximum, ndarray, ones, repeat, sum,
                    zeros)
 
+from nujo._typing import Union, _numerical
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
 
@@ -26,8 +27,8 @@ __all__ = [
 
 class _Addition(Function):
     def __init__(self,
-                 input_a: Tensor or ndarray,
-                 input_b: Tensor or ndarray,
+                 input_a: Union[Tensor, _numerical],
+                 input_b: Union[Tensor, _numerical],
                  name='Add'):
         super(_Addition, self).__init__(input_a, input_b, name=name)
 
@@ -42,7 +43,7 @@ class _Addition(Function):
 
 
 class _Negation(Function):
-    def __init__(self, input: Tensor or ndarray, name='Neg'):
+    def __init__(self, input: Union[Tensor, _numerical], name='Neg'):
         super(_Negation, self).__init__(input, name=name)
 
     def forward(self) -> ndarray:
@@ -57,8 +58,8 @@ class _Negation(Function):
 
 class _Multiplication(Function):
     def __init__(self,
-                 input_a: Tensor or ndarray,
-                 input_b: Tensor or ndarray,
+                 input_a: Union[Tensor, _numerical],
+                 input_b: Union[Tensor, _numerical],
                  name='Mul'):
         super(_Multiplication, self).__init__(input_a, input_b, name=name)
 
@@ -73,7 +74,10 @@ class _Multiplication(Function):
 
 
 class _Reciprocal(Function):
-    def __init__(self, input: Tensor or ndarray, name='Recipr', eps=1e-18):
+    def __init__(self,
+                 input: Union[Tensor, _numerical],
+                 name='Recipr',
+                 eps=1e-18):
         super(_Reciprocal, self).__init__(input, name=name)
         self.eps = eps
 
@@ -89,8 +93,8 @@ class _Reciprocal(Function):
 
 class _Power(Function):
     def __init__(self,
-                 input_a: Tensor or ndarray,
-                 input_b: Tensor or ndarray,
+                 input_a: Union[Tensor, _numerical],
+                 input_b: Union[Tensor, _numerical],
                  name='Pow'):
         super(_Power, self).__init__(input_a, input_b, name=name)
 
@@ -109,8 +113,8 @@ class _Power(Function):
 
 class _Logarithm(Function):
     def __init__(self,
-                 input_a: Tensor or ndarray,
-                 input_b: Tensor or ndarray,
+                 input_a: Union[Tensor, _numerical],
+                 input_b: Union[Tensor, _numerical],
                  name='Log'):
         super(_Logarithm, self).__init__(input_a, input_b, name=name)
 
@@ -130,8 +134,8 @@ class _Logarithm(Function):
 
 class _MatrixMul(Function):
     def __init__(self,
-                 input_a: Tensor or ndarray,
-                 input_b: Tensor or ndarray,
+                 input_a: Union[Tensor, _numerical],
+                 input_b: Union[Tensor, _numerical],
                  name='MatMul'):
         super(_MatrixMul, self).__init__(input_a, input_b, name=name)
 
@@ -211,7 +215,7 @@ class _MatrixMul(Function):
 
 class _BinaryStep(Function):
     def __init__(self,
-                 input: Tensor or ndarray,
+                 input: Union[Tensor, _numerical],
                  threshold=0.5,
                  name='BinaryStep'):
         super(_BinaryStep, self).__init__(input, name=name)
@@ -230,7 +234,7 @@ class _BinaryStep(Function):
 
 
 class _Sigmoid(Function):
-    def __init__(self, input: Tensor or ndarray, name='Sigmoid'):
+    def __init__(self, input: Union[Tensor, _numerical], name='Sigmoid'):
         super(_Sigmoid, self).__init__(input, name=name)
         self._output: ndarray = None  # Used to compute the derivative
 
@@ -246,7 +250,7 @@ class _Sigmoid(Function):
 
 
 class _TanH(Function):
-    def __init__(self, input: Tensor or ndarray, name='TanH'):
+    def __init__(self, input: Union[Tensor, _numerical], name='TanH'):
         super(_TanH, self).__init__(input, name=name)
         self._output: ndarray = None  # Used to compute the derivative
 
@@ -267,7 +271,7 @@ class _TanH(Function):
 
 
 class _ReLU(Function):
-    def __init__(self, input: Tensor or ndarray, name='ReLU'):
+    def __init__(self, input: Union[Tensor, _numerical], name='ReLU'):
         super(_ReLU, self).__init__(input, name=name)
 
     def forward(self) -> ndarray:
@@ -281,7 +285,10 @@ class _ReLU(Function):
 
 
 class _LeakyReLU(Function):
-    def __init__(self, input: Tensor or ndarray, eps=0.1, name='LeakyReLU'):
+    def __init__(self,
+                 input: Union[Tensor, _numerical],
+                 eps=0.1,
+                 name='LeakyReLU'):
         super(_LeakyReLU, self).__init__(input, name=name)
         self.eps = eps
 
@@ -302,7 +309,7 @@ class _LeakyReLU(Function):
 class _Swish(Function):
     ''' More info here: https://arxiv.org/abs/1710.05941
     '''
-    def __init__(self, input: Tensor or ndarray, beta=1, name='Swish'):
+    def __init__(self, input: Union[Tensor, _numerical], beta=1, name='Swish'):
         super(_Swish, self).__init__(input, name=name)
         self.beta = beta
 
@@ -322,7 +329,7 @@ class _Swish(Function):
 
 
 class _Softmax(Function):
-    def __init__(self, input: Tensor or ndarray, name='Softmax'):
+    def __init__(self, input: Union[Tensor, _numerical], name='Softmax'):
         super(_Softmax, self).__init__(input, name=name)
         self._output: ndarray = None  # Used to compute the derivative
 
