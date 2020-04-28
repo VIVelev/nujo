@@ -1,13 +1,22 @@
-# Contibuting to Nujo
+# Contributing to nujo
 
-First off, thank you for considering contributing to Nujo. It's people like you that make Nujo such a great tool.
+First off, thank you for considering contributing to nujo. It's people like you that make nujo such a great tool.
 
-## Ground Rules
+## Reporting issues
+  - Describe what you expect to happen
+  - Describe what happened
+  - If you could, include a [minimal reproducible example](https://stackoverflow.com/help/minimal-reproducible-example)
+  - List vesions of your Python, NumPy, Requests and GarphViz
 
+## Submiting code
+  - It is recommended to use [Visual Studio Code](https://code.visualstudio.com/) 
+  - All commits will be tested against flake8 linter, so make sure to abide by PEP8
+  
 ### Commit messages
-  - "[Update] ..." - creating bugs
-  - "[Fix] ..." - correcting bugs
-  - "[Remove] ..." - rage quit
+  - "[up:*branch*] *commit-message*" - creating bugs
+  - "[fix:*branch*] *commit-message*" - correcting bugs
+  - "[rm:*branch*] *commit-message*" - delete files
+  - For the branch name, skip the type(feature, release, hotfix)
 
 ### Branching strategy
 We are using *Gitflow* as a branching strategy.
@@ -20,11 +29,59 @@ We have the following branches:
 
 [Gitflow reference](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
 
-### Python type hints
->TODO ...
+### Task Management Tool
+The Kanban tool used for this project is [Trello](https://trello.com/b/fObyuiWt/nujo-develop)
 
 ## Getting started
->coming soon...
+
+### Prerequisites
+
+-   [Python](https://www.python.org/) - The Programming Language used (version 3.6+)
+-   [Poetry](https://python-poetry.org/) - Dependency and Virtual Environment Management
+
+***Download for Mac OSX using Homebrew***
+
+```bash
+$ brew install python poetry
+```
+
+### Installing and setting up nujo
+
+Run the following in the terminal:
+```bash
+$ git clone https://github.com/VIVelev/nujo && cd nujo
+$ poetry install && poetry shell
+```
+
+## Running the tests
+
+Once you have **Installed and set up** nujo, run:
+
+```bash
+$ pytest
+```
 
 ## Your First Contribution
 >coming soon...
+
+### When and how to write unit tests?
+>coming soon...
+
+### Pyhton Docstrings format
+Use the following format to document python code.
+
+```
+''' Name of the Pyhton object you are documenting
+
+Short description
+
+Parameters:
+-----------
+param_name : param type, description...
+
+Returns:
+--------
+return_name : return type, description...
+
+'''
+```

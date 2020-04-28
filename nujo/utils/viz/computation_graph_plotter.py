@@ -1,6 +1,6 @@
 from graphviz import Digraph
 
-from nujo.autodiff.node import Node
+from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
 
 
@@ -14,7 +14,7 @@ class ComputationGraphPlotter:
         self.computation_graph = Digraph(**kwargs)
 
     @staticmethod
-    def get_color(node: Node) -> str:
+    def get_color(node: _Node) -> str:
         if isinstance(node, Tensor):
             if len(node.children) > 0:
                 return 'lightblue'
@@ -23,13 +23,13 @@ class ComputationGraphPlotter:
             return 'gold2'
 
     @staticmethod
-    def get_shape(node: Node) -> str:
+    def get_shape(node: _Node) -> str:
         if isinstance(node, Tensor):
             return 'box'
         else:
             return 'oval'
 
-    def create(self, root: Node) -> 'ComputationGraphPlotter':
+    def create(self, root: _Node) -> 'ComputationGraphPlotter':
         if len(root.children) == 0:
             return
 

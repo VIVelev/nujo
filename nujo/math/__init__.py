@@ -1,19 +1,9 @@
-from nujo.math.aggregate import (max, mean, median, min, prod, stddev, sum,
-                                 variance)
-from nujo.math.scalar import abs, ceil, floor, round, sqrt
+''' nujo's core mathematical functionality
 
-__all__ = [
-    'max',
-    'mean',
-    'median',
-    'min',
-    'prod',
-    'stddev',
-    'sum',
-    'variance',
-    'abs',
-    'ceil',
-    'floor',
-    'round',
-    'sqrt',
-]
+The functions presented here are just tiny wrappers
+around `numpy` functions.
+
+'''
+
+from nujo.math.aggregate import *
+from nujo.math.scalar import *

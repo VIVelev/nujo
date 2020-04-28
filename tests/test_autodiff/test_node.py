@@ -1,6 +1,6 @@
 import pytest
 
-from nujo.autodiff.node import Node
+from nujo.autodiff._node import _Node
 
 
 def test_node_equality(get_nodes):
@@ -18,10 +18,10 @@ def test_node_children(get_nodes):
     A.add_child(3)
 
     assert len(A.children) == 3
-    assert isinstance(A.children[-1], Node)
+    assert isinstance(A.children[-1], _Node)
     assert A.children[-1].value == 3
 
 
 @pytest.fixture
 def get_nodes():
-    return Node(), Node()
+    return _Node(), _Node()

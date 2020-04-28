@@ -2,7 +2,7 @@ import pytest
 from numpy import ndarray
 
 from nujo import Tensor
-from nujo.autodiff.functions import Addition
+from nujo.autodiff._functions import _Addition
 
 
 def test_tensor_value(get_tensors):
@@ -18,7 +18,7 @@ def test_tensor_creator(get_tensors):
 
     assert A.creator is None
     assert B.creator is None
-    assert isinstance(C.creator, Addition)
+    assert isinstance(C.creator, _Addition)
 
 
 def test_tensor_backward(get_tensors):

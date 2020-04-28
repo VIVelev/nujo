@@ -1,9 +1,9 @@
 from numbers import Number
 
 import pytest
-from numpy import ndarray
+from numpy import allclose, log, log2, ndarray
 
-import nujo.autodiff.functions as funcs
+import nujo.autodiff._functions as funcs
 from nujo import Tensor
 
 # ====================================================================================================
@@ -12,7 +12,7 @@ from nujo import Tensor
 
 def test_addition(get_tensors):
     A, B = get_tensors
-    add = funcs.Addition(A, B)
+    add = funcs._Addition(A, B)
 
     # Test Forwardprop
     C = add()
@@ -37,7 +37,7 @@ def test_addition(get_tensors):
 
 def test_negation(get_tensors):
     A, _ = get_tensors
-    neg = funcs.Negation(A)
+    neg = funcs._Negation(A)
 
     # Test Forwardprop
     C = neg()
@@ -60,7 +60,7 @@ def test_negation(get_tensors):
 
 def test_multiplication(get_tensors):
     A, B = get_tensors
-    mul = funcs.Multiplication(A, B)
+    mul = funcs._Multiplication(A, B)
 
     # Test Forwardprop
     C = mul()
@@ -85,7 +85,7 @@ def test_multiplication(get_tensors):
 
 def test_reciprocal(get_tensors):
     A, _ = get_tensors
-    recipr = funcs.Reciprocal(A)
+    recipr = funcs._Reciprocal(A)
 
     # Test Forwardprop
     C = recipr()
@@ -108,7 +108,7 @@ def test_reciprocal(get_tensors):
 
 def test_power(get_tensors):
     A, _ = get_tensors
-    pow = funcs.Power(A, 2)
+    pow = funcs._Power(A, 2)
 
     # Test Forwardprop
     C = pow()
@@ -128,12 +128,37 @@ def test_power(get_tensors):
 
 
 # ====================================================================================================
+# Unit Testing Logarithm
+
+
+def test_logarithm(get_tensors):
+    A, _ = get_tensors
+    log_2 = funcs._Logarithm(A, 2)  # log_2(A)
+
+    # Test Forwardprop
+    C = log_2()
+    assert isinstance(C, Tensor)
+    assert allclose(log2(A.value), C.value)
+
+    # Test Backprop
+    grad = log_2.backward()
+    assert len(grad) == 2
+
+    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
+    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
+
+    # Test Derivative computation
+    assert allclose(grad[0], 1 / (A.value * log(2)))
+    assert grad[1] == 1
+
+
+# ====================================================================================================
 # Unit Testing Matrix Multiplication
 
 
 def test_matrixmul(get_tensors):
     A, B = get_tensors
-    matmul = funcs.MatrixMul(A, B)
+    matmul = funcs._MatrixMul(A, B)
 
     # Test Forwardprop
     C = matmul()
@@ -148,7 +173,7 @@ def test_matrixmul(get_tensors):
     assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
-    dA, dB = funcs.MatrixMul.differentiate(A, B)
+    dA, dB = funcs._MatrixMul.differentiate(A, B)
     assert (grad[0] == dA).all()
     assert (grad[1] == dB).all()
 

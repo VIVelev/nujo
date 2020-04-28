@@ -1,10 +1,13 @@
-from nujo.autodiff import Tensor, no_diff
-from nujo.math import (abs, ceil, floor, max, mean, median, min, prod, round,
-                       sqrt, stddev, sum, variance)
+from nujo.autodiff import Function, Tensor, no_diff
+from nujo.flow import Flow
+from nujo.init import *
+from nujo.math import *
 
 __all__ = [
+    'Function',
     'Tensor',
     'no_diff',
+    'Flow',
 ]
 
-__version__ = '0.1.0'
+__version__ = '0.1.5'
