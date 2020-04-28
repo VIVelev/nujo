@@ -277,14 +277,14 @@ class Tensor(_Node):
     # Arithmetic operations
 
     def __add__(self, other):
-        from nujo.autodiff._functions import _Addition
+        from nujo.autodiff._functions._elementary import _Addition
         return _Addition(self, other)()
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __neg__(self):
-        from nujo.autodiff._functions import _Negation
+        from nujo.autodiff._functions._elementary import _Negation
         return _Negation(self)()
 
     def __sub__(self, other):
@@ -294,36 +294,36 @@ class Tensor(_Node):
         return self.__neg__().__add__(other)
 
     def __mul__(self, other):
-        from nujo.autodiff._functions import _Multiplication
+        from nujo.autodiff._functions._elementary import _Multiplication
         return _Multiplication(self, other)()
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        from nujo.autodiff._functions import _Reciprocal
+        from nujo.autodiff._functions._elementary import _Reciprocal
         return self.__mul__(_Reciprocal(other)())
 
     def __rtruediv__(self, other):
-        from nujo.autodiff._functions import _Reciprocal
+        from nujo.autodiff._functions._elementary import _Reciprocal
         return _Reciprocal(self)().__mul__(other)
 
     def __pow__(self, other):
-        from nujo.autodiff._functions import _Power
+        from nujo.autodiff._functions._elementary import _Power
         return _Power(self, other)()
 
     def __rpow__(self, other):
-        from nujo.autodiff._functions import _Power
+        from nujo.autodiff._functions._elementary import _Power
         return _Power(other, self)()
 
     # More complex arithmetic operations
 
     def __matmul__(self, other):
-        from nujo.autodiff._functions import _MatrixMul
+        from nujo.autodiff._functions._elementary import _MatrixMul
         return _MatrixMul(self, other)()
 
     def __rmatmul__(self, other):
-        from nujo.autodiff._functions import _MatrixMul
+        from nujo.autodiff._functions._elementary import _MatrixMul
         return _MatrixMul(other, self)()
 
     # Representations

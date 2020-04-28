@@ -1,4 +1,4 @@
-from nujo.autodiff._functions import _InnerProd, _InnerSum
+from nujo.autodiff._functions._aggregate import _InnerProd, _InnerSum
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 
