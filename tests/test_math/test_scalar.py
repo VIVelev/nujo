@@ -1,61 +1,71 @@
 import pytest
+from numpy import abs, ceil, exp, floor, isclose, log, log2, log10, round, sqrt
 
 import nujo.math.scalar as scalar
 from nujo.init.random import rand
 
 
 def test_log(input):
-    scalar.log(input)
-    scalar.log(input.value)
-    assert True
+    target = log(input.value)
+
+    assert (scalar.log(input) == target).all()
+    assert (scalar.log(input.value) == target).all()
 
 
 def test_log2(input):
-    scalar.log2(input)
-    scalar.log2(input.value)
-    assert True
+    target = log2(input.value)
+
+    assert isclose(scalar.log2(input).value, target).all()
+    assert isclose(scalar.log2(input.value).value, target).all()
 
 
 def test_log10(input):
-    scalar.log10(input)
-    scalar.log10(input.value)
-    assert True
+    target = log10(input.value)
+
+    assert isclose(scalar.log10(input).value, target).all()
+    assert isclose(scalar.log10(input.value).value, target).all()
 
 
 def test_exp(input):
-    scalar.exp(input)
-    scalar.exp(input.value)
-    assert True
+    target = exp(input.value)
+
+    assert isclose(scalar.exp(input).value, target).all()
+    assert isclose(scalar.exp(input.value).value, target).all()
 
 
 def test_sqrt(input):
-    scalar.sqrt(input)
-    scalar.sqrt(input.value)
-    assert True
+    target = sqrt(input.value)
+
+    assert (scalar.sqrt(input) == target).all()
+    assert (scalar.sqrt(input.value) == target).all()
 
 
 def test_abs(input):
-    scalar.abs(input)
-    scalar.abs(input.value)
-    assert True
+    target = abs(input.value)
+
+    assert (scalar.abs(input) == target).all()
+    assert (scalar.abs(input.value) == target).all()
 
 
 def test_round(input):
-    scalar.round(input)
-    scalar.round(input.value)
-    assert True
+    target = round(input.value)
+
+    assert (scalar.round(input) == target).all()
+    assert (scalar.round(input.value) == target).all()
 
 
 def test_ceil(input):
-    scalar.ceil(input)
-    scalar.ceil(input.value)
-    assert True
+    target = ceil(input.value)
+
+    assert (scalar.ceil(input) == target).all()
+    assert (scalar.ceil(input.value) == target).all()
 
 
 def test_floor(input):
-    scalar.floor(input)
-    scalar.floor(input.value)
-    assert True
+    target = floor(input.value)
+
+    assert (scalar.floor(input) == target).all()
+    assert (scalar.floor(input.value) == target).all()
 
 
 @pytest.fixture
