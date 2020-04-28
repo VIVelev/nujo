@@ -1,5 +1,6 @@
 from numpy import ndarray
 
+from nujo._typing import Union
 from nujo.utils.data.dataset_iterator import DatasetIterator
 from nujo.utils.data.dataset_loader import DatasetLoader
 
@@ -31,7 +32,7 @@ class Dataset:
     def __iter__(self):
         return DatasetIterator(self)
 
-    def __getitem__(self, position) -> ndarray:
+    def __getitem__(self, position: Union[int, tuple]) -> ndarray:
         if isinstance(position, int):
             return self.X[position]
         row, col = position

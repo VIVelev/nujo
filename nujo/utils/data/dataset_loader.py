@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
 from os import mkdir
 from os.path import exists
 
-from numpy import array, empty, vstack
+from numpy import array, asarray, empty, vstack
+from PIL import Image
 from requests import get
 
 from nujo.utils.data.nujo_dir import HOME_DIR
@@ -20,7 +20,7 @@ class DatasetLoader:
     https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}
     '''
 
-    def __init__(self, name, override=True):
+    def __init__(self, name: str, override=True):
         self.name = name  # with .data
         self._file = HOME_DIR + self.name
         if exists(HOME_DIR + name) and not override:
@@ -29,15 +29,28 @@ class DatasetLoader:
             self.name.split('.')[0], self.name).strip()
         self.download()
 
-    def install(self, dataset) -> None:
-        with open(self._file, 'r+') as data:
-            lines = data.readlines()
-        dataset._cols = len(lines[0].split(','))
-        dataset.X = empty((0, dataset._cols))
-        # number of columns
-        for line in lines[:-1]:  # last row is \n
-            x = array(line.strip().split(','))
-            dataset.X = vstack((dataset.X, x))
+    def install(self, dataset, type: str) -> None:
+        type = type.strip()
+        # -----------------------------------------
+        # reading csv
+        if (type == 'csv'):
+            with open(self._file, 'r+') as data:
+                lines = data.readlines()
+            dataset._cols = len(lines[0].split(','))
+            dataset.X = empty((0, dataset._cols))
+            # number of columns
+            for line in lines[:-1]:  # last row is \n
+                x = array(line.strip().split(','))
+                dataset.X = vstack((dataset.X, x))
+        # -----------------------------------------
+        # reading image
+        elif (type == 'image' or type == 'image' or type == 'png'
+              or type == 'jpg'):
+            # image has to be black and white
+            dataset.x = array([])
+            x = asarray(Image.open(self.name))
+            assert len(x.shape) < 3
+            dataset.X.append(x)
 
     def download(self) -> None:
         r = get(self._link)
