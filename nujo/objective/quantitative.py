@@ -14,10 +14,7 @@ class L1Loss(QuantitativeLoss):
     ''' L1 loss (or Mean Absolute Error)
     '''
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
-        return self.reduction_fn(abs(input - target),
-                                 dim=self.dim,
-                                 keepdim=self.keepdim,
-                                 inplace=True)
+        return self.reduction_fn(abs(input - target))
 
 
 # ====================================================================================================
@@ -27,10 +24,7 @@ class L2Loss(QuantitativeLoss):
     ''' L2 loss (or Mean Squared Error)
     '''
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
-        return self.reduction_fn((input - target)**2,
-                                 dim=self.dim,
-                                 keepdim=self.keepdim,
-                                 inplace=True)
+        return self.reduction_fn((input - target)**2)
 
 
 # ====================================================================================================

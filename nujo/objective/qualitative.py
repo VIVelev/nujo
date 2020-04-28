@@ -22,10 +22,7 @@ class BinaryCrossEntropy(QualitativeLoss):
         # Avoid division by zero
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
         return self.reduction_fn(-target * log(input) -
-                                 (1 - target) * log(1 - input),
-                                 dim=self.dim,
-                                 keepdim=self.keepdim,
-                                 inplace=True)
+                                 (1 - target) * log(1 - input))
 
 
 # ====================================================================================================
@@ -37,10 +34,7 @@ class CrossEntropy(QualitativeLoss):
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         # Avoid division by zero
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
-        return -self.reduction_fn(sum(target * log(input), dim=1),
-                                  dim=self.dim,
-                                  keepdim=self.keepdim,
-                                  inplace=True)
+        return -self.reduction_fn(sum(target * log(input), dim=1))
 
 
 # ====================================================================================================

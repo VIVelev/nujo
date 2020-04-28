@@ -1,7 +1,6 @@
 from copy import deepcopy
 
 from numpy import max as np_max
-from numpy import mean as np_mean
 from numpy import median as np_median
 from numpy import min as np_min
 from numpy import prod as np_prod
@@ -10,7 +9,9 @@ from numpy import sum as np_sum
 from numpy import var as np_variance
 
 from nujo._typing import Union, _numerical
+from nujo.autodiff._functions import _InnerMean
 from nujo.autodiff.tensor import Tensor
+from nujo.flow import Flow
 
 __all__ = [
     'sum',
@@ -112,10 +113,7 @@ def prod(*args: Union[Tensor, _numerical],
 # ====================================================================================================
 
 
-def mean(*args: Union[Tensor, _numerical],
-         dim: int = None,
-         keepdim=False,
-         inplace=False) -> Tensor:
+class mean(Flow):
     ''' Mean of tensors
 
     Parameters:
@@ -133,23 +131,13 @@ def mean(*args: Union[Tensor, _numerical],
     result : Tensor
 
     '''
+    def __init__(self, dim: int = None, keepdim=False, inplace=False):
+        self.dim = dim
+        self.keepdim = keepdim
+        self.inplace = inplace
 
-    tensor_0 = args[0] if isinstance(args[0], Tensor) else Tensor(args[0])
-
-    if len(args) > 1:
-        res_value = np_mean(
-            [arg.value if isinstance(arg, Tensor) else arg for arg in args],
-            axis=dim,
-            keepdims=keepdim)
-
-    else:
-        res_value = np_mean(tensor_0.value, axis=dim, keepdims=keepdim)
-
-    res = tensor_0 if inplace else deepcopy(tensor_0)
-    res.name += ' (mean)'
-    res.value = res_value
-
-    return res
+    def forward(self, x: Tensor) -> Tensor:
+        return _InnerMean(x, dim=self.dim, keepdim=self.keepdim)()
 
 
 # ====================================================================================================

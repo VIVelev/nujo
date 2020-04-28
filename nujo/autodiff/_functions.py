@@ -1,5 +1,5 @@
-from numpy import (diag, exp, hstack, log, maximum, ndarray, ones, repeat, sum,
-                   zeros)
+from numpy import (diag, exp, hstack, log, maximum, mean, ndarray, ones,
+                   repeat, sum, zeros)
 
 from nujo._typing import Union, _numerical
 from nujo.autodiff.function import Function
@@ -13,6 +13,7 @@ __all__ = [
     '_Power',
     '_Logarithm',
     '_MatrixMul',
+    '_InnerMean',
     '_BinaryStep',
     '_Sigmoid',
     '_TanH',
@@ -205,6 +206,25 @@ class _MatrixMul(Function):
 
     def backward(self) -> tuple:
         return _MatrixMul.differentiate(*self.children)
+
+
+class _InnerMean(Function):
+    def __init__(self,
+                 input: Union[Tensor, _numerical],
+                 dim: int = None,
+                 keepdim=False,
+                 name='InnerMean'):
+        super(_InnerMean, self).__init__(input, name=name)
+        self.dim = dim
+        self.keepdim = keepdim
+
+    def forward(self) -> ndarray:
+        return mean(self.children[0].value,
+                    axis=self.dim,
+                    keepdims=self.keepdim)
+
+    def backward(self) -> tuple:
+        return ones(self.children[0].shape) / self.children[0].shape[0],
 
 
 # ====================================================================================================

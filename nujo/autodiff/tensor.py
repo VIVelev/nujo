@@ -134,9 +134,10 @@ class Tensor(_Node):
             if _debug:
                 print()
                 print('=' * 30)
-                print(self)
+                print(self, end='\n\n')
                 print('Shape:', self.shape)
-                print(f'Has {len(self._grad_dependencies)} dependencies:\n')
+                print(f'Has {len(self._grad_dependencies)} dependencies:')
+                print('Grad Dependecies:', self._grad_dependencies, end='\n\n')
 
             # Top-parent grad
             if len(self._grad_dependencies) == 0:
@@ -146,24 +147,24 @@ class Tensor(_Node):
             self._grad = Tensor(0, name=f'grad[{self.name}]')
             for z, weight in self._grad_dependencies:
                 if _debug:
-                    print('-' * 10)
-                    print('Z_prev Grad:', z.grad)
-                    print('Shape:', z.grad.shape)
+                    print('~' * 10)
+                    print('Z Grad:', z.grad)
+                    print('Shape:', z.grad.shape, end='\n\n')
                     print('-' * 5)
-                    print('Weight of `Z_prev Grad`:', weight)
-                    print('Shape:', weight.shape)
-                    print('-' * 5)
+                    print('Z Weight:', weight)
+                    print('Shape:', weight.shape, end='\n\n')
 
-                if weight.shape == () or z.grad.shape == ():  # Is scalar
+                if weight.shape == () or z.grad.shape == () or (
+                        weight.shape == z.grad.shape):  # Is scalar
                     self._accumulate_grad_scalar(z, weight)
                 else:
                     self._accumulate_grad_matrix(z, weight)
 
             if _debug:
+                print('#' * 10)
                 print('Current Grad:', self._grad)
                 print('Shape:', self._grad.shape)
-                print('-' * 5)
-                print()
+                print('-' * 5, end='\n\n')
 
     def _accumulate_grad_scalar(self, z: 'Tensor', weight: 'Tensor') -> None:
         self._grad.value = self._grad.value + z.grad.value * weight.value
@@ -198,7 +199,7 @@ class Tensor(_Node):
 
         while nodes_to_visit:
             node = nodes_to_visit.pop()
-            node._compute_grad()
+            node._compute_grad(_debug=_debug)
 
             if _debug:
                 nstr = f' [{i}]'
