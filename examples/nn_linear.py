@@ -11,6 +11,7 @@ print('Defined net:', net)
 loss_fn = obj.L2Loss()
 print('Loss:', loss_fn)
 
+print(net.parameters)
 optimizer = optim.Adam(net.parameters, lr=0.1)
 print('Optimizer:', optimizer)
 
