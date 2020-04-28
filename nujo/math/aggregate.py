@@ -48,17 +48,22 @@ def sum(*args: Union[Tensor, _numerical],
 
     '''
 
-    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
+    tensor_0 = args[0] if isinstance(args[0], Tensor) else Tensor(args[0])
 
     if len(args) > 1:
-        return np_sum(args, axis=dim, keepdims=keepdim)
+        res_value = np_sum(
+            [arg.value if isinstance(arg, Tensor) else arg for arg in args],
+            axis=dim,
+            keepdims=keepdim)
 
     else:
-        res = args[0] if inplace else deepcopy(args[0])
-        res.name += ' (sum)'
-        res.value = np_sum(args[0].value, axis=dim, keepdims=keepdim)
+        res_value = np_sum(tensor_0.value, axis=dim, keepdims=keepdim)
 
-        return res
+    res = tensor_0 if inplace else deepcopy(tensor_0)
+    res.name += ' (sum)'
+    res.value = res_value
+
+    return res
 
 
 # ====================================================================================================
@@ -86,17 +91,22 @@ def prod(*args: Union[Tensor, _numerical],
 
     '''
 
-    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
+    tensor_0 = args[0] if isinstance(args[0], Tensor) else Tensor(args[0])
 
     if len(args) > 1:
-        return np_prod(args, axis=dim, keepdims=keepdim)
+        res_value = np_prod(
+            [arg.value if isinstance(arg, Tensor) else arg for arg in args],
+            axis=dim,
+            keepdims=keepdim)
 
     else:
-        res = args[0] if inplace else deepcopy(args[0])
-        res.name += ' (prod)'
-        res.value = np_prod(args[0].value, axis=dim, keepdims=keepdim)
+        res_value = np_prod(tensor_0.value, axis=dim, keepdims=keepdim)
 
-        return res
+    res = tensor_0 if inplace else deepcopy(tensor_0)
+    res.name += ' (prod)'
+    res.value = res_value
+
+    return res
 
 
 # ====================================================================================================
@@ -124,17 +134,22 @@ def mean(*args: Union[Tensor, _numerical],
 
     '''
 
-    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
+    tensor_0 = args[0] if isinstance(args[0], Tensor) else Tensor(args[0])
 
     if len(args) > 1:
-        return np_mean(args, axis=dim, keepdims=keepdim)
+        res_value = np_mean(
+            [arg.value if isinstance(arg, Tensor) else arg for arg in args],
+            axis=dim,
+            keepdims=keepdim)
 
     else:
-        res = args[0] if inplace else deepcopy(args[0])
-        res.name += ' (mean)'
-        res.value = np_mean(args[0].value, axis=dim, keepdims=keepdim)
+        res_value = np_mean(tensor_0.value, axis=dim, keepdims=keepdim)
 
-        return res
+    res = tensor_0 if inplace else deepcopy(tensor_0)
+    res.name += ' (mean)'
+    res.value = res_value
+
+    return res
 
 
 # ====================================================================================================
@@ -162,17 +177,22 @@ def median(*args: Union[Tensor, _numerical],
 
     '''
 
-    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
+    tensor_0 = args[0] if isinstance(args[0], Tensor) else Tensor(args[0])
 
     if len(args) > 1:
-        return np_median(args, axis=dim, keepdims=keepdim)
+        res_value = np_median(
+            [arg.value if isinstance(arg, Tensor) else arg for arg in args],
+            axis=dim,
+            keepdims=keepdim)
 
     else:
-        res = args[0] if inplace else deepcopy(args[0])
-        res.name += ' (median)'
-        res.value = np_median(args[0].value, axis=dim, keepdims=keepdim)
+        res_value = np_median(tensor_0.value, axis=dim, keepdims=keepdim)
 
-        return res
+    res = tensor_0 if inplace else deepcopy(tensor_0)
+    res.name += ' (median)'
+    res.value = res_value
+
+    return res
 
 
 # ====================================================================================================
@@ -200,17 +220,22 @@ def min(*args: Union[Tensor, _numerical],
 
     '''
 
-    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
+    tensor_0 = args[0] if isinstance(args[0], Tensor) else Tensor(args[0])
 
     if len(args) > 1:
-        return np_min(args, axis=dim, keepdims=keepdim)
+        res_value = np_min(
+            [arg.value if isinstance(arg, Tensor) else arg for arg in args],
+            axis=dim,
+            keepdims=keepdim)
 
     else:
-        res = args[0] if inplace else deepcopy(args[0])
-        res.name += ' (min)'
-        res.value = np_min(args[0].value, axis=dim, keepdims=keepdim)
+        res_value = np_min(tensor_0.value, axis=dim, keepdims=keepdim)
 
-        return res
+    res = tensor_0 if inplace else deepcopy(tensor_0)
+    res.name += ' (min)'
+    res.value = res_value
+
+    return res
 
 
 # ====================================================================================================
@@ -238,17 +263,22 @@ def max(*args: Union[Tensor, _numerical],
 
     '''
 
-    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
+    tensor_0 = args[0] if isinstance(args[0], Tensor) else Tensor(args[0])
 
     if len(args) > 1:
-        return np_max(args, axis=dim, keepdims=keepdim)
+        res_value = np_max(
+            [arg.value if isinstance(arg, Tensor) else arg for arg in args],
+            axis=dim,
+            keepdims=keepdim)
 
     else:
-        res = args[0] if inplace else deepcopy(args[0])
-        res.name += ' (max)'
-        res.value = np_max(args[0].value, axis=dim, keepdims=keepdim)
+        res_value = np_max(tensor_0.value, axis=dim, keepdims=keepdim)
 
-        return res
+    res = tensor_0 if inplace else deepcopy(tensor_0)
+    res.name += ' (max)'
+    res.value = res_value
+
+    return res
 
 
 # ====================================================================================================
@@ -276,17 +306,22 @@ def stddev(*args: Union[Tensor, _numerical],
 
     '''
 
-    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
+    tensor_0 = args[0] if isinstance(args[0], Tensor) else Tensor(args[0])
 
     if len(args) > 1:
-        return np_stddev(args, axis=dim, keepdims=keepdim)
+        res_value = np_stddev(
+            [arg.value if isinstance(arg, Tensor) else arg for arg in args],
+            axis=dim,
+            keepdims=keepdim)
 
     else:
-        res = args[0] if inplace else deepcopy(args[0])
-        res.name += ' (stddev)'
-        res.value = np_stddev(args[0].value, axis=dim, keepdims=keepdim)
+        res_value = np_stddev(tensor_0.value, axis=dim, keepdims=keepdim)
 
-        return res
+    res = tensor_0 if inplace else deepcopy(tensor_0)
+    res.name += ' (stddev)'
+    res.value = res_value
+
+    return res
 
 
 # ====================================================================================================
@@ -314,17 +349,22 @@ def variance(*args: Union[Tensor, _numerical],
 
     '''
 
-    args = [arg if isinstance(arg, Tensor) else Tensor(arg) for arg in args]
+    tensor_0 = args[0] if isinstance(args[0], Tensor) else Tensor(args[0])
 
     if len(args) > 1:
-        return np_variance(args, axis=dim, keepdims=keepdim)
+        res_value = np_variance(
+            [arg.value if isinstance(arg, Tensor) else arg for arg in args],
+            axis=dim,
+            keepdims=keepdim)
 
     else:
-        res = args[0] if inplace else deepcopy(args[0])
-        res.name += ' (variance)'
-        res.value = np_variance(args[0].value, axis=dim, keepdims=keepdim)
+        res_value = np_variance(tensor_0.value, axis=dim, keepdims=keepdim)
 
-        return res
+    res = tensor_0 if inplace else deepcopy(tensor_0)
+    res.name += ' (variance)'
+    res.value = res_value
+
+    return res
 
 
 # ====================================================================================================
