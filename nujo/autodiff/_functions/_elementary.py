@@ -1,4 +1,4 @@
-from numpy import log, ndarray, ones
+from numpy import log, ndarray, zeros
 
 from nujo._typing import Union, _numerical
 from nujo.autodiff.function import Function
@@ -151,41 +151,26 @@ class _MatrixMul(Function):
 
         '''
 
-        # ------------------------------------------------------------
-        dX = ones((X.shape[0]**2, W.shape[1] * X.shape[1]))
-
-        i, j = 0, 0  # indecies of Z
-        k, m = 0, 0  # indecies of X
-        # p, q : indecies of dX
-
-        for p in range(dX.shape[0]):
-            for q in range(dX.shape[1]):
-                if k == i:
-                    dX[p, q] = W[m, j]
-
-                j = q % W.shape[1]
-                m = q % X.shape[1]
-
-            i = q % X.shape[0]
-            k = p % X.shape[0]
+        Z_nrows = X.shape[0]
+        Z_ncols = W.shape[1]
 
         # ------------------------------------------------------------
-        dW = ones((X.shape[0] * W.shape[0], W.shape[1]**2))
+        dX = zeros(X.shape)
 
-        i, j = 0, 0  # indecies of Z
-        k, m = 0, 0  # indecies of W
-        # p, q : indecies of dW
+        for row_x in range(dX.shape[0]):
+            for col_x in range(dX.shape[1]):
 
-        for p in range(dW.shape[0]):
-            for q in range(dW.shape[1]):
-                if m == j:
-                    dW[p, q] = X[i, k]
+                for col_z in range(Z_ncols):
+                    dX[row_x, col_x] += W[col_x, col_z]
 
-                j = q % W.shape[1]
-                m = q % W.shape[1]
+        # ------------------------------------------------------------
+        dW = zeros(W.shape)
 
-            i = q % X.shape[0]
-            k = p % W.shape[0]
+        for row_w in range(dW.shape[0]):
+            for col_w in range(dW.shape[1]):
+
+                for row_z in range(Z_nrows):
+                    dW[row_w, col_w] += X[row_z, row_w]
 
         ##############################################################
 
