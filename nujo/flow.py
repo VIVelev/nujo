@@ -48,6 +48,8 @@ class Flow(metaclass=_FlowSetup):
             if isinstance(prop, Tensor) and prop.diff:
                 self.parameters.append(prop)
 
+        self.parameters = [self.parameters]
+
     def _generate_supflow_name(self) -> str:
         return ' >> '.join(map(lambda x: x.name, self.subflows))
 
