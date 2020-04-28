@@ -47,10 +47,12 @@ class DatasetLoader:
         elif (type == 'image' or type == 'image' or type == 'png'
               or type == 'jpg'):
             # image has to be black and white
-            dataset.x = array([])
-            x = asarray(Image.open(self.name))
-            assert len(x.shape) < 3
-            dataset.X.append(x)
+            dataset.X = empty((0, 0))
+            with Image.open(self._file) as img:
+                vect = asarray(img)
+                assert vect.ndim < 3
+                vect.reshape((vect.size, 1))
+                dataset.X.append(vect)
 
     def download(self) -> None:
         r = get(self._link)
