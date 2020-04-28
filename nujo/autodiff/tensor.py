@@ -187,13 +187,27 @@ class Tensor(_Node):
         self._grad = None
         self._T = None
 
-    def backward(self) -> None:
-        # TODO: Try BFS instead of DFS ?
-        self._compute_grad()
+    def backward(self, _debug=False) -> None:
+        ''' It uses Breadth First Search to traverse the computation graph
+        and compute the gradient for each differentiable Tensor in the graph.
+        '''
 
-        if self.creator:
-            for child in self.creator.children:
-                child.backward()
+        nodes_to_visit = [self]
+        if _debug:
+            i = 1
+
+        while nodes_to_visit:
+            node = nodes_to_visit.pop()
+            node._compute_grad()
+
+            if _debug:
+                nstr = f' [{i}]'
+                node.name += nstr if nstr not in node.name else ''
+                i += 1
+
+            if node.creator:
+                for child in node.creator.children:
+                    nodes_to_visit.insert(0, child)
 
     # Useful methods
 
