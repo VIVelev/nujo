@@ -1,4 +1,4 @@
-from numpy import array
+from numpy import ndarray
 
 from nujo.utils.data.dataset_iterator import DatasetIterator
 from nujo.utils.data.dataset_loader import DatasetLoader
@@ -16,7 +16,7 @@ class Dataset:
 
     Returns:
     --------
-    array : stores the csv dataset,
+    ndarray : stores the csv dataset,
     - floating point integers
     - last column -> labels
 
@@ -31,7 +31,7 @@ class Dataset:
     def __iter__(self):
         return DatasetIterator(self)
 
-    def __getitem__(self, position) -> array:
+    def __getitem__(self, position) -> ndarray:
         if isinstance(position, int):
             return self.X[position]
         row, col = position
@@ -43,8 +43,3 @@ class Dataset:
 
     def __repr__(self):
         return self.X.__str__()
-
-
-if __name__ == '__main__':
-    data = Dataset('iris')
-    print(data[1, 2])

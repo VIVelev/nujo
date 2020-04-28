@@ -20,7 +20,7 @@ class DatasetLoader:
     https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}
     '''
 
-    def __init__(self, name, override=False):
+    def __init__(self, name, override=True):
         self.name = name  # with .data
         self._file = HOME_DIR + self.name
         if exists(HOME_DIR + name) and not override:
@@ -29,7 +29,7 @@ class DatasetLoader:
             self.name.split('.')[0], self.name).strip()
         self.download()
 
-    def install(self, dataset):
+    def install(self, dataset) -> None:
         with open(self._file, 'r+') as data:
             lines = data.readlines()
         dataset._cols = len(lines[0].split(','))
@@ -43,9 +43,10 @@ class DatasetLoader:
         r = get(self._link)
         if not exists(HOME_DIR):
             mkdir(HOME_DIR)
-            print('Directory "~/.nujo" created')
+            print('Directory `~/.nujo` created')
         else:
-            print('Directory "~/.nujo" already exists')
+            print('Directory `~/.nujo` already exists')
         print(f'File {self.name} has been created.')
+
         with open(self._file, 'wb') as f:
             f.write(r.content)
