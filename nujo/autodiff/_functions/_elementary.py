@@ -1,4 +1,4 @@
-from numpy import log, ndarray, ones, zeros
+from numpy import log, ndarray, ones
 
 from nujo._typing import Union, _numerical
 from nujo.autodiff.function import Function
@@ -131,57 +131,12 @@ class _MatrixMul(Function):
                  name='MatMul'):
         super(_MatrixMul, self).__init__(input_a, input_b, name=name)
 
-    @staticmethod
-    def differentiate(X: 'Tensor', W: 'Tensor') -> tuple:
-        ''' Calculate Matrix partial derivatives
-
-        Given Z = XW, Calculate:
-            - dX = dZ/dX
-            - dW = dZ/dW
-
-        Parameters:
-        -----------
-        X : matrix, left hand multiplier
-        W : matrix, right hand multiplier
-
-        Returns:
-        --------
-        dX : partial derivative of Z w.r.t. X
-        dW : partial derivative of Z w.r.t. W
-
-        '''
-
-        Z_nrows = X.shape[0]
-        Z_ncols = W.shape[1]
-
-        # ------------------------------------------------------------
-        dX = zeros(X.shape)
-
-        for row_x in range(dX.shape[0]):
-            for col_x in range(dX.shape[1]):
-
-                for col_z in range(Z_ncols):
-                    dX[row_x, col_x] += W[col_x, col_z]
-
-        # ------------------------------------------------------------
-        dW = zeros(W.shape)
-
-        for row_w in range(dW.shape[0]):
-            for col_w in range(dW.shape[1]):
-
-                for row_z in range(Z_nrows):
-                    dW[row_w, col_w] += X[row_z, row_w]
-
-        ##############################################################
-
-        return W, X
-
     def forward(self) -> ndarray:
         assert self.children[0].shape[-1] == self.children[1].shape[0]
         return self.children[0].value @ self.children[1].value
 
     def backward(self) -> tuple:
-        return _MatrixMul.differentiate(*self.children)
+        return self.children[1].value, self.children[0].value
 
 
 # ====================================================================================================
