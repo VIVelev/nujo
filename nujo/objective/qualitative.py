@@ -34,11 +34,10 @@ class CrossEntropy(QualitativeLoss):
     ''' Multi-class Cross-Entropy loss
     '''
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
-        # TODO: The use of sum and log is bizarre
-
         # Avoid division by zero
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
-        return -self.reduction_fn(sum(target * log(input), dim=1),
+        return -self.reduction_fn(sum(target * log(input), dim=1,
+                                      keepdim=True),
                                   dim=self.dim,
                                   keepdim=self.keepdim)
 

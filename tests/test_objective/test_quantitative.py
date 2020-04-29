@@ -10,7 +10,7 @@ def test_l1_loss(input, target):
     loss = loss_fn(input, target)
 
     assert isinstance(loss, Tensor)
-    assert loss.shape == ()
+    assert loss.shape == (1, 1)
 
 
 def test_l2_loss(input, target):
@@ -18,7 +18,7 @@ def test_l2_loss(input, target):
     loss = loss_fn(input, target)
 
     assert isinstance(loss, Tensor)
-    assert loss.shape == ()
+    assert loss.shape == (1, 1)
 
 
 @pytest.fixture
