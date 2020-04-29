@@ -1,4 +1,5 @@
-from numpy import diag, exp, hstack, maximum, ndarray, ones, repeat, sum, zeros
+from numpy import (diag, exp, eye, hstack, maximum, ndarray, ones, repeat, sum,
+                   zeros)
 
 from nujo._typing import Union, _numerical
 from nujo.autodiff.function import Function
@@ -100,7 +101,6 @@ class _LeakyReLU(Function):
         self.eps = eps
 
     def forward(self) -> ndarray:
-        # TODO: Can this be done in a more efficient way?
         return maximum(self.eps * self.children[0].value,
                        self.children[0].value)
 
@@ -156,6 +156,8 @@ class _Softmax(Function):
         '''
 
         # TODO: Is there a more optimal way to compute Si matrix?
+        # Should you really compute the whole Jacobian?
+        # Test against PyTorch
 
         k, n = self._output.shape
 
@@ -171,7 +173,14 @@ class _Softmax(Function):
         Sj_diag = hstack([diag(self._output[:, i]) for i in range(n)])
 
         # Compute the Jacobian
-        return Sj_diag - Si_matrix * Sj_matrix,
+        jacobian = Sj_diag - Si_matrix * Sj_matrix
+
+        # Get the needed columns, ignore the rest
+        identity = eye(k * n)
+        mask = hstack(
+            [identity[:, i].reshape(-1, 1) for i in range(0, k * n, k)])
+
+        return jacobian @ mask,
 
 
 # ====================================================================================================
