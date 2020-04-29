@@ -14,7 +14,7 @@ __all__ = [
 
 
 def sum(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
-    ''' Summation of tensors
+    ''' Summation of tensor(s)
 
     Parameters:
     -----------
@@ -39,7 +39,7 @@ def sum(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
 
 def prod(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
-    ''' Product of tensors
+    ''' Product of tensor(s)
 
     Parameters:
     -----------
@@ -64,7 +64,7 @@ def prod(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
 
 
 def mean(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
-    ''' Mean of tensors
+    ''' Mean of tensor(s)
 
     Parameters:
     -----------
@@ -80,10 +80,11 @@ def mean(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
     '''
 
     if len(inputs) == 1:
-        return _InnerSum(inputs[0], dim=dim,
-                         keepdim=keepdim)() / inputs[0].shape[dim]
+        n = npprod(inputs[0].shape) if dim is None else inputs[0].shape[dim]
+        return _InnerSum(inputs[0], dim=dim, keepdim=keepdim)() / n
+
     else:
-        npsum(inputs, axis=dim, keepdims=keepdim) / inputs[0].shape[dim]
+        return npsum(inputs, axis=dim, keepdims=keepdim) / len(inputs)
 
 
 # ====================================================================================================
