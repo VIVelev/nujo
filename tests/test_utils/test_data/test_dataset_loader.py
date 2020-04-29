@@ -13,7 +13,7 @@ def test_dataset_loader_install(get_dataset):
     assert dataset.X.shape == get_dataset
 
 
-def test_dataset_loader_download():
+def test_dataset_loader_download(get_dataset):
     DatasetLoader('iris').download()
 
     assert exists(nujo_dir.HOME_DIR + 'iris.data')
