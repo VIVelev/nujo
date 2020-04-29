@@ -1,4 +1,4 @@
-from numpy import log, ndarray, zeros
+from numpy import log, ndarray, ones, zeros
 
 from nujo._typing import Union, _numerical
 from nujo.autodiff.function import Function
@@ -28,7 +28,7 @@ class _Addition(Function):
         return self.children[0].value + self.children[1].value
 
     def backward(self) -> tuple:
-        return 1, 1
+        return ones(self.children[0].shape), ones(self.children[1].shape)
 
 
 # ====================================================================================================
@@ -42,7 +42,7 @@ class _Negation(Function):
         return -self.children[0].value
 
     def backward(self) -> tuple:
-        return -1,
+        return -ones(self.children[0].shape),
 
 
 # ====================================================================================================
@@ -174,7 +174,7 @@ class _MatrixMul(Function):
 
         ##############################################################
 
-        return dX, dW
+        return W, X
 
     def forward(self) -> ndarray:
         assert self.children[0].shape[-1] == self.children[1].shape[0]

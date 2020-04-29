@@ -12,7 +12,7 @@ __all__ = [
 class _Loss(Flow):
     ''' Base loss class
     '''
-    def __init__(self, dim=0, keepdim=False, reduction: str = None):
+    def __init__(self, dim=0, keepdim=True, reduction: str = None):
         super(_Loss, self).__init__(name=self.__class__.__name__)
         self.dim = dim
         self.keepdim = keepdim
@@ -31,7 +31,7 @@ class _Loss(Flow):
 class QualitativeLoss(_Loss):
     ''' Base qualitative loss class
     '''
-    def __init__(self, dim=0, keepdim=False, reduction='sum'):
+    def __init__(self, dim=0, keepdim=True, reduction='sum'):
         super(QualitativeLoss, self).__init__(dim, keepdim, reduction)
 
 
@@ -41,7 +41,7 @@ class QualitativeLoss(_Loss):
 class QuantitativeLoss(_Loss):
     ''' Base quantitative loss class
     '''
-    def __init__(self, dim=0, keepdim=False, reduction='mean'):
+    def __init__(self, dim=0, keepdim=True, reduction='mean'):
         super(QuantitativeLoss, self).__init__(dim, keepdim, reduction)
 
 
