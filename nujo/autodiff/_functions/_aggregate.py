@@ -1,4 +1,4 @@
-from numpy import eye, ndarray, ones, prod, sum
+from numpy import ndarray, ones, prod, sum
 
 from nujo._typing import Union, _numerical
 from nujo.autodiff.function import Function
@@ -44,17 +44,17 @@ class _InnerProd(Function):
         self.dim = dim
         self.keepdim = keepdim
 
+        self._output: ndarray = None  # Used to compute the derivative
+
     def forward(self) -> ndarray:
-        return prod(self.children[0].value,
-                    axis=self.dim,
-                    keepdims=self.keepdim)
+        self._output = prod(self.children[0].value,
+                            axis=self.dim,
+                            keepdims=self.keepdim)
+
+        return self._output
 
     def backward(self) -> tuple:
-        mask = -(eye(self.children[0].shape[0]) - 1)
-        matrix = self.children[0].value.repeat(self.children[0].shape[0],
-                                               axis=-1)
-
-        return prod(mask * matrix, axis=0),
+        return self._output / self.children[0].value,
 
 
 # ====================================================================================================

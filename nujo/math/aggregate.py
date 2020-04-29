@@ -1,6 +1,8 @@
+from numpy import prod as npprod
+from numpy import sum as npsum
+
 from nujo.autodiff._functions._aggregate import _InnerProd, _InnerSum
 from nujo.autodiff.tensor import Tensor
-from nujo.flow import Flow
 
 __all__ = [
     'sum',
@@ -11,12 +13,12 @@ __all__ = [
 # ====================================================================================================
 
 
-class sum(Flow):
+def sum(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Summation of tensors
 
     Parameters:
     -----------
-    args : varargs, tensors to be summed;
+    inputs : varargs, tensors to be summed;
     if a single tensor is passed, its elements will be summed
     dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
@@ -26,27 +28,22 @@ class sum(Flow):
     result : Tensor
 
     '''
-    def __init__(self, dim=0, keepdim=False):
-        super(sum, self).__init__()
-        self.dim = dim
-        self.keepdim = keepdim
 
-    def forward(self, *inputs: Tensor) -> Tensor:
-        if len(inputs) == 1:
-            return _InnerSum(inputs[0], dim=self.dim, keepdim=self.keepdim)()
-        else:
-            pass
+    if len(inputs) == 1:
+        return _InnerSum(inputs[0], dim=dim, keepdim=keepdim)()
+    else:
+        return npsum(inputs, axis=dim, keepdims=keepdim)
 
 
 # ====================================================================================================
 
 
-class prod(Flow):
+def prod(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Product of tensors
 
     Parameters:
     -----------
-    args : varargs, tensors to be multiplied;
+    inputs : varargs, tensors to be multiplied;
     if a single tensor is passed, its elements will be multiplied
     dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
@@ -56,27 +53,22 @@ class prod(Flow):
     result : Tensor
 
     '''
-    def __init__(self, dim=0, keepdim=False):
-        super(prod, self).__init__()
-        self.dim = dim
-        self.keepdim = keepdim
 
-    def forward(self, *inputs: Tensor) -> Tensor:
-        if len(inputs) == 1:
-            return _InnerProd(inputs[0], dim=self.dim, keepdim=self.keepdim)()
-        else:
-            pass
+    if len(inputs) == 1:
+        return _InnerProd(inputs[0], dim=dim, keepdim=keepdim)()
+    else:
+        return npprod(inputs, axis=dim, keepdims=keepdim)
 
 
 # ====================================================================================================
 
 
-class mean(Flow):
+def mean(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
     ''' Mean of tensors
 
     Parameters:
     -----------
-    args : varargs, tensors to compute the mean of;
+    inputs : varargs, tensors to compute the mean of;
     if a single tensor is passed, the mean of its elements will be computed
     dim : int, dimension to reduce over
     keepdim : bool, whether to keep `dim`
@@ -86,18 +78,12 @@ class mean(Flow):
     result : Tensor
 
     '''
-    def __init__(self, dim=0, keepdim=False):
-        super(mean, self).__init__()
-        self.dim = dim
-        self.keepdim = keepdim
 
-    def forward(self, *inputs: Tensor) -> Tensor:
-        if len(inputs) == 1:
-            return _InnerSum(
-                inputs[0], dim=self.dim,
-                keepdim=self.keepdim)() / inputs[0].shape[self.dim]
-        else:
-            pass
+    if len(inputs) == 1:
+        return _InnerSum(inputs[0], dim=dim,
+                         keepdim=keepdim)() / inputs[0].shape[dim]
+    else:
+        npsum(inputs, axis=dim, keepdims=keepdim) / inputs[0].shape[dim]
 
 
 # ====================================================================================================
