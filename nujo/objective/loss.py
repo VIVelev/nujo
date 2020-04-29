@@ -18,9 +18,9 @@ class _Loss(Flow):
         self.keepdim = keepdim
 
         if reduction == 'sum':
-            self.reduction_fn = sum(dim=self.dim, keepdim=self.keepdim)
+            self.reduction_fn = sum
         elif reduction == 'mean':
-            self.reduction_fn = mean(dim=self.dim, keepdim=self.keepdim)
+            self.reduction_fn = mean
         else:  # if None
             self.reduction_fn = lambda x: x
 
