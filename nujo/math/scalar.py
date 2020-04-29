@@ -48,6 +48,12 @@ def sqrt(x: Union[Tensor, _numerical]) -> Tensor:
     return _Power(x, 1 / 2, name='Sqrt')()
 
 
+# ====================================================================================================
+# TODO: Everything below is not registered in the computation graph;
+# fix or remove
+# ====================================================================================================
+
+
 def abs(x: Union[Tensor, _numerical]) -> Tensor:
     return x * where(x < 0, -1, 1)
 
