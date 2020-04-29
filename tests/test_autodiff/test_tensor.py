@@ -74,8 +74,8 @@ def test_tensor_inplace_assignment(get_tensors):
 
 @pytest.fixture
 def get_tensors():
-    A = Tensor([[1, 2], [3, 4]])
-    B = Tensor([[5, 6], [7, 8]])
+    A = Tensor([[1, 2], [3, 4]], diff=True)
+    B = Tensor([[5, 6], [7, 8]], diff=True)
     C = A + B
 
     return A, B, C

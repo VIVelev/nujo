@@ -34,4 +34,4 @@ class _Node:
         from nujo.autodiff.tensor import Tensor
 
         self.children.append(child if isinstance(child, _Node) else Tensor(
-            child, name=str(child), diff=False))
+            child, name=str(child)))

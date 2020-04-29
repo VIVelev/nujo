@@ -135,7 +135,9 @@ def test_softmax(input_value):
 
 @pytest.fixture
 def input_value():
-    return Tensor([[0.42, 0.32, 0.34], [0.6, 0.1, 1.1]], name='test_input')
+    return Tensor([[0.42, 0.32, 0.34], [0.6, 0.1, 1.1]],
+                  diff=True,
+                  name='test_input')
 
 
 # ====================================================================================================

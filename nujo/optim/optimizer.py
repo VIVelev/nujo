@@ -14,7 +14,7 @@ class Optimizer:
     lr : float, the learning rate
 
     '''
-    def __init__(self, params: list, lr: float) -> None:
+    def __init__(self, params: list, lr: float):
         self.params = params
         self.lr = lr
 

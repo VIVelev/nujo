@@ -28,7 +28,7 @@ class Tensor(_Node):
     '''
     def __init__(self,
                  value: Union['Tensor', _numerical],
-                 diff=True,
+                 diff=False,
                  creator=None,
                  name='Tensor'):
 
@@ -130,9 +130,6 @@ class Tensor(_Node):
         self._grad_dependencies.append((wrt, weight))
 
     def _compute_grad(self, _debug=False) -> None:
-        # TODO: For some reason power grad breaks
-        # when matmul is in the computation graph
-
         if modes.DIFF_ENABLED and self.diff and self._grad is None:
             if _debug:
                 print()
@@ -159,7 +156,6 @@ class Tensor(_Node):
                     print('Shape:', weight.shape, end='\n\n')
 
                 if z.creator.name == 'MatMul':
-
                     if self.id == z.creator.children[0].id:
                         # XW = Z, dX ...
                         self._grad.value = self._grad.value + \
