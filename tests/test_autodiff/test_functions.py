@@ -173,8 +173,8 @@ def test_matrixmul(inputs):
     assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
-    assert (grad[0] == B).all()
-    assert (grad[1] == A).all()
+    assert (grad[0] == B.value).all()
+    assert (grad[1] == A.value).all()
 
 
 # ====================================================================================================
