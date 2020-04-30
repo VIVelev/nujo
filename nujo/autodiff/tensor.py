@@ -325,4 +325,5 @@ class Tensor(_Node):
     # Representations
 
     def __str__(self):
+        # TODO: Come up with a better representation
         return self.__repr__() + '\n' + '-' * 32 + '\n' + str(self.value)

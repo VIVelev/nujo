@@ -131,8 +131,9 @@ class _MatrixMul(Function):
                  name='MatMul'):
         super(_MatrixMul, self).__init__(input_a, input_b, name=name)
 
-    def forward(self) -> ndarray:
         assert self.children[0].shape[-1] == self.children[1].shape[0]
+
+    def forward(self) -> ndarray:
         return self.children[0].value @ self.children[1].value
 
     def backward(self) -> tuple:
