@@ -22,7 +22,8 @@ def test_prod(inputs):
 
 
 def test_mean(inputs):
-    assert allclose(aggregate.mean(inputs[0]).value, mean(inputs[0].value))
+    output = aggregate.mean(inputs[0])
+    assert allclose(output.value, mean(inputs[0].value))
     assert (inputs[0].grad == 1 / 9).all()
 
     assert (aggregate.mean(*inputs) == mean(inputs)).all()
@@ -33,5 +34,5 @@ def inputs():
     return [
         rand(3, 3, diff=True),
         rand(3, 3, diff=True),
-        rand(3, 3, diff=True)
+        rand(3, 3, diff=True),
     ]
