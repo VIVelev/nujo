@@ -26,7 +26,7 @@ class DatasetLoader:
         self._filepath = HOME_DIR + self.name
         if not override and exists(HOME_DIR + name):
             return
-        self.type = self.type.strip().lower()
+        self.type = type.strip().lower()
 
     def install(self,
                 dataset,
