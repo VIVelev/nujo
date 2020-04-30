@@ -3,32 +3,32 @@ name: codecov
 on: [push]
 
 jobs:
-  run:
+    run:
+        runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@master
 
-    steps:
-    - uses: actions/checkout@master
+            - name: Set up Python 3.8
+              uses: actions/setup-python@master
+              with:
+                  python-version: 3.8
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@master
-      with:
-        python-version: 3.8
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+                  pip install -r test-requirements.txt
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+            - name: Generate coverage report
+              run: |
+                  pip install pytest pytest-cov
+                  pytest --cov=nujo --cov-report=xml
 
-    - name: Generate coverage report
-      run: |
-        pip install pytest pytest-cov
-        pytest --cov=nujo --cov-report=xml
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-      with:
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: true
+            - name: Upload coverage to Codecov
+              uses: codecov/codecov-action@v1
+              with:
+                  file: ./coverage.xml
+                  flags: unittests
+                  name: codecov-umbrella
+                  fail_ci_if_error: true
