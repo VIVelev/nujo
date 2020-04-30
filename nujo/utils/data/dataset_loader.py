@@ -1,7 +1,6 @@
 from os import mkdir
 from os.path import exists
 
-from mnist import MNIST
 from numpy import array, asarray, empty, ndarray, vstack
 from PIL import Image
 from requests import get
@@ -20,12 +19,6 @@ class DatasetLoader:
     '''
     _UCI_REPO_URL = '''
     https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}
-    '''
-    _MNIST_IMAGES_REPO_URL = '''
-    http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz
-    '''
-    _MNIST_LABELS_REPO_URL = '''
-    http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
     '''
 
     def __init__(self, name: str, type: str, override=True):
@@ -78,13 +71,6 @@ class DatasetLoader:
                 vect.reshape((vect.size, 1))
                 dataset.X.append(vect)
             dataset.y = labels
-        # -----------------------------------------
-        # loading MNIST
-        elif (type == 'mnist'):
-            # default mnist dataset files
-            assert exists(f'{HOME_DIR}train-images-idx3-ubyte')
-            assert exists(f'{HOME_DIR}train-labels-idx1-ubyte')
-            dataset.X, dataset.y = MNIST(HOME_DIR).load_training()
 
     def download(self) -> None:
         if not exists(HOME_DIR):
@@ -97,13 +83,3 @@ class DatasetLoader:
             with open(self._filepath, 'wb') as f:
                 f.write(get(self._link).content)
             print(f'{self.name} has been saved in `~/.nujo`')
-        elif self.type == 'mnist':
-            # save images
-            with open(f'{HOME_DIR}train-images-idx3-ubyte', 'wb') as f:
-                f.write(get(self._MNIST_IMAGES_REPO_URL).content)
-
-            # save labels
-            with open(f'{HOME_DIR}train-labels-idx1-ubyte', 'wb') as f:
-                f.write(get(self._MNIST_LABELS_REPO_URL).content)
-
-            print(f'Mnist has been saved in `~/.nujo`')

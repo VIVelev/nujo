@@ -7,16 +7,16 @@ from nujo.utils.data import Dataset
 from nujo.utils.data.dataset_loader import DatasetLoader
 
 
-def test_dataset_loader_install(get_dataset):
-    dataset = Dataset('iris')
-
-    assert dataset.X.shape == get_dataset
-
-
 def test_dataset_loader_download(get_dataset):
     DatasetLoader('iris').download()
 
     assert exists(nujo_dir.HOME_DIR + 'iris.data')
+
+
+def test_dataset_loader_install(get_dataset):
+    dataset = Dataset(True, 'iris')
+
+    assert dataset.X.shape == get_dataset
 
 
 @pytest.fixture
