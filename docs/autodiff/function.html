@@ -28,6 +28,7 @@
 
 from numpy import ndarray
 
+from nujo._typing import Union, _numerical
 from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
@@ -49,7 +50,7 @@ class Function(_Node):
     name : string, the name of the function
 
     &#39;&#39;&#39;
-    def __init__(self, *children: Tensor or ndarray, name=&#39;Function&#39;) -&gt; None:
+    def __init__(self, *children: Union[Tensor, _numerical], name=&#39;Function&#39;):
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):
@@ -83,7 +84,7 @@ class Function(_Node):
             # Compute gradient for this tensor
             for tensor, derivative in zip(self.children, self.backward()):
                 tensor.add_grad_dependency(
-                    z, Tensor(derivative, name=f&#39;weight[{tensor.name}]&#39;))
+                    z, Tensor(derivative, name=f&#39;weight[{z.name}]&#39;))
 
         return z</code></pre>
 </details>
@@ -130,7 +131,7 @@ name : string, the name of the function</p></section>
     name : string, the name of the function
 
     &#39;&#39;&#39;
-    def __init__(self, *children: Tensor or ndarray, name=&#39;Function&#39;) -&gt; None:
+    def __init__(self, *children: Union[Tensor, _numerical], name=&#39;Function&#39;):
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):
@@ -164,7 +165,7 @@ name : string, the name of the function</p></section>
             # Compute gradient for this tensor
             for tensor, derivative in zip(self.children, self.backward()):
                 tensor.add_grad_dependency(
-                    z, Tensor(derivative, name=f&#39;weight[{tensor.name}]&#39;))
+                    z, Tensor(derivative, name=f&#39;weight[{z.name}]&#39;))
 
         return z</code></pre>
 </details>
@@ -174,20 +175,22 @@ name : string, the name of the function</p></section>
 </ul>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li>nujo.autodiff._functions._Addition</li>
-<li>nujo.autodiff._functions._BinaryStep</li>
-<li>nujo.autodiff._functions._LeakyReLU</li>
-<li>nujo.autodiff._functions._Logarithm</li>
-<li>nujo.autodiff._functions._MatrixMul</li>
-<li>nujo.autodiff._functions._Multiplication</li>
-<li>nujo.autodiff._functions._Negation</li>
-<li>nujo.autodiff._functions._Power</li>
-<li>nujo.autodiff._functions._ReLU</li>
-<li>nujo.autodiff._functions._Reciprocal</li>
-<li>nujo.autodiff._functions._Sigmoid</li>
-<li>nujo.autodiff._functions._Softmax</li>
-<li>nujo.autodiff._functions._Swish</li>
-<li>nujo.autodiff._functions._TanH</li>
+<li>nujo.autodiff._functions._activations._BinaryStep</li>
+<li>nujo.autodiff._functions._activations._LeakyReLU</li>
+<li>nujo.autodiff._functions._activations._ReLU</li>
+<li>nujo.autodiff._functions._activations._Sigmoid</li>
+<li>nujo.autodiff._functions._activations._Softmax</li>
+<li>nujo.autodiff._functions._activations._Swish</li>
+<li>nujo.autodiff._functions._activations._TanH</li>
+<li>nujo.autodiff._functions._aggregate._InnerProd</li>
+<li>nujo.autodiff._functions._aggregate._InnerSum</li>
+<li>nujo.autodiff._functions._elementary._Addition</li>
+<li>nujo.autodiff._functions._elementary._Logarithm</li>
+<li>nujo.autodiff._functions._elementary._MatrixMul</li>
+<li>nujo.autodiff._functions._elementary._Multiplication</li>
+<li>nujo.autodiff._functions._elementary._Negation</li>
+<li>nujo.autodiff._functions._elementary._Power</li>
+<li>nujo.autodiff._functions._elementary._Reciprocal</li>
 </ul>
 <h3>Methods</h3>
 <dl>

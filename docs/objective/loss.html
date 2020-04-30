@@ -38,7 +38,7 @@ __all__ = [
 class _Loss(Flow):
     &#39;&#39;&#39; Base loss class
     &#39;&#39;&#39;
-    def __init__(self, dim: int = None, keepdim=False, reduction: str = None):
+    def __init__(self, dim: int = None, keepdim=True, reduction: str = None):
         super(_Loss, self).__init__(name=self.__class__.__name__)
         self.dim = dim
         self.keepdim = keepdim
@@ -57,7 +57,7 @@ class _Loss(Flow):
 class QualitativeLoss(_Loss):
     &#39;&#39;&#39; Base qualitative loss class
     &#39;&#39;&#39;
-    def __init__(self, dim: int = None, keepdim=False, reduction=&#39;sum&#39;):
+    def __init__(self, dim: int = None, keepdim=True, reduction=&#39;sum&#39;):
         super(QualitativeLoss, self).__init__(dim, keepdim, reduction)
 
 
@@ -67,7 +67,7 @@ class QualitativeLoss(_Loss):
 class QuantitativeLoss(_Loss):
     &#39;&#39;&#39; Base quantitative loss class
     &#39;&#39;&#39;
-    def __init__(self, dim: int = None, keepdim=False, reduction=&#39;mean&#39;):
+    def __init__(self, dim: int = None, keepdim=True, reduction=&#39;mean&#39;):
         super(QuantitativeLoss, self).__init__(dim, keepdim, reduction)
 
 
@@ -96,7 +96,7 @@ class QuantitativeLoss(_Loss):
 <pre><code class="python">class QualitativeLoss(_Loss):
     &#39;&#39;&#39; Base qualitative loss class
     &#39;&#39;&#39;
-    def __init__(self, dim: int = None, keepdim=False, reduction=&#39;sum&#39;):
+    def __init__(self, dim: int = None, keepdim=True, reduction=&#39;sum&#39;):
         super(QualitativeLoss, self).__init__(dim, keepdim, reduction)</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -134,7 +134,7 @@ class QuantitativeLoss(_Loss):
 <pre><code class="python">class QuantitativeLoss(_Loss):
     &#39;&#39;&#39; Base quantitative loss class
     &#39;&#39;&#39;
-    def __init__(self, dim: int = None, keepdim=False, reduction=&#39;mean&#39;):
+    def __init__(self, dim: int = None, keepdim=True, reduction=&#39;mean&#39;):
         super(QuantitativeLoss, self).__init__(dim, keepdim, reduction)</code></pre>
 </details>
 <h3>Ancestors</h3>

@@ -26,14 +26,14 @@
 </summary>
 <pre><code class="python">from copy import deepcopy
 from math import e
-from numbers import Number
 
 from numpy import around as np_round
 from numpy import ceil as np_ceil
 from numpy import floor as np_floor
 from numpy import where
 
-from nujo.autodiff._functions import _Logarithm, _Power
+from nujo._typing import Union, _numerical
+from nujo.autodiff._functions._elementary import _Logarithm, _Power
 from nujo.autodiff.tensor import Tensor
 
 __all__ = [
@@ -51,37 +51,37 @@ __all__ = [
 # ====================================================================================================
 
 
-def log(x: Number or Tensor, base: float = e) -&gt; Tensor:
+def log(x: Union[Tensor, _numerical], base: float = e) -&gt; Tensor:
     return _Logarithm(x, base)()
 
 
-def log2(x: Number or Tensor) -&gt; Tensor:
+def log2(x: Union[Tensor, _numerical]) -&gt; Tensor:
     return _Logarithm(x, 2, name=&#39;Log2&#39;)()
 
 
-def log10(x: Number or Tensor) -&gt; Tensor:
+def log10(x: Union[Tensor, _numerical]) -&gt; Tensor:
     return _Logarithm(x, 10, name=&#39;Log10&#39;)()
 
 
 # ====================================================================================================
 
 
-def exp(x: Number or Tensor) -&gt; Tensor:
+def exp(x: Union[Tensor, _numerical]) -&gt; Tensor:
     return _Power(e, x, name=&#39;Exp&#39;)()
 
 
-def sqrt(x: Number or Tensor) -&gt; Tensor:
+def sqrt(x: Union[Tensor, _numerical]) -&gt; Tensor:
     return _Power(x, 1 / 2, name=&#39;Sqrt&#39;)()
 
 
-def abs(x: Number or Tensor) -&gt; Tensor:
+def abs(x: Union[Tensor, _numerical]) -&gt; Tensor:
     return x * where(x &lt; 0, -1, 1)
 
 
 # ====================================================================================================
 
 
-def round(x: Number or Tensor, inplace=False) -&gt; Tensor:
+def round(x: Union[Tensor, _numerical], inplace=False) -&gt; Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
@@ -92,7 +92,7 @@ def round(x: Number or Tensor, inplace=False) -&gt; Tensor:
     return rounded
 
 
-def ceil(x: Number or Tensor, inplace=False) -&gt; Tensor:
+def ceil(x: Union[Tensor, _numerical], inplace=False) -&gt; Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
@@ -103,7 +103,7 @@ def ceil(x: Number or Tensor, inplace=False) -&gt; Tensor:
     return ceiled
 
 
-def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
+def floor(x: Union[Tensor, _numerical], inplace=False) -&gt; Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
@@ -133,7 +133,7 @@ def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def abs(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def abs(x: Union[Tensor, _numerical]) -&gt; Tensor:
     return x * where(x &lt; 0, -1, 1)</code></pre>
 </details>
 </dd>
@@ -146,7 +146,7 @@ def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def ceil(x: Number or Tensor, inplace=False) -&gt; Tensor:
+<pre><code class="python">def ceil(x: Union[Tensor, _numerical], inplace=False) -&gt; Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
@@ -166,7 +166,7 @@ def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def exp(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def exp(x: Union[Tensor, _numerical]) -&gt; Tensor:
     return _Power(e, x, name=&#39;Exp&#39;)()</code></pre>
 </details>
 </dd>
@@ -179,7 +179,7 @@ def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
+<pre><code class="python">def floor(x: Union[Tensor, _numerical], inplace=False) -&gt; Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
@@ -199,7 +199,7 @@ def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def log(x: Number or Tensor, base: float = e) -&gt; Tensor:
+<pre><code class="python">def log(x: Union[Tensor, _numerical], base: float = e) -&gt; Tensor:
     return _Logarithm(x, base)()</code></pre>
 </details>
 </dd>
@@ -212,7 +212,7 @@ def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def log10(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def log10(x: Union[Tensor, _numerical]) -&gt; Tensor:
     return _Logarithm(x, 10, name=&#39;Log10&#39;)()</code></pre>
 </details>
 </dd>
@@ -225,7 +225,7 @@ def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def log2(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def log2(x: Union[Tensor, _numerical]) -&gt; Tensor:
     return _Logarithm(x, 2, name=&#39;Log2&#39;)()</code></pre>
 </details>
 </dd>
@@ -238,7 +238,7 @@ def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def round(x: Number or Tensor, inplace=False) -&gt; Tensor:
+<pre><code class="python">def round(x: Union[Tensor, _numerical], inplace=False) -&gt; Tensor:
     if not isinstance(x, Tensor):
         x = Tensor(x)
 
@@ -258,7 +258,7 @@ def floor(x: Number or Tensor, inplace=False) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def sqrt(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def sqrt(x: Union[Tensor, _numerical]) -&gt; Tensor:
     return _Power(x, 1 / 2, name=&#39;Sqrt&#39;)()</code></pre>
 </details>
 </dd>
