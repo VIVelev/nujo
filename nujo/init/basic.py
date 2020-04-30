@@ -1,7 +1,5 @@
 from numpy import empty as np_empty
 from numpy import full as np_full
-from numpy import ones as np_ones
-from numpy import zeros as np_zeros
 
 from nujo.autodiff.tensor import Tensor
 
@@ -36,7 +34,7 @@ def ones(*shape: int, diff=False, name='Tensor[ones]') -> Tensor:
     ''' Return a new array of given shape, filled with ones.
     '''
 
-    return Tensor(np_ones(shape), diff=diff, name=name)
+    return full(*shape, fill_value=1, diff=diff, name=name)
 
 
 def ones_like(x: Tensor, diff=False, name='Tensor[ones]') -> Tensor:
@@ -47,7 +45,7 @@ def zeros(*shape: int, diff=False, name='Tensor[zeros]') -> Tensor:
     ''' Return a new array of given shape, filled with zeros.
     '''
 
-    return Tensor(np_zeros(shape), diff=diff, name=name)
+    return full(*shape, fill_value=0, diff=diff, name=name)
 
 
 def zeros_like(x: Tensor, diff=False, name='Tensor[zeros]') -> Tensor:

@@ -1,5 +1,5 @@
-from numpy import prod as npprod
-from numpy import sum as npsum
+from numpy import prod as np_prod
+from numpy import sum as np_sum
 
 from nujo._typing import Union, _numerical
 from nujo.autodiff._functions._aggregate import _InnerProd, _InnerSum
@@ -35,7 +35,7 @@ def sum(*inputs: Union[Tensor, _numerical],
     if len(inputs) == 1:
         return _InnerSum(inputs[0], dim=dim, keepdim=keepdim)()
     else:
-        return npsum(inputs, axis=dim, keepdims=keepdim)
+        return np_sum(inputs, axis=dim, keepdims=keepdim)
 
 
 # ====================================================================================================
@@ -62,7 +62,7 @@ def prod(*inputs: Union[Tensor, _numerical],
     if len(inputs) == 1:
         return _InnerProd(inputs[0], dim=dim, keepdim=keepdim)()
     else:
-        return npprod(inputs, axis=dim, keepdims=keepdim)
+        return np_prod(inputs, axis=dim, keepdims=keepdim)
 
 
 # ====================================================================================================
@@ -87,11 +87,11 @@ def mean(*inputs: Union[Tensor, _numerical],
     '''
 
     if len(inputs) == 1:
-        n = npprod(inputs[0].shape) if dim is None else inputs[0].shape[dim]
+        n = np_prod(inputs[0].shape) if dim is None else inputs[0].shape[dim]
         return _InnerSum(inputs[0], dim=dim, keepdim=keepdim)() / n
 
     else:
-        return npsum(inputs, axis=dim, keepdims=keepdim) / len(inputs)
+        return np_sum(inputs, axis=dim, keepdims=keepdim) / len(inputs)
 
 
 # ====================================================================================================
