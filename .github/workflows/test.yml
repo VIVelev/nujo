@@ -26,9 +26,9 @@ jobs:
         pip install -r requirements.txt
 
       if: matrix.os == 'windows-latest'
-        run: pip install torch==1.4.0+cpu torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      run: pip install torch==1.4.0+cpu torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
       else:
-        run: pip install torch
+      run: pip install torch
 
     - name: Test with pytest
       run: |
