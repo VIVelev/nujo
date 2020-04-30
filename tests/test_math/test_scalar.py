@@ -70,4 +70,4 @@ def test_floor(input):
 
 @pytest.fixture
 def input():
-    return rand(3, 3, diff=False, name='test_input')
+    return rand(3, 3)
