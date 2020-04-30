@@ -6,24 +6,32 @@ from nujo.init.random import rand
 
 
 def test_sum(inputs):
-    assert (aggregate.sum(inputs[0]) == sum(inputs[0].value)).all()
+    output = aggregate.sum(inputs[0])
+    assert (output == sum(inputs[0].value)).all()
+    assert (inputs[0].grad == 1).all()
+
     assert (aggregate.sum(*inputs) == sum(inputs)).all()
 
 
 def test_prod(inputs):
-    assert (aggregate.prod(inputs[0]) == prod(inputs[0].value)).all()
+    output = aggregate.prod(inputs[0])
+    assert (output == prod(inputs[0].value)).all()
+    assert allclose(inputs[0].grad.value, (output / inputs[0]).value)
+
     assert (aggregate.prod(*inputs) == prod(inputs)).all()
 
 
 def test_mean(inputs):
     assert allclose(aggregate.mean(inputs[0]).value, mean(inputs[0].value))
+    assert (inputs[0].grad == 1 / 9).all()
+
     assert (aggregate.mean(*inputs) == mean(inputs)).all()
 
 
 @pytest.fixture
 def inputs():
     return [
-        rand(3, 3, diff=False, name='test_input_1'),
-        rand(3, 3, diff=False, name='test_input_2'),
-        rand(3, 3, diff=False, name='test_input_3')
+        rand(3, 3, diff=True),
+        rand(3, 3, diff=True),
+        rand(3, 3, diff=True)
     ]
