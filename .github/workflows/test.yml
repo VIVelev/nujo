@@ -23,11 +23,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ "$RUNNER_OS" == "Windows" ]; then
-            pip install torch==1.4.0+cpu torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
-        else
-            pip install torch
-        fi
+        pip install -r requirements.txt
+
+      if: matrix.os == 'windows-latest'
+        run: pip install torch==1.4.0+cpu torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      else:
+        run: pip install torch
 
     - name: Test with pytest
       run: |
