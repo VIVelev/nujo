@@ -1,6 +1,7 @@
 from numpy import prod as npprod
 from numpy import sum as npsum
 
+from nujo._typing import Union, _numerical
 from nujo.autodiff._functions._aggregate import _InnerProd, _InnerSum
 from nujo.autodiff.tensor import Tensor
 
@@ -13,7 +14,9 @@ __all__ = [
 # ====================================================================================================
 
 
-def sum(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def sum(*inputs: Union[Tensor, _numerical],
+        dim: int = None,
+        keepdim=False) -> Tensor:
     ''' Summation of tensor(s)
 
     Parameters:
@@ -38,7 +41,9 @@ def sum(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def prod(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def prod(*inputs: Union[Tensor, _numerical],
+         dim: int = None,
+         keepdim=False) -> Tensor:
     ''' Product of tensor(s)
 
     Parameters:
@@ -63,7 +68,9 @@ def prod(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
 # ====================================================================================================
 
 
-def mean(*inputs: Tensor, dim: int = None, keepdim=False) -> Tensor:
+def mean(*inputs: Union[Tensor, _numerical],
+         dim: int = None,
+         keepdim=False) -> Tensor:
     ''' Mean of tensor(s)
 
     Parameters:
