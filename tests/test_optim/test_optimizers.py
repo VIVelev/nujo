@@ -155,7 +155,7 @@ def vec_params():
 
 @pytest.fixture
 def num_iters():
-    return 256
+    return 512
 
 
 @pytest.fixture

@@ -31,7 +31,7 @@ class SGD(Optimizer):
     lr : float, the learning rate
 
     '''
-    def __init__(self, params: list, lr=0.01):
+    def __init__(self, params: list, lr=0.005):
         super(SGD, self).__init__(params, lr)
 
     def update_rule(self, param: Tensor, grad: Tensor) -> Tensor:
@@ -134,7 +134,7 @@ class Adam(Optimizer):
     eps : float, added for numerical stability
 
     '''
-    def __init__(self, params: list, lr=0.01, betas=(0.9, 0.999), eps=1e-09):
+    def __init__(self, params: list, lr=0.005, betas=(0.9, 0.999), eps=1e-09):
         super(Adam, self).__init__(params, lr)
 
         self.betas = betas
