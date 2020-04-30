@@ -25,7 +25,7 @@ def test_sgd_basic(scalar_params, num_iters, quadratic_loss):
 def test_sgd_matrix(vec_params, num_iters, matrix_mse_loss):
     optimizer = optim.SGD(vec_params)
 
-    moving_avrg_loss = 1e4
+    prev_loss = 1e3
     for i in range(num_iters):
         loss = matrix_mse_loss(vec_params)
 
@@ -33,9 +33,8 @@ def test_sgd_matrix(vec_params, num_iters, matrix_mse_loss):
         optimizer.step()
         optimizer.zero_grad()
 
-        if (i + 1) % 4 == 0:
-            assert loss < moving_avrg_loss
-        moving_avrg_loss = 0.9 * moving_avrg_loss + 0.1 * loss
+        assert loss < prev_loss
+        prev_loss = loss
 
 
 # ====================================================================================================
@@ -60,7 +59,7 @@ def test_momentum_basic(scalar_params, num_iters, quadratic_loss):
 def test_momentum_matrix(vec_params, num_iters, matrix_mse_loss):
     optimizer = optim.Momentum(vec_params)
 
-    moving_avrg_loss = 1e4
+    prev_loss = 1e3
     for i in range(num_iters):
         loss = matrix_mse_loss(vec_params)
 
@@ -68,9 +67,8 @@ def test_momentum_matrix(vec_params, num_iters, matrix_mse_loss):
         optimizer.step()
         optimizer.zero_grad()
 
-        if (i + 1) % 4 == 0:
-            assert loss < moving_avrg_loss
-        moving_avrg_loss = 0.9 * moving_avrg_loss + 0.1 * loss
+        assert loss < prev_loss
+        prev_loss = loss
 
 
 # ====================================================================================================
@@ -95,7 +93,7 @@ def test_rmsprop_basic(scalar_params, num_iters, quadratic_loss):
 def test_rmsprop_matrix(vec_params, num_iters, matrix_mse_loss):
     optimizer = optim.RMSprop(vec_params)
 
-    moving_avrg_loss = 1e4
+    prev_loss = 1e3
     for i in range(num_iters):
         loss = matrix_mse_loss(vec_params)
 
@@ -103,9 +101,8 @@ def test_rmsprop_matrix(vec_params, num_iters, matrix_mse_loss):
         optimizer.step()
         optimizer.zero_grad()
 
-        if (i + 1) % 4 == 0:
-            assert loss < moving_avrg_loss
-        moving_avrg_loss = 0.9 * moving_avrg_loss + 0.1 * loss
+        assert loss < prev_loss
+        prev_loss = loss
 
 
 # ====================================================================================================
@@ -130,7 +127,7 @@ def test_adam_basic(scalar_params, num_iters, quadratic_loss):
 def test_adam_matrix(vec_params, num_iters, matrix_mse_loss):
     optimizer = optim.Adam(vec_params)
 
-    moving_avrg_loss = 1e4
+    prev_loss = 1e3
     for i in range(num_iters):
         loss = matrix_mse_loss(vec_params)
 
@@ -138,9 +135,8 @@ def test_adam_matrix(vec_params, num_iters, matrix_mse_loss):
         optimizer.step()
         optimizer.zero_grad()
 
-        if (i + 1) % 4 == 0:
-            assert loss < moving_avrg_loss
-        moving_avrg_loss = 0.9 * moving_avrg_loss + 0.1 * loss
+        assert loss < prev_loss
+        prev_loss = loss
 
 
 # ====================================================================================================
@@ -149,17 +145,17 @@ def test_adam_matrix(vec_params, num_iters, matrix_mse_loss):
 
 @pytest.fixture
 def scalar_params():
-    return [[rand()]]
+    return [[rand(diff=True)]]
 
 
 @pytest.fixture
 def vec_params():
-    return [[randn(3, 1)]]
+    return [[rand(3, 1, diff=True)]]
 
 
 @pytest.fixture
 def num_iters():
-    return 128
+    return 512
 
 
 @pytest.fixture
@@ -172,11 +168,11 @@ def quadratic_loss():
 
 @pytest.fixture
 def matrix_mse_loss():
-    X = rand(3, 3, diff=False)
-    y = X @ randn(3, 1, diff=False) + rand(diff=False)
+    X = rand(3, 3)
+    y = X @ randn(3, 1) + rand()
 
     def compute(params):
-        return mean((y - X @ params[0][0])**2, inplace=True)
+        return mean((y - X @ params[0][0])**2)
 
     return compute
 

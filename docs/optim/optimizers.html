@@ -85,7 +85,7 @@ class Momentum(Optimizer):
     time step to be added to the current update vector
 
     &#39;&#39;&#39;
-    def __init__(self, params: list, lr=0.003, beta=0.9):
+    def __init__(self, params: list, lr=0.001, beta=0.9):
         super(Momentum, self).__init__(params, lr)
 
         self.beta = beta
@@ -123,7 +123,7 @@ class RMSprop(Optimizer):
     eps : float, added for numerical stability
 
     &#39;&#39;&#39;
-    def __init__(self, params: list, lr=0.0005, beta=0.999, eps=1e-09):
+    def __init__(self, params: list, lr=0.001, beta=0.999, eps=1e-09):
         super(RMSprop, self).__init__(params, lr)
 
         self.beta = beta
@@ -163,7 +163,7 @@ class Adam(Optimizer):
     eps : float, added for numerical stability
 
     &#39;&#39;&#39;
-    def __init__(self, params: list, lr=0.001, betas=(0.9, 0.999), eps=1e-09):
+    def __init__(self, params: list, lr=0.005, betas=(0.9, 0.999), eps=1e-09):
         super(Adam, self).__init__(params, lr)
 
         self.betas = betas
@@ -210,7 +210,7 @@ class Adam(Optimizer):
 <dl>
 <dt id="nujo.optim.optimizers.Adam"><code class="flex name class">
 <span>class <span class="ident">Adam</span></span>
-<span>(</span><span>params, lr=0.001, betas=(0.9, 0.999), eps=1e-09)</span>
+<span>(</span><span>params, lr=0.005, betas=(0.9, 0.999), eps=1e-09)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Adam: Adaptive Moment Estimation</p>
@@ -243,7 +243,7 @@ eps : float, added for numerical stability</p></section>
     eps : float, added for numerical stability
 
     &#39;&#39;&#39;
-    def __init__(self, params: list, lr=0.001, betas=(0.9, 0.999), eps=1e-09):
+    def __init__(self, params: list, lr=0.005, betas=(0.9, 0.999), eps=1e-09):
         super(Adam, self).__init__(params, lr)
 
         self.betas = betas
@@ -317,7 +317,7 @@ eps : float, added for numerical stability</p></section>
 </dd>
 <dt id="nujo.optim.optimizers.Momentum"><code class="flex name class">
 <span>class <span class="ident">Momentum</span></span>
-<span>(</span><span>params, lr=0.003, beta=0.9)</span>
+<span>(</span><span>params, lr=0.001, beta=0.9)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Momentum</p>
@@ -348,7 +348,7 @@ time step to be added to the current update vector</p></section>
     time step to be added to the current update vector
 
     &#39;&#39;&#39;
-    def __init__(self, params: list, lr=0.003, beta=0.9):
+    def __init__(self, params: list, lr=0.001, beta=0.9):
         super(Momentum, self).__init__(params, lr)
 
         self.beta = beta
@@ -400,7 +400,7 @@ time step to be added to the current update vector</p></section>
 </dd>
 <dt id="nujo.optim.optimizers.RMSprop"><code class="flex name class">
 <span>class <span class="ident">RMSprop</span></span>
-<span>(</span><span>params, lr=0.0005, beta=0.999, eps=1e-09)</span>
+<span>(</span><span>params, lr=0.001, beta=0.999, eps=1e-09)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>RMSprop</p>
@@ -431,7 +431,7 @@ eps : float, added for numerical stability</p></section>
     eps : float, added for numerical stability
 
     &#39;&#39;&#39;
-    def __init__(self, params: list, lr=0.0005, beta=0.999, eps=1e-09):
+    def __init__(self, params: list, lr=0.001, beta=0.999, eps=1e-09):
         super(RMSprop, self).__init__(params, lr)
 
         self.beta = beta

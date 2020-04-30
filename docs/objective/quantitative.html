@@ -42,8 +42,7 @@ class L1Loss(QuantitativeLoss):
     def forward(self, input: Tensor, target: Tensor) -&gt; Tensor:
         return self.reduction_fn(abs(input - target),
                                  dim=self.dim,
-                                 keepdim=self.keepdim,
-                                 inplace=True)
+                                 keepdim=self.keepdim)
 
 
 # ====================================================================================================
@@ -55,8 +54,7 @@ class L2Loss(QuantitativeLoss):
     def forward(self, input: Tensor, target: Tensor) -&gt; Tensor:
         return self.reduction_fn((input - target)**2,
                                  dim=self.dim,
-                                 keepdim=self.keepdim,
-                                 inplace=True)
+                                 keepdim=self.keepdim)
 
 
 # ====================================================================================================</code></pre>
@@ -87,8 +85,7 @@ class L2Loss(QuantitativeLoss):
     def forward(self, input: Tensor, target: Tensor) -&gt; Tensor:
         return self.reduction_fn(abs(input - target),
                                  dim=self.dim,
-                                 keepdim=self.keepdim,
-                                 inplace=True)</code></pre>
+                                 keepdim=self.keepdim)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -124,8 +121,7 @@ class L2Loss(QuantitativeLoss):
     def forward(self, input: Tensor, target: Tensor) -&gt; Tensor:
         return self.reduction_fn((input - target)**2,
                                  dim=self.dim,
-                                 keepdim=self.keepdim,
-                                 inplace=True)</code></pre>
+                                 keepdim=self.keepdim)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">

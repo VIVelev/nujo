@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from numpy import array, eye, ndarray, tile
+from numpy import array, ndarray, ones, zeros
 
 from nujo._typing import Union, _numerical
 from nujo.autodiff import modes
@@ -28,7 +28,7 @@ class Tensor(_Node):
     '''
     def __init__(self,
                  value: Union['Tensor', _numerical],
-                 diff=True,
+                 diff=False,
                  creator=None,
                  name='Tensor'):
 
@@ -134,50 +134,45 @@ class Tensor(_Node):
             if _debug:
                 print()
                 print('=' * 30)
-                print(self)
+                print(self, end='\n\n')
                 print('Shape:', self.shape)
-                print(f'Has {len(self._grad_dependencies)} dependencies:\n')
+                print(f'Has {len(self._grad_dependencies)} dependencies:')
+                print('Grad Dependecies:', self._grad_dependencies, end='\n\n')
 
             # Top-parent grad
             if len(self._grad_dependencies) == 0:
-                self._grad = Tensor(1, name=f'grad[{self.name}]')
+                self._grad = Tensor(ones(self.shape),
+                                    name=f'grad[{self.name}]')
                 return
 
-            self._grad = Tensor(0, name=f'grad[{self.name}]')
+            self._grad = Tensor(zeros(self.shape), name=f'grad[{self.name}]')
             for z, weight in self._grad_dependencies:
                 if _debug:
-                    print('-' * 10)
-                    print('Z_prev Grad:', z.grad)
-                    print('Shape:', z.grad.shape)
+                    print('~' * 10)
+                    print('Z Grad:', z.grad)
+                    print('Shape:', z.grad.shape, end='\n\n')
                     print('-' * 5)
-                    print('Weight of `Z_prev Grad`:', weight)
-                    print('Shape:', weight.shape)
-                    print('-' * 5)
+                    print('Z Weight:', weight)
+                    print('Shape:', weight.shape, end='\n\n')
 
-                if weight.shape == () or z.grad.shape == ():  # Is scalar
-                    self._accumulate_grad_scalar(z, weight)
+                if z.creator.name == 'MatMul':
+                    if self.id == z.creator.children[0].id:
+                        # XW = Z, dX ...
+                        self._grad.value += z.grad.value @ weight.value.T
+
+                    else:
+                        # XW = Z, dW ...
+                        self._grad.value += (z.grad.value.T @ weight.value).T
+
                 else:
-                    self._accumulate_grad_matrix(z, weight)
+                    self._grad.value = self._grad.value + \
+                        z.grad.value * weight.value
 
             if _debug:
+                print('#' * 10)
                 print('Current Grad:', self._grad)
                 print('Shape:', self._grad.shape)
-                print('-' * 5)
-                print()
-
-    def _accumulate_grad_scalar(self, z: 'Tensor', weight: 'Tensor') -> None:
-        self._grad.value = self._grad.value + z.grad.value * weight.value
-
-    def _accumulate_grad_matrix(self, z: 'Tensor', weight: 'Tensor') -> None:
-        weight.value = weight.value.reshape(z.grad.shape[0], self.shape[0],
-                                            z.grad.shape[1] * self.shape[1])
-        z_grad = z.grad.value.repeat(self.shape[1],
-                                     axis=1).reshape(z.grad.shape[0], 1, -1)
-
-        sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
-        accumulated_grad = ((weight.value * z_grad) @ sum_mask.T).sum(0)
-
-        self._grad.value = self.grad.value + accumulated_grad / z.grad.shape[0]
+                print('-' * 5, end='\n\n')
 
     def zero_grad(self) -> None:
         # `zero_grad` is called after an iteration.
@@ -198,7 +193,7 @@ class Tensor(_Node):
 
         while nodes_to_visit:
             node = nodes_to_visit.pop()
-            node._compute_grad()
+            node._compute_grad(_debug=_debug)
 
             if _debug:
                 nstr = f' [{i}]'
@@ -276,14 +271,14 @@ class Tensor(_Node):
     # Arithmetic operations
 
     def __add__(self, other):
-        from nujo.autodiff._functions import _Addition
+        from nujo.autodiff._functions._elementary import _Addition
         return _Addition(self, other)()
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __neg__(self):
-        from nujo.autodiff._functions import _Negation
+        from nujo.autodiff._functions._elementary import _Negation
         return _Negation(self)()
 
     def __sub__(self, other):
@@ -293,39 +288,40 @@ class Tensor(_Node):
         return self.__neg__().__add__(other)
 
     def __mul__(self, other):
-        from nujo.autodiff._functions import _Multiplication
+        from nujo.autodiff._functions._elementary import _Multiplication
         return _Multiplication(self, other)()
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        from nujo.autodiff._functions import _Reciprocal
+        from nujo.autodiff._functions._elementary import _Reciprocal
         return self.__mul__(_Reciprocal(other)())
 
     def __rtruediv__(self, other):
-        from nujo.autodiff._functions import _Reciprocal
+        from nujo.autodiff._functions._elementary import _Reciprocal
         return _Reciprocal(self)().__mul__(other)
 
     def __pow__(self, other):
-        from nujo.autodiff._functions import _Power
+        from nujo.autodiff._functions._elementary import _Power
         return _Power(self, other)()
 
     def __rpow__(self, other):
-        from nujo.autodiff._functions import _Power
+        from nujo.autodiff._functions._elementary import _Power
         return _Power(other, self)()
 
     # More complex arithmetic operations
 
     def __matmul__(self, other):
-        from nujo.autodiff._functions import _MatrixMul
+        from nujo.autodiff._functions._elementary import _MatrixMul
         return _MatrixMul(self, other)()
 
     def __rmatmul__(self, other):
-        from nujo.autodiff._functions import _MatrixMul
+        from nujo.autodiff._functions._elementary import _MatrixMul
         return _MatrixMul(other, self)()
 
     # Representations
 
     def __str__(self):
+        # TODO: Come up with a better representation
         return self.__repr__() + '\n' + '-' * 32 + '\n' + str(self.value)

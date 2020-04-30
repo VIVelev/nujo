@@ -7,7 +7,7 @@ from numpy import floor as np_floor
 from numpy import where
 
 from nujo._typing import Union, _numerical
-from nujo.autodiff._functions import _Logarithm, _Power
+from nujo.autodiff._functions._elementary import _Logarithm, _Power
 from nujo.autodiff.tensor import Tensor
 
 __all__ = [

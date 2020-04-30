@@ -24,9 +24,7 @@ class Function(_Node):
     name : string, the name of the function
 
     '''
-    def __init__(self,
-                 *children: Union[Tensor, _numerical],
-                 name='Function') -> None:
+    def __init__(self, *children: Union[Tensor, _numerical], name='Function'):
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):
@@ -60,6 +58,6 @@ class Function(_Node):
             # Compute gradient for this tensor
             for tensor, derivative in zip(self.children, self.backward()):
                 tensor.add_grad_dependency(
-                    z, Tensor(derivative, name=f'weight[{tensor.name}]'))
+                    z, Tensor(derivative, name=f'weight[{z.name}]'))
 
         return z
