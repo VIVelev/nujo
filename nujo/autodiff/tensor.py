@@ -158,13 +158,11 @@ class Tensor(_Node):
                 if z.creator.name == 'MatMul':
                     if self.id == z.creator.children[0].id:
                         # XW = Z, dX ...
-                        self._grad.value = self._grad.value + \
-                            (z.grad.value @ weight.value.T)
+                        self._grad.value += z.grad.value @ weight.value.T
 
                     else:
                         # XW = Z, dW ...
-                        self._grad.value = self._grad.value + \
-                            (z.grad.value.T @ weight.value).T
+                        self._grad.value += (z.grad.value.T @ weight.value).T
 
                 else:
                     self._grad.value = self._grad.value + \
