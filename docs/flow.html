@@ -29,8 +29,8 @@
 &#39;&#39;&#39;
 
 from copy import deepcopy
+from typing import List, Union
 
-from nujo._typing import Union, _numerical
 from nujo.autodiff.tensor import Tensor
 
 
@@ -56,12 +56,12 @@ class Flow(metaclass=_FlowSetup):
     subflows : list of flows, only if the current flow is a supflow
 
     &#39;&#39;&#39;
-    def __init__(self, name=&#39;Flow&#39;, subflows=[]):
+    def __init__(self, name=&#39;Flow&#39;, subflows: List[&#39;Flow&#39;] = []):
         self.name = name
         self.is_supflow = True if subflows else False
 
-        self.subflows = []
-        self.parameters = []
+        self.subflows: List[&#39;Flow&#39;] = []
+        self.parameters: List[Tensor] = []
 
         if self.is_supflow:
             self.append(*subflows)
@@ -135,7 +135,7 @@ class Flow(metaclass=_FlowSetup):
 
         return retflow
 
-    def forward(self, x: Tensor) -&gt; Union[Tensor, _numerical]:
+    def forward(self, x: Tensor) -&gt; Tensor:
         &#39;&#39;&#39; Flow Forward
 
         The flow computation is defined here.
@@ -146,7 +146,7 @@ class Flow(metaclass=_FlowSetup):
 
         Returns:
         --------
-        res : numerical value, computed result
+        res : Tensor, computed result
 
         &#39;&#39;&#39;
 
@@ -247,12 +247,12 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
     subflows : list of flows, only if the current flow is a supflow
 
     &#39;&#39;&#39;
-    def __init__(self, name=&#39;Flow&#39;, subflows=[]):
+    def __init__(self, name=&#39;Flow&#39;, subflows: List[&#39;Flow&#39;] = []):
         self.name = name
         self.is_supflow = True if subflows else False
 
-        self.subflows = []
-        self.parameters = []
+        self.subflows: List[&#39;Flow&#39;] = []
+        self.parameters: List[Tensor] = []
 
         if self.is_supflow:
             self.append(*subflows)
@@ -326,7 +326,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         return retflow
 
-    def forward(self, x: Tensor) -&gt; Union[Tensor, _numerical]:
+    def forward(self, x: Tensor) -&gt; Tensor:
         &#39;&#39;&#39; Flow Forward
 
         The flow computation is defined here.
@@ -337,7 +337,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         Returns:
         --------
-        res : numerical value, computed result
+        res : Tensor, computed result
 
         &#39;&#39;&#39;
 
@@ -487,12 +487,12 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <h2 id="parameters">Parameters:</h2>
 <p>x : Tensor, input tensor</p>
 <h2 id="returns">Returns:</h2>
-<p>res : numerical value, computed result</p></section>
+<p>res : Tensor, computed result</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def forward(self, x: Tensor) -&gt; Union[Tensor, _numerical]:
+<pre><code class="python">def forward(self, x: Tensor) -&gt; Tensor:
     &#39;&#39;&#39; Flow Forward
 
     The flow computation is defined here.
@@ -503,7 +503,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
     Returns:
     --------
-    res : numerical value, computed result
+    res : Tensor, computed result
 
     &#39;&#39;&#39;
 
