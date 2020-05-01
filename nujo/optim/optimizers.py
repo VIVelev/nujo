@@ -5,6 +5,8 @@ http://ruder.io/optimizing-gradient-descent/index.html
 
 '''
 
+from typing import Dict, List
+
 from nujo.autodiff.tensor import Tensor
 from nujo.init.basic import zeros_like
 from nujo.math.scalar import sqrt
@@ -31,7 +33,7 @@ class SGD(Optimizer):
     lr : float, the learning rate
 
     '''
-    def __init__(self, params: list, lr=0.005):
+    def __init__(self, params: List[Tensor], lr=0.005):
         super(SGD, self).__init__(params, lr)
 
     def update_rule(self, param: Tensor, grad: Tensor) -> Tensor:
@@ -56,11 +58,11 @@ class Momentum(Optimizer):
     time step to be added to the current update vector
 
     '''
-    def __init__(self, params: list, lr=0.001, beta=0.9):
+    def __init__(self, params: List[Tensor], lr=0.001, beta=0.9):
         super(Momentum, self).__init__(params, lr)
 
         self.beta = beta
-        self._velocity = {}
+        self._velocity: Dict[str, Tensor] = {}
 
     def update_rule(self, param: Tensor, grad: Tensor) -> Tensor:
         # Get the corresponding velocity
@@ -94,12 +96,12 @@ class RMSprop(Optimizer):
     eps : float, added for numerical stability
 
     '''
-    def __init__(self, params: list, lr=0.001, beta=0.999, eps=1e-09):
+    def __init__(self, params: List[Tensor], lr=0.001, beta=0.999, eps=1e-09):
         super(RMSprop, self).__init__(params, lr)
 
         self.beta = beta
         self.eps = eps
-        self._squared = {}
+        self._squared: Dict[str, Tensor] = {}
 
     def update_rule(self, param: Tensor, grad: Tensor) -> Tensor:
         # Get the corresponding squared gradient
@@ -134,14 +136,19 @@ class Adam(Optimizer):
     eps : float, added for numerical stability
 
     '''
-    def __init__(self, params: list, lr=0.005, betas=(0.9, 0.999), eps=1e-09):
+    def __init__(self,
+                 params: List[Tensor],
+                 lr=0.005,
+                 betas=(0.9, 0.999),
+                 eps=1e-09):
+
         super(Adam, self).__init__(params, lr)
 
         self.betas = betas
         self.eps = eps
 
-        self._velocity = {}
-        self._squared = {}
+        self._velocity: Dict[str, Tensor] = {}
+        self._squared: Dict[str, Tensor] = {}
         self._t = 1
 
     def update_rule(self, param: Tensor, grad: Tensor) -> Tensor:
