@@ -1,8 +1,9 @@
 from copy import deepcopy
+from numbers import Number
+from typing import List, Optional, Tuple, Union
 
 from numpy import array, ndarray, ones, zeros
 
-from nujo._typing import Union, _numerical
 from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff._utils import _if_not_none
@@ -11,7 +12,7 @@ from nujo.autodiff._utils import _if_not_none
 class Tensor(_Node):
     ''' Tensor - a multi-dimensional array
 
-    Tensors are the main units of data and computation in Nujo.
+    Tensors are the main units of data and computation in nujo.
     They "flow" in the computation graph. :)
 
     Tensors can be either constants or trainable weights,
@@ -21,13 +22,13 @@ class Tensor(_Node):
     -----------
     value : value, numerical value of the tensor
     diff : boolean, whether to compute gradients for the tensor
-    creator : Nujo Function, that created this tensor;
+    creator : nujo function, that created this tensor;
     the only child of a tensor
     name : string, representation of the tensor
 
     '''
     def __init__(self,
-                 value: Union['Tensor', _numerical],
+                 value: Union['Tensor', ndarray, List[Number], Number],
                  diff=False,
                  creator=None,
                  name='Tensor'):
@@ -41,7 +42,7 @@ class Tensor(_Node):
 
         # (Tensor, weight) pair, used to backpropagate through the network
         # See: `Chain Rule` Wikipedia page for more info
-        self._grad_dependencies = []
+        self._grad_dependencies: List[Tuple['Tensor', 'Tensor']] = []
 
         # Gradient cache
         self._grad: 'Tensor' = None
@@ -57,7 +58,7 @@ class Tensor(_Node):
         return self._grad
 
     @grad.setter
-    def grad(self, value: Union['Tensor', _numerical]):
+    def grad(self, value: Union['Tensor', ndarray, List[Number], Number]):
         self._grad = value if isinstance(value, Tensor) else Tensor(
             value, name=f'grad[{self.name}]')
 
@@ -78,7 +79,7 @@ class Tensor(_Node):
     # Shape and shape transformations
 
     @property
-    def shape(self):
+    def shape(self) -> Tuple[int, ...]:
         return self.value.shape
 
     def reshape(self, *shape: int, inplace=False) -> 'Tensor':
@@ -88,7 +89,7 @@ class Tensor(_Node):
 
     def repeat(self,
                *repeats: int,
-               axis: int = None,
+               axis: Optional[int] = None,
                inplace=False) -> 'Tensor':
 
         repeated = self if inplace else deepcopy(self)
@@ -185,9 +186,10 @@ class Tensor(_Node):
     def backward(self, _debug=False) -> None:
         ''' It uses Breadth First Search to traverse the computation graph
         and compute the gradient for each differentiable Tensor in the graph.
+
         '''
 
-        nodes_to_visit = [self]
+        nodes_to_visit: List['Tensor'] = [self]
         if _debug:
             i = 1
 
@@ -212,10 +214,12 @@ class Tensor(_Node):
     def any(self) -> ndarray:
         return self.value.any()
 
-    def __getitem__(self, position):
+    def __getitem__(self, position: Union[int, Tuple[int, ...]]):
         return self.value[position]
 
-    def __setitem__(self, position, value):
+    def __setitem__(self, position: Union[int, Tuple[int, ...]],
+                    value: Union['Tensor', ndarray, List[Number], Number]):
+
         self.value[position] = value
 
     def __hash__(self):
@@ -223,7 +227,8 @@ class Tensor(_Node):
 
     # Static evaluation operator
 
-    def __ilshift__(self, other):
+    def __ilshift__(self, other: Union['Tensor', ndarray, List[Number],
+                                       Number]):
         ''' In-place assignment operator: `<<=`
 
         Essentially used to achieve static evaluation.
