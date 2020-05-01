@@ -1,5 +1,3 @@
-from typing import Union
-
 from nujo.autodiff._utils import _counter
 
 
@@ -17,7 +15,7 @@ class _Node:
 
     id_generator = _counter()
 
-    def __init__(self, *children: Union[...], name='Node'):
+    def __init__(self, *children: ..., name='Node'):
         # Parse all children that are not Nodes to Tensors
         self.children = []
         for child in children:
