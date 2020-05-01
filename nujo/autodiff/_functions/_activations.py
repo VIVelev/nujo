@@ -1,7 +1,9 @@
+from numbers import Number
+from typing import List, Tuple, Union
+
 from numpy import (diag, exp, eye, hstack, maximum, ndarray, ones, repeat, sum,
                    zeros)
 
-from nujo._typing import Union, _numerical
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
 
@@ -23,9 +25,10 @@ __all__ = [
 
 class _BinaryStep(Function):
     def __init__(self,
-                 input: Union[Tensor, _numerical],
+                 input: Union[Tensor, ndarray, List[Number], Number],
                  threshold=0.5,
                  name='BinaryStep'):
+
         super(_BinaryStep, self).__init__(input, name=name)
         self.threshold = threshold
 
@@ -34,7 +37,7 @@ class _BinaryStep(Function):
         output[self.children[0].value > self.threshold] = 1
         return output
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray]:
         return zeros(self.children[0].shape),
 
 
@@ -42,7 +45,10 @@ class _BinaryStep(Function):
 
 
 class _Sigmoid(Function):
-    def __init__(self, input: Union[Tensor, _numerical], name='Sigmoid'):
+    def __init__(self,
+                 input: Union[Tensor, ndarray, List[Number], Number],
+                 name='Sigmoid'):
+
         super(_Sigmoid, self).__init__(input, name=name)
         self._output: ndarray = None  # Used to compute the derivative
 
@@ -50,7 +56,7 @@ class _Sigmoid(Function):
         self._output = 1 / (1 + exp(-self.children[0].value))
         return self._output
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray]:
         return self._output * (1 - self._output),
 
 
@@ -58,7 +64,10 @@ class _Sigmoid(Function):
 
 
 class _TanH(Function):
-    def __init__(self, input: Union[Tensor, _numerical], name='TanH'):
+    def __init__(self,
+                 input: Union[Tensor, ndarray, List[Number], Number],
+                 name='TanH'):
+
         super(_TanH, self).__init__(input, name=name)
         self._output: ndarray = None  # Used to compute the derivative
 
@@ -71,7 +80,7 @@ class _TanH(Function):
         self._output = (2 / (1 + exp(-2 * self.children[0].value))) - 1
         return self._output
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray]:
         return 1 - self._output**2,
 
 
@@ -79,13 +88,16 @@ class _TanH(Function):
 
 
 class _ReLU(Function):
-    def __init__(self, input: Union[Tensor, _numerical], name='ReLU'):
+    def __init__(self,
+                 input: Union[Tensor, ndarray, List[Number], Number],
+                 name='ReLU'):
+
         super(_ReLU, self).__init__(input, name=name)
 
     def forward(self) -> ndarray:
         return self.children[0].value * (self.children[0].value > 0)
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray]:
         return ones(self.children[0].shape) * (self.children[0].value > 0),
 
 
@@ -94,9 +106,10 @@ class _ReLU(Function):
 
 class _LeakyReLU(Function):
     def __init__(self,
-                 input: Union[Tensor, _numerical],
+                 input: Union[Tensor, ndarray, List[Number], Number],
                  eps=0.1,
                  name='LeakyReLU'):
+
         super(_LeakyReLU, self).__init__(input, name=name)
         self.eps = eps
 
@@ -104,7 +117,7 @@ class _LeakyReLU(Function):
         return maximum(self.eps * self.children[0].value,
                        self.children[0].value)
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray]:
         dinput = ones(self.children[0].shape)
         dinput[self.children[0].value < 0] = self.eps
         return dinput,
@@ -116,19 +129,23 @@ class _LeakyReLU(Function):
 class _Swish(Function):
     ''' More info here: https://arxiv.org/abs/1710.05941
     '''
-    def __init__(self, input: Union[Tensor, _numerical], beta=1, name='Swish'):
+    def __init__(self,
+                 input: Union[Tensor, ndarray, List[Number], Number],
+                 beta=1,
+                 name='Swish'):
+
         super(_Swish, self).__init__(input, name=name)
         self.beta = beta
 
-        self._sigmoid = _Sigmoid(
-            beta * input.value)  # Reuse the sigmoid activation function
+        # Reuse the sigmoid activation function
+        self._sigmoid = _Sigmoid(beta * input.value)
         self._output: ndarray = None  # Used to compute the derivative
 
     def forward(self) -> ndarray:
         self._output = self.children[0].value * self._sigmoid.forward()
         return self._output
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray]:
         return self._output + self._sigmoid._output * (1 - self._output),
 
 
@@ -136,7 +153,10 @@ class _Swish(Function):
 
 
 class _Softmax(Function):
-    def __init__(self, input: Union[Tensor, _numerical], name='Softmax'):
+    def __init__(self,
+                 input: Union[Tensor, ndarray, List[Number], Number],
+                 name='Softmax'):
+
         super(_Softmax, self).__init__(input, name=name)
         self._output: ndarray = None  # Used to compute the derivative
 
@@ -147,7 +167,7 @@ class _Softmax(Function):
         self._output = exps / sums
         return self._output
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray]:
         ''' Computes the Jacobian matrix
 
         See here:
