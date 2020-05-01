@@ -67,7 +67,6 @@ def test_aggregate_by_dim(matrix_tensors):
     loss_torch = torch.prod(
         torch.mean(X_torch @ W1_torch, axis=1, keepdim=True) + y_torch)
 
-    print(loss_nj.value)
     assert allclose(loss_nj.value, loss_torch.detach().numpy())
 
     # Test Backward

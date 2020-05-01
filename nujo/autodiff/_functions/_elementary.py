@@ -25,11 +25,13 @@ class _Addition(Function):
         super(_Addition, self).__init__(input_a, input_b, name=name)
 
         # The following assert will not allow numpy's
-        # vectorized shortcuts like:
+        # vector broadcasts such as:
         #
-        #   [1, 2, 3] + [[1], = [[2, 3, 4],
-        #                [2],    [3, 4, 5],
-        #                [3]]    [4, 5, 6]]
+        #   [[1, 2, 3]] + [[1], = [[2, 3, 4],
+        #                  [2],    [3, 4, 5],
+        #                  [3]]    [4, 5, 6]]
+        #
+        # In future versions of nujo this may be supported.
 
         assert (self.children[0].shape == self.children[1].shape
                 or self.children[0].shape == () or self.children[1].shape == ()
@@ -68,11 +70,13 @@ class _Multiplication(Function):
         super(_Multiplication, self).__init__(input_a, input_b, name=name)
 
         # The following assert will not allow numpy's
-        # vectorized shortcuts like:
+        # vector broadcasts such as:
         #
-        #   [1, 2, 3] * [[1], = [[1, 2, 3],
-        #                [2],    [2, 4, 6],
-        #                [3]]    [3, 6, 6]]
+        #   [[1, 2, 3]] * [[1], = [[1, 2, 3],
+        #                  [2],    [2, 4, 6],
+        #                  [3]]    [3, 6, 6]]
+        #
+        # In future versions of nujo this may be supported.
 
         assert (self.children[0].shape == self.children[1].shape
                 or self.children[0].shape == () or self.children[1].shape == ()
