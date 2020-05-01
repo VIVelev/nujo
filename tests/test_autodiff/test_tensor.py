@@ -4,6 +4,9 @@ from numpy import expand_dims, ndarray
 from nujo import Tensor
 from nujo.autodiff._functions._elementary import _Addition
 
+# ====================================================================================================
+# Test Tensor value and creator properties
+
 
 def test_tensor_value(tensors):
     A, B, C = tensors
@@ -19,6 +22,10 @@ def test_tensor_creator(tensors):
     assert A.creator is None
     assert B.creator is None
     assert isinstance(C.creator, _Addition)
+
+
+# ====================================================================================================
+# Test Tensor backward method
 
 
 def test_tensor_backward(tensors):
@@ -40,6 +47,11 @@ def test_tensor_backward(tensors):
     assert (B.grad == 1).all()
 
 
+# ====================================================================================================
+# Test Tensor transpose and shape manipulation
+# methods: reshape, repeat, squeeze, unsqueeze
+
+
 def test_tensor_transpose(tensors):
     A, _, _ = tensors
 
@@ -58,6 +70,10 @@ def test_tensor_shape_manipulation(tensors):
     assert (A.unsqueeze(1) == expand_dims(A_np, 1)).all()
 
 
+# ====================================================================================================
+# Test gradient cleaning method
+
+
 def test_tensor_zero_grad(tensors):
     A, _, _ = tensors
 
@@ -65,6 +81,10 @@ def test_tensor_zero_grad(tensors):
     assert len(A._grad_dependencies) == 0
     assert A._grad is None
     assert A._T is None
+
+
+# ====================================================================================================
+# Test inplace assignment operator
 
 
 def test_tensor_inplace_assignment(tensors):
@@ -78,6 +98,10 @@ def test_tensor_inplace_assignment(tensors):
     assert (A.value == C.value).all()
 
 
+# ====================================================================================================
+# Unit Test fixtures
+
+
 @pytest.fixture
 def tensors():
     A = Tensor([[1, 2], [3, 4]], diff=True)
@@ -85,3 +109,6 @@ def tensors():
     C = A + B
 
     return A, B, C
+
+
+# ====================================================================================================

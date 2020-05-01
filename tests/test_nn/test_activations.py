@@ -1,5 +1,3 @@
-# TODO: Test against PyTorch implementation of activation functions
-
 import pytest
 from numpy import exp, isclose, maximum, sum
 
@@ -10,113 +8,112 @@ from nujo.autodiff.tensor import Tensor
 # Test BinaryStep activation function
 
 
-def test_binary_step(input_vector):
+def test_binary_step(inputs):
     # Test Forward pass
-    output = activ.BinaryStep()(input_vector)
+    output = activ.BinaryStep()(inputs)
     assert (output == [[0, 0, 0], [1, 0, 1]]).all()
 
     # Test Backward pass
     output.backward()
-    assert (input_vector.grad == 0).all()
+    assert (inputs.grad == 0).all()
 
 
 # ====================================================================================================
 # Test Sigmoid activation function
 
 
-def test_sigmoid(input_vector):
+def test_sigmoid(inputs):
     # Test Forward pass
-    output = activ.Sigmoid()(input_vector)
+    output = activ.Sigmoid()(inputs)
 
-    x = input_vector.value
+    x = inputs.value
     assert (output == 1 / (1 + exp(-x))).all()
 
     # Test Backward pass
     output.backward()
-    assert (input_vector.grad == output.value * (1 - output.value)).all()
+    assert (inputs.grad == output.value * (1 - output.value)).all()
 
 
 # ====================================================================================================
 # Test TanH activation function
 
 
-def test_tanh(input_vector):
+def test_tanh(inputs):
     # Test Forward pass
-    output = activ.TanH()(input_vector)
+    output = activ.TanH()(inputs)
 
-    x = input_vector.value
+    x = inputs.value
     assert isclose(output.value, (exp(x) - exp(-x)) / (exp(x) + exp(-x))).all()
 
     # Test Backward pass
     output.backward()
-    assert (input_vector.grad == 1 - output.value**2).all()
+    assert (inputs.grad == 1 - output.value**2).all()
 
 
 # ====================================================================================================
 # Test ReLU activation function
 
 
-def test_relu(input_vector):
+def test_relu(inputs):
     # Test Forward pass
-    output = activ.ReLU()(input_vector)
+    output = activ.ReLU()(inputs)
 
-    x = input_vector.value
+    x = inputs.value
     assert (output == maximum(0, x)).all()
 
     # Test Backward pass
     output.backward()
-    assert (input_vector.grad[input_vector.grad > 0] == 1).all()
-    assert (input_vector.grad[input_vector.grad <= 0] == 0).all()
+    assert (inputs.grad[inputs.grad > 0] == 1).all()
+    assert (inputs.grad[inputs.grad <= 0] == 0).all()
 
 
 # ====================================================================================================
 # Test LeakyReLU activation function
 
 
-def test_leaky_relu(input_vector):
+def test_leaky_relu(inputs):
     # Test Forward pass
     eps = 0.1
-    output = activ.LeakyReLU(eps=eps)(input_vector)
+    output = activ.LeakyReLU(eps=eps)(inputs)
 
-    x = input_vector.value
+    x = inputs.value
     assert (output == maximum(eps * x, x)).all()
 
     # Test Backward pass
     output.backward()
-    assert (input_vector.grad[input_vector.grad > 0] == 1).all()
-    assert (input_vector.grad[input_vector.grad <= 0] == eps).all()
+    assert (inputs.grad[inputs.grad > 0] == 1).all()
+    assert (inputs.grad[inputs.grad <= 0] == eps).all()
 
 
 # ====================================================================================================
 # Test Swish activation function
 
 
-def test_swish(input_vector):
+def test_swish(inputs):
     # Test Forward pass
     beta = 1
-    output = activ.Swish(beta=beta)(input_vector)
+    output = activ.Swish(beta=beta)(inputs)
 
-    x = input_vector.value
+    x = inputs.value
     sigma = activ.Sigmoid()(beta * x).value
     assert (output == x * sigma).all()
 
     # Test Backward pass
     output.backward()
-    assert (input_vector.grad == output.value + sigma *
-            (1 - output.value)).all()
+    assert (inputs.grad == output.value + sigma * (1 - output.value)).all()
 
 
 # ====================================================================================================
 # Test Softmax activation function
 
 
-def test_softmax(input_vector):
+def test_softmax(inputs):
     # Test Forward pass
-    print(input_vector)
-    output = activ.Softmax()(input_vector)
+    print(inputs)
+    output = activ.Softmax()(inputs)
     print(output)
 
-    exps = exp(input_vector.value)
+    exps = exp(inputs.value)
     sums = sum(exps, axis=0, keepdims=True)
 
     assert (output == exps / sums).all()
@@ -127,11 +124,11 @@ def test_softmax(input_vector):
 
 
 # ====================================================================================================
-# Fixtures
+# Unit Test fixtures
 
 
 @pytest.fixture
-def input_vector():
+def inputs():
     return Tensor([[0.42, 0.32, 0.34], [0.6, 0.1, 1.1]],
                   diff=True,
                   name='test_input')

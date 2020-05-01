@@ -4,6 +4,8 @@ from numpy import allclose, random
 
 import nujo as nj
 
+# ====================================================================================================
+
 
 def test_scalar_diff(scalar_tensors):
     (X_nj, y_nj, W1_nj, W2_nj, X_torch, y_torch, W1_torch,
@@ -21,6 +23,9 @@ def test_scalar_diff(scalar_tensors):
 
     assert allclose(W1_nj.grad.value, W1_torch.grad.detach().numpy())
     assert allclose(W2_nj.grad.value, W2_torch.grad.detach().numpy())
+
+
+# ====================================================================================================
 
 
 def test_matrix_diff(matrix_tensors):
@@ -41,6 +46,9 @@ def test_matrix_diff(matrix_tensors):
     assert allclose(W2_nj.grad.value, W2_torch.grad.detach().numpy())
 
 
+# ====================================================================================================
+
+
 def test_prod_log(matrix_tensors):
     (X_nj, y_nj, W1_nj, W2_nj, X_torch, y_torch, W1_torch,
      W2_torch) = matrix_tensors
@@ -59,6 +67,9 @@ def test_prod_log(matrix_tensors):
     assert allclose(W2_nj.grad.value, W2_torch.grad.detach().numpy())
 
 
+# ====================================================================================================
+
+
 def test_aggregate_by_dim(matrix_tensors):
     (X_nj, y_nj, W1_nj, _, X_torch, y_torch, W1_torch, _) = matrix_tensors
 
@@ -74,6 +85,10 @@ def test_aggregate_by_dim(matrix_tensors):
     loss_torch.backward()
 
     assert allclose(W1_nj.grad.value, W1_torch.grad.detach().numpy())
+
+
+# ====================================================================================================
+# Unit Test fixtures - generate the same nujo and PyTorch tensors
 
 
 @pytest.fixture
@@ -116,3 +131,6 @@ def matrix_tensors():
     W2_torch = torch.tensor(W2, requires_grad=True)
 
     return X_nj, y_nj, W1_nj, W2_nj, X_torch, y_torch, W1_torch, W2_torch
+
+
+# ====================================================================================================
