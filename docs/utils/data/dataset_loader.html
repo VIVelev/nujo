@@ -26,49 +26,101 @@
 </summary>
 <pre><code class="python">from os import mkdir
 from os.path import exists
+from typing import Optional
 
-from numpy import array, empty, vstack
+from numpy import array, asarray, empty, ndarray, vstack
+from PIL import Image
 from requests import get
 
 from nujo.utils.data.nujo_dir import HOME_DIR
 
 
 class DatasetLoader:
-    &#39;&#39;&#39;
+    &#39;&#39;&#39; Dataset Loader
 
     Parameters:
     -----------
-    name : will be downloaded from the UCI ML repo
+     - name : str, downloaded from uci repo or filename to install from
+     - type : str, indicates the type of file, can be csv, image or mnist
+     - override : bool, if this file exists, does it get downloaded again
+
     &#39;&#39;&#39;
-    _UCI_REPO_URL = &#39;archive.ics.uci.edu/ml/machine-learning-databases/{}/{}&#39;
 
-    def __init__(self, dataset):
-        self.name = dataset.name  # with .data
-        self._link = self._UCI_REPO_URL.format(self.name[:-4], self.name)
-        with open(self.name, &#39;r+&#39;) as data:
-            lines = data.readlines()
+    _UCI_REPO_URL = (
+        &#39;https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}&#39;)
 
-        dataset.X = empty((0, len(lines[0].split(&#39;,&#39;))))
-        # number of columns
-        for line in lines[:-1]:  # last row is \n
-            x = array(line.strip().split(&#39;,&#39;))
-            dataset.X = vstack((dataset.X, x))
+    def __init__(self, name: str, type: str, override=True):
+        self.name = name.strip().lower()
+        self.type = type.strip().lower()
+        self._filepath = f&#39;{HOME_DIR}{self.name}.data&#39;
+
+    def install(self,
+                filepath: Optional[str] = None,
+                labels: Optional[ndarray] = None) -&gt; ndarray:
+        &#39;&#39;&#39; Dataset Install
+
+        (will override anything in the Dataset class)
+
+        Parameters:
+        -----------
+         - filepath : str, indicates source file, if none then `~/.nujo/`
+         - labels : ndarray, labels for loading from image
+
+        Returns:
+        -----------
+         - res : ndarray, X and y (data and labels)
+
+        &#39;&#39;&#39;
+
+        self._filepath = filepath if filepath is not None else self._filepath
+        assert exists(self._filepath)
+
+        # -----------------------------------------
+        # reading csv
+        if self.type == &#39;csv&#39;:
+            with open(self._filepath, &#39;r+&#39;) as data:
+                lines = data.readlines()
+
+            cols = len(lines[0].split(&#39;,&#39;))
+            X = empty((0, cols - 1))
+            y = empty((0, 1))
+
+            # number of columns
+            for line in lines[:-1]:  # last row is \n
+                X = vstack((X, array(line.strip().split(&#39;,&#39;)[:-1])))
+                y = vstack((y, line.strip().split(&#39;,&#39;)[-1]))
+
+        # -----------------------------------------
+        # reading image
+        elif (self.type == &#39;image&#39; or self.type == &#39;img&#39; or self.type == &#39;png&#39;
+              or self.type == &#39;jpg&#39;):
+
+            # image has to be black and white
+            with Image.open(self._filepath) as img:
+                vect = asarray(img)
+                assert vect.ndim &lt; 3
+                X = vect.reshape((vect.size, 1))
+
+            assert labels is not None
+            y = labels
+
+        else:
+            raise ValueError(&#34;type should me csv or image&#34;)
+
+        return X, y
 
     def download(self) -&gt; None:
-        r = get(self._link)
-        file = f&#39;{HOME_DIR}{self.name}.data&#39;
         if not exists(HOME_DIR):
             mkdir(HOME_DIR)
-            print(&#39;Directory &#34;~/.nujo&#34; Created &#39;)
-        else:
-            print(&#39;Directory &#34;~/.nujo&#34; already exists&#39;)
-        print(f&#39;File {self.name} has been created.&#39;)
-        with open(file) as f:
-            f.write(r.content)
+            print(&#39;Directory `~/.nujo` created&#39;)
 
-
-if __name__ == &#39;__main__&#39;:
-    DatasetLoader(&#39;iris&#39;).download()</code></pre>
+        if self.type == &#39;csv&#39;:
+            self._link = self._UCI_REPO_URL.format(self.name,
+                                                   f&#39;{self.name}.data&#39;)
+            print(self._link)
+            with open(self._filepath, &#39;wb&#39;) as f:
+                f.write(get(self._link).content)
+            print(f&#39;{self.name} has been saved in `~/.nujo`&#39;)</code></pre>
 </details>
 </section>
 <section>
@@ -82,47 +134,106 @@ if __name__ == &#39;__main__&#39;:
 <dl>
 <dt id="nujo.utils.data.dataset_loader.DatasetLoader"><code class="flex name class">
 <span>class <span class="ident">DatasetLoader</span></span>
-<span>(</span><span>dataset)</span>
+<span>(</span><span>name, type, override=True)</span>
 </code></dt>
 <dd>
-<section class="desc"><h2 id="parameters">Parameters:</h2>
-<p>name : will be downloaded from the UCI ML repo</p></section>
+<section class="desc"><p>Dataset Loader</p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>name : str, downloaded from uci repo or filename to install from</li>
+<li>type : str, indicates the type of file, can be csv, image or mnist</li>
+<li>override : bool, if this file exists, does it get downloaded again</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class DatasetLoader:
-    &#39;&#39;&#39;
+    &#39;&#39;&#39; Dataset Loader
 
     Parameters:
     -----------
-    name : will be downloaded from the UCI ML repo
+     - name : str, downloaded from uci repo or filename to install from
+     - type : str, indicates the type of file, can be csv, image or mnist
+     - override : bool, if this file exists, does it get downloaded again
+
     &#39;&#39;&#39;
-    _UCI_REPO_URL = &#39;archive.ics.uci.edu/ml/machine-learning-databases/{}/{}&#39;
 
-    def __init__(self, dataset):
-        self.name = dataset.name  # with .data
-        self._link = self._UCI_REPO_URL.format(self.name[:-4], self.name)
-        with open(self.name, &#39;r+&#39;) as data:
-            lines = data.readlines()
+    _UCI_REPO_URL = (
+        &#39;https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}&#39;)
 
-        dataset.X = empty((0, len(lines[0].split(&#39;,&#39;))))
-        # number of columns
-        for line in lines[:-1]:  # last row is \n
-            x = array(line.strip().split(&#39;,&#39;))
-            dataset.X = vstack((dataset.X, x))
+    def __init__(self, name: str, type: str, override=True):
+        self.name = name.strip().lower()
+        self.type = type.strip().lower()
+        self._filepath = f&#39;{HOME_DIR}{self.name}.data&#39;
+
+    def install(self,
+                filepath: Optional[str] = None,
+                labels: Optional[ndarray] = None) -&gt; ndarray:
+        &#39;&#39;&#39; Dataset Install
+
+        (will override anything in the Dataset class)
+
+        Parameters:
+        -----------
+         - filepath : str, indicates source file, if none then `~/.nujo/`
+         - labels : ndarray, labels for loading from image
+
+        Returns:
+        -----------
+         - res : ndarray, X and y (data and labels)
+
+        &#39;&#39;&#39;
+
+        self._filepath = filepath if filepath is not None else self._filepath
+        assert exists(self._filepath)
+
+        # -----------------------------------------
+        # reading csv
+        if self.type == &#39;csv&#39;:
+            with open(self._filepath, &#39;r+&#39;) as data:
+                lines = data.readlines()
+
+            cols = len(lines[0].split(&#39;,&#39;))
+            X = empty((0, cols - 1))
+            y = empty((0, 1))
+
+            # number of columns
+            for line in lines[:-1]:  # last row is \n
+                X = vstack((X, array(line.strip().split(&#39;,&#39;)[:-1])))
+                y = vstack((y, line.strip().split(&#39;,&#39;)[-1]))
+
+        # -----------------------------------------
+        # reading image
+        elif (self.type == &#39;image&#39; or self.type == &#39;img&#39; or self.type == &#39;png&#39;
+              or self.type == &#39;jpg&#39;):
+
+            # image has to be black and white
+            with Image.open(self._filepath) as img:
+                vect = asarray(img)
+                assert vect.ndim &lt; 3
+                X = vect.reshape((vect.size, 1))
+
+            assert labels is not None
+            y = labels
+
+        else:
+            raise ValueError(&#34;type should me csv or image&#34;)
+
+        return X, y
 
     def download(self) -&gt; None:
-        r = get(self._link)
-        file = f&#39;{HOME_DIR}{self.name}.data&#39;
         if not exists(HOME_DIR):
             mkdir(HOME_DIR)
-            print(&#39;Directory &#34;~/.nujo&#34; Created &#39;)
-        else:
-            print(&#39;Directory &#34;~/.nujo&#34; already exists&#39;)
-        print(f&#39;File {self.name} has been created.&#39;)
-        with open(file) as f:
-            f.write(r.content)</code></pre>
+            print(&#39;Directory `~/.nujo` created&#39;)
+
+        if self.type == &#39;csv&#39;:
+            self._link = self._UCI_REPO_URL.format(self.name,
+                                                   f&#39;{self.name}.data&#39;)
+            print(self._link)
+            with open(self._filepath, &#39;wb&#39;) as f:
+                f.write(get(self._link).content)
+            print(f&#39;{self.name} has been saved in `~/.nujo`&#39;)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -136,16 +247,92 @@ if __name__ == &#39;__main__&#39;:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def download(self) -&gt; None:
-    r = get(self._link)
-    file = f&#39;{HOME_DIR}{self.name}.data&#39;
     if not exists(HOME_DIR):
         mkdir(HOME_DIR)
-        print(&#39;Directory &#34;~/.nujo&#34; Created &#39;)
+        print(&#39;Directory `~/.nujo` created&#39;)
+
+    if self.type == &#39;csv&#39;:
+        self._link = self._UCI_REPO_URL.format(self.name,
+                                               f&#39;{self.name}.data&#39;)
+        print(self._link)
+        with open(self._filepath, &#39;wb&#39;) as f:
+            f.write(get(self._link).content)
+        print(f&#39;{self.name} has been saved in `~/.nujo`&#39;)</code></pre>
+</details>
+</dd>
+<dt id="nujo.utils.data.dataset_loader.DatasetLoader.install"><code class="name flex">
+<span>def <span class="ident">install</span></span>(<span>self, filepath=None, labels=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Dataset Install</p>
+<p>(will override anything in the Dataset class)</p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>filepath : str, indicates source file, if none then <code>~/.nujo/</code></li>
+<li>labels : ndarray, labels for loading from image</li>
+</ul>
+<h2 id="returns">Returns:</h2>
+<ul>
+<li>res : ndarray, X and y (data and labels)</li>
+</ul></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def install(self,
+            filepath: Optional[str] = None,
+            labels: Optional[ndarray] = None) -&gt; ndarray:
+    &#39;&#39;&#39; Dataset Install
+
+    (will override anything in the Dataset class)
+
+    Parameters:
+    -----------
+     - filepath : str, indicates source file, if none then `~/.nujo/`
+     - labels : ndarray, labels for loading from image
+
+    Returns:
+    -----------
+     - res : ndarray, X and y (data and labels)
+
+    &#39;&#39;&#39;
+
+    self._filepath = filepath if filepath is not None else self._filepath
+    assert exists(self._filepath)
+
+    # -----------------------------------------
+    # reading csv
+    if self.type == &#39;csv&#39;:
+        with open(self._filepath, &#39;r+&#39;) as data:
+            lines = data.readlines()
+
+        cols = len(lines[0].split(&#39;,&#39;))
+        X = empty((0, cols - 1))
+        y = empty((0, 1))
+
+        # number of columns
+        for line in lines[:-1]:  # last row is \n
+            X = vstack((X, array(line.strip().split(&#39;,&#39;)[:-1])))
+            y = vstack((y, line.strip().split(&#39;,&#39;)[-1]))
+
+    # -----------------------------------------
+    # reading image
+    elif (self.type == &#39;image&#39; or self.type == &#39;img&#39; or self.type == &#39;png&#39;
+          or self.type == &#39;jpg&#39;):
+
+        # image has to be black and white
+        with Image.open(self._filepath) as img:
+            vect = asarray(img)
+            assert vect.ndim &lt; 3
+            X = vect.reshape((vect.size, 1))
+
+        assert labels is not None
+        y = labels
+
     else:
-        print(&#39;Directory &#34;~/.nujo&#34; already exists&#39;)
-    print(f&#39;File {self.name} has been created.&#39;)
-    with open(file) as f:
-        f.write(r.content)</code></pre>
+        raise ValueError(&#34;type should me csv or image&#34;)
+
+    return X, y</code></pre>
 </details>
 </dd>
 </dl>
@@ -170,6 +357,7 @@ if __name__ == &#39;__main__&#39;:
 <h4><code><a title="nujo.utils.data.dataset_loader.DatasetLoader" href="#nujo.utils.data.dataset_loader.DatasetLoader">DatasetLoader</a></code></h4>
 <ul class="">
 <li><code><a title="nujo.utils.data.dataset_loader.DatasetLoader.download" href="#nujo.utils.data.dataset_loader.DatasetLoader.download">download</a></code></li>
+<li><code><a title="nujo.utils.data.dataset_loader.DatasetLoader.install" href="#nujo.utils.data.dataset_loader.DatasetLoader.install">install</a></code></li>
 </ul>
 </li>
 </ul>
