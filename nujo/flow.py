@@ -26,34 +26,31 @@ class Flow(metaclass=_FlowSetup):
     Parameters:
     -----------
     name : string
-    subflows : list of flows, only if the current flow is a supflow
+    subflows : list of flows that will run when called
 
     '''
     def __init__(self, name='Flow', subflows: List['Flow'] = []):
         self.name = name
-        self.is_supflow = True if subflows else False
-
         self.subflows: List['Flow'] = []
 
-        if self.is_supflow:
-            self.append(*subflows)
+        self.append(*(subflows if len(subflows) else [self]))
 
     def _register_parameters(self) -> None:
         ''' Called after Flow.__init__
         '''
 
-        for prop_name in dir(self):
-            prop = getattr(self, prop_name)
-            if isinstance(prop, Tensor):
-                prop.diff = True
+        for flow in self.subflows:
+            for prop_name in dir(flow):
+                prop = getattr(flow, prop_name)
+
+                if isinstance(prop, Tensor):
+                    prop.diff = True
 
     def _generate_supflow_name(self) -> str:
         return ' >> '.join(map(lambda x: x.name, self.subflows))
 
     def parameters(self) -> Tensor:
-        flows = self.subflows if self.is_supflow else [self]
-
-        for flow in flows:
+        for flow in self.subflows:
             for prop_name in dir(flow):
                 prop = getattr(flow, prop_name)
 
@@ -76,11 +73,6 @@ class Flow(metaclass=_FlowSetup):
         supflow : Flow, the total computational flow
 
         '''
-
-        if not self.is_supflow:
-            flows = list(flows)
-            flows.insert(0, self)
-            return Flow(subflows=flows)
 
         for flow in flows:
             self.subflows.append(flow)
@@ -154,10 +146,7 @@ class Flow(metaclass=_FlowSetup):
 
         '''
 
-        self_subflows = self.subflows if self.is_supflow else [self]
-        other_subflows = other.subflows if other.is_supflow else [other]
-
-        return Flow(subflows=[*self_subflows, *other_subflows])
+        return Flow(subflows=[*self.subflows, *other.subflows])
 
     def __getitem__(self, key: Union[int, str]) -> 'Flow':
         ''' Subflow getter of a supflow
