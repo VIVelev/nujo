@@ -1,8 +1,9 @@
-from numpy import array
+from typing import Tuple, Union
 
-from nujo._typing import Union
+from numpy import ndarray
+
 from nujo.utils.data.dataset_iterator import DatasetIterator
-from nujo.utils.data.dataset_loader import DatasetLoader, ndarray
+from nujo.utils.data.dataset_loader import DatasetLoader
 
 
 class Dataset:
@@ -23,8 +24,8 @@ class Dataset:
     def __init__(self,
                  name: str,
                  type: str,
-                 override: bool = True,
-                 download: bool = False):
+                 override=True,
+                 download=False):
         self.name = name
         self.type = type
         loader = DatasetLoader(self.name, self.type, override)
@@ -35,7 +36,7 @@ class Dataset:
     def __iter__(self):
         return DatasetIterator(self)
 
-    def __getitem__(self, position: Union[int, tuple]) -> ndarray:
+    def __getitem__(self, position: Union[int, Tuple[int]]) -> ndarray:
         if isinstance(position, int):
             return self.X[position]
         row, col = position

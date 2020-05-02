@@ -1,7 +1,8 @@
 from os import mkdir
 from os.path import exists
+from typing import Optional
 
-from numpy import array, asarray, empty, float32, ndarray, vstack
+from numpy import array, asarray, empty, ndarray, vstack
 from PIL import Image
 from requests import get
 
@@ -13,21 +14,25 @@ class DatasetLoader:
 
     Parameters:
     -----------
-    - name : str,
+    - name : str, downloaded from uci repo or filename to install from
     - type : str, indicates the type of file, can be csv, image or mnist
     - override : bool, if this file exists, does it get downloaded again
+
+
     '''
     _UCI_REPO_URL = (
         'https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}')
 
-    def __init__(self, name: str, type: str, override: bool = True):
+    def __init__(self, name: str, type: str, override=True):
         self.name = name.strip().lower()
         self.type = type.strip().lower()
         self._filepath = f'{HOME_DIR}{self.name}.data'
         if not override and exists(self._filepath):
             return
 
-    def install(self, filepath: str = None, labels: ndarray = None) -> ndarray:
+    def install(self,
+                filepath: Optional[str] = None,
+                labels: Optional[ndarray] = None) -> ndarray:
         ''' Dataset Install
 
         (will override anything in the Dataset class)
@@ -39,7 +44,7 @@ class DatasetLoader:
 
         Returns:
         -----------
-        tuple : ndarray, X and y (data and labels)
+        - tuple : ndarray, X and y (data and labels)
 
 
         '''
@@ -48,7 +53,7 @@ class DatasetLoader:
 
         # -----------------------------------------
         # reading csv
-        if (self.type == 'csv'):
+        if self.type == 'csv':
             with open(self._filepath, 'r+') as data:
                 lines = data.readlines()
             cols = len(lines[0].split(','))
@@ -59,19 +64,22 @@ class DatasetLoader:
             for line in lines[:-1]:  # last row is \n
                 X = vstack((X, array(line.strip().split(',')[:-1])))
                 y = vstack((y, line.strip().split(',')[-1]))
+
         # -----------------------------------------
         # reading image
         elif (self.type == 'image' or self.type == 'img' or self.type == 'png'
               or self.type == 'jpg'):
             assert labels is not None
+
             # image has to be black and white
             with Image.open(self._filepath) as img:
                 vect = asarray(img)
                 assert vect.ndim < 3
                 X = vect.reshape((vect.size, 1))
             y = labels
+
         else:
-            raise (ValueError("type should me csv or image"))
+            raise ValueError("type should me csv or image")
 
         return X, y
 

@@ -24,9 +24,10 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from numpy import array
+<pre><code class="python">from typing import Tuple, Union
 
-from nujo.utils.data.nujo_dir import HOME_DIR
+from numpy import ndarray
+
 from nujo.utils.data.dataset_iterator import DatasetIterator
 from nujo.utils.data.dataset_loader import DatasetLoader
 
@@ -39,34 +40,38 @@ class Dataset:
 
     Parameters:
     -----------
-    name : will be downloaded from the UCI ML repo (for now)
+    - name : str, will be downloaded from the UCI ML repo (for now)
+    - type : str, type of dataset - either csv or image
+    - override : boolean, for loader, will override file if it exists
+    - download : boolean, should it be downloaded from uci repo
 
-    Returns:
-    --------
-    array : stores the csv dataset,
-    - floating point integers
-    - last column -&gt; labels
 
     &#39;&#39;&#39;
-    def __init__(self, name: str):
-        self.name = HOME_DIR + name
-        if &#39;.data&#39; not in name:
-            self.name += &#39;.data&#39;
-        DatasetLoader(self)
+    def __init__(self,
+                 name: str,
+                 type: str,
+                 override=True,
+                 download=False):
+        self.name = name
+        self.type = type
+        loader = DatasetLoader(self.name, self.type, override)
+        if download is True:
+            loader.download()
+        self.X, self.y = loader.install()
 
     def __iter__(self):
         return DatasetIterator(self)
 
-    def __getitem__(self, position) -&gt; array:
+    def __getitem__(self, position: Union[int, Tuple[int]]) -&gt; ndarray:
         if isinstance(position, int):
             return self.X[position]
         row, col = position
-        return self.X[row][col]
+        if (col != self._cols):
+            return self.X[row][col]
+        return self.y[row]
 
-
-if __name__ == &#39;__main__&#39;:
-    data = Dataset(&#39;iris&#39;)
-    print(data[2])</code></pre>
+    def __repr__(self):
+        return self.X.__str__()</code></pre>
 </details>
 </section>
 <section>
@@ -80,18 +85,19 @@ if __name__ == &#39;__main__&#39;:
 <dl>
 <dt id="nujo.utils.data.dataset.Dataset"><code class="flex name class">
 <span>class <span class="ident">Dataset</span></span>
-<span>(</span><span>name)</span>
+<span>(</span><span>name, type, override=True, download=False)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Dataset</p>
 <p>A class made for easy access and manipulation
 to online or local datasets</p>
 <h2 id="parameters">Parameters:</h2>
-<p>name : will be downloaded from the UCI ML repo (for now)</p>
-<h2 id="returns">Returns:</h2>
-<p>array : stores the csv dataset,
-- floating point integers
-- last column -&gt; labels</p></section>
+<ul>
+<li>name : str, will be downloaded from the UCI ML repo (for now)</li>
+<li>type : str, type of dataset - either csv or image</li>
+<li>override : boolean, for loader, will override file if it exists</li>
+<li>download : boolean, should it be downloaded from uci repo</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -104,29 +110,38 @@ to online or local datasets</p>
 
     Parameters:
     -----------
-    name : will be downloaded from the UCI ML repo (for now)
+    - name : str, will be downloaded from the UCI ML repo (for now)
+    - type : str, type of dataset - either csv or image
+    - override : boolean, for loader, will override file if it exists
+    - download : boolean, should it be downloaded from uci repo
 
-    Returns:
-    --------
-    array : stores the csv dataset,
-    - floating point integers
-    - last column -&gt; labels
 
     &#39;&#39;&#39;
-    def __init__(self, name: str):
-        self.name = HOME_DIR + name
-        if &#39;.data&#39; not in name:
-            self.name += &#39;.data&#39;
-        DatasetLoader(self)
+    def __init__(self,
+                 name: str,
+                 type: str,
+                 override=True,
+                 download=False):
+        self.name = name
+        self.type = type
+        loader = DatasetLoader(self.name, self.type, override)
+        if download is True:
+            loader.download()
+        self.X, self.y = loader.install()
 
     def __iter__(self):
         return DatasetIterator(self)
 
-    def __getitem__(self, position) -&gt; array:
+    def __getitem__(self, position: Union[int, Tuple[int]]) -&gt; ndarray:
         if isinstance(position, int):
             return self.X[position]
         row, col = position
-        return self.X[row][col]</code></pre>
+        if (col != self._cols):
+            return self.X[row][col]
+        return self.y[row]
+
+    def __repr__(self):
+        return self.X.__str__()</code></pre>
 </details>
 </dd>
 </dl>

@@ -3,11 +3,13 @@ class DatasetIterator:
 
     Parameters:
     -----------
-    dataset: 
+    dataset: Dataset, the dataset to iterate over
 
     Returns:
     --------
     next element : numpy array of values with the label
+
+
     '''
     def __init__(self, dataset):
         self._data = dataset
