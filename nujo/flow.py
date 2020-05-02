@@ -2,10 +2,8 @@
 '''
 
 from copy import deepcopy
-from numbers import Number
 
-from numpy import ndarray
-
+from nujo._typing import Union, _numerical
 from nujo.autodiff.tensor import Tensor
 
 
@@ -47,8 +45,12 @@ class Flow(metaclass=_FlowSetup):
 
         for prop_name in dir(self):
             prop = getattr(self, prop_name)
-            if isinstance(prop, Tensor) and prop.diff:
+            if isinstance(prop, Tensor):
+                prop.diff = True
                 self.parameters.append(prop)
+
+        if self.parameters and not isinstance(self.parameters[0], list):
+            self.parameters = [self.parameters]
 
     def _generate_supflow_name(self) -> str:
         return ' >> '.join(map(lambda x: x.name, self.subflows))
@@ -77,11 +79,8 @@ class Flow(metaclass=_FlowSetup):
             self.subflows.append(flow)
 
             if flow.parameters:
-                if flow.is_supflow:
-                    for params in flow.parameters:
-                        self.parameters.append(params)
-                else:
-                    self.parameters.append(flow.parameters)
+                for params in flow.parameters:
+                    self.parameters.append(params)
 
         self.name = self._generate_supflow_name()
         return self
@@ -109,7 +108,7 @@ class Flow(metaclass=_FlowSetup):
 
         return retflow
 
-    def forward(self, x: Tensor) -> Tensor or ndarray or Number:
+    def forward(self, x: Tensor) -> Union[Tensor, _numerical]:
         ''' Flow Forward
 
         The flow computation is defined here.
@@ -120,7 +119,7 @@ class Flow(metaclass=_FlowSetup):
 
         Returns:
         --------
-        res : Tensor or ndarray or Number, computed result
+        res : numerical value, computed result
 
         '''
 
@@ -157,7 +156,7 @@ class Flow(metaclass=_FlowSetup):
 
         return Flow(subflows=[*self_subflows, *other_subflows])
 
-    def __getitem__(self, key: int or str) -> 'Flow':
+    def __getitem__(self, key: Union[int, str]) -> 'Flow':
         ''' Subflow getter of a supflow
 
         Example:

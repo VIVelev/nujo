@@ -37,14 +37,14 @@ __all__ = [
 ]
 
 
-def rand(*shape: int, diff=True, name=&#39;rand::Tensor&#39;) -&gt; Tensor:
+def rand(*shape: int, diff=False, name=&#39;Tensor[rand]&#39;) -&gt; Tensor:
     &#39;&#39;&#39; Random values in a given shape.
     &#39;&#39;&#39;
 
     return Tensor(np_rand(*shape), diff=diff, name=name)
 
 
-def randn(*shape: int, diff=True, name=&#39;randn::Tensor&#39;) -&gt; Tensor:
+def randn(*shape: int, diff=False, name=&#39;Tensor[randn]&#39;) -&gt; Tensor:
     &#39;&#39;&#39; Return a sample (or samples) from the &#34;standard normal&#34; distribution.
     &#39;&#39;&#39;
 
@@ -54,8 +54,8 @@ def randn(*shape: int, diff=True, name=&#39;randn::Tensor&#39;) -&gt; Tensor:
 def randint(*shape: int,
             low=0,
             high=100,
-            diff=True,
-            name=&#39;randint::Tensor&#39;) -&gt; Tensor:
+            diff=False,
+            name=&#39;Tensor[randint]&#39;) -&gt; Tensor:
     &#39;&#39;&#39; Return random integers from low (inclusive) to high (exclusive).
     &#39;&#39;&#39;
 
@@ -70,7 +70,7 @@ def randint(*shape: int,
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="nujo.init.random.rand"><code class="name flex">
-<span>def <span class="ident">rand</span></span>(<span>*shape, diff=True, name='rand::Tensor')</span>
+<span>def <span class="ident">rand</span></span>(<span>*shape, diff=False, name='Tensor[rand]')</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Random values in a given shape.</p></section>
@@ -78,7 +78,7 @@ def randint(*shape: int,
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def rand(*shape: int, diff=True, name=&#39;rand::Tensor&#39;) -&gt; Tensor:
+<pre><code class="python">def rand(*shape: int, diff=False, name=&#39;Tensor[rand]&#39;) -&gt; Tensor:
     &#39;&#39;&#39; Random values in a given shape.
     &#39;&#39;&#39;
 
@@ -86,7 +86,7 @@ def randint(*shape: int,
 </details>
 </dd>
 <dt id="nujo.init.random.randint"><code class="name flex">
-<span>def <span class="ident">randint</span></span>(<span>*shape, low=0, high=100, diff=True, name='randint::Tensor')</span>
+<span>def <span class="ident">randint</span></span>(<span>*shape, low=0, high=100, diff=False, name='Tensor[randint]')</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Return random integers from low (inclusive) to high (exclusive).</p></section>
@@ -97,8 +97,8 @@ def randint(*shape: int,
 <pre><code class="python">def randint(*shape: int,
             low=0,
             high=100,
-            diff=True,
-            name=&#39;randint::Tensor&#39;) -&gt; Tensor:
+            diff=False,
+            name=&#39;Tensor[randint]&#39;) -&gt; Tensor:
     &#39;&#39;&#39; Return random integers from low (inclusive) to high (exclusive).
     &#39;&#39;&#39;
 
@@ -106,7 +106,7 @@ def randint(*shape: int,
 </details>
 </dd>
 <dt id="nujo.init.random.randn"><code class="name flex">
-<span>def <span class="ident">randn</span></span>(<span>*shape, diff=True, name='randn::Tensor')</span>
+<span>def <span class="ident">randn</span></span>(<span>*shape, diff=False, name='Tensor[randn]')</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Return a sample (or samples) from the "standard normal" distribution.</p></section>
@@ -114,7 +114,7 @@ def randint(*shape: int,
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def randn(*shape: int, diff=True, name=&#39;randn::Tensor&#39;) -&gt; Tensor:
+<pre><code class="python">def randn(*shape: int, diff=False, name=&#39;Tensor[randn]&#39;) -&gt; Tensor:
     &#39;&#39;&#39; Return a sample (or samples) from the &#34;standard normal&#34; distribution.
     &#39;&#39;&#39;
 

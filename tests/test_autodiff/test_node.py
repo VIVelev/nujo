@@ -3,15 +3,15 @@ import pytest
 from nujo.autodiff._node import _Node
 
 
-def test_node_equality(get_nodes):
-    A, B = get_nodes
+def test_node_equality(nodes):
+    A, B = nodes
 
     assert A == A
     assert A != B
 
 
-def test_node_children(get_nodes):
-    A, B = get_nodes
+def test_node_children(nodes):
+    A, B = nodes
 
     A.add_child(1)
     A.add_child(2)
@@ -23,5 +23,5 @@ def test_node_children(get_nodes):
 
 
 @pytest.fixture
-def get_nodes():
+def nodes():
     return _Node(), _Node()

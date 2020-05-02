@@ -3,15 +3,15 @@ from numbers import Number
 import pytest
 from numpy import allclose, log, log2, ndarray
 
-import nujo.autodiff._functions as funcs
+import nujo.autodiff._functions._elementary as funcs
 from nujo import Tensor
 
 # ====================================================================================================
 # Unit Testing Addition
 
 
-def test_addition(get_tensors):
-    A, B = get_tensors
+def test_addition(inputs):
+    A, B = inputs
     add = funcs._Addition(A, B)
 
     # Test Forwardprop
@@ -27,16 +27,16 @@ def test_addition(get_tensors):
     assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
-    assert grad[0] == 1
-    assert grad[1] == 1
+    assert (grad[0] == 1).all()
+    assert (grad[1] == 1).all()
 
 
 # ====================================================================================================
 # Unit Testing Negation
 
 
-def test_negation(get_tensors):
-    A, _ = get_tensors
+def test_negation(inputs):
+    A, _ = inputs
     neg = funcs._Negation(A)
 
     # Test Forwardprop
@@ -51,15 +51,15 @@ def test_negation(get_tensors):
     assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
 
     # Test Derivative computation
-    assert grad[0] == -1
+    assert (grad[0] == -1).all()
 
 
 # ====================================================================================================
 # Unit Testing Multiplication
 
 
-def test_multiplication(get_tensors):
-    A, B = get_tensors
+def test_multiplication(inputs):
+    A, B = inputs
     mul = funcs._Multiplication(A, B)
 
     # Test Forwardprop
@@ -83,8 +83,8 @@ def test_multiplication(get_tensors):
 # Unit Testing Reciprocal
 
 
-def test_reciprocal(get_tensors):
-    A, _ = get_tensors
+def test_reciprocal(inputs):
+    A, _ = inputs
     recipr = funcs._Reciprocal(A)
 
     # Test Forwardprop
@@ -106,8 +106,8 @@ def test_reciprocal(get_tensors):
 # Unit Testing Power
 
 
-def test_power(get_tensors):
-    A, _ = get_tensors
+def test_power(inputs):
+    A, _ = inputs
     pow = funcs._Power(A, 2)
 
     # Test Forwardprop
@@ -131,8 +131,8 @@ def test_power(get_tensors):
 # Unit Testing Logarithm
 
 
-def test_logarithm(get_tensors):
-    A, _ = get_tensors
+def test_logarithm(inputs):
+    A, _ = inputs
     log_2 = funcs._Logarithm(A, 2)  # log_2(A)
 
     # Test Forwardprop
@@ -156,8 +156,8 @@ def test_logarithm(get_tensors):
 # Unit Testing Matrix Multiplication
 
 
-def test_matrixmul(get_tensors):
-    A, B = get_tensors
+def test_matrixmul(inputs):
+    A, B = inputs
     matmul = funcs._MatrixMul(A, B)
 
     # Test Forwardprop
@@ -173,9 +173,8 @@ def test_matrixmul(get_tensors):
     assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
-    dA, dB = funcs._MatrixMul.differentiate(A, B)
-    assert (grad[0] == dA).all()
-    assert (grad[1] == dB).all()
+    assert (grad[0] == B.value).all()
+    assert (grad[1] == A.value).all()
 
 
 # ====================================================================================================
@@ -183,7 +182,7 @@ def test_matrixmul(get_tensors):
 
 
 @pytest.fixture
-def get_tensors():
+def inputs():
     A = Tensor([[1, 2], [3, 4]])
     B = Tensor([[5, 6], [7, 8]])
 

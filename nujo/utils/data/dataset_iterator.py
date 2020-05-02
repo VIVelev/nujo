@@ -4,7 +4,7 @@ class DatasetIterator:
     Parameters:
     -----------
     dataset: Dataset, the dataset to iterate over
-
+    
     Returns:
     --------
     next element : numpy array of values with the label

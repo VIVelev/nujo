@@ -21,18 +21,21 @@
 </header>
 <section id="section-intro">
 <p>Neural Network activation functions</p>
-<p>More info here: <a href="https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-activation-functions-right/">https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-activation-functions-right/</a></p>
+<p>More info here:
+<a href="https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-activation-functions-right/">https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-activation-functions-right/</a></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#39;&#39;&#39; Neural Network activation functions
 
-More info here: https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-activation-functions-right/
+More info here:
+https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-activation-functions-right/
 &#39;&#39;&#39;
 
-from nujo.autodiff._functions import (_BinaryStep, _LeakyReLU, _ReLU, _Sigmoid,
-                                      _Softmax, _Swish, _TanH)
+from nujo.autodiff._functions._activations import (_BinaryStep, _LeakyReLU,
+                                                   _ReLU, _Sigmoid, _Softmax,
+                                                   _Swish, _TanH)
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 
@@ -142,7 +145,8 @@ class Swish(Flow):
         swish(x) = x * sigmoid(beta * x) = x / (1 + e ^ (-beta * x))
 
     Implementation of the activation function presented in:
-    &#34;Searching for Activation Functions&#34; - Prajit Ramachandran, Barret Zoph, Quoc V. Le
+    &#34;Searching for Activation Functions&#34;
+    Prajit Ramachandran, Barret Zoph, Quoc V. Le
     (https://arxiv.org/abs/1710.05941)
 
     &#39;&#39;&#39;
@@ -164,7 +168,8 @@ class Softmax(Flow):
 
         softmax(z) = e ^ z_i / sum(e ^ z_i)
 
-    Nice read here: https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
+    Nice read here:
+    https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
     &#39;&#39;&#39;
     def __init__(self, name=&#39;Softmax&#39;):
         super(Softmax, self).__init__(name=name)
@@ -357,7 +362,8 @@ return 0</p></section>
 <section class="desc"><p>Softmax activation function</p>
 <pre><code>softmax(z) = e ^ z_i / sum(e ^ z_i)
 </code></pre>
-<p>Nice read here: <a href="https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/">https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/</a></p></section>
+<p>Nice read here:
+<a href="https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/">https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/</a></p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -367,7 +373,8 @@ return 0</p></section>
 
         softmax(z) = e ^ z_i / sum(e ^ z_i)
 
-    Nice read here: https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
+    Nice read here:
+    https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
     &#39;&#39;&#39;
     def __init__(self, name=&#39;Softmax&#39;):
         super(Softmax, self).__init__(name=name)
@@ -400,7 +407,8 @@ return 0</p></section>
 <pre><code>swish(x) = x * sigmoid(beta * x) = x / (1 + e ^ (-beta * x))
 </code></pre>
 <p>Implementation of the activation function presented in:
-"Searching for Activation Functions" - Prajit Ramachandran, Barret Zoph, Quoc V. Le
+"Searching for Activation Functions"
+Prajit Ramachandran, Barret Zoph, Quoc V. Le
 (<a href="https://arxiv.org/abs/1710.05941">https://arxiv.org/abs/1710.05941</a>)</p></section>
 <details class="source">
 <summary>
@@ -412,7 +420,8 @@ return 0</p></section>
         swish(x) = x * sigmoid(beta * x) = x / (1 + e ^ (-beta * x))
 
     Implementation of the activation function presented in:
-    &#34;Searching for Activation Functions&#34; - Prajit Ramachandran, Barret Zoph, Quoc V. Le
+    &#34;Searching for Activation Functions&#34;
+    Prajit Ramachandran, Barret Zoph, Quoc V. Le
     (https://arxiv.org/abs/1710.05941)
 
     &#39;&#39;&#39;

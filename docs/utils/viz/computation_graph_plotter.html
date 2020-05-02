@@ -55,22 +55,28 @@ class ComputationGraphPlotter:
         else:
             return &#39;oval&#39;
 
-    def create(self, root: _Node) -&gt; &#39;ComputationGraphPlotter&#39;:
+    def create(self,
+               root: _Node,
+               display_values=False) -&gt; &#39;ComputationGraphPlotter&#39;:
+
         if len(root.children) == 0:
             return
 
+        root_name = str(root) if display_values else repr(root)
         for child in root.children:
-            self.computation_graph.node(str(child),
+            child_name = str(child) if display_values else repr(child)
+
+            self.computation_graph.node(child_name,
                                         color=self.get_color(child),
                                         shape=self.get_shape(child),
                                         style=&#39;filled&#39;)
 
-            self.computation_graph.node(str(root),
+            self.computation_graph.node(root_name,
                                         color=self.get_color(root),
                                         shape=self.get_shape(root),
                                         style=&#39;filled&#39;)
 
-            self.computation_graph.edge(str(child), str(root))
+            self.computation_graph.edge(child_name, root_name)
             self.create(child)
 
         return self
@@ -124,22 +130,28 @@ class ComputationGraphPlotter:
         else:
             return &#39;oval&#39;
 
-    def create(self, root: _Node) -&gt; &#39;ComputationGraphPlotter&#39;:
+    def create(self,
+               root: _Node,
+               display_values=False) -&gt; &#39;ComputationGraphPlotter&#39;:
+
         if len(root.children) == 0:
             return
 
+        root_name = str(root) if display_values else repr(root)
         for child in root.children:
-            self.computation_graph.node(str(child),
+            child_name = str(child) if display_values else repr(child)
+
+            self.computation_graph.node(child_name,
                                         color=self.get_color(child),
                                         shape=self.get_shape(child),
                                         style=&#39;filled&#39;)
 
-            self.computation_graph.node(str(root),
+            self.computation_graph.node(root_name,
                                         color=self.get_color(root),
                                         shape=self.get_shape(root),
                                         style=&#39;filled&#39;)
 
-            self.computation_graph.edge(str(child), str(root))
+            self.computation_graph.edge(child_name, root_name)
             self.create(child)
 
         return self
@@ -189,7 +201,7 @@ def get_shape(node: _Node) -&gt; str:
 <h3>Methods</h3>
 <dl>
 <dt id="nujo.utils.viz.computation_graph_plotter.ComputationGraphPlotter.create"><code class="name flex">
-<span>def <span class="ident">create</span></span>(<span>self, root)</span>
+<span>def <span class="ident">create</span></span>(<span>self, root, display_values=False)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
@@ -197,22 +209,28 @@ def get_shape(node: _Node) -&gt; str:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create(self, root: _Node) -&gt; &#39;ComputationGraphPlotter&#39;:
+<pre><code class="python">def create(self,
+           root: _Node,
+           display_values=False) -&gt; &#39;ComputationGraphPlotter&#39;:
+
     if len(root.children) == 0:
         return
 
+    root_name = str(root) if display_values else repr(root)
     for child in root.children:
-        self.computation_graph.node(str(child),
+        child_name = str(child) if display_values else repr(child)
+
+        self.computation_graph.node(child_name,
                                     color=self.get_color(child),
                                     shape=self.get_shape(child),
                                     style=&#39;filled&#39;)
 
-        self.computation_graph.node(str(root),
+        self.computation_graph.node(root_name,
                                     color=self.get_color(root),
                                     shape=self.get_shape(root),
                                     style=&#39;filled&#39;)
 
-        self.computation_graph.edge(str(child), str(root))
+        self.computation_graph.edge(child_name, root_name)
         self.create(child)
 
     return self</code></pre>

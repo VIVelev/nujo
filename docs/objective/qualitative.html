@@ -41,7 +41,7 @@ __all__ = [
 class BinaryCrossEntropy(QualitativeLoss):
     &#39;&#39;&#39; Binary Cross-Entropy loss
 
-        −(y * log(p) + (1−y) * log(1 − p))
+        −(y * log(p) + (1 − y) * log(1 − p))
 
     &#39;&#39;&#39;
     def forward(self, input: Tensor, target: Tensor) -&gt; Tensor:
@@ -62,7 +62,8 @@ class CrossEntropy(QualitativeLoss):
     def forward(self, input: Tensor, target: Tensor) -&gt; Tensor:
         # Avoid division by zero
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
-        return -self.reduction_fn(sum(target * log(input), dim=1),
+        return -self.reduction_fn(sum(target * log(input), dim=1,
+                                      keepdim=True),
                                   dim=self.dim,
                                   keepdim=self.keepdim)
 
@@ -85,7 +86,7 @@ class CrossEntropy(QualitativeLoss):
 </code></dt>
 <dd>
 <section class="desc"><p>Binary Cross-Entropy loss</p>
-<p>−(y * log(p) + (1−y) * log(1 − p))</p></section>
+<p>−(y * log(p) + (1 − y) * log(1 − p))</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -93,7 +94,7 @@ class CrossEntropy(QualitativeLoss):
 <pre><code class="python">class BinaryCrossEntropy(QualitativeLoss):
     &#39;&#39;&#39; Binary Cross-Entropy loss
 
-        −(y * log(p) + (1−y) * log(1 − p))
+        −(y * log(p) + (1 − y) * log(1 − p))
 
     &#39;&#39;&#39;
     def forward(self, input: Tensor, target: Tensor) -&gt; Tensor:
@@ -138,7 +139,8 @@ class CrossEntropy(QualitativeLoss):
     def forward(self, input: Tensor, target: Tensor) -&gt; Tensor:
         # Avoid division by zero
         input.value = clip(input.value, 1e-16, 1 - 1e-16)
-        return -self.reduction_fn(sum(target * log(input), dim=1),
+        return -self.reduction_fn(sum(target * log(input), dim=1,
+                                      keepdim=True),
                                   dim=self.dim,
                                   keepdim=self.keepdim)</code></pre>
 </details>
