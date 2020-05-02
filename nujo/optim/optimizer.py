@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import List
 
 from nujo.autodiff import Tensor, no_diff
 
@@ -14,7 +15,7 @@ class Optimizer:
     lr : float, the learning rate
 
     '''
-    def __init__(self, params: list, lr: float):
+    def __init__(self, params: List[Tensor], lr: float):
         self.params = params
         self.lr = lr
 

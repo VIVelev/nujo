@@ -108,12 +108,12 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
     subflows : list of flows, only if the current flow is a supflow
 
     &#39;&#39;&#39;
-    def __init__(self, name=&#39;Flow&#39;, subflows=[]):
+    def __init__(self, name=&#39;Flow&#39;, subflows: List[&#39;Flow&#39;] = []):
         self.name = name
         self.is_supflow = True if subflows else False
 
-        self.subflows = []
-        self.parameters = []
+        self.subflows: List[&#39;Flow&#39;] = []
+        self.parameters: List[Tensor] = []
 
         if self.is_supflow:
             self.append(*subflows)
@@ -187,7 +187,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         return retflow
 
-    def forward(self, x: Tensor) -&gt; Union[Tensor, _numerical]:
+    def forward(self, x: Tensor) -&gt; Tensor:
         &#39;&#39;&#39; Flow Forward
 
         The flow computation is defined here.
@@ -198,7 +198,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         Returns:
         --------
-        res : numerical value, computed result
+        res : Tensor, computed result
 
         &#39;&#39;&#39;
 
@@ -348,12 +348,12 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <h2 id="parameters">Parameters:</h2>
 <p>x : Tensor, input tensor</p>
 <h2 id="returns">Returns:</h2>
-<p>res : numerical value, computed result</p></section>
+<p>res : Tensor, computed result</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def forward(self, x: Tensor) -&gt; Union[Tensor, _numerical]:
+<pre><code class="python">def forward(self, x: Tensor) -&gt; Tensor:
     &#39;&#39;&#39; Flow Forward
 
     The flow computation is defined here.
@@ -364,7 +364,7 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
     Returns:
     --------
-    res : numerical value, computed result
+    res : Tensor, computed result
 
     &#39;&#39;&#39;
 
@@ -450,7 +450,10 @@ name : string, the name of the function</p></section>
     name : string, the name of the function
 
     &#39;&#39;&#39;
-    def __init__(self, *children: Union[Tensor, _numerical], name=&#39;Function&#39;):
+    def __init__(self,
+                 *children: Union[Tensor, ndarray, List[Number], Number],
+                 name=&#39;Function&#39;):
+
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):
@@ -464,12 +467,15 @@ name : string, the name of the function</p></section>
         pass
 
     @abstractmethod
-    def backward(self) -&gt; tuple:
+    def backward(self) -&gt; Tuple[ndarray, ...]:
         pass
 
     def __call__(self) -&gt; Tensor:
         &#39;&#39;&#39; This method controls what gets registered in the
         computation graph and what gets a gradient.
+
+        It also builds the backpropagation graph.
+
         &#39;&#39;&#39;
 
         z = self.forward()
@@ -523,7 +529,7 @@ name : string, the name of the function</p></section>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-def backward(self) -&gt; tuple:
+def backward(self) -&gt; Tuple[ndarray, ...]:
     pass</code></pre>
 </details>
 </dd>
@@ -549,14 +555,14 @@ def forward(self) -&gt; ndarray:
 </code></dt>
 <dd>
 <section class="desc"><p>Tensor - a multi-dimensional array</p>
-<p>Tensors are the main units of data and computation in Nujo.
+<p>Tensors are the main units of data and computation in nujo.
 They "flow" in the computation graph. :)</p>
 <p>Tensors can be either constants or trainable weights,
 depending on whether gradients are computed for the given tensor.</p>
 <h2 id="parameters">Parameters:</h2>
 <p>value : value, numerical value of the tensor
 diff : boolean, whether to compute gradients for the tensor
-creator : Nujo Function, that created this tensor;
+creator : nujo function, that created this tensor;
 the only child of a tensor
 name : string, representation of the tensor</p></section>
 <details class="source">
@@ -566,7 +572,7 @@ name : string, representation of the tensor</p></section>
 <pre><code class="python">class Tensor(_Node):
     &#39;&#39;&#39; Tensor - a multi-dimensional array
 
-    Tensors are the main units of data and computation in Nujo.
+    Tensors are the main units of data and computation in nujo.
     They &#34;flow&#34; in the computation graph. :)
 
     Tensors can be either constants or trainable weights,
@@ -576,13 +582,13 @@ name : string, representation of the tensor</p></section>
     -----------
     value : value, numerical value of the tensor
     diff : boolean, whether to compute gradients for the tensor
-    creator : Nujo Function, that created this tensor;
+    creator : nujo function, that created this tensor;
     the only child of a tensor
     name : string, representation of the tensor
 
     &#39;&#39;&#39;
     def __init__(self,
-                 value: Union[&#39;Tensor&#39;, _numerical],
+                 value: Union[&#39;Tensor&#39;, ndarray, List[Number], Number],
                  diff=False,
                  creator=None,
                  name=&#39;Tensor&#39;):
@@ -596,7 +602,7 @@ name : string, representation of the tensor</p></section>
 
         # (Tensor, weight) pair, used to backpropagate through the network
         # See: `Chain Rule` Wikipedia page for more info
-        self._grad_dependencies = []
+        self._grad_dependencies: List[Tuple[&#39;Tensor&#39;, &#39;Tensor&#39;]] = []
 
         # Gradient cache
         self._grad: &#39;Tensor&#39; = None
@@ -612,7 +618,7 @@ name : string, representation of the tensor</p></section>
         return self._grad
 
     @grad.setter
-    def grad(self, value: Union[&#39;Tensor&#39;, _numerical]):
+    def grad(self, value: Union[&#39;Tensor&#39;, ndarray, List[Number], Number]):
         self._grad = value if isinstance(value, Tensor) else Tensor(
             value, name=f&#39;grad[{self.name}]&#39;)
 
@@ -633,7 +639,7 @@ name : string, representation of the tensor</p></section>
     # Shape and shape transformations
 
     @property
-    def shape(self):
+    def shape(self) -&gt; Tuple[int, ...]:
         return self.value.shape
 
     def reshape(self, *shape: int, inplace=False) -&gt; &#39;Tensor&#39;:
@@ -643,7 +649,7 @@ name : string, representation of the tensor</p></section>
 
     def repeat(self,
                *repeats: int,
-               axis: int = None,
+               axis: Optional[int] = None,
                inplace=False) -&gt; &#39;Tensor&#39;:
 
         repeated = self if inplace else deepcopy(self)
@@ -740,9 +746,10 @@ name : string, representation of the tensor</p></section>
     def backward(self, _debug=False) -&gt; None:
         &#39;&#39;&#39; It uses Breadth First Search to traverse the computation graph
         and compute the gradient for each differentiable Tensor in the graph.
+
         &#39;&#39;&#39;
 
-        nodes_to_visit = [self]
+        nodes_to_visit: List[&#39;Tensor&#39;] = [self]
         if _debug:
             i = 1
 
@@ -767,10 +774,12 @@ name : string, representation of the tensor</p></section>
     def any(self) -&gt; ndarray:
         return self.value.any()
 
-    def __getitem__(self, position):
+    def __getitem__(self, position: Union[int, Tuple[int, ...]]):
         return self.value[position]
 
-    def __setitem__(self, position, value):
+    def __setitem__(self, position: Union[int, Tuple[int, ...]],
+                    value: Union[&#39;Tensor&#39;, ndarray, List[Number], Number]):
+
         self.value[position] = value
 
     def __hash__(self):
@@ -778,7 +787,8 @@ name : string, representation of the tensor</p></section>
 
     # Static evaluation operator
 
-    def __ilshift__(self, other):
+    def __ilshift__(self, other: Union[&#39;Tensor&#39;, ndarray, List[Number],
+                                       Number]):
         &#39;&#39;&#39; In-place assignment operator: `&lt;&lt;=`
 
         Essentially used to achieve static evaluation.
@@ -928,7 +938,7 @@ def grad(self) -&gt; &#39;Tensor&#39;:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
-def shape(self):
+def shape(self) -&gt; Tuple[int, ...]:
     return self.value.shape</code></pre>
 </details>
 </dd>
@@ -987,9 +997,10 @@ and compute the gradient for each differentiable Tensor in the graph.</p></secti
 <pre><code class="python">def backward(self, _debug=False) -&gt; None:
     &#39;&#39;&#39; It uses Breadth First Search to traverse the computation graph
     and compute the gradient for each differentiable Tensor in the graph.
+
     &#39;&#39;&#39;
 
-    nodes_to_visit = [self]
+    nodes_to_visit: List[&#39;Tensor&#39;] = [self]
     if _debug:
         i = 1
 
@@ -1018,7 +1029,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></secti
 </summary>
 <pre><code class="python">def repeat(self,
            *repeats: int,
-           axis: int = None,
+           axis: Optional[int] = None,
            inplace=False) -&gt; &#39;Tensor&#39;:
 
     repeated = self if inplace else deepcopy(self)

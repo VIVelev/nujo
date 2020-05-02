@@ -2,8 +2,8 @@
 '''
 
 from copy import deepcopy
+from typing import List, Union
 
-from nujo._typing import Union, _numerical
 from nujo.autodiff.tensor import Tensor
 
 
@@ -29,12 +29,12 @@ class Flow(metaclass=_FlowSetup):
     subflows : list of flows, only if the current flow is a supflow
 
     '''
-    def __init__(self, name='Flow', subflows=[]):
+    def __init__(self, name='Flow', subflows: List['Flow'] = []):
         self.name = name
         self.is_supflow = True if subflows else False
 
-        self.subflows = []
-        self.parameters = []
+        self.subflows: List['Flow'] = []
+        self.parameters: List[Tensor] = []
 
         if self.is_supflow:
             self.append(*subflows)
@@ -108,7 +108,7 @@ class Flow(metaclass=_FlowSetup):
 
         return retflow
 
-    def forward(self, x: Tensor) -> Union[Tensor, _numerical]:
+    def forward(self, x: Tensor) -> Tensor:
         ''' Flow Forward
 
         The flow computation is defined here.
@@ -119,7 +119,7 @@ class Flow(metaclass=_FlowSetup):
 
         Returns:
         --------
-        res : numerical value, computed result
+        res : Tensor, computed result
 
         '''
 

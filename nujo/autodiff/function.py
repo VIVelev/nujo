@@ -1,8 +1,9 @@
 from abc import abstractmethod
+from numbers import Number
+from typing import List, Tuple, Union
 
 from numpy import ndarray
 
-from nujo._typing import Union, _numerical
 from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
@@ -24,7 +25,10 @@ class Function(_Node):
     name : string, the name of the function
 
     '''
-    def __init__(self, *children: Union[Tensor, _numerical], name='Function'):
+    def __init__(self,
+                 *children: Union[Tensor, ndarray, List[Number], Number],
+                 name='Function'):
+
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):
@@ -38,12 +42,15 @@ class Function(_Node):
         pass
 
     @abstractmethod
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray, ...]:
         pass
 
     def __call__(self) -> Tensor:
         ''' This method controls what gets registered in the
         computation graph and what gets a gradient.
+
+        It also builds the backpropagation graph.
+
         '''
 
         z = self.forward()

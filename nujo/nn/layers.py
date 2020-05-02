@@ -1,6 +1,6 @@
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
-from nujo.init import randn, zeros
+from nujo.init import randn
 
 __all__ = [
     'Linear',
@@ -11,21 +11,28 @@ class Linear(Flow):
     '''Linear Layer
 
         f(x) = xW + b
+
     '''
     def __init__(self,
                  in_features: int,
                  out_features: int,
                  bias=True,
                  name='Linear'):
+
         super(Linear,
               self).__init__(name=f'{name}({in_features}, {out_features})')
 
-        self.W = randn(in_features, out_features, name=self.name + '.W')
+        self.in_features = in_features
+        self.out_features = out_features
+        self.bias = bias
 
-        if bias:
-            self.b = randn(1, out_features, name=self.name + '.bias')
-        else:
-            self.b = zeros(diff=False)
+        self.W = randn(self.in_features,
+                       self.out_features,
+                       name=self.name + '.W')
+
+        if self.bias:
+            self.b = randn(1, self.out_features, name=self.name + '.bias')
 
     def forward(self, x: Tensor) -> Tensor:
-        return x @ self.W + self.b
+        out = x @ self.W
+        return out + self.b if self.bias else out
