@@ -36,16 +36,16 @@ from nujo.utils.data.nujo_dir import HOME_DIR
 
 
 class DatasetLoader:
-    &#39;&#39;&#39;
+    &#39;&#39;&#39; Dataset Loader
 
     Parameters:
     -----------
-    - name : str, downloaded from uci repo or filename to install from
-    - type : str, indicates the type of file, can be csv, image or mnist
-    - override : bool, if this file exists, does it get downloaded again
-
+     - name : str, downloaded from uci repo or filename to install from
+     - type : str, indicates the type of file, can be csv, image or mnist
+     - override : bool, if this file exists, does it get downloaded again
 
     &#39;&#39;&#39;
+
     _UCI_REPO_URL = (
         &#39;https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}&#39;)
 
@@ -53,8 +53,6 @@ class DatasetLoader:
         self.name = name.strip().lower()
         self.type = type.strip().lower()
         self._filepath = f&#39;{HOME_DIR}{self.name}.data&#39;
-        if not override and exists(self._filepath):
-            return
 
     def install(self,
                 filepath: Optional[str] = None,
@@ -65,15 +63,15 @@ class DatasetLoader:
 
         Parameters:
         -----------
-        - filepath : str, indicates source file, if none then `~/.nujo/`
-        - labels : ndarray, labels for loading from image
+         - filepath : str, indicates source file, if none then `~/.nujo/`
+         - labels : ndarray, labels for loading from image
 
         Returns:
         -----------
-        - tuple : ndarray, X and y (data and labels)
-
+         - res : ndarray, X and y (data and labels)
 
         &#39;&#39;&#39;
+
         self._filepath = filepath if filepath is not None else self._filepath
         assert exists(self._filepath)
 
@@ -82,6 +80,7 @@ class DatasetLoader:
         if self.type == &#39;csv&#39;:
             with open(self._filepath, &#39;r+&#39;) as data:
                 lines = data.readlines()
+
             cols = len(lines[0].split(&#39;,&#39;))
             X = empty((0, cols - 1))
             y = empty((0, 1))
@@ -95,13 +94,14 @@ class DatasetLoader:
         # reading image
         elif (self.type == &#39;image&#39; or self.type == &#39;img&#39; or self.type == &#39;png&#39;
               or self.type == &#39;jpg&#39;):
-            assert labels is not None
 
             # image has to be black and white
             with Image.open(self._filepath) as img:
                 vect = asarray(img)
                 assert vect.ndim &lt; 3
                 X = vect.reshape((vect.size, 1))
+
+            assert labels is not None
             y = labels
 
         else:
@@ -137,7 +137,8 @@ class DatasetLoader:
 <span>(</span><span>name, type, override=True)</span>
 </code></dt>
 <dd>
-<section class="desc"><h2 id="parameters">Parameters:</h2>
+<section class="desc"><p>Dataset Loader</p>
+<h2 id="parameters">Parameters:</h2>
 <ul>
 <li>name : str, downloaded from uci repo or filename to install from</li>
 <li>type : str, indicates the type of file, can be csv, image or mnist</li>
@@ -148,16 +149,16 @@ class DatasetLoader:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class DatasetLoader:
-    &#39;&#39;&#39;
+    &#39;&#39;&#39; Dataset Loader
 
     Parameters:
     -----------
-    - name : str, downloaded from uci repo or filename to install from
-    - type : str, indicates the type of file, can be csv, image or mnist
-    - override : bool, if this file exists, does it get downloaded again
-
+     - name : str, downloaded from uci repo or filename to install from
+     - type : str, indicates the type of file, can be csv, image or mnist
+     - override : bool, if this file exists, does it get downloaded again
 
     &#39;&#39;&#39;
+
     _UCI_REPO_URL = (
         &#39;https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}&#39;)
 
@@ -165,8 +166,6 @@ class DatasetLoader:
         self.name = name.strip().lower()
         self.type = type.strip().lower()
         self._filepath = f&#39;{HOME_DIR}{self.name}.data&#39;
-        if not override and exists(self._filepath):
-            return
 
     def install(self,
                 filepath: Optional[str] = None,
@@ -177,15 +176,15 @@ class DatasetLoader:
 
         Parameters:
         -----------
-        - filepath : str, indicates source file, if none then `~/.nujo/`
-        - labels : ndarray, labels for loading from image
+         - filepath : str, indicates source file, if none then `~/.nujo/`
+         - labels : ndarray, labels for loading from image
 
         Returns:
         -----------
-        - tuple : ndarray, X and y (data and labels)
-
+         - res : ndarray, X and y (data and labels)
 
         &#39;&#39;&#39;
+
         self._filepath = filepath if filepath is not None else self._filepath
         assert exists(self._filepath)
 
@@ -194,6 +193,7 @@ class DatasetLoader:
         if self.type == &#39;csv&#39;:
             with open(self._filepath, &#39;r+&#39;) as data:
                 lines = data.readlines()
+
             cols = len(lines[0].split(&#39;,&#39;))
             X = empty((0, cols - 1))
             y = empty((0, 1))
@@ -207,13 +207,14 @@ class DatasetLoader:
         # reading image
         elif (self.type == &#39;image&#39; or self.type == &#39;img&#39; or self.type == &#39;png&#39;
               or self.type == &#39;jpg&#39;):
-            assert labels is not None
 
             # image has to be black and white
             with Image.open(self._filepath) as img:
                 vect = asarray(img)
                 assert vect.ndim &lt; 3
                 X = vect.reshape((vect.size, 1))
+
+            assert labels is not None
             y = labels
 
         else:
@@ -272,7 +273,7 @@ class DatasetLoader:
 </ul>
 <h2 id="returns">Returns:</h2>
 <ul>
-<li>tuple : ndarray, X and y (data and labels)</li>
+<li>res : ndarray, X and y (data and labels)</li>
 </ul></section>
 <details class="source">
 <summary>
@@ -287,15 +288,15 @@ class DatasetLoader:
 
     Parameters:
     -----------
-    - filepath : str, indicates source file, if none then `~/.nujo/`
-    - labels : ndarray, labels for loading from image
+     - filepath : str, indicates source file, if none then `~/.nujo/`
+     - labels : ndarray, labels for loading from image
 
     Returns:
     -----------
-    - tuple : ndarray, X and y (data and labels)
-
+     - res : ndarray, X and y (data and labels)
 
     &#39;&#39;&#39;
+
     self._filepath = filepath if filepath is not None else self._filepath
     assert exists(self._filepath)
 
@@ -304,6 +305,7 @@ class DatasetLoader:
     if self.type == &#39;csv&#39;:
         with open(self._filepath, &#39;r+&#39;) as data:
             lines = data.readlines()
+
         cols = len(lines[0].split(&#39;,&#39;))
         X = empty((0, cols - 1))
         y = empty((0, 1))
@@ -317,13 +319,14 @@ class DatasetLoader:
     # reading image
     elif (self.type == &#39;image&#39; or self.type == &#39;img&#39; or self.type == &#39;png&#39;
           or self.type == &#39;jpg&#39;):
-        assert labels is not None
 
         # image has to be black and white
         with Image.open(self._filepath) as img:
             vect = asarray(img)
             assert vect.ndim &lt; 3
             X = vect.reshape((vect.size, 1))
+
+        assert labels is not None
         y = labels
 
     else:

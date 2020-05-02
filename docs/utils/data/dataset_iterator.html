@@ -24,20 +24,22 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class DatasetIterator:
-    &#39;&#39;&#39;
+<pre><code class="python">from nujo.utils.data.dataset import Dataset
+
+
+class DatasetIterator:
+    &#39;&#39;&#39; Dataset Iterator
 
     Parameters:
     -----------
-    dataset: Dataset, the dataset to iterate over
-    
-    Returns:
-    -----------
-    next element : numpy array of values with the label
+     - dataset: Dataset, the dataset to iterate over
 
+    Returns:
+    --------
+     - next element : numpy array of values with the label
 
     &#39;&#39;&#39;
-    def __init__(self, dataset):
+    def __init__(self, dataset: Dataset):
         self._data = dataset
         self._index = 0
 
@@ -47,6 +49,7 @@
 
         result = (self._data.X[self._index], self._data.y[self._index])
         self._index += 1
+
         return result</code></pre>
 </details>
 </section>
@@ -64,28 +67,32 @@
 <span>(</span><span>dataset)</span>
 </code></dt>
 <dd>
-<section class="desc"><h2 id="parameters">Parameters:</h2>
-<p>dataset: Dataset, the dataset to iterate over</p>
+<section class="desc"><p>Dataset Iterator</p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>dataset: Dataset, the dataset to iterate over</li>
+</ul>
 <h2 id="returns">Returns:</h2>
-<p>next element : numpy array of values with the label</p></section>
+<ul>
+<li>next element : numpy array of values with the label</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class DatasetIterator:
-    &#39;&#39;&#39;
+    &#39;&#39;&#39; Dataset Iterator
 
     Parameters:
     -----------
-    dataset: Dataset, the dataset to iterate over
+     - dataset: Dataset, the dataset to iterate over
 
     Returns:
     --------
-    next element : numpy array of values with the label
-
+     - next element : numpy array of values with the label
 
     &#39;&#39;&#39;
-    def __init__(self, dataset):
+    def __init__(self, dataset: Dataset):
         self._data = dataset
         self._index = 0
 
@@ -95,6 +102,7 @@
 
         result = (self._data.X[self._index], self._data.y[self._index])
         self._index += 1
+
         return result</code></pre>
 </details>
 </dd>
