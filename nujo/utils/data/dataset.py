@@ -19,7 +19,6 @@ class Dataset:
     - override : boolean, for loader, will override file if it exists
     - download : boolean, should it be downloaded from uci repo
 
-
     '''
     def __init__(self, name: str, type: str, override=True, download=False):
         self.name = name

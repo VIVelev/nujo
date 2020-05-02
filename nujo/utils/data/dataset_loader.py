@@ -10,14 +10,13 @@ from nujo.utils.data.nujo_dir import HOME_DIR
 
 
 class DatasetLoader:
-    '''
+    ''' Dataset Loader
 
     Parameters:
     -----------
     - name : str, downloaded from uci repo or filename to install from
     - type : str, indicates the type of file, can be csv, image or mnist
     - override : bool, if this file exists, does it get downloaded again
-
 
     '''
     _UCI_REPO_URL = (

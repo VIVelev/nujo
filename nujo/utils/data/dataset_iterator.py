@@ -9,7 +9,6 @@ class DatasetIterator:
     --------
     next element : numpy array of values with the label
 
-
     '''
     def __init__(self, dataset):
         self._data = dataset
