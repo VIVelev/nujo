@@ -14,11 +14,12 @@ class DatasetLoader:
 
     Parameters:
     -----------
-    - name : str, downloaded from uci repo or filename to install from
-    - type : str, indicates the type of file, can be csv, image or mnist
-    - override : bool, if this file exists, does it get downloaded again
+     - name : str, downloaded from uci repo or filename to install from
+     - type : str, indicates the type of file, can be csv, image or mnist
+     - override : bool, if this file exists, does it get downloaded again
 
     '''
+
     _UCI_REPO_URL = (
         'https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}')
 
@@ -26,8 +27,6 @@ class DatasetLoader:
         self.name = name.strip().lower()
         self.type = type.strip().lower()
         self._filepath = f'{HOME_DIR}{self.name}.data'
-        if not override and exists(self._filepath):
-            return
 
     def install(self,
                 filepath: Optional[str] = None,
@@ -38,15 +37,15 @@ class DatasetLoader:
 
         Parameters:
         -----------
-        - filepath : str, indicates source file, if none then `~/.nujo/`
-        - labels : ndarray, labels for loading from image
+         - filepath : str, indicates source file, if none then `~/.nujo/`
+         - labels : ndarray, labels for loading from image
 
         Returns:
         -----------
-        - tuple : ndarray, X and y (data and labels)
-
+         - res : ndarray, X and y (data and labels)
 
         '''
+
         self._filepath = filepath if filepath is not None else self._filepath
         assert exists(self._filepath)
 
@@ -55,6 +54,7 @@ class DatasetLoader:
         if self.type == 'csv':
             with open(self._filepath, 'r+') as data:
                 lines = data.readlines()
+
             cols = len(lines[0].split(','))
             X = empty((0, cols - 1))
             y = empty((0, 1))
@@ -68,13 +68,14 @@ class DatasetLoader:
         # reading image
         elif (self.type == 'image' or self.type == 'img' or self.type == 'png'
               or self.type == 'jpg'):
-            assert labels is not None
 
             # image has to be black and white
             with Image.open(self._filepath) as img:
                 vect = asarray(img)
                 assert vect.ndim < 3
                 X = vect.reshape((vect.size, 1))
+
+            assert labels is not None
             y = labels
 
         else:
