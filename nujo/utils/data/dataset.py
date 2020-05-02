@@ -21,11 +21,7 @@ class Dataset:
 
 
     '''
-    def __init__(self,
-                 name: str,
-                 type: str,
-                 override=True,
-                 download=False):
+    def __init__(self, name: str, type: str, override=True, download=False):
         self.name = name
         self.type = type
         loader = DatasetLoader(self.name, self.type, override)
