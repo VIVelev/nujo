@@ -30,7 +30,7 @@ def train(net, x, y, num_epochs):
             print('EPOCH:', epoch, '| LOSS: ', loss.value)
 
         # Backprop
-        loss.backward(_debug=False)
+        loss.backward()
 
         # Update
         optimizer.step()

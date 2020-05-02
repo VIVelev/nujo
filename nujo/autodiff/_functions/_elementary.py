@@ -24,6 +24,20 @@ class _Addition(Function):
                  name='Add'):
         super(_Addition, self).__init__(input_a, input_b, name=name)
 
+        # The following assert will not allow numpy's
+        # vector broadcasts such as:
+        #
+        #   [[1, 2, 3]] + [[1], = [[2, 3, 4],
+        #                  [2],    [3, 4, 5],
+        #                  [3]]    [4, 5, 6]]
+        #
+        # In future versions of nujo this may be supported.
+
+        assert (self.children[0].shape == self.children[1].shape
+                or self.children[0].shape == () or self.children[1].shape == ()
+                or self.children[0].shape == (1, 1)
+                or self.children[1].shape == (1, 1))
+
     def forward(self) -> ndarray:
         return self.children[0].value + self.children[1].value
 
@@ -54,6 +68,20 @@ class _Multiplication(Function):
                  input_b: Union[Tensor, _numerical],
                  name='Mul'):
         super(_Multiplication, self).__init__(input_a, input_b, name=name)
+
+        # The following assert will not allow numpy's
+        # vector broadcasts such as:
+        #
+        #   [[1, 2, 3]] * [[1], = [[1, 2, 3],
+        #                  [2],    [2, 4, 6],
+        #                  [3]]    [3, 6, 6]]
+        #
+        # In future versions of nujo this may be supported.
+
+        assert (self.children[0].shape == self.children[1].shape
+                or self.children[0].shape == () or self.children[1].shape == ()
+                or self.children[0].shape == (1, 1)
+                or self.children[1].shape == (1, 1))
 
     def forward(self) -> ndarray:
         return self.children[0].value * self.children[1].value
@@ -131,6 +159,7 @@ class _MatrixMul(Function):
                  name='MatMul'):
         super(_MatrixMul, self).__init__(input_a, input_b, name=name)
 
+        # Assert valid dimensions for matrix multiplication
         assert self.children[0].shape[-1] == self.children[1].shape[0]
 
     def forward(self) -> ndarray:

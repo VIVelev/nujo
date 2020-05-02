@@ -3,7 +3,7 @@ class DatasetIterator:
 
     Parameters:
     -----------
-    dataset: 
+    dataset:
 
     Returns:
     --------

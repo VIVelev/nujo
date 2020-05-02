@@ -4,70 +4,88 @@ from numpy import abs, ceil, exp, floor, isclose, log, log2, log10, round, sqrt
 import nujo.math.scalar as scalar
 from nujo.init.random import rand
 
-
-def test_log(input):
-    target = log(input.value)
-
-    assert (scalar.log(input) == target).all()
-    assert (scalar.log(input.value) == target).all()
+# ====================================================================================================
+# Test Logarithms with different bases
 
 
-def test_log2(input):
-    target = log2(input.value)
+def test_log(inputs):
+    target = log(inputs.value)
 
-    assert isclose(scalar.log2(input).value, target).all()
-    assert isclose(scalar.log2(input.value).value, target).all()
-
-
-def test_log10(input):
-    target = log10(input.value)
-
-    assert isclose(scalar.log10(input).value, target).all()
-    assert isclose(scalar.log10(input.value).value, target).all()
+    assert (scalar.log(inputs) == target).all()
+    assert (scalar.log(inputs.value) == target).all()
 
 
-def test_exp(input):
-    target = exp(input.value)
+def test_log2(inputs):
+    target = log2(inputs.value)
 
-    assert isclose(scalar.exp(input).value, target).all()
-    assert isclose(scalar.exp(input.value).value, target).all()
-
-
-def test_sqrt(input):
-    target = sqrt(input.value)
-
-    assert (scalar.sqrt(input) == target).all()
-    assert (scalar.sqrt(input.value) == target).all()
+    assert isclose(scalar.log2(inputs).value, target).all()
+    assert isclose(scalar.log2(inputs.value).value, target).all()
 
 
-def test_abs(input):
-    target = abs(input.value)
+def test_log10(inputs):
+    target = log10(inputs.value)
 
-    assert (scalar.abs(input) == target).all()
-    assert (scalar.abs(input.value) == target).all()
-
-
-def test_round(input):
-    target = round(input.value)
-
-    assert (scalar.round(input) == target).all()
-    assert (scalar.round(input.value) == target).all()
+    assert isclose(scalar.log10(inputs).value, target).all()
+    assert isclose(scalar.log10(inputs.value).value, target).all()
 
 
-def test_ceil(input):
-    target = ceil(input.value)
-
-    assert (scalar.ceil(input) == target).all()
-    assert (scalar.ceil(input.value) == target).all()
+# ====================================================================================================
+# Test Exponentiation, Square Root and Absolute functions
 
 
-def test_floor(input):
-    target = floor(input.value)
+def test_exp(inputs):
+    target = exp(inputs.value)
 
-    assert (scalar.floor(input) == target).all()
-    assert (scalar.floor(input.value) == target).all()
+    assert isclose(scalar.exp(inputs).value, target).all()
+    assert isclose(scalar.exp(inputs.value).value, target).all()
+
+
+def test_sqrt(inputs):
+    target = sqrt(inputs.value)
+
+    assert (scalar.sqrt(inputs) == target).all()
+    assert (scalar.sqrt(inputs.value) == target).all()
+
+
+def test_abs(inputs):
+    target = abs(inputs.value)
+
+    assert (scalar.abs(inputs) == target).all()
+    assert (scalar.abs(inputs.value) == target).all()
+
+
+# ====================================================================================================
+# Test Round, Ceil, Floor
+
+
+def test_round(inputs):
+    target = round(inputs.value)
+
+    assert (scalar.round(inputs) == target).all()
+    assert (scalar.round(inputs.value) == target).all()
+
+
+def test_ceil(inputs):
+    target = ceil(inputs.value)
+
+    assert (scalar.ceil(inputs) == target).all()
+    assert (scalar.ceil(inputs.value) == target).all()
+
+
+def test_floor(inputs):
+    target = floor(inputs.value)
+
+    assert (scalar.floor(inputs) == target).all()
+    assert (scalar.floor(inputs.value) == target).all()
+
+
+# ====================================================================================================
+# Unit Test fixtures
 
 
 @pytest.fixture
-def input():
-    return rand(3, 3, diff=False, name='test_input')
+def inputs():
+    return rand(3, 3)
+
+
+# ====================================================================================================
