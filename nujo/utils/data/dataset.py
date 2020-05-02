@@ -31,7 +31,7 @@ class Dataset:
     def __iter__(self):
         return DatasetIterator(self)
 
-    def __getitem__(self, position: Union[int, Tuple[int]]) -> ndarray:
+    def __getitem__(self, position: Union[int, Tuple[int, ...]]) -> ndarray:
         if isinstance(position, int):
             return self.X[position]
         row, col = position
