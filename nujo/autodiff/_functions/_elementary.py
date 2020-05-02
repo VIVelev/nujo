@@ -1,6 +1,8 @@
+from numbers import Number
+from typing import List, Tuple, Union
+
 from numpy import log, ndarray, ones
 
-from nujo._typing import Union, _numerical
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
 
@@ -19,9 +21,10 @@ __all__ = [
 
 class _Addition(Function):
     def __init__(self,
-                 input_a: Union[Tensor, _numerical],
-                 input_b: Union[Tensor, _numerical],
+                 input_a: Union[Tensor, ndarray, List[Number], Number],
+                 input_b: Union[Tensor, ndarray, List[Number], Number],
                  name='Add'):
+
         super(_Addition, self).__init__(input_a, input_b, name=name)
 
         # The following assert will not allow numpy's
@@ -41,7 +44,7 @@ class _Addition(Function):
     def forward(self) -> ndarray:
         return self.children[0].value + self.children[1].value
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray, ndarray]:
         return ones(self.children[0].shape), ones(self.children[1].shape)
 
 
@@ -49,13 +52,16 @@ class _Addition(Function):
 
 
 class _Negation(Function):
-    def __init__(self, input: Union[Tensor, _numerical], name='Neg'):
+    def __init__(self,
+                 input: Union[Tensor, ndarray, List[Number], Number],
+                 name='Neg'):
+
         super(_Negation, self).__init__(input, name=name)
 
     def forward(self) -> ndarray:
         return -self.children[0].value
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray]:
         return -ones(self.children[0].shape),
 
 
@@ -64,9 +70,10 @@ class _Negation(Function):
 
 class _Multiplication(Function):
     def __init__(self,
-                 input_a: Union[Tensor, _numerical],
-                 input_b: Union[Tensor, _numerical],
+                 input_a: Union[Tensor, ndarray, List[Number], Number],
+                 input_b: Union[Tensor, ndarray, List[Number], Number],
                  name='Mul'):
+
         super(_Multiplication, self).__init__(input_a, input_b, name=name)
 
         # The following assert will not allow numpy's
@@ -86,7 +93,7 @@ class _Multiplication(Function):
     def forward(self) -> ndarray:
         return self.children[0].value * self.children[1].value
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray, ndarray]:
         return self.children[1].value, self.children[0].value
 
 
@@ -95,16 +102,17 @@ class _Multiplication(Function):
 
 class _Reciprocal(Function):
     def __init__(self,
-                 input: Union[Tensor, _numerical],
+                 input: Union[Tensor, ndarray, List[Number], Number],
                  name='Recipr',
                  eps=1e-18):
+
         super(_Reciprocal, self).__init__(input, name=name)
         self.eps = eps
 
     def forward(self) -> ndarray:
         return 1 / (self.children[0].value + self.eps)
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray]:
         return -1 / ((self.children[0].value + self.eps)**2),
 
 
@@ -113,15 +121,16 @@ class _Reciprocal(Function):
 
 class _Power(Function):
     def __init__(self,
-                 input_a: Union[Tensor, _numerical],
-                 input_b: Union[Tensor, _numerical],
+                 input_a: Union[Tensor, ndarray, List[Number], Number],
+                 input_b: Union[Tensor, ndarray, List[Number], Number],
                  name='Pow'):
+
         super(_Power, self).__init__(input_a, input_b, name=name)
 
     def forward(self) -> ndarray:
         return self.children[0].value**self.children[1].value
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray, ndarray]:
         # TODO: FIX wrong partial - the second
 
         return (self.children[1].value *
@@ -133,9 +142,10 @@ class _Power(Function):
 
 class _Logarithm(Function):
     def __init__(self,
-                 input_a: Union[Tensor, _numerical],
-                 input_b: Union[Tensor, _numerical],
+                 input_a: Union[Tensor, ndarray, List[Number], Number],
+                 input_b: Union[Tensor, ndarray, List[Number], Number],
                  name='Log'):
+
         super(_Logarithm, self).__init__(input_a, input_b, name=name)
 
         assert (self.children[0] > 0).all()  # argument value limit
@@ -145,7 +155,7 @@ class _Logarithm(Function):
     def forward(self) -> ndarray:
         return log(self.children[0].value) / log(self.children[1].value)
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray, ndarray]:
         return 1 / (self.children[0].value * log(self.children[1].value)), 1
 
 
@@ -154,9 +164,10 @@ class _Logarithm(Function):
 
 class _MatrixMul(Function):
     def __init__(self,
-                 input_a: Union[Tensor, _numerical],
-                 input_b: Union[Tensor, _numerical],
+                 input_a: Union[Tensor, ndarray, List[Number], Number],
+                 input_b: Union[Tensor, ndarray, List[Number], Number],
                  name='MatMul'):
+
         super(_MatrixMul, self).__init__(input_a, input_b, name=name)
 
         # Assert valid dimensions for matrix multiplication
@@ -165,7 +176,7 @@ class _MatrixMul(Function):
     def forward(self) -> ndarray:
         return self.children[0].value @ self.children[1].value
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray, ndarray]:
         return self.children[1].value, self.children[0].value
 
 

@@ -6,7 +6,6 @@ from numpy import ceil as np_ceil
 from numpy import floor as np_floor
 from numpy import where
 
-from nujo._typing import Union, _numerical
 from nujo.autodiff._functions._elementary import _Logarithm, _Power
 from nujo.autodiff.tensor import Tensor
 
@@ -25,40 +24,37 @@ __all__ = [
 # ====================================================================================================
 
 
-def log(x: Union[Tensor, _numerical], base: float = e) -> Tensor:
+def log(x: Tensor, base: float = e) -> Tensor:
     return _Logarithm(x, base)()
 
 
-def log2(x: Union[Tensor, _numerical]) -> Tensor:
+def log2(x: Tensor) -> Tensor:
     return _Logarithm(x, 2, name='Log2')()
 
 
-def log10(x: Union[Tensor, _numerical]) -> Tensor:
+def log10(x: Tensor) -> Tensor:
     return _Logarithm(x, 10, name='Log10')()
 
 
 # ====================================================================================================
 
 
-def exp(x: Union[Tensor, _numerical]) -> Tensor:
+def exp(x: Tensor) -> Tensor:
     return _Power(e, x, name='Exp')()
 
 
-def sqrt(x: Union[Tensor, _numerical]) -> Tensor:
+def sqrt(x: Tensor) -> Tensor:
     return _Power(x, 1 / 2, name='Sqrt')()
 
 
-def abs(x: Union[Tensor, _numerical]) -> Tensor:
+def abs(x: Tensor) -> Tensor:
     return x * where(x < 0, -1, 1)
 
 
 # ====================================================================================================
 
 
-def round(x: Union[Tensor, _numerical], inplace=False) -> Tensor:
-    if not isinstance(x, Tensor):
-        x = Tensor(x)
-
+def round(x: Tensor, inplace=False) -> Tensor:
     rounded = x if inplace else deepcopy(x)
     rounded.name += ' (rounded)'
     rounded.value = np_round(x.value)
@@ -66,10 +62,7 @@ def round(x: Union[Tensor, _numerical], inplace=False) -> Tensor:
     return rounded
 
 
-def ceil(x: Union[Tensor, _numerical], inplace=False) -> Tensor:
-    if not isinstance(x, Tensor):
-        x = Tensor(x)
-
+def ceil(x: Tensor, inplace=False) -> Tensor:
     ceiled = x if inplace else deepcopy(x)
     ceiled.name += ' (ceiled)'
     ceiled.value = np_ceil(x.value)
@@ -77,10 +70,7 @@ def ceil(x: Union[Tensor, _numerical], inplace=False) -> Tensor:
     return ceiled
 
 
-def floor(x: Union[Tensor, _numerical], inplace=False) -> Tensor:
-    if not isinstance(x, Tensor):
-        x = Tensor(x)
-
+def floor(x: Tensor, inplace=False) -> Tensor:
     floored = x if inplace else deepcopy(x)
     floored.name += ' (floored)'
     floored.value = np_floor(x.value)

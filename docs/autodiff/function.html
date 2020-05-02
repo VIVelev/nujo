@@ -25,10 +25,11 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from abc import abstractmethod
+from numbers import Number
+from typing import List, Tuple, Union
 
 from numpy import ndarray
 
-from nujo._typing import Union, _numerical
 from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
@@ -50,7 +51,10 @@ class Function(_Node):
     name : string, the name of the function
 
     &#39;&#39;&#39;
-    def __init__(self, *children: Union[Tensor, _numerical], name=&#39;Function&#39;):
+    def __init__(self,
+                 *children: Union[Tensor, ndarray, List[Number], Number],
+                 name=&#39;Function&#39;):
+
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):
@@ -64,12 +68,15 @@ class Function(_Node):
         pass
 
     @abstractmethod
-    def backward(self) -&gt; tuple:
+    def backward(self) -&gt; Tuple[ndarray, ...]:
         pass
 
     def __call__(self) -&gt; Tensor:
         &#39;&#39;&#39; This method controls what gets registered in the
         computation graph and what gets a gradient.
+
+        It also builds the backpropagation graph.
+
         &#39;&#39;&#39;
 
         z = self.forward()
@@ -131,7 +138,10 @@ name : string, the name of the function</p></section>
     name : string, the name of the function
 
     &#39;&#39;&#39;
-    def __init__(self, *children: Union[Tensor, _numerical], name=&#39;Function&#39;):
+    def __init__(self,
+                 *children: Union[Tensor, ndarray, List[Number], Number],
+                 name=&#39;Function&#39;):
+
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):
@@ -145,12 +155,15 @@ name : string, the name of the function</p></section>
         pass
 
     @abstractmethod
-    def backward(self) -&gt; tuple:
+    def backward(self) -&gt; Tuple[ndarray, ...]:
         pass
 
     def __call__(self) -&gt; Tensor:
         &#39;&#39;&#39; This method controls what gets registered in the
         computation graph and what gets a gradient.
+
+        It also builds the backpropagation graph.
+
         &#39;&#39;&#39;
 
         z = self.forward()
@@ -204,7 +217,7 @@ name : string, the name of the function</p></section>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-def backward(self) -&gt; tuple:
+def backward(self) -&gt; Tuple[ndarray, ...]:
     pass</code></pre>
 </details>
 </dd>

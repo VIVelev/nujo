@@ -1,6 +1,8 @@
+from numbers import Number
+from typing import List, Optional, Tuple, Union
+
 from numpy import ndarray, ones, prod, sum
 
-from nujo._typing import Union, _numerical
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
 
@@ -14,10 +16,11 @@ __all__ = [
 
 class _InnerSum(Function):
     def __init__(self,
-                 input: Union[Tensor, _numerical],
-                 dim: int = None,
+                 input: Union[Tensor, ndarray, List[Number], Number],
+                 dim: Optional[int] = None,
                  keepdim=False,
                  name='InnerSum'):
+
         super(_InnerSum, self).__init__(input, name=name)
         self.dim = dim
         self.keepdim = keepdim
@@ -27,7 +30,7 @@ class _InnerSum(Function):
                    axis=self.dim,
                    keepdims=self.keepdim)
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray]:
         return ones(self.children[0].shape),
 
 
@@ -36,10 +39,11 @@ class _InnerSum(Function):
 
 class _InnerProd(Function):
     def __init__(self,
-                 input: Union[Tensor, _numerical],
-                 dim: int = None,
+                 input: Union[Tensor, ndarray, List[Number], Number],
+                 dim: Optional[int] = None,
                  keepdim=False,
                  name='InnerProd'):
+
         super(_InnerProd, self).__init__(input, name=name)
         self.dim = dim
         self.keepdim = keepdim
@@ -53,7 +57,7 @@ class _InnerProd(Function):
 
         return self._output
 
-    def backward(self) -> tuple:
+    def backward(self) -> Tuple[ndarray]:
         return self._output / self.children[0].value,
 
 

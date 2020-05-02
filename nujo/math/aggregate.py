@@ -1,7 +1,8 @@
+from typing import Optional
+
 from numpy import prod as np_prod
 from numpy import sum as np_sum
 
-from nujo._typing import Union, _numerical
 from nujo.autodiff._functions._aggregate import _InnerProd, _InnerSum
 from nujo.autodiff.tensor import Tensor
 
@@ -14,16 +15,14 @@ __all__ = [
 # ====================================================================================================
 
 
-def sum(*inputs: Union[Tensor, _numerical],
-        dim: int = None,
-        keepdim=False) -> Tensor:
+def sum(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -> Tensor:
     ''' Summation of tensor(s)
 
     Parameters:
     -----------
     inputs : varargs, tensors to be summed;
     if a single tensor is passed, its elements will be summed
-    dim : int, dimension to reduce over
+    dim : int (optional), dimension to reduce over
     keepdim : bool, whether to keep `dim`
 
     Returns:
@@ -41,16 +40,14 @@ def sum(*inputs: Union[Tensor, _numerical],
 # ====================================================================================================
 
 
-def prod(*inputs: Union[Tensor, _numerical],
-         dim: int = None,
-         keepdim=False) -> Tensor:
+def prod(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -> Tensor:
     ''' Product of tensor(s)
 
     Parameters:
     -----------
     inputs : varargs, tensors to be multiplied;
     if a single tensor is passed, its elements will be multiplied
-    dim : int, dimension to reduce over
+    dim : int (optional), dimension to reduce over
     keepdim : bool, whether to keep `dim`
 
     Returns:
@@ -68,16 +65,14 @@ def prod(*inputs: Union[Tensor, _numerical],
 # ====================================================================================================
 
 
-def mean(*inputs: Union[Tensor, _numerical],
-         dim: int = None,
-         keepdim=False) -> Tensor:
+def mean(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -> Tensor:
     ''' Mean of tensor(s)
 
     Parameters:
     -----------
     inputs : varargs, tensors to compute the mean of;
     if a single tensor is passed, the mean of its elements will be computed
-    dim : int, dimension to reduce over
+    dim : int (optional), dimension to reduce over
     keepdim : bool, whether to keep `dim`
 
     Returns:

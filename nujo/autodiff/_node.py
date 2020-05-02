@@ -15,14 +15,14 @@ class _Node:
 
     id_generator = _counter()
 
-    def __init__(self, *children, name='Node'):
-        # Parse all children to Tensors
+    def __init__(self, *children: ..., name='Node'):
+        # Parse all children that are not Nodes to Tensors
         self.children = []
         for child in children:
             self.add_child(child)
 
         self.name = name
-        self.id = _Node.id_generator.get()
+        self.id: int = _Node.id_generator.get()
 
     def __eq__(self, other):
         return self.id == other.id

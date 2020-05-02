@@ -2,6 +2,7 @@
 
 More info here:
 https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-activation-functions-right/
+
 '''
 
 from nujo.autodiff._functions._activations import (_BinaryStep, _LeakyReLU,
@@ -115,7 +116,6 @@ class Swish(Flow):
 
         swish(x) = x * sigmoid(beta * x) = x / (1 + e ^ (-beta * x))
 
-    Implementation of the activation function presented in:
     "Searching for Activation Functions"
     Prajit Ramachandran, Barret Zoph, Quoc V. Le
     (https://arxiv.org/abs/1710.05941)
@@ -141,6 +141,7 @@ class Softmax(Flow):
 
     Nice read here:
     https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
+
     '''
     def __init__(self, name='Softmax'):
         super(Softmax, self).__init__(name=name)
