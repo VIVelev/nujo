@@ -2,9 +2,6 @@ from typing import Tuple, Union
 
 from numpy import ndarray
 
-from nujo.utils.data.dataset_iterator import DatasetIterator
-from nujo.utils.data.dataset_loader import DatasetLoader
-
 
 class Dataset:
     ''' Dataset
@@ -24,13 +21,16 @@ class Dataset:
         self.name = name
         self.type = type
 
+        from nujo.utils.data.dataset_loader import DatasetLoader
         loader = DatasetLoader(self.name, self.type, override)
+
         if download is True:
             loader.download()
 
         self.X, self.y = loader.install()
 
     def __iter__(self):
+        from nujo.utils.data.dataset_iterator import DatasetIterator
         return DatasetIterator(self)
 
     def __getitem__(self, position: Union[int, Tuple[int, ...]]) -> ndarray:
