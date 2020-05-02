@@ -37,9 +37,7 @@ class _Addition(Function):
         # In future versions of nujo this may be supported.
 
         assert (self.children[0].shape == self.children[1].shape
-                or self.children[0].shape == () or self.children[1].shape == ()
-                or self.children[0].shape == (1, 1)
-                or self.children[1].shape == (1, 1))
+                or self.children[0].shape != self.children[1].T.shape)
 
     def forward(self) -> ndarray:
         return self.children[0].value + self.children[1].value
@@ -86,9 +84,7 @@ class _Multiplication(Function):
         # In future versions of nujo this may be supported.
 
         assert (self.children[0].shape == self.children[1].shape
-                or self.children[0].shape == () or self.children[1].shape == ()
-                or self.children[0].shape == (1, 1)
-                or self.children[1].shape == (1, 1))
+                or self.children[0].shape != self.children[1].T.shape)
 
     def forward(self) -> ndarray:
         return self.children[0].value * self.children[1].value
