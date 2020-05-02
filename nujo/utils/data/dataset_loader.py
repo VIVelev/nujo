@@ -1,7 +1,7 @@
 from os import mkdir
 from os.path import exists
 
-from numpy import array, asarray, empty, ndarray, vstack
+from numpy import array, asarray, empty, float32, ndarray, vstack
 from PIL import Image
 from requests import get
 
@@ -17,29 +17,29 @@ class DatasetLoader:
     - type : str, indicates the type of file, can be csv, image or mnist
     - override : bool, if this file exists, does it get downloaded again
     '''
-    _UCI_REPO_URL = '''
-    https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}
-    '''
+    _UCI_REPO_URL = (
+        'https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}')
 
-    def __init__(self, name: str, type: str, override=True):
-        self.name = name
-        self._filepath = HOME_DIR + self.name
-        if not override and exists(HOME_DIR + name):
-            return
+    def __init__(self, name: str, type: str, override: bool = True):
+        self.name = name.strip().lower()
         self.type = type.strip().lower()
+        self._filepath = f'{HOME_DIR}{self.name}.data'
+        if not override and exists(self._filepath):
+            return
 
-    def install(self,
-                dataset,
-                filepath: str = None,
-                labels: ndarray = None) -> None:
-        ''' Dataset Install\n
-        (will override anything in the dataset)
+    def install(self, filepath: str = None, labels: ndarray = None) -> ndarray:
+        ''' Dataset Install
+
+        (will override anything in the Dataset class)
 
         Parameters:
         -----------
-        - dataset : Dataset, creates two ndarray containing vectors and labels
         - filepath : str, indicates source file, if none then `~/.nujo/`
         - labels : ndarray, labels for loading from image
+
+        Returns:
+        -----------
+        tuple : ndarray, X and y (data and labels)
 
 
         '''
@@ -48,29 +48,32 @@ class DatasetLoader:
 
         # -----------------------------------------
         # reading csv
-        if (type == 'csv'):
+        if (self.type == 'csv'):
             with open(self._filepath, 'r+') as data:
                 lines = data.readlines()
-            dataset._cols = len(lines[0].split(','))
-            dataset.X = empty((0, dataset._cols - 1))
+            cols = len(lines[0].split(','))
+            X = empty((0, cols - 1))
+            y = empty((0, 1))
+
             # number of columns
             for line in lines[:-1]:  # last row is \n
-                x = array(line.strip().split(',')[:-2])
-                dataset.X = vstack((dataset.X, x))
-                dataset.y = vstack((dataset.y, line.strip().split(',')[-1]))
+                X = vstack((X, array(line.strip().split(',')[:-1])))
+                y = vstack((y, line.strip().split(',')[-1]))
         # -----------------------------------------
         # reading image
-        elif (type == 'image' or type == 'img' or type == 'png'
-              or type == 'jpg'):
+        elif (self.type == 'image' or self.type == 'img' or self.type == 'png'
+              or self.type == 'jpg'):
             assert labels is not None
             # image has to be black and white
-            dataset.X = empty((0, 0))
             with Image.open(self._filepath) as img:
                 vect = asarray(img)
                 assert vect.ndim < 3
-                vect.reshape((vect.size, 1))
-                dataset.X.append(vect)
-            dataset.y = labels
+                X = vect.reshape((vect.size, 1))
+            y = labels
+        else:
+            raise (ValueError("type should me csv or image"))
+
+        return X, y
 
     def download(self) -> None:
         if not exists(HOME_DIR):
@@ -80,6 +83,7 @@ class DatasetLoader:
         if self.type == 'csv':
             self._link = self._UCI_REPO_URL.format(self.name,
                                                    f'{self.name}.data')
+            print(self._link)
             with open(self._filepath, 'wb') as f:
                 f.write(get(self._link).content)
             print(f'{self.name} has been saved in `~/.nujo`')

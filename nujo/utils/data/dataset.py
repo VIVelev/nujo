@@ -1,3 +1,5 @@
+from numpy import array
+
 from nujo._typing import Union
 from nujo.utils.data.dataset_iterator import DatasetIterator
 from nujo.utils.data.dataset_loader import DatasetLoader, ndarray
@@ -11,21 +13,24 @@ class Dataset:
 
     Parameters:
     -----------
-    name : will be downloaded from the UCI ML repo (for now)
+    - name : str, will be downloaded from the UCI ML repo (for now)
+    - type : str, type of dataset - either csv or image
+    - override : boolean, for loader, will override file if it exists
+    - download : boolean, should it be downloaded from uci repo
 
-    Returns:
-    --------
-    ndarray : stores the csv dataset,
-    - floating point integers
-    - last column -> labels
 
     '''
-    def __init__(self, download: bool, name: str):
+    def __init__(self,
+                 name: str,
+                 type: str,
+                 override: bool = True,
+                 download: bool = False):
         self.name = name
-        loader = DatasetLoader(self.name, type='csv')
-        if download:
+        self.type = type
+        loader = DatasetLoader(self.name, self.type, override)
+        if download is True:
             loader.download()
-        loader.install(self)
+        self.X, self.y = loader.install()
 
     def __iter__(self):
         return DatasetIterator(self)
@@ -35,10 +40,8 @@ class Dataset:
             return self.X[position]
         row, col = position
         if (col != self._cols):
-            # if not the last col, then return a float
-            return float(self.X[row][col])
-        # last col is a string
-        return self.X[row][col]
+            return self.X[row][col]
+        return self.y[row]
 
     def __repr__(self):
         return self.X.__str__()
