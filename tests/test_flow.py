@@ -17,7 +17,6 @@ def test_custom_flow_creation():
     assert repr(flow) == '<|SomeFlowName>'
     assert not flow.is_supflow
     assert not flow.subflows
-    assert not flow.parameters
 
     assert flow(9) == 9**2 + 42
 

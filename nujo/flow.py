@@ -34,7 +34,6 @@ class Flow(metaclass=_FlowSetup):
         self.is_supflow = True if subflows else False
 
         self.subflows: List['Flow'] = []
-        self.parameters: List[Tensor] = []
 
         if self.is_supflow:
             self.append(*subflows)
@@ -47,13 +46,21 @@ class Flow(metaclass=_FlowSetup):
             prop = getattr(self, prop_name)
             if isinstance(prop, Tensor):
                 prop.diff = True
-                self.parameters.append(prop)
-
-        if self.parameters and not isinstance(self.parameters[0], list):
-            self.parameters = [self.parameters]
 
     def _generate_supflow_name(self) -> str:
         return ' >> '.join(map(lambda x: x.name, self.subflows))
+
+    def parameters(self) -> Tensor:
+        flows = self.subflows if self.is_supflow else [self]
+
+        for flow in flows:
+            for prop_name in dir(flow):
+                prop = getattr(flow, prop_name)
+
+                if isinstance(prop, Tensor):
+                    updated_prop = (yield prop)
+                    if updated_prop is not None:
+                        prop <<= updated_prop
 
     def append(self, *flows: 'Flow') -> 'Flow':
         ''' Flow Append
@@ -77,10 +84,6 @@ class Flow(metaclass=_FlowSetup):
 
         for flow in flows:
             self.subflows.append(flow)
-
-            if flow.parameters:
-                for params in flow.parameters:
-                    self.parameters.append(params)
 
         self.name = self._generate_supflow_name()
         return self
