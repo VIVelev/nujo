@@ -29,16 +29,13 @@ jobs:
       run: git status
 
     - name: add
-      run: git add .
+      run: git add -A
 
     - name: commit
       run:
         git config --local user.email "actions@github.com";
         git config --local user.name "GitHub Action";
         git commit -m "[up] generate documentation";
-
-    - name: second pull
-      run: git pull
 
     - name: push
       uses: ad-m/github-push-action@master
