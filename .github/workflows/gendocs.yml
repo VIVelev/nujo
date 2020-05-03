@@ -38,10 +38,10 @@ jobs:
         git commit -m "[up] generate documentation";
 
     - name: test
-      run: echo ${{ secrets.GITHUB_TOKEN }}
+      run: echo ${{ GITHUB_TOKEN }}
 
     - name: push
       uses: ad-m/github-push-action@master
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ GITHUB_TOKEN }}
 
