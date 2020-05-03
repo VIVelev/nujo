@@ -21,7 +21,7 @@ jobs:
 
     - name: generate documentation
       run: |
-        python docs/gendocs.py
+        python docs/gendocs.py false
 
     - name: check for changes
       run: git status
