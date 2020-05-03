@@ -77,7 +77,6 @@ def test_append(flows):
 def test_pop(flows):
     mul2, add1, supflow = flows
 
-    assert len(supflow) == 2
     poped = supflow.pop()
     assert len(supflow) == 1
     assert poped is add1[0]
