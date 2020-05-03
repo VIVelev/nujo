@@ -1,4 +1,4 @@
-''' a computational Flow JUST A TEST
+''' a computational Flow
 '''
 
 from copy import deepcopy

@@ -731,6 +731,14 @@ six = ">=1.5"
 
 [[package]]
 category = "dev"
+description = "Simple MNIST and EMNIST data parser written in pure Python"
+name = "python-mnist"
+optional = false
+python-versions = "*"
+version = "0.7"
+
+[[package]]
+category = "dev"
 description = "Python for Window Extensions"
 marker = "sys_platform == \"win32\""
 name = "pywin32"
@@ -784,11 +792,6 @@ name = "qtpy"
 optional = false
 python-versions = "*"
 version = "1.9.0"
-description = "Simple MNIST and EMNIST data parser written in pure Python"
-name = "python-mnist"
-optional = false
-python-versions = "*"
-version = "0.7"
 
 [[package]]
 category = "main"
@@ -946,7 +949,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "b86856255e6325c6cd01f276f666ba9ed6915ac46b34e38bc6c9c844931dc837"
+content-hash = "645d7187c13b412946e2fb7943a40b2d4a291d192340504e870ddeb2d8d34d1c"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1340,6 +1343,7 @@ qtconsole = [
 qtpy = [
     {file = "QtPy-1.9.0-py2.py3-none-any.whl", hash = "sha256:fa0b8363b363e89b2a6f49eddc162a04c0699ae95e109a6be3bb145a913190ea"},
     {file = "QtPy-1.9.0.tar.gz", hash = "sha256:2db72c44b55d0fe1407be8fba35c838ad0d6d3bb81f23007886dc1fc0f459c8d"},
+]
 requests = [
     {file = "requests-2.23.0-py2.py3-none-any.whl", hash = "sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee"},
     {file = "requests-2.23.0.tar.gz", hash = "sha256:b3f43d496c6daba4493e7c431722aeb7dbc6288f52a6e04e7b6023b0247817e6"},
