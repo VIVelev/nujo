@@ -3,21 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.7.5" />
+<meta name="generator" content="pdoc 0.8.1" />
 <title>nujo API documentation</title>
 <meta name="description" content="" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 </head>
 <body>
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>nujo</code></h1>
+<h1 class="title">Package <code>nujo</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
@@ -44,35 +44,35 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 <dl>
 <dt><code class="name"><a title="nujo.autodiff" href="autodiff/index.html">nujo.autodiff</a></code></dt>
 <dd>
-<section class="desc"><p>nujo's core Reverse-mode Automatic Differentiation module</p></section>
+<div class="desc"><p>nujo's core Reverse-mode Automatic Differentiation module</p></div>
 </dd>
 <dt><code class="name"><a title="nujo.flow" href="flow.html">nujo.flow</a></code></dt>
 <dd>
-<section class="desc"><p>a computational Flow</p></section>
+<div class="desc"><p>a computational Flow</p></div>
 </dd>
 <dt><code class="name"><a title="nujo.init" href="init/index.html">nujo.init</a></code></dt>
 <dd>
-<section class="desc"><p>Tensor initializers …</p></section>
+<div class="desc"><p>Tensor initializers …</p></div>
 </dd>
 <dt><code class="name"><a title="nujo.math" href="math/index.html">nujo.math</a></code></dt>
 <dd>
-<section class="desc"><p>nujo's core mathematical functionality</p></section>
+<div class="desc"><p>nujo's core mathematical functionality</p></div>
 </dd>
 <dt><code class="name"><a title="nujo.nn" href="nn/index.html">nujo.nn</a></code></dt>
 <dd>
-<section class="desc"><p>nujo's Neural Network module …</p></section>
+<div class="desc"><p>nujo's Neural Network module …</p></div>
 </dd>
 <dt><code class="name"><a title="nujo.objective" href="objective/index.html">nujo.objective</a></code></dt>
 <dd>
-<section class="desc"><p>nujo's objective functions module …</p></section>
+<div class="desc"><p>nujo's objective functions module …</p></div>
 </dd>
 <dt><code class="name"><a title="nujo.optim" href="optim/index.html">nujo.optim</a></code></dt>
 <dd>
-<section class="desc"><p>nujo's optimization module …</p></section>
+<div class="desc"><p>nujo's optimization module …</p></div>
 </dd>
 <dt><code class="name"><a title="nujo.utils" href="utils/index.html">nujo.utils</a></code></dt>
 <dd>
-<section class="desc"><p>nujo utils</p></section>
+<div class="desc"><p>nujo utils</p></div>
 </dd>
 </dl>
 </section>
@@ -88,13 +88,13 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>A computational Flow</p>
+<div class="desc"><p>A computational Flow</p>
 <p>Flow of tensors through nujo functions.</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
 <li>name : string</li>
 <li>subflows : list of flows, only if the current flow is a supflow</li>
-</ul></section>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -281,10 +281,10 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 <h3>Methods</h3>
 <dl>
 <dt id="nujo.Flow.append"><code class="name flex">
-<span>def <span class="ident">append</span></span>(<span>self, *flows)</span>
+<span>def <span class="ident">append</span></span>(<span>self, *flows: Flow) -> <a title="nujo.flow.Flow" href="flow.html#nujo.flow.Flow">Flow</a></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Flow Append</p>
+<div class="desc"><p>Flow Append</p>
 <p>Appends a new Flow on top of the current one.</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
@@ -293,7 +293,7 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 <h2 id="returns">Returns:</h2>
 <ul>
 <li>supflow : Flow, the total computational flow</li>
-</ul></section>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -330,10 +330,10 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 </details>
 </dd>
 <dt id="nujo.Flow.copy"><code class="name flex">
-<span>def <span class="ident">copy</span></span>(<span>self)</span>
+<span>def <span class="ident">copy</span></span>(<span>self) -> <a title="nujo.flow.Flow" href="flow.html#nujo.flow.Flow">Flow</a></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Make a copy of the current flow</p></section>
+<div class="desc"><p>Make a copy of the current flow</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -346,10 +346,10 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 </details>
 </dd>
 <dt id="nujo.Flow.forward"><code class="name flex">
-<span>def <span class="ident">forward</span></span>(<span>self, x)</span>
+<span>def <span class="ident">forward</span></span>(<span>self, x: <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Flow Forward</p>
+<div class="desc"><p>Flow Forward</p>
 <p>The flow computation is defined here.</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
@@ -358,7 +358,7 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 <h2 id="returns">Returns:</h2>
 <ul>
 <li>res : Tensor, computed result</li>
-</ul></section>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -386,10 +386,10 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 </details>
 </dd>
 <dt id="nujo.Flow.pop"><code class="name flex">
-<span>def <span class="ident">pop</span></span>(<span>self, idx=-1)</span>
+<span>def <span class="ident">pop</span></span>(<span>self, idx=-1) -> <a title="nujo.flow.Flow" href="flow.html#nujo.flow.Flow">Flow</a></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Flow Pop</p>
+<div class="desc"><p>Flow Pop</p>
 <p>Removes a flow at a given index, defaults to the last one (-1).</p>
 <p>Once a supflow is a supflow it stays a supflow.
 No mather how many subflows it contains.</p>
@@ -400,7 +400,7 @@ No mather how many subflows it contains.</p>
 <h2 id="returns">Returns:</h2>
 <ul>
 <li>flow : Flow, the total computational flow</li>
-</ul></section>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -433,10 +433,10 @@ No mather how many subflows it contains.</p>
 </dd>
 <dt id="nujo.Function"><code class="flex name class">
 <span>class <span class="ident">Function</span></span>
-<span>(</span><span>*children, name='Function')</span>
+<span>(</span><span>*children: Union[nujo.autodiff.tensor.Tensor, numpy.ndarray, List[numbers.Number], numbers.Number], name='Function')</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Base Class for functions</p>
+<div class="desc"><p>Base Class for functions</p>
 <p>Functions are applied to tensors.</p>
 <p>A Function takes multiple tensors as input
 and produces only one tensor as output.</p>
@@ -445,7 +445,7 @@ and produces only one tensor as output.</p>
 <ul>
 <li>children : varargs, the inpute tensors</li>
 <li>name : string, the name of the function</li>
-</ul></section>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -536,10 +536,10 @@ and produces only one tensor as output.</p>
 <h3>Methods</h3>
 <dl>
 <dt id="nujo.Function.backward"><code class="name flex">
-<span>def <span class="ident">backward</span></span>(<span>self)</span>
+<span>def <span class="ident">backward</span></span>(<span>self) -> Tuple[numpy.ndarray, ...]</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -550,10 +550,10 @@ def backward(self) -&gt; Tuple[ndarray, ...]:
 </details>
 </dd>
 <dt id="nujo.Function.forward"><code class="name flex">
-<span>def <span class="ident">forward</span></span>(<span>self)</span>
+<span>def <span class="ident">forward</span></span>(<span>self) -> numpy.ndarray</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -567,10 +567,10 @@ def forward(self) -&gt; ndarray:
 </dd>
 <dt id="nujo.Tensor"><code class="flex name class">
 <span>class <span class="ident">Tensor</span></span>
-<span>(</span><span>value, diff=False, creator=None, name='Tensor')</span>
+<span>(</span><span>value: Union[ForwardRef('Tensor'), numpy.ndarray, List[numbers.Number], numbers.Number], diff=False, creator=None, name='Tensor')</span>
 </code></dt>
 <dd>
-<section class="desc"><p>Tensor - a multi-dimensional array</p>
+<div class="desc"><p>Tensor - a multi-dimensional array</p>
 <p>Tensors are the main units of data and computation in nujo.
 They "flow" in the computation graph. :)</p>
 <p>Tensors can be either constants or trainable weights,
@@ -582,7 +582,7 @@ depending on whether gradients are computed for the given tensor.</p>
 <li>creator : nujo function, that created this tensor;
 the only child of a tensor</li>
 <li>name : string, representation of the tensor</li>
-</ul></section>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -915,9 +915,9 @@ the only child of a tensor</li>
 </ul>
 <h3>Instance variables</h3>
 <dl>
-<dt id="nujo.Tensor.T"><code class="name">var <span class="ident">T</span></code></dt>
+<dt id="nujo.Tensor.T"><code class="name">var <span class="ident">T</span> : <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -933,9 +933,9 @@ def T(self) -&gt; &#39;Tensor&#39;:
     return self._T</code></pre>
 </details>
 </dd>
-<dt id="nujo.Tensor.grad"><code class="name">var <span class="ident">grad</span></code></dt>
+<dt id="nujo.Tensor.grad"><code class="name">var <span class="ident">grad</span> : <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -948,9 +948,9 @@ def grad(self) -&gt; &#39;Tensor&#39;:
     return self._grad</code></pre>
 </details>
 </dd>
-<dt id="nujo.Tensor.shape"><code class="name">var <span class="ident">shape</span></code></dt>
+<dt id="nujo.Tensor.shape"><code class="name">var <span class="ident">shape</span> : Tuple[int, ...]</code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -964,10 +964,10 @@ def shape(self) -&gt; Tuple[int, ...]:
 <h3>Methods</h3>
 <dl>
 <dt id="nujo.Tensor.add_grad_dependency"><code class="name flex">
-<span>def <span class="ident">add_grad_dependency</span></span>(<span>self, wrt, weight)</span>
+<span>def <span class="ident">add_grad_dependency</span></span>(<span>self, wrt: Tensor, weight: Tensor) -> NoneType</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -977,10 +977,10 @@ def shape(self) -&gt; Tuple[int, ...]:
 </details>
 </dd>
 <dt id="nujo.Tensor.all"><code class="name flex">
-<span>def <span class="ident">all</span></span>(<span>self)</span>
+<span>def <span class="ident">all</span></span>(<span>self) -> numpy.ndarray</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -990,10 +990,10 @@ def shape(self) -&gt; Tuple[int, ...]:
 </details>
 </dd>
 <dt id="nujo.Tensor.any"><code class="name flex">
-<span>def <span class="ident">any</span></span>(<span>self)</span>
+<span>def <span class="ident">any</span></span>(<span>self) -> numpy.ndarray</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1003,11 +1003,11 @@ def shape(self) -&gt; Tuple[int, ...]:
 </details>
 </dd>
 <dt id="nujo.Tensor.backward"><code class="name flex">
-<span>def <span class="ident">backward</span></span>(<span>self)</span>
+<span>def <span class="ident">backward</span></span>(<span>self) -> NoneType</span>
 </code></dt>
 <dd>
-<section class="desc"><p>It uses Breadth First Search to traverse the computation graph
-and compute the gradient for each differentiable Tensor in the graph.</p></section>
+<div class="desc"><p>It uses Breadth First Search to traverse the computation graph
+and compute the gradient for each differentiable Tensor in the graph.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1037,10 +1037,10 @@ and compute the gradient for each differentiable Tensor in the graph.</p></secti
 </details>
 </dd>
 <dt id="nujo.Tensor.repeat"><code class="name flex">
-<span>def <span class="ident">repeat</span></span>(<span>self, *repeats, axis=None, inplace=False)</span>
+<span>def <span class="ident">repeat</span></span>(<span>self, *repeats: int, axis: Union[int, NoneType] = None, inplace=False) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1056,10 +1056,10 @@ and compute the gradient for each differentiable Tensor in the graph.</p></secti
 </details>
 </dd>
 <dt id="nujo.Tensor.reshape"><code class="name flex">
-<span>def <span class="ident">reshape</span></span>(<span>self, *shape, inplace=False)</span>
+<span>def <span class="ident">reshape</span></span>(<span>self, *shape: int, inplace=False) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1071,10 +1071,10 @@ and compute the gradient for each differentiable Tensor in the graph.</p></secti
 </details>
 </dd>
 <dt id="nujo.Tensor.squeeze"><code class="name flex">
-<span>def <span class="ident">squeeze</span></span>(<span>self, dim=-1, inplace=False)</span>
+<span>def <span class="ident">squeeze</span></span>(<span>self, dim=-1, inplace=False) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1094,10 +1094,10 @@ and compute the gradient for each differentiable Tensor in the graph.</p></secti
 </details>
 </dd>
 <dt id="nujo.Tensor.unsqueeze"><code class="name flex">
-<span>def <span class="ident">unsqueeze</span></span>(<span>self, dim=-1, inplace=False)</span>
+<span>def <span class="ident">unsqueeze</span></span>(<span>self, dim=-1, inplace=False) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1120,10 +1120,10 @@ and compute the gradient for each differentiable Tensor in the graph.</p></secti
 </details>
 </dd>
 <dt id="nujo.Tensor.zero_grad"><code class="name flex">
-<span>def <span class="ident">zero_grad</span></span>(<span>self)</span>
+<span>def <span class="ident">zero_grad</span></span>(<span>self) -> NoneType</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1143,9 +1143,9 @@ and compute the gradient for each differentiable Tensor in the graph.</p></secti
 <span>class <span class="ident">no_diff</span></span>
 </code></dt>
 <dd>
-<section class="desc"><p>No Differentiation block</p>
+<div class="desc"><p>No Differentiation block</p>
 <p>Creates a block of code where no differentiation is done.
-a.k.a. No gradients are computed for whatever tensor.</p></section>
+a.k.a. No gradients are computed for whatever tensor.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1231,7 +1231,7 @@ a.k.a. No gradients are computed for whatever tensor.</p></section>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.1</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>
