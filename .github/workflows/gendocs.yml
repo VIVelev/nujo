@@ -1,14 +1,9 @@
-- name:
-  include_vars:
-    file: secrets.yaml
-    name: secrets
-
 name: generate docs
 
 on: [push, pull_request]
 
 jobs:
-  run:
+  build:
 
     runs-on: ubuntu-latest
     steps:
@@ -36,12 +31,11 @@ jobs:
 
     - name: commit
       run:
-        git config --local user.email "victor@gorchilov.com";
-        git config --local user.name "ManiacMaxo";
+        git config --local user.email "actions@github.com";
+        git config --local user.name "GitHub Action";
         git commit -m "[up] generate documentation";
 
     - name: push
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-
