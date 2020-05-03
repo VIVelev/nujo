@@ -1,35 +1,39 @@
 ''' Documentation generation and update procedure
 '''
 
-import os
-import shutil
+from os import listdir, system
+from os.path import dirname, isdir, join
+from shutil import move, rmtree
 
 
 def gen_docs():
     print('Generating HTML documentation for nujo out of docstrings...')
 
-    nujo = os.path.join(os.path.dirname(__file__), '../nujo')
-    docs = os.path.dirname(__file__)
+    nujo = '../nujo'
+    # nujo = join(dirname(__file__), '../nujo')
+    docs = dirname(__file__)
 
-    os.system(f'pdoc3 --html {nujo} --output-dir {docs} --force')
-    print('Done.\n')
+    system(f'pdoc3 --html {nujo} --output-dir {docs} --force')
+    print('--Done--')
 
 
 def extract_docs():
     print('Extracting documentation...')
 
-    source = os.path.join(os.path.dirname(__file__), 'nujo')
-    dest = os.path.dirname(__file__)
+    # source = join(dirname(__file__), 'nujo')
+    source = 'nujo'
+    dest = dirname(__file__)
 
-    for f in os.listdir(source):
+    for f in listdir(source):
+        print(f)
         current_dest = dest + '/' + f
-        if os.path.isdir(current_dest):
-            shutil.rmtree(current_dest)
+        if isdir(current_dest):
+            rmtree(current_dest)
 
-        shutil.move(source + '/' + f, current_dest)
+        move(source + '/' + f, current_dest)
 
-    shutil.rmtree(source)
-    print('Done.\n')
+    rmtree(source)
+    print('--Done--')
 
 
 if __name__ == '__main__':
