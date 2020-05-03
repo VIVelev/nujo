@@ -20,7 +20,7 @@ jobs:
         pip install -r requirements.txt
 
     - name: pull
-      run: git pull ${{ github.ref }}
+      run: git pull origin ${{ github.ref }}
 
     - name: generate documentation
       run: python docs/gendocs.py
