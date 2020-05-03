@@ -16,10 +16,9 @@ class _FlowSetup(type):
         obj = type.__call__(cls, *args, **kwargs)
 
         if not obj.subflows:
-            obj = Flow(name=obj.name, subflows=[obj])
+            obj = Flow(subflows=[obj])
 
         obj._register_parameters()
-        obj.name = obj._generate_supflow_name()
         return obj
 
 
@@ -37,6 +36,9 @@ class Flow(metaclass=_FlowSetup):
     def __init__(self, name='Flow', subflows: List['Flow'] = []):
         self.name = name
         self.subflows = subflows
+
+        if len(self.subflows):
+            self.name = self._generate_supflow_name()
 
     def _register_parameters(self) -> None:
         ''' Called after Flow.__init__
