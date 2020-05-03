@@ -138,7 +138,7 @@ class Adam(Optimizer):
     '''
     def __init__(self,
                  params: List[Tensor],
-                 lr=0.005,
+                 lr=0.001,
                  betas=(0.9, 0.999),
                  eps=1e-09):
 
