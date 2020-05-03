@@ -35,10 +35,11 @@ jobs:
         git config --local user.name "ManiacMaxo";
         git commit -m "[up] generate documentation";
 
+    - name: test
+      run: echo ${{ secrets.GITHUB_TOKEN }}
+
     - name: push
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: test
-      run: echo ${{ secrets.GITHUB_TOKEN }}
