@@ -1,4 +1,4 @@
-name: generate docs
+name: gendocs
 
 on: [push, pull_request]
 

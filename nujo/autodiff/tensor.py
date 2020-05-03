@@ -20,11 +20,11 @@ class Tensor(_Node):
 
     Parameters:
     -----------
-    value : value, numerical value of the tensor
-    diff : boolean, whether to compute gradients for the tensor
-    creator : nujo function, that created this tensor;
-    the only child of a tensor
-    name : string, representation of the tensor
+     - value : value, numerical value of the tensor
+     - diff : boolean, whether to compute gradients for the tensor
+     - creator : nujo function, that created this tensor;
+       the only child of a tensor
+     - name : string, representation of the tensor
 
     '''
     def __init__(self,

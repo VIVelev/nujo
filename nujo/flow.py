@@ -25,8 +25,8 @@ class Flow(metaclass=_FlowSetup):
 
     Parameters:
     -----------
-    name : string
-    subflows : list of flows, only if the current flow is a supflow
+     - name : string
+     - subflows : list of flows, only if the current flow is a supflow
 
     '''
     def __init__(self, name='Flow', subflows: List['Flow'] = []):
@@ -62,11 +62,11 @@ class Flow(metaclass=_FlowSetup):
 
         Parameters:
         -----------
-        flows : varargs, the flows to append, sequantially
+         - flows : varargs, the flows to append, sequantially
 
         Returns:
         --------
-        supflow : Flow, the total computational flow
+         - supflow : Flow, the total computational flow
 
         '''
 
@@ -95,11 +95,11 @@ class Flow(metaclass=_FlowSetup):
 
         Parameters:
         -----------
-        idx : integer, index of the flow to remove
+         - idx : integer, index of the flow to remove
 
         Returns:
         --------
-        flow : Flow, the total computational flow
+         - flow : Flow, the total computational flow
 
         '''
 
@@ -115,11 +115,11 @@ class Flow(metaclass=_FlowSetup):
 
         Parameters:
         -----------
-        x : Tensor or ndarray, input tensor
+         - x : Tensor or ndarray, input tensor
 
         Returns:
         --------
-        res : Tensor, computed result
+         - res : Tensor, computed result
 
         '''
 

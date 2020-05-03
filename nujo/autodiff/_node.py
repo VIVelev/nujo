@@ -8,8 +8,8 @@ class _Node:
 
     Parameters:
     -----------
-    children : varargs, the children of the node.
-    name : string, representation of the node.
+     - children : varargs, the children of the node.
+     - name : string, representation of the node.
 
     '''
 
