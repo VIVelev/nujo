@@ -1,5 +1,3 @@
-# ./gendocs.yml
-
 name: generate docs
 
 on: [push, pull_request]
@@ -38,10 +36,10 @@ jobs:
         git commit -m "[up] generate documentation";
 
     - name: test
-      run: echo ${{ GITHUB_TOKEN }}
+      run: echo ${{ secrets.GITHUB_TOKEN }}
 
     - name: push
       uses: ad-m/github-push-action@master
       with:
-        github_token: ${{ GITHUB_TOKEN }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
 
