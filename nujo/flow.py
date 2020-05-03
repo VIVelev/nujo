@@ -115,7 +115,7 @@ class Flow(metaclass=_FlowSetup):
 
         Parameters:
         -----------
-        x : Tensor, input tensor
+        x : Tensor or ndarray, input tensor
 
         Returns:
         --------

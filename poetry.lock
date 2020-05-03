@@ -784,6 +784,11 @@ name = "qtpy"
 optional = false
 python-versions = "*"
 version = "1.9.0"
+description = "Simple MNIST and EMNIST data parser written in pure Python"
+name = "python-mnist"
+optional = false
+python-versions = "*"
+version = "0.7"
 
 [[package]]
 category = "main"
@@ -1268,6 +1273,10 @@ python-dateutil = [
     {file = "python-dateutil-2.8.1.tar.gz", hash = "sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"},
     {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
 ]
+python-mnist = [
+    {file = "python-mnist-0.7.tar.gz", hash = "sha256:a0cced01e83b5b844cff86109280df7a672a8e4e38fc19fa68999a17f8a9fbd8"},
+    {file = "python_mnist-0.7-py2.py3-none-any.whl", hash = "sha256:f5753799787b8ba853ed7b0551a21be14ee3f635aa649e114393c9a5fd58538e"},
+]
 pywin32 = [
     {file = "pywin32-227-cp27-cp27m-win32.whl", hash = "sha256:371fcc39416d736401f0274dd64c2302728c9e034808e37381b5e1b22be4a6b0"},
     {file = "pywin32-227-cp27-cp27m-win_amd64.whl", hash = "sha256:4cdad3e84191194ea6d0dd1b1b9bdda574ff563177d2adf2b4efec2a244fa116"},
@@ -1331,7 +1340,6 @@ qtconsole = [
 qtpy = [
     {file = "QtPy-1.9.0-py2.py3-none-any.whl", hash = "sha256:fa0b8363b363e89b2a6f49eddc162a04c0699ae95e109a6be3bb145a913190ea"},
     {file = "QtPy-1.9.0.tar.gz", hash = "sha256:2db72c44b55d0fe1407be8fba35c838ad0d6d3bb81f23007886dc1fc0f459c8d"},
-]
 requests = [
     {file = "requests-2.23.0-py2.py3-none-any.whl", hash = "sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee"},
     {file = "requests-2.23.0.tar.gz", hash = "sha256:b3f43d496c6daba4493e7c431722aeb7dbc6288f52a6e04e7b6023b0247817e6"},

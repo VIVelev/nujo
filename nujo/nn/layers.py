@@ -18,7 +18,6 @@ class Linear(Flow):
                  out_features: int,
                  bias=True,
                  name='Linear'):
-
         super(Linear,
               self).__init__(name=f'{name}({in_features}, {out_features})')
 
