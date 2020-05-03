@@ -5,7 +5,7 @@ import nujo.optim as optim
 from nujo.utils.viz import ComputationGraphPlotter
 
 # Define the net and optimizer
-net = nn.Linear(3, 1, bias=False)  # >> nn.Linear(6, 2) >> nn.Linear(2, 1)
+net = nn.Linear(3, 6) >> nn.Linear(6, 2) >> nn.Linear(2, 1)
 print('Defined net:', net)
 
 loss_fn = obj.L2Loss()
@@ -34,7 +34,6 @@ def train(net, x, y, num_epochs):
 
         # Update
         optimizer.step()
-        break
 
         # Zero grad
         optimizer.zero_grad()
