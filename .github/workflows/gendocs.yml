@@ -26,23 +26,26 @@ jobs:
     - name: Status
       run: git status
 
+    - id: has_changed
+      run: echo ::set-output name=key::git status --porcelain
+
     - name: Generate documentation if any changes were made
-      if: ${{ git status --porcelain }}
+      if: steps.has_changed.outputs.key != ''
       run: python docs/gendocs.py
 
     - name: Stage the changes
-      if: ${{ git status --porcelain }}
+      if: steps.has_changed.outputs.key != ''
       run: git add -A
 
     - name: Make a commit
-      if: ${{ git status --porcelain }}
+      if: steps.has_changed.outputs.key != ''
       run:
         git config --local user.email "actions@github.com";
         git config --local user.name "GitHub Action";
         git commit -m "[up] generate documentation";
 
     - name: Push the commit to the current branch
-      if: ${{ git status --porcelain }}
+      if: steps.has_changed.outputs.key != ''
       uses: ad-m/github-push-action@master
       with:
         github_token: '${{ secrets.MAXO_SECRET }}'
