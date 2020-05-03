@@ -112,29 +112,35 @@ __version__ = &#39;0.1.5&#39;</code></pre>
     &#39;&#39;&#39;
     def __init__(self, name=&#39;Flow&#39;, subflows: List[&#39;Flow&#39;] = []):
         self.name = name
-        self.is_supflow = True if subflows else False
+        self.subflows = subflows
 
-        self.subflows: List[&#39;Flow&#39;] = []
-        self.parameters: List[Tensor] = []
-
-        if self.is_supflow:
-            self.append(*subflows)
+        if len(self.subflows):
+            self.name = self._generate_supflow_name()
 
     def _register_parameters(self) -&gt; None:
         &#39;&#39;&#39; Called after Flow.__init__
         &#39;&#39;&#39;
 
-        for prop_name in dir(self):
-            prop = getattr(self, prop_name)
-            if isinstance(prop, Tensor):
-                prop.diff = True
-                self.parameters.append(prop)
+        for flow in self.subflows:
+            for prop_name in dir(flow):
+                prop = getattr(flow, prop_name)
 
-        if self.parameters and not isinstance(self.parameters[0], list):
-            self.parameters = [self.parameters]
+                if isinstance(prop, Tensor):
+                    prop.diff = True
 
     def _generate_supflow_name(self) -&gt; str:
         return &#39; &gt;&gt; &#39;.join(map(lambda x: x.name, self.subflows))
+
+    def parameters(self) -&gt; Tensor:
+        for flow in self.subflows:
+            for prop_name in dir(flow):
+                prop = getattr(flow, prop_name)
+
+                if isinstance(prop, Tensor):
+                    updated = (yield prop)
+                    yield
+                    if updated is not None:
+                        prop &lt;&lt;= updated
 
     def append(self, *flows: &#39;Flow&#39;) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Flow Append
@@ -151,17 +157,9 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 
         &#39;&#39;&#39;
 
-        if not self.is_supflow:
-            flows = list(flows)
-            flows.insert(0, self)
-            return Flow(subflows=flows)
-
         for flow in flows:
-            self.subflows.append(flow)
-
-            if flow.parameters:
-                for params in flow.parameters:
-                    self.parameters.append(params)
+            for subflow in flow:
+                self.subflows.append(subflow)
 
         self.name = self._generate_supflow_name()
         return self
@@ -189,36 +187,29 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 
         return retflow
 
-    def forward(self, x: Tensor) -&gt; Tensor:
-        &#39;&#39;&#39; Flow Forward
-
-        The flow computation is defined here.
-
-        Parameters:
-        -----------
-         - x : Tensor or ndarray, input tensor
-
-        Returns:
-        --------
-         - res : Tensor, computed result
-
-        &#39;&#39;&#39;
-
-        output_x = x
-        for subflow in self:
-            output_x = subflow(output_x)
-
-        return output_x
-
     def copy(self) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Make a copy of the current flow
         &#39;&#39;&#39;
 
         return deepcopy(self)
 
+    @abstractmethod
+    def forward(self, *args, **kwargs) -&gt; Tensor:
+        &#39;&#39;&#39; Flow Forward
+
+        The flow computation is defined here.
+
+        &#39;&#39;&#39;
+
+        pass
+
     def __call__(self, *args, **kwargs) -&gt; Tensor:
-        output = self.forward(*args, **kwargs)
-        return output if isinstance(output, Tensor) else Tensor(output)
+        output = self[0].forward(*args, **kwargs)
+
+        for subflow in self[1:]:
+            output = subflow.forward(output, **kwargs)
+
+        return output
 
     def __rshift__(self, other: &#39;Flow&#39;) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Chaining operator
@@ -232,10 +223,7 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 
         &#39;&#39;&#39;
 
-        self_subflows = self.subflows if self.is_supflow else [self]
-        other_subflows = other.subflows if other.is_supflow else [other]
-
-        return Flow(subflows=[*self_subflows, *other_subflows])
+        return Flow(subflows=[*self.subflows, *other.subflows])
 
     def __getitem__(self, key: Union[int, str]) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Subflow getter of a supflow
@@ -262,6 +250,9 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 
     def __iter__(self):
         return iter(self.subflows)
+
+    def __len__(self):
+        return len(self.subflows)
 
     def __repr__(self):
         return &#39;&lt;|&#39; + self.name + &#39;&gt;&#39;</code></pre>
@@ -313,17 +304,9 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 
     &#39;&#39;&#39;
 
-    if not self.is_supflow:
-        flows = list(flows)
-        flows.insert(0, self)
-        return Flow(subflows=flows)
-
     for flow in flows:
-        self.subflows.append(flow)
-
-        if flow.parameters:
-            for params in flow.parameters:
-                self.parameters.append(params)
+        for subflow in flow:
+            self.subflows.append(subflow)
 
     self.name = self._generate_supflow_name()
     return self</code></pre>
@@ -346,43 +329,45 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 </details>
 </dd>
 <dt id="nujo.Flow.forward"><code class="name flex">
-<span>def <span class="ident">forward</span></span>(<span>self, x: <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
+<span>def <span class="ident">forward</span></span>(<span>self, *args, **kwargs) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Flow Forward</p>
-<p>The flow computation is defined here.</p>
-<h2 id="parameters">Parameters:</h2>
-<ul>
-<li>x : Tensor or ndarray, input tensor</li>
-</ul>
-<h2 id="returns">Returns:</h2>
-<ul>
-<li>res : Tensor, computed result</li>
-</ul></div>
+<p>The flow computation is defined here.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def forward(self, x: Tensor) -&gt; Tensor:
+<pre><code class="python">@abstractmethod
+def forward(self, *args, **kwargs) -&gt; Tensor:
     &#39;&#39;&#39; Flow Forward
 
     The flow computation is defined here.
 
-    Parameters:
-    -----------
-     - x : Tensor or ndarray, input tensor
-
-    Returns:
-    --------
-     - res : Tensor, computed result
-
     &#39;&#39;&#39;
 
-    output_x = x
-    for subflow in self:
-        output_x = subflow(output_x)
+    pass</code></pre>
+</details>
+</dd>
+<dt id="nujo.Flow.parameters"><code class="name flex">
+<span>def <span class="ident">parameters</span></span>(<span>self) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def parameters(self) -&gt; Tensor:
+    for flow in self.subflows:
+        for prop_name in dir(flow):
+            prop = getattr(flow, prop_name)
 
-    return output_x</code></pre>
+            if isinstance(prop, Tensor):
+                updated = (yield prop)
+                yield
+                if updated is not None:
+                    prop &lt;&lt;= updated</code></pre>
 </details>
 </dd>
 <dt id="nujo.Flow.pop"><code class="name flex">
@@ -1195,6 +1180,7 @@ a.k.a. No gradients are computed for whatever tensor.</p></div>
 <li><code><a title="nujo.Flow.append" href="#nujo.Flow.append">append</a></code></li>
 <li><code><a title="nujo.Flow.copy" href="#nujo.Flow.copy">copy</a></code></li>
 <li><code><a title="nujo.Flow.forward" href="#nujo.Flow.forward">forward</a></code></li>
+<li><code><a title="nujo.Flow.parameters" href="#nujo.Flow.parameters">parameters</a></code></li>
 <li><code><a title="nujo.Flow.pop" href="#nujo.Flow.pop">pop</a></code></li>
 </ul>
 </li>
