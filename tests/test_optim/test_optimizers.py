@@ -7,6 +7,7 @@ from nujo import mean, rand, randn
 # Test Stochastic Gradient Descent (SGD)
 
 
+@pytest.mark.slow
 def test_sgd_basic(scalar_params, get_generator_for, num_iters,
                    quadratic_loss):
 
@@ -24,6 +25,7 @@ def test_sgd_basic(scalar_params, get_generator_for, num_iters,
         prev_loss = loss
 
 
+@pytest.mark.slow
 def test_sgd_matrix(vec_params, get_generator_for, num_iters, matrix_mse_loss):
     optimizer = optim.SGD(get_generator_for(vec_params))
 
@@ -43,6 +45,7 @@ def test_sgd_matrix(vec_params, get_generator_for, num_iters, matrix_mse_loss):
 # Test Momentum optimizer
 
 
+@pytest.mark.slow
 def test_momentum_basic(scalar_params, get_generator_for, num_iters,
                         quadratic_loss):
 
@@ -60,6 +63,7 @@ def test_momentum_basic(scalar_params, get_generator_for, num_iters,
         prev_loss = loss
 
 
+@pytest.mark.slow
 def test_momentum_matrix(vec_params, get_generator_for, num_iters,
                          matrix_mse_loss):
 
@@ -81,6 +85,7 @@ def test_momentum_matrix(vec_params, get_generator_for, num_iters,
 # Test RMSprop optimizer
 
 
+@pytest.mark.slow
 def test_rmsprop_basic(scalar_params, get_generator_for, num_iters,
                        quadratic_loss):
 
@@ -98,6 +103,7 @@ def test_rmsprop_basic(scalar_params, get_generator_for, num_iters,
         prev_loss = loss
 
 
+@pytest.mark.slow
 def test_rmsprop_matrix(vec_params, get_generator_for, num_iters,
                         matrix_mse_loss):
 
@@ -119,6 +125,7 @@ def test_rmsprop_matrix(vec_params, get_generator_for, num_iters,
 # Test Adam optimizer
 
 
+@pytest.mark.slow
 def test_adam_basic(scalar_params, get_generator_for, num_iters,
                     quadratic_loss):
 
@@ -136,6 +143,7 @@ def test_adam_basic(scalar_params, get_generator_for, num_iters,
         prev_loss = loss
 
 
+@pytest.mark.slow
 def test_adam_matrix(vec_params, get_generator_for, num_iters,
                      matrix_mse_loss):
 

@@ -46,7 +46,6 @@ def test_append(flows):
 
     # -------------------------
 
-    assert len(supflow) == 2
     supflow = supflow.append(mul2)
     assert len(supflow) == 3
     assert supflow[2] is mul2[0]
@@ -56,6 +55,26 @@ def test_append(flows):
     assert supflow[2].name == 'mul2'
     assert supflow.name == 'mul2 >> add1 >> mul2'
     assert supflow(42) == (42 * 2 + 1) * 2
+
+    # -------------------------
+
+    for f in supflow:
+        print(f)
+    assert False
+
+    supflow = supflow.append(supflow)
+    assert len(supflow) == 6
+    assert supflow[5] is mul2[0]
+
+    assert supflow[0].name == 'mul2'
+    assert supflow[1].name == 'add1'
+    assert supflow[2].name == 'mul2'
+    assert supflow[3].name == 'mul2'
+    assert supflow[4].name == 'add1'
+    assert supflow[5].name == 'mul2'
+
+    assert supflow.name == 'mul2 >> add1 >> mul2 >> mul2 >> add1 >> mul2'
+    assert supflow(42) == ((42 * 2 + 1) * 2 * 2 + 1) * 2
 
 
 def test_pop(flows):
