@@ -34,9 +34,16 @@ __all__ = [
 
 
 class Linear(Flow):
-    &#39;&#39;&#39;Linear Layer
+    &#39;&#39;&#39; Linear Layer
 
         f(x) = xW + b
+
+    Parameters:
+    -----------
+     - in_features : int, dim of input variables
+     - out_features : int, wanted dim of output variables
+     - bias : bool, whether to train a bias term or no
+     - name : string, identifier for the current layer
 
     &#39;&#39;&#39;
     def __init__(self,
@@ -44,6 +51,7 @@ class Linear(Flow):
                  out_features: int,
                  bias=True,
                  name=&#39;Linear&#39;):
+
         super(Linear,
               self).__init__(name=f&#39;{name}({in_features}, {out_features})&#39;)
 
@@ -78,15 +86,30 @@ class Linear(Flow):
 </code></dt>
 <dd>
 <div class="desc"><p>Linear Layer</p>
-<p>f(x) = xW + b</p></div>
+<pre><code>f(x) = xW + b
+</code></pre>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>in_features : int, dim of input variables</li>
+<li>out_features : int, wanted dim of output variables</li>
+<li>bias : bool, whether to train a bias term or no</li>
+<li>name : string, identifier for the current layer</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Linear(Flow):
-    &#39;&#39;&#39;Linear Layer
+    &#39;&#39;&#39; Linear Layer
 
         f(x) = xW + b
+
+    Parameters:
+    -----------
+     - in_features : int, dim of input variables
+     - out_features : int, wanted dim of output variables
+     - bias : bool, whether to train a bias term or no
+     - name : string, identifier for the current layer
 
     &#39;&#39;&#39;
     def __init__(self,
@@ -94,6 +117,7 @@ class Linear(Flow):
                  out_features: int,
                  bias=True,
                  name=&#39;Linear&#39;):
+
         super(Linear,
               self).__init__(name=f&#39;{name}({in_features}, {out_features})&#39;)
 
