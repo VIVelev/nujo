@@ -23,22 +23,26 @@ jobs:
     - name: pull
       run: git pull origin ${{ github.ref }}
 
-    - name: generate documentation
-      run: python docs/gendocs.py
-
     - name: status
       run: git status
 
+    - name: generate documentation
+      if: ${{ git status --porcelain }}
+      run: python docs/gendocs.py
+
     - name: add
+      if: ${{ git status --porcelain }}
       run: git add -A
 
     - name: commit
+      if: ${{ git status --porcelain }}
       run:
         git config --local user.email "actions@github.com";
         git config --local user.name "GitHub Action";
         git commit -m "[up] generate documentation";
 
     - name: push
+      if: ${{ git status --porcelain }}
       uses: ad-m/github-push-action@master
       with:
         github_token: '${{ secrets.MAXO_SECRET }}'
