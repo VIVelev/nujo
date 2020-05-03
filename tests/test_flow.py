@@ -1,5 +1,6 @@
 import pytest
 
+from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 
 # ====================================================================================================
@@ -8,8 +9,13 @@ from nujo.flow import Flow
 
 def test_custom_flow_creation():
     class CustomFlow(Flow):
+        def __init__(self, name):
+            super(CustomFlow, self).__init__(name=name)
+            self.two = Tensor(2)
+            self.fourty_two = Tensor(42)
+
         def forward(self, x):
-            return x**2 + 42
+            return x**self.two + self.fourty_two
 
     flow = CustomFlow('SomeFlowName')
 
@@ -96,18 +102,54 @@ def test_getitem(flows):
 
 
 # ====================================================================================================
+# Test parameters
+
+
+def test_parameters(flows):
+    mul2, add1, supflow = flows
+
+    mul2_param = next(mul2.parameters())
+    assert mul2_param == 2
+    assert mul2_param.diff
+
+    add1_param = next(add1.parameters())
+    assert add1_param == 1
+    assert add1_param.diff
+
+    # -------------------------
+
+    supflow_params = supflow.parameters()
+
+    param = next(supflow_params)
+    assert param is mul2_param
+    supflow_params.send(0)
+
+    param = next(supflow_params)
+    assert param is add1_param
+    supflow_params.send(0)
+
+
+# ====================================================================================================
 # Unit Test fixtures
 
 
 @pytest.fixture
 def flows():
     class Mul2(Flow):
+        def __init__(self, name):
+            super(Mul2, self).__init__(name=name)
+            self.two = Tensor(2)
+
         def forward(self, x):
-            return x * 2
+            return x * self.two
 
     class Add1(Flow):
+        def __init__(self, name):
+            super(Add1, self).__init__(name=name)
+            self.one = Tensor(1)
+
         def forward(self, x):
-            return x + 1
+            return x + self.one
 
     mul2 = Mul2('mul2')
     add1 = Add1('add1')
