@@ -111,4 +111,4 @@ venv.bak/
 .vscode
 
 # Workflow
-secrets
+secrets.yml

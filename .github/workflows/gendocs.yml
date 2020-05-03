@@ -1,3 +1,5 @@
+# ./gendocs.yml
+
 name: generate docs
 
 on: [push, pull_request]
