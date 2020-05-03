@@ -180,8 +180,9 @@ def get_generator_for():
     def gen(params):
         def g():
             updated = (yield params[0])
-            params[0] <<= updated
             yield
+            if updated is not None:
+                params[0] <<= updated
 
         return g
 
