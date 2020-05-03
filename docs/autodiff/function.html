@@ -47,8 +47,8 @@ class Function(_Node):
 
     Parameters:
     -----------
-    children : varargs, the inpute tensors
-    name : string, the name of the function
+     - children : varargs, the inpute tensors
+     - name : string, the name of the function
 
     &#39;&#39;&#39;
     def __init__(self,
@@ -116,8 +116,10 @@ class Function(_Node):
 and produces only one tensor as output.</p>
 <p>Functions do not change tensors in-place.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>children : varargs, the inpute tensors
-name : string, the name of the function</p></section>
+<ul>
+<li>children : varargs, the inpute tensors</li>
+<li>name : string, the name of the function</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -134,8 +136,8 @@ name : string, the name of the function</p></section>
 
     Parameters:
     -----------
-    children : varargs, the inpute tensors
-    name : string, the name of the function
+     - children : varargs, the inpute tensors
+     - name : string, the name of the function
 
     &#39;&#39;&#39;
     def __init__(self,

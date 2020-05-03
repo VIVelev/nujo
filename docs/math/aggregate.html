@@ -46,14 +46,14 @@ def sum(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -&gt; Tensor:
 
     Parameters:
     -----------
-    inputs : varargs, tensors to be summed;
-    if a single tensor is passed, its elements will be summed
-    dim : int (optional), dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to be summed;
+       if a single tensor is passed, its elements will be summed
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     &#39;&#39;&#39;
 
@@ -71,14 +71,14 @@ def prod(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -&gt; Tensor
 
     Parameters:
     -----------
-    inputs : varargs, tensors to be multiplied;
-    if a single tensor is passed, its elements will be multiplied
-    dim : int (optional), dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to be multiplied;
+       if a single tensor is passed, its elements will be multiplied
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     &#39;&#39;&#39;
 
@@ -96,14 +96,14 @@ def mean(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -&gt; Tensor
 
     Parameters:
     -----------
-    inputs : varargs, tensors to compute the mean of;
-    if a single tensor is passed, the mean of its elements will be computed
-    dim : int (optional), dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to compute the mean of;
+       if a single tensor is passed, the mean of its elements will be computed
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     &#39;&#39;&#39;
 
@@ -131,12 +131,16 @@ def mean(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -&gt; Tensor
 <dd>
 <section class="desc"><p>Mean of tensor(s)</p>
 <h2 id="parameters">Parameters:</h2>
-<p>inputs : varargs, tensors to compute the mean of;
-if a single tensor is passed, the mean of its elements will be computed
-dim : int (optional), dimension to reduce over
-keepdim : bool, whether to keep <code>dim</code></p>
+<ul>
+<li>inputs : varargs, tensors to compute the mean of;
+if a single tensor is passed, the mean of its elements will be computed</li>
+<li>dim : int (optional), dimension to reduce over</li>
+<li>keepdim : bool, whether to keep <code>dim</code></li>
+</ul>
 <h2 id="returns">Returns:</h2>
-<p>result : Tensor</p></section>
+<ul>
+<li>result : Tensor</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -146,14 +150,14 @@ keepdim : bool, whether to keep <code>dim</code></p>
 
     Parameters:
     -----------
-    inputs : varargs, tensors to compute the mean of;
-    if a single tensor is passed, the mean of its elements will be computed
-    dim : int (optional), dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to compute the mean of;
+       if a single tensor is passed, the mean of its elements will be computed
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     &#39;&#39;&#39;
 
@@ -171,12 +175,16 @@ keepdim : bool, whether to keep <code>dim</code></p>
 <dd>
 <section class="desc"><p>Product of tensor(s)</p>
 <h2 id="parameters">Parameters:</h2>
-<p>inputs : varargs, tensors to be multiplied;
-if a single tensor is passed, its elements will be multiplied
-dim : int (optional), dimension to reduce over
-keepdim : bool, whether to keep <code>dim</code></p>
+<ul>
+<li>inputs : varargs, tensors to be multiplied;
+if a single tensor is passed, its elements will be multiplied</li>
+<li>dim : int (optional), dimension to reduce over</li>
+<li>keepdim : bool, whether to keep <code>dim</code></li>
+</ul>
 <h2 id="returns">Returns:</h2>
-<p>result : Tensor</p></section>
+<ul>
+<li>result : Tensor</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -186,14 +194,14 @@ keepdim : bool, whether to keep <code>dim</code></p>
 
     Parameters:
     -----------
-    inputs : varargs, tensors to be multiplied;
-    if a single tensor is passed, its elements will be multiplied
-    dim : int (optional), dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to be multiplied;
+       if a single tensor is passed, its elements will be multiplied
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     &#39;&#39;&#39;
 
@@ -209,12 +217,16 @@ keepdim : bool, whether to keep <code>dim</code></p>
 <dd>
 <section class="desc"><p>Summation of tensor(s)</p>
 <h2 id="parameters">Parameters:</h2>
-<p>inputs : varargs, tensors to be summed;
-if a single tensor is passed, its elements will be summed
-dim : int (optional), dimension to reduce over
-keepdim : bool, whether to keep <code>dim</code></p>
+<ul>
+<li>inputs : varargs, tensors to be summed;
+if a single tensor is passed, its elements will be summed</li>
+<li>dim : int (optional), dimension to reduce over</li>
+<li>keepdim : bool, whether to keep <code>dim</code></li>
+</ul>
 <h2 id="returns">Returns:</h2>
-<p>result : Tensor</p></section>
+<ul>
+<li>result : Tensor</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -224,14 +236,14 @@ keepdim : bool, whether to keep <code>dim</code></p>
 
     Parameters:
     -----------
-    inputs : varargs, tensors to be summed;
-    if a single tensor is passed, its elements will be summed
-    dim : int (optional), dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to be summed;
+       if a single tensor is passed, its elements will be summed
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     &#39;&#39;&#39;
 
