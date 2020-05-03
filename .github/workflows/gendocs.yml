@@ -26,11 +26,11 @@ jobs:
     - name: Status
       run: git status
 
-    - name: Has Changed
+    - name: Has the code base changed?
       id: has_changed
       run: echo "##[set-output name=changed;]$(git status --porcelain)"
 
-    - name: Generate documentation if any changes were made
+    - name: Generate docs if any changes were made
       if: steps.has_changed.outputs.changed != ''
       run: python docs/gendocs.py
 
@@ -49,5 +49,5 @@ jobs:
       if: steps.has_changed.outputs.key != ''
       uses: ad-m/github-push-action@master
       with:
-        github_token: '${{ secrets.MAXO_SECRET }}'
+        github_token: '${{ secrets.NUJO_TOKEN }}'
         branch: '${{ github.ref }}'
