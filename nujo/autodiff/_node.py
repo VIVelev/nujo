@@ -1,4 +1,4 @@
-from nujo.autodiff._utils import _counter
+from itertools import count
 
 
 class _Node:
@@ -13,7 +13,7 @@ class _Node:
 
     '''
 
-    id_generator = _counter()
+    _id_generator = count()
 
     def __init__(self, *children: ..., name='Node'):
         # Parse all children that are not Nodes to Tensors
@@ -22,7 +22,7 @@ class _Node:
             self.add_child(child)
 
         self.name = name
-        self.id: int = _Node.id_generator.get()
+        self.id: int = next(_Node._id_generator)
 
     def __eq__(self, other):
         return self.id == other.id

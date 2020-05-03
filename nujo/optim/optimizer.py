@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import List
+from typing import Generator
 
 from nujo.autodiff import Tensor, no_diff
 
@@ -15,7 +15,7 @@ class Optimizer:
      - lr : float, the learning rate
 
     '''
-    def __init__(self, params: List[Tensor], lr: float):
+    def __init__(self, params: Generator[Tensor, Tensor, None], lr: float):
         self.params = params
         self.lr = lr
 
@@ -25,17 +25,12 @@ class Optimizer:
 
     def step(self) -> None:
         with no_diff():
-            # Iterate over layers
-            for l in range(len(self.params)):
-                # Iterate over params in layer `l`
-                for i in range(len(self.params[l])):
-
-                    self.params[l][i] <<= self.update_rule(
-                        self.params[l][i], self.params[l][i].grad)
+            parameters = self.params()
+            for param in parameters:
+                parameters.send(self.update_rule(param, param.grad))
 
     def zero_grad(self) -> None:
-        # Iterate over layers
-        for l in range(len(self.params)):
-            # Iterate over params in layer `l`
-            for i in range(len(self.params[l])):
-                self.params[l][i].zero_grad()
+        parameters = self.params()
+        for param in parameters:
+            param.zero_grad()
+            parameters.send(param)

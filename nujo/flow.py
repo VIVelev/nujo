@@ -1,6 +1,7 @@
 ''' a computational Flow
 '''
 
+from abc import abstractmethod
 from copy import deepcopy
 from typing import List, Union
 
@@ -13,8 +14,11 @@ class _FlowSetup(type):
     def __call__(cls, *args, **kwargs):
         ''' Flow() init call '''
         obj = type.__call__(cls, *args, **kwargs)
-        obj._register_parameters()
 
+        if not obj.subflows:
+            obj = Flow(subflows=[obj])
+
+        obj._register_parameters()
         return obj
 
 
@@ -31,29 +35,35 @@ class Flow(metaclass=_FlowSetup):
     '''
     def __init__(self, name='Flow', subflows: List['Flow'] = []):
         self.name = name
-        self.is_supflow = True if subflows else False
+        self.subflows = subflows
 
-        self.subflows: List['Flow'] = []
-        self.parameters: List[Tensor] = []
-
-        if self.is_supflow:
-            self.append(*subflows)
+        if len(self.subflows):
+            self.name = self._generate_supflow_name()
 
     def _register_parameters(self) -> None:
         ''' Called after Flow.__init__
         '''
 
-        for prop_name in dir(self):
-            prop = getattr(self, prop_name)
-            if isinstance(prop, Tensor):
-                prop.diff = True
-                self.parameters.append(prop)
+        for flow in self.subflows:
+            for prop_name in dir(flow):
+                prop = getattr(flow, prop_name)
 
-        if self.parameters and not isinstance(self.parameters[0], list):
-            self.parameters = [self.parameters]
+                if isinstance(prop, Tensor):
+                    prop.diff = True
 
     def _generate_supflow_name(self) -> str:
         return ' >> '.join(map(lambda x: x.name, self.subflows))
+
+    def parameters(self) -> Tensor:
+        for flow in self.subflows:
+            for prop_name in dir(flow):
+                prop = getattr(flow, prop_name)
+
+                if isinstance(prop, Tensor):
+                    updated = (yield prop)
+                    yield
+                    if updated is not None:
+                        prop <<= updated
 
     def append(self, *flows: 'Flow') -> 'Flow':
         ''' Flow Append
@@ -70,17 +80,9 @@ class Flow(metaclass=_FlowSetup):
 
         '''
 
-        if not self.is_supflow:
-            flows = list(flows)
-            flows.insert(0, self)
-            return Flow(subflows=flows)
-
         for flow in flows:
-            self.subflows.append(flow)
-
-            if flow.parameters:
-                for params in flow.parameters:
-                    self.parameters.append(params)
+            for subflow in flow:
+                self.subflows.append(subflow)
 
         self.name = self._generate_supflow_name()
         return self
@@ -108,36 +110,29 @@ class Flow(metaclass=_FlowSetup):
 
         return retflow
 
-    def forward(self, x: Tensor) -> Tensor:
-        ''' Flow Forward
-
-        The flow computation is defined here.
-
-        Parameters:
-        -----------
-         - x : Tensor or ndarray, input tensor
-
-        Returns:
-        --------
-         - res : Tensor, computed result
-
-        '''
-
-        output_x = x
-        for subflow in self:
-            output_x = subflow(output_x)
-
-        return output_x
-
     def copy(self) -> 'Flow':
         ''' Make a copy of the current flow
         '''
 
         return deepcopy(self)
 
+    @abstractmethod
+    def forward(self, *args, **kwargs) -> Tensor:
+        ''' Flow Forward
+
+        The flow computation is defined here.
+
+        '''
+
+        pass
+
     def __call__(self, *args, **kwargs) -> Tensor:
-        output = self.forward(*args, **kwargs)
-        return output if isinstance(output, Tensor) else Tensor(output)
+        output = self[0].forward(*args, **kwargs)
+
+        for subflow in self[1:]:
+            output = subflow.forward(output, **kwargs)
+
+        return output
 
     def __rshift__(self, other: 'Flow') -> 'Flow':
         ''' Chaining operator
@@ -151,10 +146,7 @@ class Flow(metaclass=_FlowSetup):
 
         '''
 
-        self_subflows = self.subflows if self.is_supflow else [self]
-        other_subflows = other.subflows if other.is_supflow else [other]
-
-        return Flow(subflows=[*self_subflows, *other_subflows])
+        return Flow(subflows=[*self.subflows, *other.subflows])
 
     def __getitem__(self, key: Union[int, str]) -> 'Flow':
         ''' Subflow getter of a supflow
@@ -181,6 +173,9 @@ class Flow(metaclass=_FlowSetup):
 
     def __iter__(self):
         return iter(self.subflows)
+
+    def __len__(self):
+        return len(self.subflows)
 
     def __repr__(self):
         return '<|' + self.name + '>'

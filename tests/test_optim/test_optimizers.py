@@ -7,8 +7,11 @@ from nujo import mean, rand, randn
 # Test Stochastic Gradient Descent (SGD)
 
 
-def test_sgd_basic(scalar_params, num_iters, quadratic_loss):
-    optimizer = optim.SGD(scalar_params)
+@pytest.mark.slow
+def test_sgd_basic(scalar_params, get_generator_for, num_iters,
+                   quadratic_loss):
+
+    optimizer = optim.SGD(get_generator_for(scalar_params))
 
     prev_loss = 1e3
     for _ in range(num_iters):
@@ -22,8 +25,9 @@ def test_sgd_basic(scalar_params, num_iters, quadratic_loss):
         prev_loss = loss
 
 
-def test_sgd_matrix(vec_params, num_iters, matrix_mse_loss):
-    optimizer = optim.SGD(vec_params)
+@pytest.mark.slow
+def test_sgd_matrix(vec_params, get_generator_for, num_iters, matrix_mse_loss):
+    optimizer = optim.SGD(get_generator_for(vec_params))
 
     prev_loss = 1e3
     for i in range(num_iters):
@@ -41,8 +45,11 @@ def test_sgd_matrix(vec_params, num_iters, matrix_mse_loss):
 # Test Momentum optimizer
 
 
-def test_momentum_basic(scalar_params, num_iters, quadratic_loss):
-    optimizer = optim.Momentum(scalar_params)
+@pytest.mark.slow
+def test_momentum_basic(scalar_params, get_generator_for, num_iters,
+                        quadratic_loss):
+
+    optimizer = optim.Momentum(get_generator_for(scalar_params))
 
     prev_loss = 1e3
     for _ in range(num_iters):
@@ -56,8 +63,11 @@ def test_momentum_basic(scalar_params, num_iters, quadratic_loss):
         prev_loss = loss
 
 
-def test_momentum_matrix(vec_params, num_iters, matrix_mse_loss):
-    optimizer = optim.Momentum(vec_params)
+@pytest.mark.slow
+def test_momentum_matrix(vec_params, get_generator_for, num_iters,
+                         matrix_mse_loss):
+
+    optimizer = optim.Momentum(get_generator_for(vec_params))
 
     prev_loss = 1e3
     for i in range(num_iters):
@@ -75,8 +85,11 @@ def test_momentum_matrix(vec_params, num_iters, matrix_mse_loss):
 # Test RMSprop optimizer
 
 
-def test_rmsprop_basic(scalar_params, num_iters, quadratic_loss):
-    optimizer = optim.RMSprop(scalar_params)
+@pytest.mark.slow
+def test_rmsprop_basic(scalar_params, get_generator_for, num_iters,
+                       quadratic_loss):
+
+    optimizer = optim.RMSprop(get_generator_for(scalar_params))
 
     prev_loss = 1e3
     for _ in range(num_iters):
@@ -90,8 +103,11 @@ def test_rmsprop_basic(scalar_params, num_iters, quadratic_loss):
         prev_loss = loss
 
 
-def test_rmsprop_matrix(vec_params, num_iters, matrix_mse_loss):
-    optimizer = optim.RMSprop(vec_params)
+@pytest.mark.slow
+def test_rmsprop_matrix(vec_params, get_generator_for, num_iters,
+                        matrix_mse_loss):
+
+    optimizer = optim.RMSprop(get_generator_for(vec_params))
 
     prev_loss = 1e3
     for i in range(num_iters):
@@ -109,8 +125,11 @@ def test_rmsprop_matrix(vec_params, num_iters, matrix_mse_loss):
 # Test Adam optimizer
 
 
-def test_adam_basic(scalar_params, num_iters, quadratic_loss):
-    optimizer = optim.Adam(scalar_params)
+@pytest.mark.slow
+def test_adam_basic(scalar_params, get_generator_for, num_iters,
+                    quadratic_loss):
+
+    optimizer = optim.Adam(get_generator_for(scalar_params))
 
     prev_loss = 1e3
     for _ in range(num_iters):
@@ -124,8 +143,11 @@ def test_adam_basic(scalar_params, num_iters, quadratic_loss):
         prev_loss = loss
 
 
-def test_adam_matrix(vec_params, num_iters, matrix_mse_loss):
-    optimizer = optim.Adam(vec_params)
+@pytest.mark.slow
+def test_adam_matrix(vec_params, get_generator_for, num_iters,
+                     matrix_mse_loss):
+
+    optimizer = optim.Adam(get_generator_for(vec_params))
 
     prev_loss = 1e3
     for i in range(num_iters):
@@ -145,12 +167,26 @@ def test_adam_matrix(vec_params, num_iters, matrix_mse_loss):
 
 @pytest.fixture
 def scalar_params():
-    return [[rand(diff=True)]]
+    return [rand(diff=True)]
 
 
 @pytest.fixture
 def vec_params():
-    return [[rand(3, 1, diff=True)]]
+    return [rand(3, 1, diff=True)]
+
+
+@pytest.fixture
+def get_generator_for():
+    def gen(params):
+        def g():
+            updated = (yield params[0])
+            yield
+            if updated is not None:
+                params[0] <<= updated
+
+        return g
+
+    return gen
 
 
 @pytest.fixture
@@ -161,7 +197,7 @@ def num_iters():
 @pytest.fixture
 def quadratic_loss():
     def compute(params):
-        return 3 * (params[0][0]**2) + 5 * params[0][0] + 7
+        return 3 * (params[0]**2) + 5 * params[0] + 7
 
     return compute
 
@@ -172,7 +208,7 @@ def matrix_mse_loss():
     y = X @ randn(3, 1) + rand()
 
     def compute(params):
-        return mean((y - X @ params[0][0])**2)
+        return mean((y - X @ params[0])**2)
 
     return compute
 
