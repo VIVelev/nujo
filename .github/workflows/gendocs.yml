@@ -19,6 +19,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: pull
+      run: |
+        git pull
+
     - name: generate documentation
       run: |
         python docs/gendocs.py false
