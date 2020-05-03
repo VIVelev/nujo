@@ -46,11 +46,11 @@ class Tensor(_Node):
 
     Parameters:
     -----------
-    value : value, numerical value of the tensor
-    diff : boolean, whether to compute gradients for the tensor
-    creator : nujo function, that created this tensor;
-    the only child of a tensor
-    name : string, representation of the tensor
+     - value : value, numerical value of the tensor
+     - diff : boolean, whether to compute gradients for the tensor
+     - creator : nujo function, that created this tensor;
+       the only child of a tensor
+     - name : string, representation of the tensor
 
     &#39;&#39;&#39;
     def __init__(self,
@@ -378,11 +378,13 @@ They "flow" in the computation graph. :)</p>
 <p>Tensors can be either constants or trainable weights,
 depending on whether gradients are computed for the given tensor.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>value : value, numerical value of the tensor
-diff : boolean, whether to compute gradients for the tensor
-creator : nujo function, that created this tensor;
-the only child of a tensor
-name : string, representation of the tensor</p></section>
+<ul>
+<li>value : value, numerical value of the tensor</li>
+<li>diff : boolean, whether to compute gradients for the tensor</li>
+<li>creator : nujo function, that created this tensor;
+the only child of a tensor</li>
+<li>name : string, representation of the tensor</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -398,11 +400,11 @@ name : string, representation of the tensor</p></section>
 
     Parameters:
     -----------
-    value : value, numerical value of the tensor
-    diff : boolean, whether to compute gradients for the tensor
-    creator : nujo function, that created this tensor;
-    the only child of a tensor
-    name : string, representation of the tensor
+     - value : value, numerical value of the tensor
+     - diff : boolean, whether to compute gradients for the tensor
+     - creator : nujo function, that created this tensor;
+       the only child of a tensor
+     - name : string, representation of the tensor
 
     &#39;&#39;&#39;
     def __init__(self,

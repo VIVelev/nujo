@@ -91,8 +91,10 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 <section class="desc"><p>A computational Flow</p>
 <p>Flow of tensors through nujo functions.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>name : string
-subflows : list of flows, only if the current flow is a supflow</p></section>
+<ul>
+<li>name : string</li>
+<li>subflows : list of flows, only if the current flow is a supflow</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -104,8 +106,8 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
     Parameters:
     -----------
-    name : string
-    subflows : list of flows, only if the current flow is a supflow
+     - name : string
+     - subflows : list of flows, only if the current flow is a supflow
 
     &#39;&#39;&#39;
     def __init__(self, name=&#39;Flow&#39;, subflows: List[&#39;Flow&#39;] = []):
@@ -141,11 +143,11 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         Parameters:
         -----------
-        flows : varargs, the flows to append, sequantially
+         - flows : varargs, the flows to append, sequantially
 
         Returns:
         --------
-        supflow : Flow, the total computational flow
+         - supflow : Flow, the total computational flow
 
         &#39;&#39;&#39;
 
@@ -174,11 +176,11 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         Parameters:
         -----------
-        idx : integer, index of the flow to remove
+         - idx : integer, index of the flow to remove
 
         Returns:
         --------
-        flow : Flow, the total computational flow
+         - flow : Flow, the total computational flow
 
         &#39;&#39;&#39;
 
@@ -194,11 +196,11 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
         Parameters:
         -----------
-        x : Tensor or ndarray, input tensor
+         - x : Tensor or ndarray, input tensor
 
         Returns:
         --------
-        res : Tensor, computed result
+         - res : Tensor, computed result
 
         &#39;&#39;&#39;
 
@@ -285,9 +287,13 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <section class="desc"><p>Flow Append</p>
 <p>Appends a new Flow on top of the current one.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>flows : varargs, the flows to append, sequantially</p>
+<ul>
+<li>flows : varargs, the flows to append, sequantially</li>
+</ul>
 <h2 id="returns">Returns:</h2>
-<p>supflow : Flow, the total computational flow</p></section>
+<ul>
+<li>supflow : Flow, the total computational flow</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -299,11 +305,11 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
     Parameters:
     -----------
-    flows : varargs, the flows to append, sequantially
+     - flows : varargs, the flows to append, sequantially
 
     Returns:
     --------
-    supflow : Flow, the total computational flow
+     - supflow : Flow, the total computational flow
 
     &#39;&#39;&#39;
 
@@ -346,9 +352,13 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <section class="desc"><p>Flow Forward</p>
 <p>The flow computation is defined here.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>x : Tensor or ndarray, input tensor</p>
+<ul>
+<li>x : Tensor or ndarray, input tensor</li>
+</ul>
 <h2 id="returns">Returns:</h2>
-<p>res : Tensor, computed result</p></section>
+<ul>
+<li>res : Tensor, computed result</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -360,11 +370,11 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 
     Parameters:
     -----------
-    x : Tensor or ndarray, input tensor
+     - x : Tensor or ndarray, input tensor
 
     Returns:
     --------
-    res : Tensor, computed result
+     - res : Tensor, computed result
 
     &#39;&#39;&#39;
 
@@ -384,9 +394,13 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <p>Once a supflow is a supflow it stays a supflow.
 No mather how many subflows it contains.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>idx : integer, index of the flow to remove</p>
+<ul>
+<li>idx : integer, index of the flow to remove</li>
+</ul>
 <h2 id="returns">Returns:</h2>
-<p>flow : Flow, the total computational flow</p></section>
+<ul>
+<li>flow : Flow, the total computational flow</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -401,11 +415,11 @@ No mather how many subflows it contains.</p>
 
     Parameters:
     -----------
-    idx : integer, index of the flow to remove
+     - idx : integer, index of the flow to remove
 
     Returns:
     --------
-    flow : Flow, the total computational flow
+     - flow : Flow, the total computational flow
 
     &#39;&#39;&#39;
 
@@ -428,8 +442,10 @@ No mather how many subflows it contains.</p>
 and produces only one tensor as output.</p>
 <p>Functions do not change tensors in-place.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>children : varargs, the inpute tensors
-name : string, the name of the function</p></section>
+<ul>
+<li>children : varargs, the inpute tensors</li>
+<li>name : string, the name of the function</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -446,8 +462,8 @@ name : string, the name of the function</p></section>
 
     Parameters:
     -----------
-    children : varargs, the inpute tensors
-    name : string, the name of the function
+     - children : varargs, the inpute tensors
+     - name : string, the name of the function
 
     &#39;&#39;&#39;
     def __init__(self,
@@ -560,11 +576,13 @@ They "flow" in the computation graph. :)</p>
 <p>Tensors can be either constants or trainable weights,
 depending on whether gradients are computed for the given tensor.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>value : value, numerical value of the tensor
-diff : boolean, whether to compute gradients for the tensor
-creator : nujo function, that created this tensor;
-the only child of a tensor
-name : string, representation of the tensor</p></section>
+<ul>
+<li>value : value, numerical value of the tensor</li>
+<li>diff : boolean, whether to compute gradients for the tensor</li>
+<li>creator : nujo function, that created this tensor;
+the only child of a tensor</li>
+<li>name : string, representation of the tensor</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -580,11 +598,11 @@ name : string, representation of the tensor</p></section>
 
     Parameters:
     -----------
-    value : value, numerical value of the tensor
-    diff : boolean, whether to compute gradients for the tensor
-    creator : nujo function, that created this tensor;
-    the only child of a tensor
-    name : string, representation of the tensor
+     - value : value, numerical value of the tensor
+     - diff : boolean, whether to compute gradients for the tensor
+     - creator : nujo function, that created this tensor;
+       the only child of a tensor
+     - name : string, representation of the tensor
 
     &#39;&#39;&#39;
     def __init__(self,

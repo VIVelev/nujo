@@ -58,8 +58,8 @@ class SGD(Optimizer):
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
 
     &#39;&#39;&#39;
     def __init__(self, params: List[Tensor], lr=0.005):
@@ -81,10 +81,10 @@ class Momentum(Optimizer):
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
-    beta : float, the fraction of the update vector of the past
-    time step to be added to the current update vector
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
+     - beta : float, the fraction of the update vector of the past
+       time step to be added to the current update vector
 
     &#39;&#39;&#39;
     def __init__(self, params: List[Tensor], lr=0.001, beta=0.9):
@@ -119,10 +119,10 @@ class RMSprop(Optimizer):
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
-    beta : float, the squared gradient coefficients
-    eps : float, added for numerical stability
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
+     - beta : float, the squared gradient coefficients
+     - eps : float, added for numerical stability
 
     &#39;&#39;&#39;
     def __init__(self, params: List[Tensor], lr=0.001, beta=0.999, eps=1e-09):
@@ -158,11 +158,11 @@ class Adam(Optimizer):
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
-    betas : tuple of 2 floats, the velocity (Momentum) and
-    squared gradient (RMSprop) coefficients
-    eps : float, added for numerical stability
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
+     - betas : tuple of 2 floats, the velocity (Momentum) and
+       squared gradient (RMSprop) coefficients
+     - eps : float, added for numerical stability
 
     &#39;&#39;&#39;
     def __init__(self,
@@ -225,11 +225,13 @@ class Adam(Optimizer):
 for each parameter. It basically combines Momentum
 and RMSprop into one update rule.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>params : list of Tensors, the parameters which to update
-lr : float, the learning rate
-betas : tuple of 2 floats, the velocity (Momentum) and
-squared gradient (RMSprop) coefficients
-eps : float, added for numerical stability</p></section>
+<ul>
+<li>params : list of Tensors, the parameters which to update</li>
+<li>lr : float, the learning rate</li>
+<li>betas : tuple of 2 floats, the velocity (Momentum) and
+squared gradient (RMSprop) coefficients</li>
+<li>eps : float, added for numerical stability</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -243,11 +245,11 @@ eps : float, added for numerical stability</p></section>
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
-    betas : tuple of 2 floats, the velocity (Momentum) and
-    squared gradient (RMSprop) coefficients
-    eps : float, added for numerical stability
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
+     - betas : tuple of 2 floats, the velocity (Momentum) and
+       squared gradient (RMSprop) coefficients
+     - eps : float, added for numerical stability
 
     &#39;&#39;&#39;
     def __init__(self,
@@ -337,10 +339,12 @@ eps : float, added for numerical stability</p></section>
 dampens oscillations. It does this by adding a fraction of the
 update vector of the past time step to the current update vector.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>params : list of Tensors, the parameters which to update
-lr : float, the learning rate
-beta : float, the fraction of the update vector of the past
-time step to be added to the current update vector</p></section>
+<ul>
+<li>params : list of Tensors, the parameters which to update</li>
+<li>lr : float, the learning rate</li>
+<li>beta : float, the fraction of the update vector of the past
+time step to be added to the current update vector</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -354,10 +358,10 @@ time step to be added to the current update vector</p></section>
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
-    beta : float, the fraction of the update vector of the past
-    time step to be added to the current update vector
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
+     - beta : float, the fraction of the update vector of the past
+       time step to be added to the current update vector
 
     &#39;&#39;&#39;
     def __init__(self, params: List[Tensor], lr=0.001, beta=0.9):
@@ -420,10 +424,12 @@ time step to be added to the current update vector</p></section>
 at his Neural Networks Coursera course. It uses a moving average
 of squared gradients to normalize the gradient itself.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>params : list of Tensors, the parameters which to update
-lr : float, the learning rate
-beta : float, the squared gradient coefficients
-eps : float, added for numerical stability</p></section>
+<ul>
+<li>params : list of Tensors, the parameters which to update</li>
+<li>lr : float, the learning rate</li>
+<li>beta : float, the squared gradient coefficients</li>
+<li>eps : float, added for numerical stability</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -437,10 +443,10 @@ eps : float, added for numerical stability</p></section>
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
-    beta : float, the squared gradient coefficients
-    eps : float, added for numerical stability
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
+     - beta : float, the squared gradient coefficients
+     - eps : float, added for numerical stability
 
     &#39;&#39;&#39;
     def __init__(self, params: List[Tensor], lr=0.001, beta=0.999, eps=1e-09):
@@ -502,8 +508,10 @@ eps : float, added for numerical stability</p></section>
 <section class="desc"><p>SGD: Stochastic Gradient Descent</p>
 <p>An iterative method for optimizing an objective function.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>params : list of Tensors, the parameters which to update
-lr : float, the learning rate</p></section>
+<ul>
+<li>params : list of Tensors, the parameters which to update</li>
+<li>lr : float, the learning rate</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -515,8 +523,8 @@ lr : float, the learning rate</p></section>
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
 
     &#39;&#39;&#39;
     def __init__(self, params: List[Tensor], lr=0.005):

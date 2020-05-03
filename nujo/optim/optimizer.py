@@ -11,8 +11,8 @@ class Optimizer:
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
 
     '''
     def __init__(self, params: List[Tensor], lr: float):

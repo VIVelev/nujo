@@ -37,8 +37,8 @@ class Optimizer:
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
 
     &#39;&#39;&#39;
     def __init__(self, params: List[Tensor], lr: float):
@@ -84,8 +84,10 @@ class Optimizer:
 <section class="desc"><p>Stochastic Gradient Descent Optimizer</p>
 <p>A base class.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>params : list of Tensors, the parameters which to update
-lr : float, the learning rate</p></section>
+<ul>
+<li>params : list of Tensors, the parameters which to update</li>
+<li>lr : float, the learning rate</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -97,8 +99,8 @@ lr : float, the learning rate</p></section>
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
 
     &#39;&#39;&#39;
     def __init__(self, params: List[Tensor], lr: float):
