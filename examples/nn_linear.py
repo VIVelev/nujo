@@ -2,6 +2,7 @@ import nujo as nj
 import nujo.nn as nn
 import nujo.objective as obj
 import nujo.optim as optim
+from nujo.utils.viz import ComputationGraphPlotter
 
 # Define the net and optimizer
 net = nn.Linear(3, 6) >> nn.Linear(6, 2) >> nn.Linear(2, 1)
@@ -10,7 +11,8 @@ print('Defined net:', net)
 loss_fn = obj.L2Loss()
 print('Loss:', loss_fn)
 
-optimizer = optim.Adam(net.parameters, lr=0.1)
+print(net.parameters)
+optimizer = optim.Adam(net.parameters, lr=0.5)
 print('Optimizer:', optimizer)
 
 
@@ -36,11 +38,17 @@ def train(net, x, y, num_epochs):
         # Zero grad
         optimizer.zero_grad()
 
+    return loss
+
 
 if __name__ == '__main__':
     # Create example data
-    x = nj.rand(30, 3, diff=False)
-    y = x @ [[2], [3], [4]] - 10
+    x = nj.rand(30, 3, name='X_train')
+    y = nj.Tensor(x @ [[2], [3], [4]] - 10, name='y_train')
 
     # Train
-    train(net, x, y, 100)
+    loss = train(net, x, y, 100)
+
+    # Visualize the Neural Network as a computation graph
+    cg_plot = ComputationGraphPlotter(filename='graph').create(loss)
+    cg_plot.view()

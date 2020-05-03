@@ -34,8 +34,11 @@ http://ruder.io/optimizing-gradient-descent/index.html
 
 &#39;&#39;&#39;
 
-from numpy import sqrt, zeros_like
+from typing import Dict, List
 
+from nujo.autodiff.tensor import Tensor
+from nujo.init.basic import zeros_like
+from nujo.math.scalar import sqrt
 from nujo.optim.optimizer import Optimizer
 
 __all__ = [
@@ -55,14 +58,14 @@ class SGD(Optimizer):
 
     Parameters:
     -----------
-    params : list of ndarray(s), the parameters which to update
+    params : list of Tensors, the parameters which to update
     lr : float, the learning rate
 
     &#39;&#39;&#39;
-    def __init__(self, params, lr=0.005):
+    def __init__(self, params: List[Tensor], lr=0.005):
         super(SGD, self).__init__(params, lr)
 
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
         return param - self.lr * grad
 
 
@@ -78,19 +81,19 @@ class Momentum(Optimizer):
 
     Parameters:
     -----------
-    params : list of ndarray(s), the parameters which to update
+    params : list of Tensors, the parameters which to update
     lr : float, the learning rate
     beta : float, the fraction of the update vector of the past
     time step to be added to the current update vector
 
     &#39;&#39;&#39;
-    def __init__(self, params, lr=0.003, beta=0.9):
+    def __init__(self, params: List[Tensor], lr=0.001, beta=0.9):
         super(Momentum, self).__init__(params, lr)
 
         self.beta = beta
-        self._velocity = {}
+        self._velocity: Dict[str, Tensor] = {}
 
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
         # Get the corresponding velocity
         key = param.name
         if key not in self._velocity:
@@ -116,20 +119,20 @@ class RMSprop(Optimizer):
 
     Parameters:
     -----------
-    params : list of ndarray(s), the parameters which to update
+    params : list of Tensors, the parameters which to update
     lr : float, the learning rate
     beta : float, the squared gradient coefficients
     eps : float, added for numerical stability
 
     &#39;&#39;&#39;
-    def __init__(self, params, lr=0.0005, beta=0.999, eps=1e-09):
+    def __init__(self, params: List[Tensor], lr=0.001, beta=0.999, eps=1e-09):
         super(RMSprop, self).__init__(params, lr)
 
         self.beta = beta
         self.eps = eps
-        self._squared = {}
+        self._squared: Dict[str, Tensor] = {}
 
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
         # Get the corresponding squared gradient
         key = param.name
         if key not in self._squared:
@@ -155,24 +158,29 @@ class Adam(Optimizer):
 
     Parameters:
     -----------
-    params : list of ndarray(s), the parameters which to update
+    params : list of Tensors, the parameters which to update
     lr : float, the learning rate
     betas : tuple of 2 floats, the velocity (Momentum) and
     squared gradient (RMSprop) coefficients
     eps : float, added for numerical stability
 
     &#39;&#39;&#39;
-    def __init__(self, params, lr=0.001, betas=(0.9, 0.999), eps=1e-09):
+    def __init__(self,
+                 params: List[Tensor],
+                 lr=0.005,
+                 betas=(0.9, 0.999),
+                 eps=1e-09):
+
         super(Adam, self).__init__(params, lr)
 
         self.betas = betas
         self.eps = eps
 
-        self._velocity = {}
-        self._squared = {}
+        self._velocity: Dict[str, Tensor] = {}
+        self._squared: Dict[str, Tensor] = {}
         self._t = 1
 
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
         # Get the corresponding velocity and squared gradient
         key = param.name
         if key not in self._velocity:
@@ -209,7 +217,7 @@ class Adam(Optimizer):
 <dl>
 <dt id="nujo.optim.optimizers.Adam"><code class="flex name class">
 <span>class <span class="ident">Adam</span></span>
-<span>(</span><span>params, lr=0.001, betas=(0.9, 0.999), eps=1e-09)</span>
+<span>(</span><span>params, lr=0.005, betas=(0.9, 0.999), eps=1e-09)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Adam: Adaptive Moment Estimation</p>
@@ -217,7 +225,7 @@ class Adam(Optimizer):
 for each parameter. It basically combines Momentum
 and RMSprop into one update rule.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>params : list of ndarray(s), the parameters which to update
+<p>params : list of Tensors, the parameters which to update
 lr : float, the learning rate
 betas : tuple of 2 floats, the velocity (Momentum) and
 squared gradient (RMSprop) coefficients
@@ -235,24 +243,29 @@ eps : float, added for numerical stability</p></section>
 
     Parameters:
     -----------
-    params : list of ndarray(s), the parameters which to update
+    params : list of Tensors, the parameters which to update
     lr : float, the learning rate
     betas : tuple of 2 floats, the velocity (Momentum) and
     squared gradient (RMSprop) coefficients
     eps : float, added for numerical stability
 
     &#39;&#39;&#39;
-    def __init__(self, params, lr=0.001, betas=(0.9, 0.999), eps=1e-09):
+    def __init__(self,
+                 params: List[Tensor],
+                 lr=0.005,
+                 betas=(0.9, 0.999),
+                 eps=1e-09):
+
         super(Adam, self).__init__(params, lr)
 
         self.betas = betas
         self.eps = eps
 
-        self._velocity = {}
-        self._squared = {}
+        self._velocity: Dict[str, Tensor] = {}
+        self._squared: Dict[str, Tensor] = {}
         self._t = 1
 
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
         # Get the corresponding velocity and squared gradient
         key = param.name
         if key not in self._velocity:
@@ -289,7 +302,7 @@ eps : float, added for numerical stability</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def update_rule(self, param, grad):
+<pre><code class="python">def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
     # Get the corresponding velocity and squared gradient
     key = param.name
     if key not in self._velocity:
@@ -316,7 +329,7 @@ eps : float, added for numerical stability</p></section>
 </dd>
 <dt id="nujo.optim.optimizers.Momentum"><code class="flex name class">
 <span>class <span class="ident">Momentum</span></span>
-<span>(</span><span>params, lr=0.003, beta=0.9)</span>
+<span>(</span><span>params, lr=0.001, beta=0.9)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Momentum</p>
@@ -324,7 +337,7 @@ eps : float, added for numerical stability</p></section>
 dampens oscillations. It does this by adding a fraction of the
 update vector of the past time step to the current update vector.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>params : list of ndarray(s), the parameters which to update
+<p>params : list of Tensors, the parameters which to update
 lr : float, the learning rate
 beta : float, the fraction of the update vector of the past
 time step to be added to the current update vector</p></section>
@@ -341,19 +354,19 @@ time step to be added to the current update vector</p></section>
 
     Parameters:
     -----------
-    params : list of ndarray(s), the parameters which to update
+    params : list of Tensors, the parameters which to update
     lr : float, the learning rate
     beta : float, the fraction of the update vector of the past
     time step to be added to the current update vector
 
     &#39;&#39;&#39;
-    def __init__(self, params, lr=0.003, beta=0.9):
+    def __init__(self, params: List[Tensor], lr=0.001, beta=0.9):
         super(Momentum, self).__init__(params, lr)
 
         self.beta = beta
-        self._velocity = {}
+        self._velocity: Dict[str, Tensor] = {}
 
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
         # Get the corresponding velocity
         key = param.name
         if key not in self._velocity:
@@ -381,7 +394,7 @@ time step to be added to the current update vector</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def update_rule(self, param, grad):
+<pre><code class="python">def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
     # Get the corresponding velocity
     key = param.name
     if key not in self._velocity:
@@ -399,7 +412,7 @@ time step to be added to the current update vector</p></section>
 </dd>
 <dt id="nujo.optim.optimizers.RMSprop"><code class="flex name class">
 <span>class <span class="ident">RMSprop</span></span>
-<span>(</span><span>params, lr=0.0005, beta=0.999, eps=1e-09)</span>
+<span>(</span><span>params, lr=0.001, beta=0.999, eps=1e-09)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>RMSprop</p>
@@ -407,7 +420,7 @@ time step to be added to the current update vector</p></section>
 at his Neural Networks Coursera course. It uses a moving average
 of squared gradients to normalize the gradient itself.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>params : list of ndarray(s), the parameters which to update
+<p>params : list of Tensors, the parameters which to update
 lr : float, the learning rate
 beta : float, the squared gradient coefficients
 eps : float, added for numerical stability</p></section>
@@ -424,20 +437,20 @@ eps : float, added for numerical stability</p></section>
 
     Parameters:
     -----------
-    params : list of ndarray(s), the parameters which to update
+    params : list of Tensors, the parameters which to update
     lr : float, the learning rate
     beta : float, the squared gradient coefficients
     eps : float, added for numerical stability
 
     &#39;&#39;&#39;
-    def __init__(self, params, lr=0.0005, beta=0.999, eps=1e-09):
+    def __init__(self, params: List[Tensor], lr=0.001, beta=0.999, eps=1e-09):
         super(RMSprop, self).__init__(params, lr)
 
         self.beta = beta
         self.eps = eps
-        self._squared = {}
+        self._squared: Dict[str, Tensor] = {}
 
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
         # Get the corresponding squared gradient
         key = param.name
         if key not in self._squared:
@@ -465,7 +478,7 @@ eps : float, added for numerical stability</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def update_rule(self, param, grad):
+<pre><code class="python">def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
     # Get the corresponding squared gradient
     key = param.name
     if key not in self._squared:
@@ -489,7 +502,7 @@ eps : float, added for numerical stability</p></section>
 <section class="desc"><p>SGD: Stochastic Gradient Descent</p>
 <p>An iterative method for optimizing an objective function.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>params : list of ndarray(s), the parameters which to update
+<p>params : list of Tensors, the parameters which to update
 lr : float, the learning rate</p></section>
 <details class="source">
 <summary>
@@ -502,14 +515,14 @@ lr : float, the learning rate</p></section>
 
     Parameters:
     -----------
-    params : list of ndarray(s), the parameters which to update
+    params : list of Tensors, the parameters which to update
     lr : float, the learning rate
 
     &#39;&#39;&#39;
-    def __init__(self, params, lr=0.005):
+    def __init__(self, params: List[Tensor], lr=0.005):
         super(SGD, self).__init__(params, lr)
 
-    def update_rule(self, param, grad):
+    def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
         return param - self.lr * grad</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -527,7 +540,7 @@ lr : float, the learning rate</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def update_rule(self, param, grad):
+<pre><code class="python">def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
     return param - self.lr * grad</code></pre>
 </details>
 </dd>

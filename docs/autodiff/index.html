@@ -96,7 +96,10 @@ name : string, the name of the function</p></section>
     name : string, the name of the function
 
     &#39;&#39;&#39;
-    def __init__(self, *children: Tensor or ndarray, name=&#39;Function&#39;) -&gt; None:
+    def __init__(self,
+                 *children: Union[Tensor, ndarray, List[Number], Number],
+                 name=&#39;Function&#39;):
+
         super(Function, self).__init__(*children, name=name)
 
     def __repr__(self):
@@ -110,17 +113,30 @@ name : string, the name of the function</p></section>
         pass
 
     @abstractmethod
-    def backward(self) -&gt; tuple:
+    def backward(self) -&gt; Tuple[ndarray, ...]:
         pass
 
     def __call__(self) -&gt; Tensor:
+        &#39;&#39;&#39; This method controls what gets registered in the
+        computation graph and what gets a gradient.
+
+        It also builds the backpropagation graph.
+
+        &#39;&#39;&#39;
+
         z = self.forward()
         if not isinstance(z, Tensor):
-            z = Tensor(z, creator=self, name=self._generate_tensor_name())
+            # Register in the computation graph only if in diff mode
+            z = Tensor(z,
+                       diff=any([x.diff for x in self.children]),
+                       creator=self if modes.DIFF_ENABLED else None,
+                       name=self._generate_tensor_name())
 
-        if DIFF_ENABLED and any([x.diff for x in self.children]):
+        if modes.DIFF_ENABLED and z.diff:
+            # Compute gradient for this tensor
             for tensor, derivative in zip(self.children, self.backward()):
-                tensor.add_grad_dependency(z, array(derivative))
+                tensor.add_grad_dependency(
+                    z, Tensor(derivative, name=f&#39;weight[{z.name}]&#39;))
 
         return z</code></pre>
 </details>
@@ -130,19 +146,22 @@ name : string, the name of the function</p></section>
 </ul>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li>nujo.autodiff._functions._Addition</li>
-<li>nujo.autodiff._functions._BinaryStep</li>
-<li>nujo.autodiff._functions._LeakyReLU</li>
-<li>nujo.autodiff._functions._Logarithm</li>
-<li>nujo.autodiff._functions._MatrixMul</li>
-<li>nujo.autodiff._functions._Multiplication</li>
-<li>nujo.autodiff._functions._Negation</li>
-<li>nujo.autodiff._functions._Power</li>
-<li>nujo.autodiff._functions._ReLU</li>
-<li>nujo.autodiff._functions._Reciprocal</li>
-<li>nujo.autodiff._functions._Sigmoid</li>
-<li>nujo.autodiff._functions._Swish</li>
-<li>nujo.autodiff._functions._TanH</li>
+<li>nujo.autodiff._functions._activations._BinaryStep</li>
+<li>nujo.autodiff._functions._activations._LeakyReLU</li>
+<li>nujo.autodiff._functions._activations._ReLU</li>
+<li>nujo.autodiff._functions._activations._Sigmoid</li>
+<li>nujo.autodiff._functions._activations._Softmax</li>
+<li>nujo.autodiff._functions._activations._Swish</li>
+<li>nujo.autodiff._functions._activations._TanH</li>
+<li>nujo.autodiff._functions._aggregate._InnerProd</li>
+<li>nujo.autodiff._functions._aggregate._InnerSum</li>
+<li>nujo.autodiff._functions._elementary._Addition</li>
+<li>nujo.autodiff._functions._elementary._Logarithm</li>
+<li>nujo.autodiff._functions._elementary._MatrixMul</li>
+<li>nujo.autodiff._functions._elementary._Multiplication</li>
+<li>nujo.autodiff._functions._elementary._Negation</li>
+<li>nujo.autodiff._functions._elementary._Power</li>
+<li>nujo.autodiff._functions._elementary._Reciprocal</li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -156,7 +175,7 @@ name : string, the name of the function</p></section>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-def backward(self) -&gt; tuple:
+def backward(self) -&gt; Tuple[ndarray, ...]:
     pass</code></pre>
 </details>
 </dd>
@@ -178,18 +197,18 @@ def forward(self) -&gt; ndarray:
 </dd>
 <dt id="nujo.autodiff.Tensor"><code class="flex name class">
 <span>class <span class="ident">Tensor</span></span>
-<span>(</span><span>value, diff=True, creator=None, name='Tensor')</span>
+<span>(</span><span>value, diff=False, creator=None, name='Tensor')</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Tensor - a multi-dimensional array</p>
-<p>Tensors are the main units of data and computation in Nujo.
+<p>Tensors are the main units of data and computation in nujo.
 They "flow" in the computation graph. :)</p>
 <p>Tensors can be either constants or trainable weights,
 depending on whether gradients are computed for the given tensor.</p>
 <h2 id="parameters">Parameters:</h2>
 <p>value : value, numerical value of the tensor
 diff : boolean, whether to compute gradients for the tensor
-creator : Nujo Function, that created this tensor;
+creator : nujo function, that created this tensor;
 the only child of a tensor
 name : string, representation of the tensor</p></section>
 <details class="source">
@@ -199,7 +218,7 @@ name : string, representation of the tensor</p></section>
 <pre><code class="python">class Tensor(_Node):
     &#39;&#39;&#39; Tensor - a multi-dimensional array
 
-    Tensors are the main units of data and computation in Nujo.
+    Tensors are the main units of data and computation in nujo.
     They &#34;flow&#34; in the computation graph. :)
 
     Tensors can be either constants or trainable weights,
@@ -209,14 +228,14 @@ name : string, representation of the tensor</p></section>
     -----------
     value : value, numerical value of the tensor
     diff : boolean, whether to compute gradients for the tensor
-    creator : Nujo Function, that created this tensor;
+    creator : nujo function, that created this tensor;
     the only child of a tensor
     name : string, representation of the tensor
 
     &#39;&#39;&#39;
     def __init__(self,
-                 value: Number or list or ndarray or &#39;Tensor&#39;,
-                 diff=True,
+                 value: Union[&#39;Tensor&#39;, ndarray, List[Number], Number],
+                 diff=False,
                  creator=None,
                  name=&#39;Tensor&#39;):
 
@@ -229,31 +248,32 @@ name : string, representation of the tensor</p></section>
 
         # (Tensor, weight) pair, used to backpropagate through the network
         # See: `Chain Rule` Wikipedia page for more info
-        self._grad_dependencies = []
+        self._grad_dependencies: List[Tuple[&#39;Tensor&#39;, &#39;Tensor&#39;]] = []
 
         # Gradient cache
-        self._grad: ndarray = None
+        self._grad: &#39;Tensor&#39; = None
 
         # Transposed tensor cache
-        self._T: ndarray = None
+        self._T: &#39;Tensor&#39; = None
 
     @property
-    def grad(self):
+    def grad(self) -&gt; &#39;Tensor&#39;:
         if self._grad is None:
             self._compute_grad()
 
         return self._grad
 
     @grad.setter
-    def grad(self, value: Number or list or ndarray or &#39;Tensor&#39;):
-        self._grad = value.value if isinstance(value, Tensor) else array(value)
+    def grad(self, value: Union[&#39;Tensor&#39;, ndarray, List[Number], Number]):
+        self._grad = value if isinstance(value, Tensor) else Tensor(
+            value, name=f&#39;grad[{self.name}]&#39;)
 
     @grad.deleter
     def grad(self):
         del self._grad
 
     @property
-    def T(self):
+    def T(self) -&gt; &#39;Tensor&#39;:
         if self._T is None:
             transposed = deepcopy(self)
             transposed.value = self.value.T
@@ -265,21 +285,22 @@ name : string, representation of the tensor</p></section>
     # Shape and shape transformations
 
     @property
-    def shape(self):
+    def shape(self) -&gt; Tuple[int, ...]:
         return self.value.shape
 
-    def reshape(self, *args: int, inplace=False) -&gt; &#39;Tensor&#39;:
-        new_val = self.value.reshape(*args)
+    def reshape(self, *shape: int, inplace=False) -&gt; &#39;Tensor&#39;:
+        reshaped = self if inplace else deepcopy(self)
+        reshaped.value = self.value.reshape(shape)
+        return reshaped
 
-        if inplace:
-            self.value = new_val
-            return self
+    def repeat(self,
+               *repeats: int,
+               axis: Optional[int] = None,
+               inplace=False) -&gt; &#39;Tensor&#39;:
 
-        else:
-            reshaped = deepcopy(self)
-            reshaped.name += &#39; (reshaped)&#39;
-            reshaped.value = new_val
-            return reshaped
+        repeated = self if inplace else deepcopy(self)
+        repeated.value = self.value.repeat(repeats, axis=axis)
+        return repeated
 
     def squeeze(self, dim=-1, inplace=False) -&gt; &#39;Tensor&#39;:
         if dim &lt; 0:
@@ -312,58 +333,53 @@ name : string, representation of the tensor</p></section>
 
     # Gradient computation
 
-    def add_grad_dependency(self, wrt: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
+    def add_grad_dependency(self, wrt: &#39;Tensor&#39;, weight: &#39;Tensor&#39;) -&gt; None:
         self._grad_dependencies.append((wrt, weight))
 
     def _compute_grad(self, _debug=False) -&gt; None:
-        if self.diff and DIFF_ENABLED:
+        if modes.DIFF_ENABLED and self.diff and self._grad is None:
             if _debug:
                 print()
                 print(&#39;=&#39; * 30)
-                print(self)
+                print(self, end=&#39;\n\n&#39;)
                 print(&#39;Shape:&#39;, self.shape)
-                print(f&#39;Has {len(self._grad_dependencies)} dependencies:\n&#39;)
+                print(f&#39;Has {len(self._grad_dependencies)} dependencies:&#39;)
+                print(&#39;Grad Dependecies:&#39;, self._grad_dependencies, end=&#39;\n\n&#39;)
 
             # Top-parent grad
             if len(self._grad_dependencies) == 0:
-                self._grad = array(1)
+                self._grad = Tensor(ones(self.shape),
+                                    name=f&#39;grad[{self.name}]&#39;)
                 return
 
-            self._grad = 0
+            self._grad = Tensor(zeros(self.shape), name=f&#39;grad[{self.name}]&#39;)
             for z, weight in self._grad_dependencies:
                 if _debug:
-                    print(&#39;-&#39; * 10)
-                    print(&#39;Z_prev Grad:&#39;, z.grad)
-                    print(&#39;Shape:&#39;, z.grad.shape)
+                    print(&#39;~&#39; * 10)
+                    print(&#39;Z Grad:&#39;, z.grad)
+                    print(&#39;Shape:&#39;, z.grad.shape, end=&#39;\n\n&#39;)
                     print(&#39;-&#39; * 5)
-                    print(&#39;Weight of `Z_prev Grad`:&#39;, weight)
-                    print(&#39;Shape:&#39;, weight.shape)
-                    print(&#39;-&#39; * 5)
+                    print(&#39;Z Weight:&#39;, weight)
+                    print(&#39;Shape:&#39;, weight.shape, end=&#39;\n\n&#39;)
 
-                if z.grad.shape == () or weight.shape == ():  # Is scalar
-                    self._accumulate_grad_scalar(z, weight)
+                if z.creator.name == &#39;MatMul&#39;:
+                    if self.id == z.creator.children[0].id:
+                        # XW = Z, dX ...
+                        self._grad.value += z.grad.value @ weight.value.T
+
+                    else:
+                        # XW = Z, dW ...
+                        self._grad.value += (z.grad.value.T @ weight.value).T
+
                 else:
-                    self._accumulate_grad_matrix(z, weight)
+                    self._grad.value = self._grad.value + \
+                        z.grad.value * weight.value
 
             if _debug:
+                print(&#39;#&#39; * 10)
                 print(&#39;Current Grad:&#39;, self._grad)
                 print(&#39;Shape:&#39;, self._grad.shape)
-                print(&#39;-&#39; * 5)
-                print()
-
-    def _accumulate_grad_scalar(self, z: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
-        self._grad += z.grad * weight
-
-    def _accumulate_grad_matrix(self, z: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
-        weight = weight.reshape(z.grad.shape[0], self.shape[0],
-                                z.grad.shape[1] * self.shape[1])
-        z_grad = z.grad.repeat(self.shape[1],
-                               axis=1).reshape(z.grad.shape[0], 1, -1)
-
-        sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
-        accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
-
-        self._grad += accumulated_grad / z.grad.shape[0]
+                print(&#39;-&#39; * 5, end=&#39;\n\n&#39;)
 
     def zero_grad(self) -&gt; None:
         # `zero_grad` is called after an iteration.
@@ -373,12 +389,28 @@ name : string, representation of the tensor</p></section>
         self._grad = None
         self._T = None
 
-    def backward(self) -&gt; None:
-        self._compute_grad()
+    def backward(self, _debug=False) -&gt; None:
+        &#39;&#39;&#39; It uses Breadth First Search to traverse the computation graph
+        and compute the gradient for each differentiable Tensor in the graph.
 
-        if self.creator:
-            for child in self.creator.children:
-                child.backward()
+        &#39;&#39;&#39;
+
+        nodes_to_visit: List[&#39;Tensor&#39;] = [self]
+        if _debug:
+            i = 1
+
+        while nodes_to_visit:
+            node = nodes_to_visit.pop()
+            node._compute_grad(_debug=_debug)
+
+            if _debug:
+                nstr = f&#39; [{i}]&#39;
+                node.name += nstr if nstr not in node.name else &#39;&#39;
+                i += 1
+
+            if node.creator:
+                for child in node.creator.children:
+                    nodes_to_visit.insert(0, child)
 
     # Useful methods
 
@@ -388,10 +420,12 @@ name : string, representation of the tensor</p></section>
     def any(self) -&gt; ndarray:
         return self.value.any()
 
-    def __getitem__(self, position):
+    def __getitem__(self, position: Union[int, Tuple[int, ...]]):
         return self.value[position]
 
-    def __setitem__(self, position, value):
+    def __setitem__(self, position: Union[int, Tuple[int, ...]],
+                    value: Union[&#39;Tensor&#39;, ndarray, List[Number], Number]):
+
         self.value[position] = value
 
     def __hash__(self):
@@ -399,7 +433,8 @@ name : string, representation of the tensor</p></section>
 
     # Static evaluation operator
 
-    def __ilshift__(self, other):
+    def __ilshift__(self, other: Union[&#39;Tensor&#39;, ndarray, List[Number],
+                                       Number]):
         &#39;&#39;&#39; In-place assignment operator: `&lt;&lt;=`
 
         Essentially used to achieve static evaluation.
@@ -447,14 +482,14 @@ name : string, representation of the tensor</p></section>
     # Arithmetic operations
 
     def __add__(self, other):
-        from nujo.autodiff._functions import _Addition
+        from nujo.autodiff._functions._elementary import _Addition
         return _Addition(self, other)()
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __neg__(self):
-        from nujo.autodiff._functions import _Negation
+        from nujo.autodiff._functions._elementary import _Negation
         return _Negation(self)()
 
     def __sub__(self, other):
@@ -464,41 +499,42 @@ name : string, representation of the tensor</p></section>
         return self.__neg__().__add__(other)
 
     def __mul__(self, other):
-        from nujo.autodiff._functions import _Multiplication
+        from nujo.autodiff._functions._elementary import _Multiplication
         return _Multiplication(self, other)()
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        from nujo.autodiff._functions import _Reciprocal
+        from nujo.autodiff._functions._elementary import _Reciprocal
         return self.__mul__(_Reciprocal(other)())
 
     def __rtruediv__(self, other):
-        from nujo.autodiff._functions import _Reciprocal
+        from nujo.autodiff._functions._elementary import _Reciprocal
         return _Reciprocal(self)().__mul__(other)
 
     def __pow__(self, other):
-        from nujo.autodiff._functions import _Power
+        from nujo.autodiff._functions._elementary import _Power
         return _Power(self, other)()
 
     def __rpow__(self, other):
-        from nujo.autodiff._functions import _Power
+        from nujo.autodiff._functions._elementary import _Power
         return _Power(other, self)()
 
     # More complex arithmetic operations
 
     def __matmul__(self, other):
-        from nujo.autodiff._functions import _MatrixMul
+        from nujo.autodiff._functions._elementary import _MatrixMul
         return _MatrixMul(self, other)()
 
     def __rmatmul__(self, other):
-        from nujo.autodiff._functions import _MatrixMul
+        from nujo.autodiff._functions._elementary import _MatrixMul
         return _MatrixMul(other, self)()
 
     # Representations
 
     def __str__(self):
+        # TODO: Come up with a better representation
         return self.__repr__() + &#39;\n&#39; + &#39;-&#39; * 32 + &#39;\n&#39; + str(self.value)</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -515,7 +551,7 @@ name : string, representation of the tensor</p></section>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
-def T(self):
+def T(self) -&gt; &#39;Tensor&#39;:
     if self._T is None:
         transposed = deepcopy(self)
         transposed.value = self.value.T
@@ -533,7 +569,7 @@ def T(self):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
-def grad(self):
+def grad(self) -&gt; &#39;Tensor&#39;:
     if self._grad is None:
         self._compute_grad()
 
@@ -548,7 +584,7 @@ def grad(self):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
-def shape(self):
+def shape(self) -&gt; Tuple[int, ...]:
     return self.value.shape</code></pre>
 </details>
 </dd>
@@ -564,7 +600,7 @@ def shape(self):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_grad_dependency(self, wrt: &#39;Tensor&#39;, weight: ndarray) -&gt; None:
+<pre><code class="python">def add_grad_dependency(self, wrt: &#39;Tensor&#39;, weight: &#39;Tensor&#39;) -&gt; None:
     self._grad_dependencies.append((wrt, weight))</code></pre>
 </details>
 </dd>
@@ -598,21 +634,38 @@ def shape(self):
 <span>def <span class="ident">backward</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>It uses Breadth First Search to traverse the computation graph
+and compute the gradient for each differentiable Tensor in the graph.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def backward(self) -&gt; None:
-    self._compute_grad()
+<pre><code class="python">def backward(self, _debug=False) -&gt; None:
+    &#39;&#39;&#39; It uses Breadth First Search to traverse the computation graph
+    and compute the gradient for each differentiable Tensor in the graph.
 
-    if self.creator:
-        for child in self.creator.children:
-            child.backward()</code></pre>
+    &#39;&#39;&#39;
+
+    nodes_to_visit: List[&#39;Tensor&#39;] = [self]
+    if _debug:
+        i = 1
+
+    while nodes_to_visit:
+        node = nodes_to_visit.pop()
+        node._compute_grad(_debug=_debug)
+
+        if _debug:
+            nstr = f&#39; [{i}]&#39;
+            node.name += nstr if nstr not in node.name else &#39;&#39;
+            i += 1
+
+        if node.creator:
+            for child in node.creator.children:
+                nodes_to_visit.insert(0, child)</code></pre>
 </details>
 </dd>
-<dt id="nujo.autodiff.Tensor.reshape"><code class="name flex">
-<span>def <span class="ident">reshape</span></span>(<span>self, *args, inplace=False)</span>
+<dt id="nujo.autodiff.Tensor.repeat"><code class="name flex">
+<span>def <span class="ident">repeat</span></span>(<span>self, *repeats, axis=None, inplace=False)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
@@ -620,18 +673,29 @@ def shape(self):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def reshape(self, *args: int, inplace=False) -&gt; &#39;Tensor&#39;:
-    new_val = self.value.reshape(*args)
+<pre><code class="python">def repeat(self,
+           *repeats: int,
+           axis: Optional[int] = None,
+           inplace=False) -&gt; &#39;Tensor&#39;:
 
-    if inplace:
-        self.value = new_val
-        return self
-
-    else:
-        reshaped = deepcopy(self)
-        reshaped.name += &#39; (reshaped)&#39;
-        reshaped.value = new_val
-        return reshaped</code></pre>
+    repeated = self if inplace else deepcopy(self)
+    repeated.value = self.value.repeat(repeats, axis=axis)
+    return repeated</code></pre>
+</details>
+</dd>
+<dt id="nujo.autodiff.Tensor.reshape"><code class="name flex">
+<span>def <span class="ident">reshape</span></span>(<span>self, *shape, inplace=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reshape(self, *shape: int, inplace=False) -&gt; &#39;Tensor&#39;:
+    reshaped = self if inplace else deepcopy(self)
+    reshaped.value = self.value.reshape(shape)
+    return reshaped</code></pre>
 </details>
 </dd>
 <dt id="nujo.autodiff.Tensor.squeeze"><code class="name flex">
@@ -769,6 +833,7 @@ a.k.a. No gradients are computed for whatever tensor.</p></section>
 <li><code><a title="nujo.autodiff.Tensor.any" href="#nujo.autodiff.Tensor.any">any</a></code></li>
 <li><code><a title="nujo.autodiff.Tensor.backward" href="#nujo.autodiff.Tensor.backward">backward</a></code></li>
 <li><code><a title="nujo.autodiff.Tensor.grad" href="#nujo.autodiff.Tensor.grad">grad</a></code></li>
+<li><code><a title="nujo.autodiff.Tensor.repeat" href="#nujo.autodiff.Tensor.repeat">repeat</a></code></li>
 <li><code><a title="nujo.autodiff.Tensor.reshape" href="#nujo.autodiff.Tensor.reshape">reshape</a></code></li>
 <li><code><a title="nujo.autodiff.Tensor.shape" href="#nujo.autodiff.Tensor.shape">shape</a></code></li>
 <li><code><a title="nujo.autodiff.Tensor.squeeze" href="#nujo.autodiff.Tensor.squeeze">squeeze</a></code></li>

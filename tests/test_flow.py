@@ -2,6 +2,9 @@ import pytest
 
 from nujo.flow import Flow
 
+# ====================================================================================================
+# Test custom Flow creation
+
 
 def test_custom_flow_creation():
     class CustomFlow(Flow):
@@ -17,6 +20,10 @@ def test_custom_flow_creation():
     assert not flow.parameters
 
     assert flow(9) == 9**2 + 42
+
+
+# ====================================================================================================
+# Test Flow append and pop
 
 
 def test_append(flows):
@@ -48,6 +55,10 @@ def test_pop(flows):
     assert supflow(42) == mul2(42) == 42 * 2
 
 
+# ====================================================================================================
+# Test Flow forward, chaining, selection
+
+
 def test_forward(flows):
     mul2, add1, supflow = flows
 
@@ -75,6 +86,10 @@ def test_getitem(flows):
     assert supflow['add1'] is add1
 
 
+# ====================================================================================================
+# Unit Test fixtures
+
+
 @pytest.fixture
 def flows():
     class Mul2(Flow):
@@ -90,3 +105,6 @@ def flows():
     supflow = mul2 >> add1
 
     return mul2, add1, supflow
+
+
+# ====================================================================================================

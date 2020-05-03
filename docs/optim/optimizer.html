@@ -25,8 +25,7 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from abc import abstractmethod
-
-from numpy import ndarray
+from typing import List
 
 from nujo.autodiff import Tensor, no_diff
 
@@ -38,16 +37,16 @@ class Optimizer:
 
     Parameters:
     -----------
-    params : list of ndarray(s), the parameters which to update
+    params : list of Tensors, the parameters which to update
     lr : float, the learning rate
 
     &#39;&#39;&#39;
-    def __init__(self, params: list, lr: float) -&gt; None:
+    def __init__(self, params: List[Tensor], lr: float):
         self.params = params
         self.lr = lr
 
     @abstractmethod
-    def update_rule(self, param: Tensor, grad: ndarray) -&gt; Tensor:
+    def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
         pass
 
     def step(self) -&gt; None:
@@ -85,7 +84,7 @@ class Optimizer:
 <section class="desc"><p>Stochastic Gradient Descent Optimizer</p>
 <p>A base class.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>params : list of ndarray(s), the parameters which to update
+<p>params : list of Tensors, the parameters which to update
 lr : float, the learning rate</p></section>
 <details class="source">
 <summary>
@@ -98,16 +97,16 @@ lr : float, the learning rate</p></section>
 
     Parameters:
     -----------
-    params : list of ndarray(s), the parameters which to update
+    params : list of Tensors, the parameters which to update
     lr : float, the learning rate
 
     &#39;&#39;&#39;
-    def __init__(self, params: list, lr: float) -&gt; None:
+    def __init__(self, params: List[Tensor], lr: float):
         self.params = params
         self.lr = lr
 
     @abstractmethod
-    def update_rule(self, param: Tensor, grad: ndarray) -&gt; Tensor:
+    def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
         pass
 
     def step(self) -&gt; None:
@@ -166,7 +165,7 @@ lr : float, the learning rate</p></section>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-def update_rule(self, param: Tensor, grad: ndarray) -&gt; Tensor:
+def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
     pass</code></pre>
 </details>
 </dd>

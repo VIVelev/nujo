@@ -15,14 +15,14 @@ class _Node:
 
     id_generator = _counter()
 
-    def __init__(self, *children, name='Node'):
-        # Parse all children to Tensors
+    def __init__(self, *children: ..., name='Node'):
+        # Parse all children that are not Nodes to Tensors
         self.children = []
         for child in children:
             self.add_child(child)
 
         self.name = name
-        self.id = _Node.id_generator.get()
+        self.id: int = _Node.id_generator.get()
 
     def __eq__(self, other):
         return self.id == other.id
@@ -33,5 +33,5 @@ class _Node:
     def add_child(self, child) -> None:
         from nujo.autodiff.tensor import Tensor
 
-        self.children.append(
-            child if isinstance(child, _Node) else Tensor(child))
+        self.children.append(child if isinstance(child, _Node) else Tensor(
+            child, name=str(child)))

@@ -1,17 +1,18 @@
 from copy import deepcopy
 from numbers import Number
+from typing import List, Optional, Tuple, Union
 
-from numpy import array, eye, ndarray, tile
+from numpy import array, ndarray, ones, zeros
 
+from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff._utils import _if_not_none
-from nujo.autodiff.modes import DIFF_ENABLED
 
 
 class Tensor(_Node):
     ''' Tensor - a multi-dimensional array
 
-    Tensors are the main units of data and computation in Nujo.
+    Tensors are the main units of data and computation in nujo.
     They "flow" in the computation graph. :)
 
     Tensors can be either constants or trainable weights,
@@ -21,14 +22,14 @@ class Tensor(_Node):
     -----------
     value : value, numerical value of the tensor
     diff : boolean, whether to compute gradients for the tensor
-    creator : Nujo Function, that created this tensor;
+    creator : nujo function, that created this tensor;
     the only child of a tensor
     name : string, representation of the tensor
 
     '''
     def __init__(self,
-                 value: Number or list or ndarray or 'Tensor',
-                 diff=True,
+                 value: Union['Tensor', ndarray, List[Number], Number],
+                 diff=False,
                  creator=None,
                  name='Tensor'):
 
@@ -41,31 +42,32 @@ class Tensor(_Node):
 
         # (Tensor, weight) pair, used to backpropagate through the network
         # See: `Chain Rule` Wikipedia page for more info
-        self._grad_dependencies = []
+        self._grad_dependencies: List[Tuple['Tensor', 'Tensor']] = []
 
         # Gradient cache
-        self._grad: ndarray = None
+        self._grad: 'Tensor' = None
 
         # Transposed tensor cache
-        self._T: ndarray = None
+        self._T: 'Tensor' = None
 
     @property
-    def grad(self):
+    def grad(self) -> 'Tensor':
         if self._grad is None:
             self._compute_grad()
 
         return self._grad
 
     @grad.setter
-    def grad(self, value: Number or list or ndarray or 'Tensor'):
-        self._grad = value.value if isinstance(value, Tensor) else array(value)
+    def grad(self, value: Union['Tensor', ndarray, List[Number], Number]):
+        self._grad = value if isinstance(value, Tensor) else Tensor(
+            value, name=f'grad[{self.name}]')
 
     @grad.deleter
     def grad(self):
         del self._grad
 
     @property
-    def T(self):
+    def T(self) -> 'Tensor':
         if self._T is None:
             transposed = deepcopy(self)
             transposed.value = self.value.T
@@ -77,21 +79,22 @@ class Tensor(_Node):
     # Shape and shape transformations
 
     @property
-    def shape(self):
+    def shape(self) -> Tuple[int, ...]:
         return self.value.shape
 
-    def reshape(self, *args: int, inplace=False) -> 'Tensor':
-        new_val = self.value.reshape(*args)
+    def reshape(self, *shape: int, inplace=False) -> 'Tensor':
+        reshaped = self if inplace else deepcopy(self)
+        reshaped.value = self.value.reshape(shape)
+        return reshaped
 
-        if inplace:
-            self.value = new_val
-            return self
+    def repeat(self,
+               *repeats: int,
+               axis: Optional[int] = None,
+               inplace=False) -> 'Tensor':
 
-        else:
-            reshaped = deepcopy(self)
-            reshaped.name += ' (reshaped)'
-            reshaped.value = new_val
-            return reshaped
+        repeated = self if inplace else deepcopy(self)
+        repeated.value = self.value.repeat(repeats, axis=axis)
+        return repeated
 
     def squeeze(self, dim=-1, inplace=False) -> 'Tensor':
         if dim < 0:
@@ -124,58 +127,53 @@ class Tensor(_Node):
 
     # Gradient computation
 
-    def add_grad_dependency(self, wrt: 'Tensor', weight: ndarray) -> None:
+    def add_grad_dependency(self, wrt: 'Tensor', weight: 'Tensor') -> None:
         self._grad_dependencies.append((wrt, weight))
 
     def _compute_grad(self, _debug=False) -> None:
-        if self.diff and DIFF_ENABLED:
+        if modes.DIFF_ENABLED and self.diff and self._grad is None:
             if _debug:
                 print()
                 print('=' * 30)
-                print(self)
+                print(self, end='\n\n')
                 print('Shape:', self.shape)
-                print(f'Has {len(self._grad_dependencies)} dependencies:\n')
+                print(f'Has {len(self._grad_dependencies)} dependencies:')
+                print('Grad Dependecies:', self._grad_dependencies, end='\n\n')
 
             # Top-parent grad
             if len(self._grad_dependencies) == 0:
-                self._grad = array(1)
+                self._grad = Tensor(ones(self.shape),
+                                    name=f'grad[{self.name}]')
                 return
 
-            self._grad = 0
+            self._grad = Tensor(zeros(self.shape), name=f'grad[{self.name}]')
             for z, weight in self._grad_dependencies:
                 if _debug:
-                    print('-' * 10)
-                    print('Z_prev Grad:', z.grad)
-                    print('Shape:', z.grad.shape)
+                    print('~' * 10)
+                    print('Z Grad:', z.grad)
+                    print('Shape:', z.grad.shape, end='\n\n')
                     print('-' * 5)
-                    print('Weight of `Z_prev Grad`:', weight)
-                    print('Shape:', weight.shape)
-                    print('-' * 5)
+                    print('Z Weight:', weight)
+                    print('Shape:', weight.shape, end='\n\n')
 
-                if z.grad.shape == () or weight.shape == ():  # Is scalar
-                    self._accumulate_grad_scalar(z, weight)
+                if z.creator.name == 'MatMul':
+                    if self.id == z.creator.children[0].id:
+                        # XW = Z, dX ...
+                        self._grad.value += z.grad.value @ weight.value.T
+
+                    else:
+                        # XW = Z, dW ...
+                        self._grad.value += (z.grad.value.T @ weight.value).T
+
                 else:
-                    self._accumulate_grad_matrix(z, weight)
+                    self._grad.value = self._grad.value + \
+                        z.grad.value * weight.value
 
             if _debug:
+                print('#' * 10)
                 print('Current Grad:', self._grad)
                 print('Shape:', self._grad.shape)
-                print('-' * 5)
-                print()
-
-    def _accumulate_grad_scalar(self, z: 'Tensor', weight: ndarray) -> None:
-        self._grad += z.grad * weight
-
-    def _accumulate_grad_matrix(self, z: 'Tensor', weight: ndarray) -> None:
-        weight = weight.reshape(z.grad.shape[0], self.shape[0],
-                                z.grad.shape[1] * self.shape[1])
-        z_grad = z.grad.repeat(self.shape[1],
-                               axis=1).reshape(z.grad.shape[0], 1, -1)
-
-        sum_mask = tile(eye(self.shape[1]), z.grad.shape[1])
-        accumulated_grad = ((weight * z_grad) @ sum_mask.T).sum(0)
-
-        self._grad += accumulated_grad / z.grad.shape[0]
+                print('-' * 5, end='\n\n')
 
     def zero_grad(self) -> None:
         # `zero_grad` is called after an iteration.
@@ -185,12 +183,28 @@ class Tensor(_Node):
         self._grad = None
         self._T = None
 
-    def backward(self) -> None:
-        self._compute_grad()
+    def backward(self, _debug=False) -> None:
+        ''' It uses Breadth First Search to traverse the computation graph
+        and compute the gradient for each differentiable Tensor in the graph.
 
-        if self.creator:
-            for child in self.creator.children:
-                child.backward()
+        '''
+
+        nodes_to_visit: List['Tensor'] = [self]
+        if _debug:
+            i = 1
+
+        while nodes_to_visit:
+            node = nodes_to_visit.pop()
+            node._compute_grad(_debug=_debug)
+
+            if _debug:
+                nstr = f' [{i}]'
+                node.name += nstr if nstr not in node.name else ''
+                i += 1
+
+            if node.creator:
+                for child in node.creator.children:
+                    nodes_to_visit.insert(0, child)
 
     # Useful methods
 
@@ -200,10 +214,12 @@ class Tensor(_Node):
     def any(self) -> ndarray:
         return self.value.any()
 
-    def __getitem__(self, position):
+    def __getitem__(self, position: Union[int, Tuple[int, ...]]):
         return self.value[position]
 
-    def __setitem__(self, position, value):
+    def __setitem__(self, position: Union[int, Tuple[int, ...]],
+                    value: Union['Tensor', ndarray, List[Number], Number]):
+
         self.value[position] = value
 
     def __hash__(self):
@@ -211,7 +227,8 @@ class Tensor(_Node):
 
     # Static evaluation operator
 
-    def __ilshift__(self, other):
+    def __ilshift__(self, other: Union['Tensor', ndarray, List[Number],
+                                       Number]):
         ''' In-place assignment operator: `<<=`
 
         Essentially used to achieve static evaluation.
@@ -259,14 +276,14 @@ class Tensor(_Node):
     # Arithmetic operations
 
     def __add__(self, other):
-        from nujo.autodiff._functions import _Addition
+        from nujo.autodiff._functions._elementary import _Addition
         return _Addition(self, other)()
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __neg__(self):
-        from nujo.autodiff._functions import _Negation
+        from nujo.autodiff._functions._elementary import _Negation
         return _Negation(self)()
 
     def __sub__(self, other):
@@ -276,39 +293,40 @@ class Tensor(_Node):
         return self.__neg__().__add__(other)
 
     def __mul__(self, other):
-        from nujo.autodiff._functions import _Multiplication
+        from nujo.autodiff._functions._elementary import _Multiplication
         return _Multiplication(self, other)()
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        from nujo.autodiff._functions import _Reciprocal
+        from nujo.autodiff._functions._elementary import _Reciprocal
         return self.__mul__(_Reciprocal(other)())
 
     def __rtruediv__(self, other):
-        from nujo.autodiff._functions import _Reciprocal
+        from nujo.autodiff._functions._elementary import _Reciprocal
         return _Reciprocal(self)().__mul__(other)
 
     def __pow__(self, other):
-        from nujo.autodiff._functions import _Power
+        from nujo.autodiff._functions._elementary import _Power
         return _Power(self, other)()
 
     def __rpow__(self, other):
-        from nujo.autodiff._functions import _Power
+        from nujo.autodiff._functions._elementary import _Power
         return _Power(other, self)()
 
     # More complex arithmetic operations
 
     def __matmul__(self, other):
-        from nujo.autodiff._functions import _MatrixMul
+        from nujo.autodiff._functions._elementary import _MatrixMul
         return _MatrixMul(self, other)()
 
     def __rmatmul__(self, other):
-        from nujo.autodiff._functions import _MatrixMul
+        from nujo.autodiff._functions._elementary import _MatrixMul
         return _MatrixMul(other, self)()
 
     # Representations
 
     def __str__(self):
+        # TODO: Come up with a better representation
         return self.__repr__() + '\n' + '-' * 32 + '\n' + str(self.value)

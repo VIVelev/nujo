@@ -1,7 +1,5 @@
-from math import e
-
 import pytest
-from numpy import equal, isclose, maximum
+from numpy import exp, isclose, maximum, sum
 
 import nujo.nn.activations as activ
 from nujo.autodiff.tensor import Tensor
@@ -10,109 +8,130 @@ from nujo.autodiff.tensor import Tensor
 # Test BinaryStep activation function
 
 
-def test_binary_step(input_value):
+def test_binary_step(inputs):
     # Test Forward pass
-    output = activ.BinaryStep()(input_value)
-    assert equal(output.value, [[0, 0], [1, 0]]).all()
+    output = activ.BinaryStep()(inputs)
+    assert (output == [[0, 0, 0], [1, 0, 1]]).all()
 
     # Test Backward pass
     output.backward()
-    assert equal(input_value.grad, 0).all()
+    assert (inputs.grad == 0).all()
 
 
 # ====================================================================================================
 # Test Sigmoid activation function
 
 
-def test_sigmoid(input_value):
+def test_sigmoid(inputs):
     # Test Forward pass
-    output = activ.Sigmoid()(input_value)
+    output = activ.Sigmoid()(inputs)
 
-    x = input_value.value
-    assert equal(output.value, 1 / (1 + e**-x)).all()
+    x = inputs.value
+    assert (output == 1 / (1 + exp(-x))).all()
 
     # Test Backward pass
     output.backward()
-    assert equal(input_value.grad, output.value * (1 - output.value)).all()
+    assert (inputs.grad == output.value * (1 - output.value)).all()
 
 
 # ====================================================================================================
 # Test TanH activation function
 
 
-def test_tanh(input_value):
+def test_tanh(inputs):
     # Test Forward pass
-    output = activ.TanH()(input_value)
+    output = activ.TanH()(inputs)
 
-    x = input_value.value
-    assert isclose(output.value, (e**x - e**-x) / (e**x + e**-x)).all()
+    x = inputs.value
+    assert isclose(output.value, (exp(x) - exp(-x)) / (exp(x) + exp(-x))).all()
 
     # Test Backward pass
     output.backward()
-    assert equal(input_value.grad, 1 - output.value**2).all()
+    assert (inputs.grad == 1 - output.value**2).all()
 
 
 # ====================================================================================================
 # Test ReLU activation function
 
 
-def test_relu(input_value):
+def test_relu(inputs):
     # Test Forward pass
-    output = activ.ReLU()(input_value)
+    output = activ.ReLU()(inputs)
 
-    x = input_value.value
-    assert equal(output.value, maximum(0, x)).all()
+    x = inputs.value
+    assert (output == maximum(0, x)).all()
 
     # Test Backward pass
     output.backward()
-    assert equal(input_value.grad[input_value.grad > 0], 1).all()
-    assert equal(input_value.grad[input_value.grad <= 0], 0).all()
+    assert (inputs.grad[inputs.grad > 0] == 1).all()
+    assert (inputs.grad[inputs.grad <= 0] == 0).all()
 
 
 # ====================================================================================================
 # Test LeakyReLU activation function
 
 
-def test_leaky_relu(input_value):
+def test_leaky_relu(inputs):
     # Test Forward pass
     eps = 0.1
-    output = activ.LeakyReLU(eps=eps)(input_value)
+    output = activ.LeakyReLU(eps=eps)(inputs)
 
-    x = input_value.value
-    assert equal(output.value, maximum(eps * x, x)).all()
+    x = inputs.value
+    assert (output == maximum(eps * x, x)).all()
 
     # Test Backward pass
     output.backward()
-    assert equal(input_value.grad[input_value.grad > 0], 1).all()
-    assert equal(input_value.grad[input_value.grad <= 0], eps).all()
+    assert (inputs.grad[inputs.grad > 0] == 1).all()
+    assert (inputs.grad[inputs.grad <= 0] == eps).all()
 
 
 # ====================================================================================================
 # Test Swish activation function
 
 
-def test_swish(input_value):
+def test_swish(inputs):
     # Test Forward pass
     beta = 1
-    output = activ.Swish(beta=beta)(input_value)
+    output = activ.Swish(beta=beta)(inputs)
 
-    x = input_value.value
+    x = inputs.value
     sigma = activ.Sigmoid()(beta * x).value
-    assert equal(output.value, x * sigma).all()
+    assert (output == x * sigma).all()
 
     # Test Backward pass
     output.backward()
-    assert equal(input_value.grad,
-                 output.value + sigma * (1 - output.value)).all()
+    assert (inputs.grad == output.value + sigma * (1 - output.value)).all()
 
 
 # ====================================================================================================
-# Fixtures
+# Test Softmax activation function
+
+
+def test_softmax(inputs):
+    # Test Forward pass
+    print(inputs)
+    output = activ.Softmax()(inputs)
+    print(output)
+
+    exps = exp(inputs.value)
+    sums = sum(exps, axis=0, keepdims=True)
+
+    assert (output == exps / sums).all()
+
+    # Test Backward pass
+    output.backward()
+    assert True
+
+
+# ====================================================================================================
+# Unit Test fixtures
 
 
 @pytest.fixture
-def input_value():
-    return Tensor([[0.42, 0.32], [0.6, 0.1]], name='test_input')
+def inputs():
+    return Tensor([[0.42, 0.32, 0.34], [0.6, 0.1, 1.1]],
+                  diff=True,
+                  name='test_input')
 
 
 # ====================================================================================================

@@ -26,14 +26,13 @@
 </summary>
 <pre><code class="python">from copy import deepcopy
 from math import e
-from numbers import Number
 
 from numpy import around as np_round
 from numpy import ceil as np_ceil
 from numpy import floor as np_floor
 from numpy import where
 
-from nujo.autodiff._functions import _Logarithm, _Power
+from nujo.autodiff._functions._elementary import _Logarithm, _Power
 from nujo.autodiff.tensor import Tensor
 
 __all__ = [
@@ -51,63 +50,54 @@ __all__ = [
 # ====================================================================================================
 
 
-def log(x: Number or Tensor, base: float = e) -&gt; Tensor:
+def log(x: Tensor, base: float = e) -&gt; Tensor:
     return _Logarithm(x, base)()
 
 
-def log2(x: Number or Tensor) -&gt; Tensor:
+def log2(x: Tensor) -&gt; Tensor:
     return _Logarithm(x, 2, name=&#39;Log2&#39;)()
 
 
-def log10(x: Number or Tensor) -&gt; Tensor:
+def log10(x: Tensor) -&gt; Tensor:
     return _Logarithm(x, 10, name=&#39;Log10&#39;)()
 
 
 # ====================================================================================================
 
 
-def exp(x: Number or Tensor) -&gt; Tensor:
+def exp(x: Tensor) -&gt; Tensor:
     return _Power(e, x, name=&#39;Exp&#39;)()
 
 
-def sqrt(x: Number or Tensor) -&gt; Tensor:
+def sqrt(x: Tensor) -&gt; Tensor:
     return _Power(x, 1 / 2, name=&#39;Sqrt&#39;)()
 
 
-def abs(x: Number or Tensor) -&gt; Tensor:
+def abs(x: Tensor) -&gt; Tensor:
     return x * where(x &lt; 0, -1, 1)
 
 
 # ====================================================================================================
 
 
-def round(x: Number or Tensor) -&gt; Tensor:
-    if not isinstance(x, Tensor):
-        x = Tensor(x)
-
-    rounded = deepcopy(x)
+def round(x: Tensor, inplace=False) -&gt; Tensor:
+    rounded = x if inplace else deepcopy(x)
     rounded.name += &#39; (rounded)&#39;
     rounded.value = np_round(x.value)
 
     return rounded
 
 
-def ceil(x: Number or Tensor) -&gt; Tensor:
-    if not isinstance(x, Tensor):
-        x = Tensor(x)
-
-    ceiled = deepcopy(x)
+def ceil(x: Tensor, inplace=False) -&gt; Tensor:
+    ceiled = x if inplace else deepcopy(x)
     ceiled.name += &#39; (ceiled)&#39;
     ceiled.value = np_ceil(x.value)
 
     return ceiled
 
 
-def floor(x: Number or Tensor) -&gt; Tensor:
-    if not isinstance(x, Tensor):
-        x = Tensor(x)
-
-    floored = deepcopy(x)
+def floor(x: Tensor, inplace=False) -&gt; Tensor:
+    floored = x if inplace else deepcopy(x)
     floored.name += &#39; (floored)&#39;
     floored.value = np_floor(x.value)
 
@@ -133,12 +123,12 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def abs(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def abs(x: Tensor) -&gt; Tensor:
     return x * where(x &lt; 0, -1, 1)</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.scalar.ceil"><code class="name flex">
-<span>def <span class="ident">ceil</span></span>(<span>x)</span>
+<span>def <span class="ident">ceil</span></span>(<span>x, inplace=False)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
@@ -146,11 +136,8 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def ceil(x: Number or Tensor) -&gt; Tensor:
-    if not isinstance(x, Tensor):
-        x = Tensor(x)
-
-    ceiled = deepcopy(x)
+<pre><code class="python">def ceil(x: Tensor, inplace=False) -&gt; Tensor:
+    ceiled = x if inplace else deepcopy(x)
     ceiled.name += &#39; (ceiled)&#39;
     ceiled.value = np_ceil(x.value)
 
@@ -166,12 +153,12 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def exp(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def exp(x: Tensor) -&gt; Tensor:
     return _Power(e, x, name=&#39;Exp&#39;)()</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.scalar.floor"><code class="name flex">
-<span>def <span class="ident">floor</span></span>(<span>x)</span>
+<span>def <span class="ident">floor</span></span>(<span>x, inplace=False)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
@@ -179,11 +166,8 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def floor(x: Number or Tensor) -&gt; Tensor:
-    if not isinstance(x, Tensor):
-        x = Tensor(x)
-
-    floored = deepcopy(x)
+<pre><code class="python">def floor(x: Tensor, inplace=False) -&gt; Tensor:
+    floored = x if inplace else deepcopy(x)
     floored.name += &#39; (floored)&#39;
     floored.value = np_floor(x.value)
 
@@ -199,7 +183,7 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def log(x: Number or Tensor, base: float = e) -&gt; Tensor:
+<pre><code class="python">def log(x: Tensor, base: float = e) -&gt; Tensor:
     return _Logarithm(x, base)()</code></pre>
 </details>
 </dd>
@@ -212,7 +196,7 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def log10(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def log10(x: Tensor) -&gt; Tensor:
     return _Logarithm(x, 10, name=&#39;Log10&#39;)()</code></pre>
 </details>
 </dd>
@@ -225,12 +209,12 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def log2(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def log2(x: Tensor) -&gt; Tensor:
     return _Logarithm(x, 2, name=&#39;Log2&#39;)()</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.scalar.round"><code class="name flex">
-<span>def <span class="ident">round</span></span>(<span>x)</span>
+<span>def <span class="ident">round</span></span>(<span>x, inplace=False)</span>
 </code></dt>
 <dd>
 <section class="desc"></section>
@@ -238,11 +222,8 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def round(x: Number or Tensor) -&gt; Tensor:
-    if not isinstance(x, Tensor):
-        x = Tensor(x)
-
-    rounded = deepcopy(x)
+<pre><code class="python">def round(x: Tensor, inplace=False) -&gt; Tensor:
+    rounded = x if inplace else deepcopy(x)
     rounded.name += &#39; (rounded)&#39;
     rounded.value = np_round(x.value)
 
@@ -258,7 +239,7 @@ def floor(x: Number or Tensor) -&gt; Tensor:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def sqrt(x: Number or Tensor) -&gt; Tensor:
+<pre><code class="python">def sqrt(x: Tensor) -&gt; Tensor:
     return _Power(x, 1 / 2, name=&#39;Sqrt&#39;)()</code></pre>
 </details>
 </dd>

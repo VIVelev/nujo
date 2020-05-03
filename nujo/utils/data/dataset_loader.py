@@ -1,45 +1,97 @@
 from os import mkdir
 from os.path import exists
+from typing import Optional
 
-from numpy import array, empty, vstack
+from numpy import array, asarray, empty, ndarray, vstack
+from PIL import Image
 from requests import get
 
 from nujo.utils.data.nujo_dir import HOME_DIR
 
 
 class DatasetLoader:
-    '''
+    ''' Dataset Loader
 
     Parameters:
     -----------
-    name : will be downloaded from the UCI ML repo
+     - name : str, downloaded from uci repo or filename to install from
+     - type : str, indicates the type of file, can be csv, image or mnist
+     - override : bool, if this file exists, does it get downloaded again
+
     '''
-    _UCI_REPO_URL = 'archive.ics.uci.edu/ml/machine-learning-databases/{}/{}'
 
-    def __init__(self, dataset):
-        self.name = dataset.name  # with .data
-        self._link = self._UCI_REPO_URL.format(self.name[:-4], self.name)
-        with open(self.name, 'r+') as data:
-            lines = data.readlines()
+    _UCI_REPO_URL = (
+        'https://archive.ics.uci.edu/ml/machine-learning-databases/{}/{}')
 
-        dataset.X = empty((0, len(lines[0].split(','))))
-        # number of columns
-        for line in lines[:-1]:  # last row is \n
-            x = array(line.strip().split(','))
-            dataset.X = vstack((dataset.X, x))
+    def __init__(self, name: str, type: str, override=True):
+        self.name = name.strip().lower()
+        self.type = type.strip().lower()
+        self._filepath = f'{HOME_DIR}{self.name}.data'
+
+    def install(self,
+                filepath: Optional[str] = None,
+                labels: Optional[ndarray] = None) -> ndarray:
+        ''' Dataset Install
+
+        (will override anything in the Dataset class)
+
+        Parameters:
+        -----------
+         - filepath : str, indicates source file, if none then `~/.nujo/`
+         - labels : ndarray, labels for loading from image
+
+        Returns:
+        -----------
+         - res : ndarray, X and y (data and labels)
+
+        '''
+
+        self._filepath = filepath if filepath is not None else self._filepath
+        assert exists(self._filepath)
+
+        # -----------------------------------------
+        # reading csv
+        if self.type == 'csv':
+            with open(self._filepath, 'r+') as data:
+                lines = data.readlines()
+
+            cols = len(lines[0].split(','))
+            X = empty((0, cols - 1))
+            y = empty((0, 1))
+
+            # number of columns
+            for line in lines[:-1]:  # last row is \n
+                X = vstack((X, array(line.strip().split(',')[:-1])))
+                y = vstack((y, line.strip().split(',')[-1]))
+
+        # -----------------------------------------
+        # reading image
+        elif (self.type == 'image' or self.type == 'img' or self.type == 'png'
+              or self.type == 'jpg'):
+
+            # image has to be black and white
+            with Image.open(self._filepath) as img:
+                vect = asarray(img)
+                assert vect.ndim < 3
+                X = vect.reshape((vect.size, 1))
+
+            assert labels is not None
+            y = labels
+
+        else:
+            raise ValueError("type should me csv or image")
+
+        return X, y
 
     def download(self) -> None:
-        r = get(self._link)
-        file = f'{HOME_DIR}{self.name}.data'
         if not exists(HOME_DIR):
             mkdir(HOME_DIR)
-            print('Directory "~/.nujo" Created ')
-        else:
-            print('Directory "~/.nujo" already exists')
-        print(f'File {self.name} has been created.')
-        with open(file) as f:
-            f.write(r.content)
+            print('Directory `~/.nujo` created')
 
-
-if __name__ == '__main__':
-    DatasetLoader('iris').download()
+        if self.type == 'csv':
+            self._link = self._UCI_REPO_URL.format(self.name,
+                                                   f'{self.name}.data')
+            print(self._link)
+            with open(self._filepath, 'wb') as f:
+                f.write(get(self._link).content)
+            print(f'{self.name} has been saved in `~/.nujo`')

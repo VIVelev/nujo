@@ -24,11 +24,9 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from numpy import ndarray
-
-from nujo.autodiff.tensor import Tensor
+<pre><code class="python">from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
-from nujo.init import randn, zeros
+from nujo.init import randn
 
 __all__ = [
     &#39;Linear&#39;,
@@ -39,6 +37,7 @@ class Linear(Flow):
     &#39;&#39;&#39;Linear Layer
 
         f(x) = xW + b
+
     &#39;&#39;&#39;
     def __init__(self,
                  in_features: int,
@@ -48,16 +47,20 @@ class Linear(Flow):
         super(Linear,
               self).__init__(name=f&#39;{name}({in_features}, {out_features})&#39;)
 
-        self.W = randn(in_features, out_features, name=self.name + &#39;.W&#39;)
+        self.in_features = in_features
+        self.out_features = out_features
+        self.bias = bias
 
-        if bias:
-            self.b = randn(1, out_features, name=self.name + &#39;.bias&#39;)
-        else:
-            self.b = zeros(diff=False)
+        self.W = randn(self.in_features,
+                       self.out_features,
+                       name=self.name + &#39;.W&#39;)
 
-    def forward(self, x: Tensor or ndarray) -&gt; Tensor:
-        x = x if isinstance(x, Tensor) else Tensor(x, name=&#39;x&#39;, diff=False)
-        return x @ self.W + self.b</code></pre>
+        if self.bias:
+            self.b = randn(1, self.out_features, name=self.name + &#39;.bias&#39;)
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        out = x @ self.W
+        return out + self.b if self.bias else out</code></pre>
 </details>
 </section>
 <section>
@@ -84,6 +87,7 @@ class Linear(Flow):
     &#39;&#39;&#39;Linear Layer
 
         f(x) = xW + b
+
     &#39;&#39;&#39;
     def __init__(self,
                  in_features: int,
@@ -93,16 +97,20 @@ class Linear(Flow):
         super(Linear,
               self).__init__(name=f&#39;{name}({in_features}, {out_features})&#39;)
 
-        self.W = randn(in_features, out_features, name=self.name + &#39;.W&#39;)
+        self.in_features = in_features
+        self.out_features = out_features
+        self.bias = bias
 
-        if bias:
-            self.b = randn(1, out_features, name=self.name + &#39;.bias&#39;)
-        else:
-            self.b = zeros(diff=False)
+        self.W = randn(self.in_features,
+                       self.out_features,
+                       name=self.name + &#39;.W&#39;)
 
-    def forward(self, x: Tensor or ndarray) -&gt; Tensor:
-        x = x if isinstance(x, Tensor) else Tensor(x, name=&#39;x&#39;, diff=False)
-        return x @ self.W + self.b</code></pre>
+        if self.bias:
+            self.b = randn(1, self.out_features, name=self.name + &#39;.bias&#39;)
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        out = x @ self.W
+        return out + self.b if self.bias else out</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">

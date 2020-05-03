@@ -2,9 +2,7 @@
 '''
 
 from copy import deepcopy
-from numbers import Number
-
-from numpy import ndarray
+from typing import List, Union
 
 from nujo.autodiff.tensor import Tensor
 
@@ -31,12 +29,12 @@ class Flow(metaclass=_FlowSetup):
     subflows : list of flows, only if the current flow is a supflow
 
     '''
-    def __init__(self, name='Flow', subflows=[]):
+    def __init__(self, name='Flow', subflows: List['Flow'] = []):
         self.name = name
         self.is_supflow = True if subflows else False
 
-        self.subflows = []
-        self.parameters = []
+        self.subflows: List['Flow'] = []
+        self.parameters: List[Tensor] = []
 
         if self.is_supflow:
             self.append(*subflows)
@@ -47,8 +45,12 @@ class Flow(metaclass=_FlowSetup):
 
         for prop_name in dir(self):
             prop = getattr(self, prop_name)
-            if isinstance(prop, Tensor) and prop.diff:
+            if isinstance(prop, Tensor):
+                prop.diff = True
                 self.parameters.append(prop)
+
+        if self.parameters and not isinstance(self.parameters[0], list):
+            self.parameters = [self.parameters]
 
     def _generate_supflow_name(self) -> str:
         return ' >> '.join(map(lambda x: x.name, self.subflows))
@@ -77,11 +79,8 @@ class Flow(metaclass=_FlowSetup):
             self.subflows.append(flow)
 
             if flow.parameters:
-                if flow.is_supflow:
-                    for params in flow.parameters:
-                        self.parameters.append(params)
-                else:
-                    self.parameters.append(flow.parameters)
+                for params in flow.parameters:
+                    self.parameters.append(params)
 
         self.name = self._generate_supflow_name()
         return self
@@ -109,7 +108,7 @@ class Flow(metaclass=_FlowSetup):
 
         return retflow
 
-    def forward(self, x: Tensor or ndarray) -> Tensor or ndarray or Number:
+    def forward(self, x: Tensor) -> Tensor:
         ''' Flow Forward
 
         The flow computation is defined here.
@@ -120,7 +119,7 @@ class Flow(metaclass=_FlowSetup):
 
         Returns:
         --------
-        res : Tensor or ndarray or Number, computed result
+        res : Tensor, computed result
 
         '''
 
@@ -157,7 +156,7 @@ class Flow(metaclass=_FlowSetup):
 
         return Flow(subflows=[*self_subflows, *other_subflows])
 
-    def __getitem__(self, key: int or str) -> 'Flow':
+    def __getitem__(self, key: Union[int, str]) -> 'Flow':
         ''' Subflow getter of a supflow
 
         Example:
