@@ -2,4 +2,3 @@ graphviz
 numpy
 pillow
 requests
-pdoc3
