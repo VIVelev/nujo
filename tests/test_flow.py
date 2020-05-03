@@ -15,8 +15,7 @@ def test_custom_flow_creation():
 
     assert flow.name == 'SomeFlowName'
     assert repr(flow) == '<|SomeFlowName>'
-    assert not flow.is_supflow
-    assert not flow.subflows
+    assert flow[0].name == flow.name
 
     assert flow(9) == 9**2 + 42
 
@@ -28,17 +27,27 @@ def test_custom_flow_creation():
 def test_append(flows):
     mul2, add1, supflow = flows
 
-    assert not mul2.is_supflow
-    mul2_add1 = mul2.append(add1)
-    assert mul2_add1.is_supflow
+    # -------------------------
 
+    mul2_add1 = mul2.copy().append(add1)
+    assert len(mul2_add1) == 2
+    assert mul2_add1[1] is add1[0]
+
+    assert mul2_add1[0].name == 'mul2'
+    assert mul2_add1[1].name == 'add1'
     assert mul2_add1.name == 'mul2 >> add1'
     assert mul2_add1(42) == 42 * 2 + 1
 
-    assert supflow.is_supflow
-    supflow = supflow.append(mul2)
-    assert supflow.is_supflow
+    # -------------------------
 
+    assert len(supflow) == 2
+    supflow = supflow.append(mul2)
+    assert len(supflow) == 3
+    assert supflow[2] is mul2[0]
+
+    assert supflow[0].name == 'mul2'
+    assert supflow[1].name == 'add1'
+    assert supflow[2].name == 'mul2'
     assert supflow.name == 'mul2 >> add1 >> mul2'
     assert supflow(42) == (42 * 2 + 1) * 2
 
@@ -46,11 +55,13 @@ def test_append(flows):
 def test_pop(flows):
     mul2, add1, supflow = flows
 
+    assert len(supflow) == 2
     poped = supflow.pop()
-    assert poped is add1
-    assert supflow.is_supflow
+    assert len(supflow) == 1
+    assert poped is add1[0]
 
-    assert supflow.name is mul2.name
+    assert supflow[0].name == 'mul2'
+    assert supflow.name == 'mul2'
     assert supflow(42) == mul2(42) == 42 * 2
 
 
@@ -69,20 +80,19 @@ def test_forward(flows):
 def test_chaining(flows):
     _, _, supflow = flows
 
-    assert supflow.is_supflow
     assert supflow.name == 'mul2 >> add1'
     assert repr(supflow) == '<|mul2 >> add1>'
-    assert len(supflow.subflows) == 2
+    assert len(supflow) == 2
 
 
 def test_getitem(flows):
     mul2, add1, supflow = flows
 
-    assert supflow[0] is mul2
-    assert supflow[1] is add1
+    assert supflow[0] is mul2[0]
+    assert supflow[1] is add1[0]
 
-    assert supflow['mul2'] is mul2
-    assert supflow['add1'] is add1
+    assert supflow['mul2'] is mul2[0]
+    assert supflow['add1'] is add1[0]
 
 
 # ====================================================================================================

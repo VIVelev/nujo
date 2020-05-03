@@ -1,6 +1,7 @@
 ''' a computational Flow
 '''
 
+from abc import abstractmethod
 from copy import deepcopy
 from typing import List, Union
 
@@ -13,8 +14,12 @@ class _FlowSetup(type):
     def __call__(cls, *args, **kwargs):
         ''' Flow() init call '''
         obj = type.__call__(cls, *args, **kwargs)
-        obj._register_parameters()
 
+        if not obj.subflows:
+            obj = Flow(name=obj.name, subflows=[obj])
+
+        obj._register_parameters()
+        obj.name = obj._generate_supflow_name()
         return obj
 
 
@@ -31,9 +36,7 @@ class Flow(metaclass=_FlowSetup):
     '''
     def __init__(self, name='Flow', subflows: List['Flow'] = []):
         self.name = name
-        self.subflows: List['Flow'] = []
-
-        self.append(*(subflows if len(subflows) else [self]))
+        self.subflows = subflows
 
     def _register_parameters(self) -> None:
         ''' Called after Flow.__init__
@@ -76,7 +79,11 @@ class Flow(metaclass=_FlowSetup):
         '''
 
         for flow in flows:
-            self.subflows.append(flow)
+            if len(flow):
+                for subflow in flow:
+                    self.subflows.append(subflow)
+            else:
+                self.subflows.append(flow)
 
         self.name = self._generate_supflow_name()
         return self
@@ -104,36 +111,29 @@ class Flow(metaclass=_FlowSetup):
 
         return retflow
 
-    def forward(self, x: Tensor) -> Tensor:
-        ''' Flow Forward
-
-        The flow computation is defined here.
-
-        Parameters:
-        -----------
-        x : Tensor, input tensor
-
-        Returns:
-        --------
-        res : Tensor, computed result
-
-        '''
-
-        output_x = x
-        for subflow in self:
-            output_x = subflow(output_x)
-
-        return output_x
-
     def copy(self) -> 'Flow':
         ''' Make a copy of the current flow
         '''
 
         return deepcopy(self)
 
+    @abstractmethod
+    def forward(self, *args, **kwargs) -> Tensor:
+        ''' Flow Forward
+
+        The flow computation is defined here.
+
+        '''
+
+        pass
+
     def __call__(self, *args, **kwargs) -> Tensor:
-        output = self.forward(*args, **kwargs)
-        return output if isinstance(output, Tensor) else Tensor(output)
+        output = self[0].forward(*args, **kwargs)
+
+        for subflow in self[1:]:
+            output = subflow.forward(output, **kwargs)
+
+        return output
 
     def __rshift__(self, other: 'Flow') -> 'Flow':
         ''' Chaining operator
@@ -174,6 +174,9 @@ class Flow(metaclass=_FlowSetup):
 
     def __iter__(self):
         return iter(self.subflows)
+
+    def __len__(self):
+        return len(self.subflows)
 
     def __repr__(self):
         return '<|' + self.name + '>'
