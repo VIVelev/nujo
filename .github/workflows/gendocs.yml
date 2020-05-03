@@ -1,6 +1,6 @@
-name: generate docs
+name: gendocs
 
-on: [push, pull_request]
+on: push
 
 jobs:
   run:
