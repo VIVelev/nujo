@@ -29,8 +29,8 @@ class SGD(Optimizer):
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
 
     '''
     def __init__(self, params: List[Tensor], lr=0.005):
@@ -52,10 +52,10 @@ class Momentum(Optimizer):
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
-    beta : float, the fraction of the update vector of the past
-    time step to be added to the current update vector
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
+     - beta : float, the fraction of the update vector of the past
+       time step to be added to the current update vector
 
     '''
     def __init__(self, params: List[Tensor], lr=0.001, beta=0.9):
@@ -90,10 +90,10 @@ class RMSprop(Optimizer):
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
-    beta : float, the squared gradient coefficients
-    eps : float, added for numerical stability
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
+     - beta : float, the squared gradient coefficients
+     - eps : float, added for numerical stability
 
     '''
     def __init__(self, params: List[Tensor], lr=0.001, beta=0.999, eps=1e-09):
@@ -129,11 +129,11 @@ class Adam(Optimizer):
 
     Parameters:
     -----------
-    params : list of Tensors, the parameters which to update
-    lr : float, the learning rate
-    betas : tuple of 2 floats, the velocity (Momentum) and
-    squared gradient (RMSprop) coefficients
-    eps : float, added for numerical stability
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
+     - betas : tuple of 2 floats, the velocity (Momentum) and
+       squared gradient (RMSprop) coefficients
+     - eps : float, added for numerical stability
 
     '''
     def __init__(self,

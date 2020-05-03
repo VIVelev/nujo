@@ -20,14 +20,14 @@ def sum(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -> Tensor:
 
     Parameters:
     -----------
-    inputs : varargs, tensors to be summed;
-    if a single tensor is passed, its elements will be summed
-    dim : int (optional), dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to be summed;
+       if a single tensor is passed, its elements will be summed
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     '''
 
@@ -45,14 +45,14 @@ def prod(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -> Tensor:
 
     Parameters:
     -----------
-    inputs : varargs, tensors to be multiplied;
-    if a single tensor is passed, its elements will be multiplied
-    dim : int (optional), dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to be multiplied;
+       if a single tensor is passed, its elements will be multiplied
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     '''
 
@@ -70,14 +70,14 @@ def mean(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -> Tensor:
 
     Parameters:
     -----------
-    inputs : varargs, tensors to compute the mean of;
-    if a single tensor is passed, the mean of its elements will be computed
-    dim : int (optional), dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to compute the mean of;
+       if a single tensor is passed, the mean of its elements will be computed
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     '''
 
