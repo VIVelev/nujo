@@ -9,9 +9,9 @@ First off, thank you for considering contributing to nujo. It's people like you 
   - List vesions of your Python, NumPy, Requests and GarphViz
 
 ## Submiting code
-  - It is recommended to use [Visual Studio Code](https://code.visualstudio.com/) 
+  - It is recommended to use [Visual Studio Code](https://code.visualstudio.com/)
   - All commits will be tested against flake8 linter, so make sure to abide by PEP8
-  
+
 ### Commit messages
   - "[up:*branch*] *commit-message*" - creating bugs
   - "[fix:*branch*] *commit-message*" - correcting bugs
@@ -77,11 +77,11 @@ Short description
 
 Parameters:
 -----------
-param_name : param type, description...
+ - param_name : param type, description...
 
 Returns:
 --------
-return_name : return type, description...
+ - return_name : return type, description...
 
 '''
 ```

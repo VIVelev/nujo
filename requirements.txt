@@ -1,4 +1,4 @@
-graphviz
 numpy
-pillow
+graphviz
 requests
+pillow

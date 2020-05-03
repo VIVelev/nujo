@@ -11,8 +11,8 @@ class Optimizer:
 
     Parameters:
     -----------
-    params : generator of tensors, the parameters which to update
-    lr : float, the learning rate
+     - params : list of Tensors, the parameters which to update
+     - lr : float, the learning rate
 
     '''
     def __init__(self, params: Generator[Tensor, Tensor, None], lr: float):

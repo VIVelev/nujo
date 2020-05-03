@@ -109,16 +109,14 @@ def test_swish(inputs):
 
 def test_softmax(inputs):
     # Test Forward pass
-    print(inputs)
     output = activ.Softmax()(inputs)
-    print(output)
 
     exps = exp(inputs.value)
     sums = sum(exps, axis=0, keepdims=True)
-
     assert (output == exps / sums).all()
 
     # Test Backward pass
+    # TODO: Test Backward pass appropriately.
     output.backward()
     assert True
 
@@ -129,9 +127,7 @@ def test_softmax(inputs):
 
 @pytest.fixture
 def inputs():
-    return Tensor([[0.42, 0.32, 0.34], [0.6, 0.1, 1.1]],
-                  diff=True,
-                  name='test_input')
+    return Tensor([[0.42, 0.32, 0.34], [0.6, 0.1, 1.1]], diff=True)
 
 
 # ====================================================================================================

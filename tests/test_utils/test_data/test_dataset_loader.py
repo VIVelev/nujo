@@ -3,7 +3,7 @@ from os.path import exists
 import pytest
 
 import nujo.utils.data.nujo_dir as nujo_dir
-from nujo.utils.data import Dataset
+from nujo.utils.data.dataset import Dataset
 from nujo.utils.data.dataset_loader import DatasetLoader
 
 

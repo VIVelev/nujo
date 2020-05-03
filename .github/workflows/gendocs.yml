@@ -1,0 +1,52 @@
+name: gendocs
+
+on: [push, pull_request]
+
+jobs:
+  run:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pdoc3
+
+    - name: Pull latest changes from the current branch
+      run: git pull origin ${{ github.ref }}
+
+    - name: Generate docs
+      run: python docs/gendocs.py
+
+    - name: Status - for debug
+      run: git status
+
+    - name: Have the docs changed?
+      id: have_changed
+      run: echo "##[set-output name=changed;]$(git status --porcelain)"
+
+    - name: Stage the changes if any
+      if: steps.have_changed.outputs.changed != ''
+      run: git add -A
+
+    - name: Make a commit
+      if: steps.have_changed.outputs.changed != ''
+      run:
+        git config --local user.email "actions@github.com";
+        git config --local user.name "GitHub Action";
+        git commit -m "[up] generate documentation";
+
+    - name: Push the commit to the current branch
+      if: steps.have_changed.outputs.changed != ''
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: '${{ secrets.NUJO_TOKEN }}'
+        branch: '${{ github.ref }}'

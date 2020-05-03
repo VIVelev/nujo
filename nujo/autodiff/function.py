@@ -21,8 +21,8 @@ class Function(_Node):
 
     Parameters:
     -----------
-    children : varargs, the inpute tensors
-    name : string, the name of the function
+     - children : varargs, the inpute tensors
+     - name : string, the name of the function
 
     '''
     def __init__(self,

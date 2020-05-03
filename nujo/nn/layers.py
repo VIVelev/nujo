@@ -8,9 +8,16 @@ __all__ = [
 
 
 class Linear(Flow):
-    '''Linear Layer
+    ''' Linear Layer
 
         f(x) = xW + b
+
+    Parameters:
+    -----------
+     - in_features : int, dim of input variables
+     - out_features : int, wanted dim of output variables
+     - bias : bool, whether to train a bias term or no
+     - name : string, identifier for the current layer
 
     '''
     def __init__(self,
