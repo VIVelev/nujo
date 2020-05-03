@@ -58,13 +58,10 @@ def test_append(flows):
 
     # -------------------------
 
-    for f in supflow:
-        print(f)
-    assert False
-
-    supflow = supflow.append(supflow)
+    supflow = supflow.append(supflow.copy())
     assert len(supflow) == 6
-    assert supflow[5] is mul2[0]
+    assert supflow[5] is not mul2[0]
+    assert supflow[5].name == 'mul2'
 
     assert supflow[0].name == 'mul2'
     assert supflow[1].name == 'add1'
@@ -118,6 +115,9 @@ def test_getitem(flows):
 
     assert supflow['mul2'] is mul2[0]
     assert supflow['add1'] is add1[0]
+
+    with pytest.raises(ValueError):
+        supflow['random_name']
 
 
 # ====================================================================================================

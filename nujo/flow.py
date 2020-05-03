@@ -79,11 +79,8 @@ class Flow(metaclass=_FlowSetup):
         '''
 
         for flow in flows:
-            if len(flow):
-                for subflow in flow:
-                    self.subflows.append(subflow)
-            else:
-                self.subflows.append(flow)
+            for subflow in flow:
+                self.subflows.append(subflow)
 
         self.name = self._generate_supflow_name()
         return self
