@@ -20,10 +20,10 @@ jobs:
         pip install -r requirements.txt
 
     - name: pull
-      run: git pull
+      run: git pull ${{ github.ref }}
 
     - name: generate documentation
-      run: python docs/gendocs.py false
+      run: python docs/gendocs.py
 
     - name: status
       run: git status

@@ -1,51 +1,43 @@
 ''' Documentation generation and update procedure
 '''
 
-from os import listdir, system
-from os.path import dirname, isdir, join
-from shutil import move, rmtree
-from sys import argv
+import os
+import shutil
 
 
-def gen_docs(flag):
+def gen_docs():
     print('Generating HTML documentation for nujo out of docstrings...')
 
-    # nujo = '../nujo'
-    # if (flag):
-    #     from os.path import join
+    nujo = os.path.join(os.path.dirname(__file__), '../nujo')
+    docs = os.path.dirname(__file__)
 
-    nujo = join(dirname(__file__), '../nujo')
-    docs = dirname(__file__)
+    print('nujo dir:', nujo)
+    print('docs dir:', docs)
 
-    system(f'pdoc3 --html {nujo} --output-dir {docs} --force')
-    print('--Done--')
+    os.system(f'pdoc3 --html {nujo} --output-dir {docs} --force')
+    print('Done.\n')
 
 
-def extract_docs(flag):
+def extract_docs():
     print('Extracting documentation...')
-    print(__file__)
 
-    # source = 'nujo'
-    # if (flag):
-    #     from os.path import join
-    source = join(dirname(__file__), 'nujo')
-    dest = dirname(__file__)
+    source = os.path.join(os.path.dirname(__file__), 'nujo')
+    dest = os.path.dirname(__file__)
 
-    for f in listdir(source):
-        print(f)
+    print('source dir:', source)
+    print('dest dir:', dest)
+
+    for f in os.listdir(source):
         current_dest = dest + '/' + f
-        if isdir(current_dest):
-            rmtree(current_dest)
+        if os.path.isdir(current_dest):
+            shutil.rmtree(current_dest)
 
-        move(source + '/' + f, current_dest)
+        shutil.move(source + '/' + f, current_dest)
 
-    rmtree(source)
-    print('--Done--')
+    shutil.rmtree(source)
+    print('Done.\n')
 
 
 if __name__ == '__main__':
-    flag = True
-    if len(argv) != 1:
-        flag = (argv[1].strip().lower() == 'true')
-    gen_docs(flag)
-    extract_docs(flag)
+    gen_docs()
+    extract_docs()
