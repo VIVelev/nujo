@@ -20,17 +20,15 @@ jobs:
         pip install -r requirements.txt
 
     - name: pull
-      run: |
-        git pull
+      run: git pull
 
     - name: generate documentation
-      run: |
-        python docs/gendocs.py false
+      run: python docs/gendocs.py false
 
-    - name: check for changes
+    - name: status
       run: git status
 
-    - name: stage files
+    - name: add
       run: git add .
 
     - name: commit
@@ -39,8 +37,11 @@ jobs:
         git config --local user.name "GitHub Action";
         git commit -m "[up] generate documentation";
 
+    - name: second pull
+      run: git pull
+
     - name: push
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.MAXO_SECRET }}
-        branch: HEAD
+        branch: ${{ github.head_ref }}
