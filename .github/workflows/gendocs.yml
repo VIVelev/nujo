@@ -1,3 +1,8 @@
+- name:
+  include_vars:
+    file: secrets.yaml
+    name: secrets
+
 name: generate docs
 
 on: [push, pull_request]
@@ -34,9 +39,6 @@ jobs:
         git config --local user.email "victor@gorchilov.com";
         git config --local user.name "ManiacMaxo";
         git commit -m "[up] generate documentation";
-
-    - name: test
-      run: echo ${{ secrets.GITHUB_TOKEN }}
 
     - name: push
       uses: ad-m/github-push-action@master
