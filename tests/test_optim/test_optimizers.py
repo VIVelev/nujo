@@ -8,7 +8,14 @@ from nujo import mean, rand, randn
 
 
 def test_sgd_basic(scalar_params, num_iters, quadratic_loss):
-    optimizer = optim.SGD(scalar_params)
+    def g():
+        nonlocal scalar_params
+
+        x = (yield scalar_params[0])
+        scalar_params[0] <<= x
+        yield
+
+    optimizer = optim.SGD(g)
 
     prev_loss = 1e3
     for _ in range(num_iters):
@@ -145,12 +152,12 @@ def test_adam_matrix(vec_params, num_iters, matrix_mse_loss):
 
 @pytest.fixture
 def scalar_params():
-    return [[rand(diff=True)]]
+    return [rand(diff=True)]
 
 
 @pytest.fixture
 def vec_params():
-    return [[rand(3, 1, diff=True)]]
+    return [rand(3, 1, diff=True)]
 
 
 @pytest.fixture
@@ -161,7 +168,7 @@ def num_iters():
 @pytest.fixture
 def quadratic_loss():
     def compute(params):
-        return 3 * (params[0][0]**2) + 5 * params[0][0] + 7
+        return 3 * (params[0]**2) + 5 * params[0] + 7
 
     return compute
 
@@ -172,7 +179,7 @@ def matrix_mse_loss():
     y = X @ randn(3, 1) + rand()
 
     def compute(params):
-        return mean((y - X @ params[0][0])**2)
+        return mean((y - X @ params[0])**2)
 
     return compute
 

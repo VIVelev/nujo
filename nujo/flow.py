@@ -55,9 +55,10 @@ class Flow(metaclass=_FlowSetup):
                 prop = getattr(flow, prop_name)
 
                 if isinstance(prop, Tensor):
-                    updated_prop = (yield prop)
-                    if updated_prop is not None:
-                        prop <<= updated_prop
+                    updated = (yield prop)
+                    yield
+                    if updated is not None:
+                        prop <<= updated
 
     def append(self, *flows: 'Flow') -> 'Flow':
         ''' Flow Append
