@@ -25,8 +25,8 @@ class Flow(metaclass=_FlowSetup):
 
     Parameters:
     -----------
-     - name : string
-     - subflows : list of flows, only if the current flow is a supflow
+    name : string
+    subflows : list of flows, only if the current flow is a supflow
 
     '''
     def __init__(self, name='Flow', subflows: List['Flow'] = []):
