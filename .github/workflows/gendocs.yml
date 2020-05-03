@@ -45,7 +45,7 @@ jobs:
         git commit -m "[up] generate documentation";
 
     - name: Push the commit to the current branch
-      if: steps.have_changed.outputs.key != ''
+      if: steps.have_changed.outputs.changed != ''
       uses: ad-m/github-push-action@master
       with:
         github_token: '${{ secrets.NUJO_TOKEN }}'
