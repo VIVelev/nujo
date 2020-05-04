@@ -1,6 +1,7 @@
 import numpy as np
 from mnist import MNIST
 
+import nujo as nj
 import nujo.nn as nn
 import nujo.objective as obj
 import nujo.optim as optim
@@ -17,7 +18,7 @@ print(f'Loss: {loss_fn}')
 
 # TODO: Play around with the hyperparameters of Adam
 # Maybe try  different optimizers?
-optimizer = optim.Adam(net.parameters, lr=0.1)
+optimizer = optim.Adam(net.parameters, lr=0.001)
 print(f'Optimizer: {optimizer}')
 
 
@@ -30,7 +31,8 @@ def train(net, x, y, num_epochs):
         loss = loss_fn(output, y)
 
         # Print the loss for monitoring
-        print('EPOCH:', epoch, '| LOSS: ', loss.value)
+        if epoch % 100 == 0:
+            print('EPOCH:', epoch, '| LOSS: ', loss.value)
 
         # Backprop
         loss.backward()
@@ -51,9 +53,10 @@ if __name__ == '__main__':
         elem = np.array(img[i]).reshape((len(img[i]), 1))
         images.append(elem)
 
-    images = np.array(images).squeeze()
-    labels = np.expand_dims(np.array(labels), -1)
+    images = nj.Tensor(np.array(images).squeeze()[:32, :], name='X_train')
+    labels = nj.Tensor(np.expand_dims(np.array(labels), -1)[:32],
+                       name='y_train')
 
     # TODO: 32 is the batch size in this case
     # Look up what `batch gradient descent` means
-    train(net, images[:32, :], labels[:32], 10)
+    train(net, images, labels, int(1e6))
