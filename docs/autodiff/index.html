@@ -246,7 +246,7 @@ the only child of a tensor</li>
         super(Tensor, self).__init__(*_if_not_none(creator), name=name)
 
         self.value: ndarray = value.value if isinstance(
-            value, Tensor) else array(value, dtype=float128)
+            value, Tensor) else array(value)
         self.diff = diff
         self.creator = creator
 
@@ -376,8 +376,11 @@ the only child of a tensor</li>
                         self._grad.value += (z.grad.value.T @ weight.value).T
 
                 else:
-                    self._grad.value = self._grad.value + \
-                        z.grad.value * weight.value
+                    update = z.grad.value * weight.value
+                    if self._grad.value.shape == (1, 1):
+                        self._grad.value = self._grad.value + update.sum()
+                    else:
+                        self._grad.value = self._grad.value + update
 
             if _debug:
                 print(&#39;#&#39; * 10)
