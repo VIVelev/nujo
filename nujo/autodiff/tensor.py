@@ -166,8 +166,11 @@ class Tensor(_Node):
                         self._grad.value += (z.grad.value.T @ weight.value).T
 
                 else:
-                    self._grad.value = self._grad.value + \
-                        z.grad.value * weight.value
+                    update = z.grad.value * weight.value
+                    if self._grad.value.shape == (1, 1):
+                        self._grad.value = self._grad.value + update.sum()
+                    else:
+                        self._grad.value = self._grad.value + update
 
             if _debug:
                 print('#' * 10)
