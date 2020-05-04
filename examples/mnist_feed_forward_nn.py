@@ -50,7 +50,7 @@ if __name__ == '__main__':
     for i in range(32):
         elem = np.array(images[i]).reshape(1, -1)
         arr.append(elem[0])
-    images = np.array(arr).T
+    images = np.array(arr).T / 255
 
     labels = np.array(labels).reshape(1, -1)[0]
     labels = np.eye(max(labels) + 1)[labels][:32]
