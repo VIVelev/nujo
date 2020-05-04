@@ -1,3 +1,7 @@
+''' this decorators are ment to be used with
+line/memory profiler's @profile decorator
+'''
+
 __all__ = [
     'decorate_if',
     'decorate_if_defined',
