@@ -9,7 +9,7 @@ import nujo.optim as optim
 # TODO: The  neural network now is nothing more than a big linear function
 # Use some activations maybe? But which ones?
 net = nn.Linear(28 * 28, 20) >> nn.Sigmoid() >> nn.Linear(
-    20, 10) >> nn.Sigmoid() >> nn.Linear(10, 10)
+    20, 10) >> nn.Sigmoid() >> nn.Linear(10, 10) >> nn.Softmax()
 
 print(f'Defined net: {net}')
 
@@ -55,7 +55,7 @@ if __name__ == '__main__':
         elem = np.array(img[i]).reshape((len(img[i]), 1))
         images.append(elem)
 
-    images = nj.Tensor(np.array(images).squeeze()[:32, :], name='X_train')
+    images = nj.Tensor(np.array(images).squeeze()[:32, :], name='X_train').T
     labels = nj.Tensor(np.expand_dims(np.array(labels), -1)[:32],
                        name='y_train')
 
