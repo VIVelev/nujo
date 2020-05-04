@@ -6,21 +6,16 @@ import nujo.nn as nn
 import nujo.objective as obj
 import nujo.optim as optim
 
-# TODO: The  neural network now is nothing more than a big linear function
-# Use some activations maybe? But which ones?
-net = nn.Linear(28 * 28, 20) >> nn.Sigmoid() >> nn.Linear(
-    20, 10) >> nn.Sigmoid() >> nn.Linear(10, 10) >> nn.Softmax()
+net = nn.Linear(28 * 28, 256) >> nn.Sigmoid() \
+      >> nn.Linear(256, 128) >> nn.Sigmoid() \
+      >> nn.Linear(128, 10) >> nn.Softmax()
 
 print(f'Defined net: {net}')
 
-# TODO: Maybe try different loss?
-# Please look up the difference between classification loss and regression loss
 loss_fn = obj.L2Loss()
 print(f'Loss: {loss_fn}')
 
-# TODO: Play around with the hyperparameters of Adam
-# Maybe try  different optimizers?
-optimizer = optim.Adam(net.parameters, lr=0.0001)
+optimizer = optim.SGD(net.parameters, lr=0.001)
 print(f'Optimizer: {optimizer}')
 
 
@@ -29,6 +24,9 @@ def train(net, x, y, num_epochs):
 
         # Forward
         output = net(x)
+        # print(output)
+        # print(y)
+        # break
         # Compute Loss
         loss = loss_fn(output, y)
 
@@ -51,20 +49,15 @@ if __name__ == '__main__':
     images, labels = mndata.load_training()
 
     arr = []
-    for i in range(len(images)):
-        elem = np.array(images[i]).reshape((len(images[i]), 1))
-        arr.append(elem)
-    images = np.array(arr).squeeze().T
-    # print(images.shape)
+    for i in range(4):
+        elem = np.array(images[i]).reshape(1, -1)
+        arr.append(elem[0])
+    images = np.array(arr).T
 
     labels = np.array(labels).reshape(1, -1)[0]
-    print(labels.shape)
-    labels = np.eye(max(labels) + 1)[labels]
-    print(labels.shape)
+    labels = np.eye(max(labels) + 1)[labels][:4]
 
-    images = nj.Tensor(images[:, :32], name='X_train')
-    labels = nj.Tensor(labels[:32].T, name='y_train')
+    images = nj.Tensor(images, name='X_train')
+    labels = nj.Tensor(labels.T, name='y_train')
 
-    # TODO: 32 is the batch size in this case
-    # Look up what `batch gradient descent` means
     train(net, images, labels, int(1000))

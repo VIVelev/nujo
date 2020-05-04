@@ -164,7 +164,7 @@ class _Softmax(Function):
         exps = exp(self.children[0].value)
         sums = sum(exps, axis=0, keepdims=True)
 
-        self._output = exps / sums
+        self._output = exps / (sums + 1e-09)
         return self._output
 
     def backward(self) -> Tuple[ndarray]:
