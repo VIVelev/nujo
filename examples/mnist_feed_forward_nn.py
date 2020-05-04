@@ -8,7 +8,9 @@ import nujo.optim as optim
 
 # TODO: The  neural network now is nothing more than a big linear function
 # Use some activations maybe? But which ones?
-net = nn.Linear(28 * 28, 20) >> nn.Linear(20, 10) >> nn.Linear(10, 10)
+net = nn.Linear(28 * 28, 20) >> nn.Sigmoid() >> nn.Linear(
+    20, 10) >> nn.Sigmoid() >> nn.Linear(10, 10)
+
 print(f'Defined net: {net}')
 
 # TODO: Maybe try different loss?
