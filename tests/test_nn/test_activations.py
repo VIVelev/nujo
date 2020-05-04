@@ -1,5 +1,5 @@
 import pytest
-from numpy import exp, isclose, maximum, sum
+from numpy import allclose, exp, maximum, sum
 
 import nujo.nn.activations as activ
 from nujo.autodiff.tensor import Tensor
@@ -43,7 +43,7 @@ def test_tanh(inputs):
     output = activ.TanH()(inputs)
 
     x = inputs.value
-    assert isclose(output.value, (exp(x) - exp(-x)) / (exp(x) + exp(-x))).all()
+    assert allclose(output.value, (exp(x) - exp(-x)) / (exp(x) + exp(-x)))
 
     # Test Backward pass
     output.backward()
@@ -113,7 +113,7 @@ def test_softmax(inputs):
 
     exps = exp(inputs.value)
     sums = sum(exps, axis=0, keepdims=True)
-    assert (output == exps / sums).all()
+    assert allclose(output.value, exps / sums)
 
     # Test Backward pass
     # TODO: Test Backward pass appropriately.
