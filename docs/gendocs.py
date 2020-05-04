@@ -11,6 +11,9 @@ def gen_docs():
     nujo = os.path.join(os.path.dirname(__file__), '../nujo')
     docs = os.path.dirname(__file__)
 
+    print('nujo dir:', nujo)
+    print('docs dir:', docs)
+
     os.system(f'pdoc3 --html {nujo} --output-dir {docs} --force')
     print('Done.\n')
 
@@ -20,6 +23,9 @@ def extract_docs():
 
     source = os.path.join(os.path.dirname(__file__), 'nujo')
     dest = os.path.dirname(__file__)
+
+    print('source dir:', source)
+    print('dest dir:', dest)
 
     for f in os.listdir(source):
         current_dest = dest + '/' + f
