@@ -1,8 +1,7 @@
 from numbers import Number
 from typing import List, Tuple, Union
 
-from numpy import (diag, exp, eye, hstack, maximum, ndarray, ones, repeat, sum,
-                   zeros)
+from numpy import exp, max, maximum, ndarray, ones, sum, zeros
 
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
@@ -153,6 +152,10 @@ class _Swish(Function):
 
 
 class _Softmax(Function):
+    ''' More info here:
+    https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
+
+    '''
     def __init__(self,
                  input: Union[Tensor, ndarray, List[Number], Number],
                  name='Softmax'):
@@ -161,46 +164,26 @@ class _Softmax(Function):
         self._output: ndarray = None  # Used to compute the derivative
 
     def forward(self) -> ndarray:
-        exps = exp(self.children[0].value)
+        # The max element of the input vector will be
+        # substracted from the inputs for numerical stability.
+        # This will not change the output of the softmax.
+
+        exps = exp(self.children[0].value -
+                   max(self.children[0].value, axis=0, keepdims=True))
         sums = sum(exps, axis=0, keepdims=True)
 
-        self._output = exps / (sums + 1e-09)
+        self._output = exps / sums
         return self._output
 
     def backward(self) -> Tuple[ndarray]:
-        ''' Computes the Jacobian matrix
+        # TODO: The current backward implementation is kind of hacky;
+        # when there is a sum after the softmax, the grad are still
+        # bigger than zero, when they actually should be 0.
+        # see pytorch for reassureance
+        #
+        # Try to fix that in future releases.
 
-        See here:
-        https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
-        for more info on how this Jacobian was computed.
-        '''
-
-        # TODO: Is there a more optimal way to compute Si matrix?
-        # Should you really compute the whole Jacobian?
-        # Test against PyTorch
-
-        k, n = self._output.shape
-
-        # Repeat each activation vector (each sample) k times
-        Sj_matrix = repeat(self._output, k, axis=1)
-
-        # Transpose each k by k matrix individually (for each sample)
-        Si_matrix = hstack(
-            [Sj_matrix[:, (i - k):i].T for i in range(k, (k * n) + 1, k)])
-
-        # Make a global diagonal matrix
-        # (where the diag matrix for each sample is contained)
-        Sj_diag = hstack([diag(self._output[:, i]) for i in range(n)])
-
-        # Compute the Jacobian
-        jacobian = Sj_diag - Si_matrix * Sj_matrix
-
-        # Get the needed columns, ignore the rest
-        identity = eye(k * n)
-        mask = hstack(
-            [identity[:, i].reshape(-1, 1) for i in range(0, k * n, k)])
-
-        return jacobian @ mask,
+        return self._output * (1 - self._output),
 
 
 # ====================================================================================================

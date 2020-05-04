@@ -12,10 +12,10 @@ net = nn.Linear(28 * 28, 256) >> nn.Sigmoid() \
 
 print(f'Defined net: {net}')
 
-loss_fn = obj.L2Loss()
+loss_fn = obj.CrossEntropy()
 print(f'Loss: {loss_fn}')
 
-optimizer = optim.SGD(net.parameters, lr=0.001)
+optimizer = optim.SGD(net.parameters, lr=0.01)
 print(f'Optimizer: {optimizer}')
 
 
@@ -24,9 +24,7 @@ def train(net, x, y, num_epochs):
 
         # Forward
         output = net(x)
-        # print(output)
-        # print(y)
-        # break
+
         # Compute Loss
         loss = loss_fn(output, y)
 
@@ -49,15 +47,15 @@ if __name__ == '__main__':
     images, labels = mndata.load_training()
 
     arr = []
-    for i in range(4):
+    for i in range(32):
         elem = np.array(images[i]).reshape(1, -1)
         arr.append(elem[0])
     images = np.array(arr).T
 
     labels = np.array(labels).reshape(1, -1)[0]
-    labels = np.eye(max(labels) + 1)[labels][:4]
+    labels = np.eye(max(labels) + 1)[labels][:32]
 
     images = nj.Tensor(images, name='X_train')
     labels = nj.Tensor(labels.T, name='y_train')
 
-    train(net, images, labels, int(1000))
+    train(net, images, labels, 1000)
