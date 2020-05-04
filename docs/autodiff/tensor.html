@@ -28,7 +28,7 @@
 from numbers import Number
 from typing import List, Optional, Tuple, Union
 
-from numpy import array, ndarray, ones, zeros
+from numpy import array, float128, ndarray, ones, zeros
 
 from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
@@ -62,7 +62,7 @@ class Tensor(_Node):
         super(Tensor, self).__init__(*_if_not_none(creator), name=name)
 
         self.value: ndarray = value.value if isinstance(
-            value, Tensor) else array(value)
+            value, Tensor) else array(value, dtype=float128)
         self.diff = diff
         self.creator = creator
 
@@ -416,7 +416,7 @@ the only child of a tensor</li>
         super(Tensor, self).__init__(*_if_not_none(creator), name=name)
 
         self.value: ndarray = value.value if isinstance(
-            value, Tensor) else array(value)
+            value, Tensor) else array(value, dtype=float128)
         self.diff = diff
         self.creator = creator
 

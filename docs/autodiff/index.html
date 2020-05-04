@@ -246,7 +246,7 @@ the only child of a tensor</li>
         super(Tensor, self).__init__(*_if_not_none(creator), name=name)
 
         self.value: ndarray = value.value if isinstance(
-            value, Tensor) else array(value)
+            value, Tensor) else array(value, dtype=float128)
         self.diff = diff
         self.creator = creator
 
