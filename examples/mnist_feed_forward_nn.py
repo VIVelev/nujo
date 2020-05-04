@@ -20,7 +20,7 @@ print(f'Loss: {loss_fn}')
 
 # TODO: Play around with the hyperparameters of Adam
 # Maybe try  different optimizers?
-optimizer = optim.Adam(net.parameters, lr=0.001)
+optimizer = optim.Adam(net.parameters, lr=0.01)
 print(f'Optimizer: {optimizer}')
 
 
@@ -34,7 +34,7 @@ def train(net, x, y, num_epochs):
 
         # Print the loss for monitoring
         if epoch % 100 == 0:
-            print('EPOCH:', epoch, '| LOSS: ', loss.value)
+            print(f'EPOCH:\t{epoch}| LOSS:\t{loss.value[0,0]}')
 
         # Backprop
         loss.backward()
@@ -46,14 +46,18 @@ def train(net, x, y, num_epochs):
         optimizer.zero_grad()
 
 
+def to_vect(x):
+    arr = []
+    for i in range(len(x)):
+        elem = np.array(x[i]).reshape((len(x[i]), 1))
+        arr.append(elem)
+    output = np.array(arr)
+    return output.squeeze()
+
+
 if __name__ == '__main__':
     mndata = MNIST('datasets/MNIST', gz=False)
-    img, labels = mndata.load_training()
-
-    images = []
-    for i in range(len(img)):
-        elem = np.array(img[i]).reshape((len(img[i]), 1))
-        images.append(elem)
+    images, labels = mndata.load_training()
 
     images = nj.Tensor(np.array(images).squeeze()[:32, :], name='X_train').T
     labels = nj.Tensor(np.expand_dims(np.array(labels), -1)[:32],
@@ -61,4 +65,14 @@ if __name__ == '__main__':
 
     # TODO: 32 is the batch size in this case
     # Look up what `batch gradient descent` means
-    train(net, images, labels, int(1e6))
+    train(net, images, labels, int(1000))
+
+    test_images, test_labels = mndata.load_testing()
+    test_images = to_vect(test_images)
+
+    test_images = nj.Tensor(test_images[:32, :], name='X_test')
+    test_labels = nj.Tensor(np.expand_dims(np.array(test_labels), -1)[:32],
+                            name='y_test')
+    # i = 1
+    # print(net(test_images[i]))
+    # print(test_labels[i])
