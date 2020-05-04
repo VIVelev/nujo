@@ -20,7 +20,7 @@ print(f'Loss: {loss_fn}')
 
 # TODO: Play around with the hyperparameters of Adam
 # Maybe try  different optimizers?
-optimizer = optim.Adam(net.parameters, lr=0.01)
+optimizer = optim.Adam(net.parameters, lr=0.0001)
 print(f'Optimizer: {optimizer}')
 
 
@@ -46,33 +46,25 @@ def train(net, x, y, num_epochs):
         optimizer.zero_grad()
 
 
-def to_vect(x):
-    arr = []
-    for i in range(len(x)):
-        elem = np.array(x[i]).reshape((len(x[i]), 1))
-        arr.append(elem)
-    output = np.array(arr)
-    return output.squeeze()
-
-
 if __name__ == '__main__':
     mndata = MNIST('datasets/MNIST', gz=False)
     images, labels = mndata.load_training()
 
-    images = nj.Tensor(np.array(images).squeeze()[:32, :], name='X_train').T
-    labels = nj.Tensor(np.expand_dims(np.array(labels), -1)[:32],
-                       name='y_train')
+    arr = []
+    for i in range(len(images)):
+        elem = np.array(images[i]).reshape((len(images[i]), 1))
+        arr.append(elem)
+    images = np.array(arr).squeeze().T
+    # print(images.shape)
+
+    labels = np.array(labels).reshape(1, -1)[0]
+    print(labels.shape)
+    labels = np.eye(max(labels) + 1)[labels]
+    print(labels.shape)
+
+    images = nj.Tensor(images[:, :32], name='X_train')
+    labels = nj.Tensor(labels[:32].T, name='y_train')
 
     # TODO: 32 is the batch size in this case
     # Look up what `batch gradient descent` means
     train(net, images, labels, int(1000))
-
-    test_images, test_labels = mndata.load_testing()
-    test_images = to_vect(test_images)
-
-    test_images = nj.Tensor(test_images[:32, :], name='X_test')
-    test_labels = nj.Tensor(np.expand_dims(np.array(test_labels), -1)[:32],
-                            name='y_test')
-    # i = 1
-    # print(net(test_images[i]))
-    # print(test_labels[i])
