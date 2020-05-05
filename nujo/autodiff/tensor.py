@@ -1,4 +1,4 @@
-from copy import deepcopy
+from copy import copy
 from numbers import Number
 from typing import List, Optional, Tuple, Union
 
@@ -69,7 +69,7 @@ class Tensor(_Node):
     @property
     def T(self) -> 'Tensor':
         if self._T is None:
-            transposed = deepcopy(self)
+            transposed = copy(self)
             transposed.value = self.value.T
 
             self._T = transposed
@@ -83,7 +83,7 @@ class Tensor(_Node):
         return self.value.shape
 
     def reshape(self, *shape: int, inplace=False) -> 'Tensor':
-        reshaped = self if inplace else deepcopy(self)
+        reshaped = self if inplace else copy(self)
         reshaped.value = self.value.reshape(shape)
         return reshaped
 
@@ -92,7 +92,7 @@ class Tensor(_Node):
                axis: Optional[int] = None,
                inplace=False) -> 'Tensor':
 
-        repeated = self if inplace else deepcopy(self)
+        repeated = self if inplace else copy(self)
         repeated.value = self.value.repeat(repeats, axis=axis)
         return repeated
 
