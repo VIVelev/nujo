@@ -30,6 +30,8 @@ class Function(_Node):
                  name='Function'):
 
         super(Function, self).__init__(*children, name=name)
+        self._reuse = True
+        self._z_placeholder: 'Tensor' = None
 
     def __repr__(self):
         return super(Function, self).__repr__() + f'#{self.id}'
@@ -54,17 +56,31 @@ class Function(_Node):
         '''
 
         z = self.forward()
-        if not isinstance(z, Tensor):
-            # Register in the computation graph only if in diff mode
-            z = Tensor(z,
-                       diff=any([x.diff for x in self.children]),
-                       creator=self if modes.DIFF_ENABLED else None,
-                       name=self._generate_tensor_name())
+        if self._z_placeholder is None:
+            # Register in the computation (init the placeholder)
+            self._z_placeholder = Tensor(
+                z,
+                diff=[x.diff for x in self.children],
+                creator=self if modes.DIFF_ENABLED else None,
+                name=self._generate_tensor_name())
 
-        if modes.DIFF_ENABLED and z.diff:
+            self._reuse = False
+
+        else:
+            self._z_placeholder.value = z
+            self._reuse = True
+
+        if modes.DIFF_ENABLED and self._z_placeholder.diff:
             # Compute gradient for this tensor
             for tensor, derivative in zip(self.children, self.backward()):
-                tensor.add_grad_dependency(
-                    z, Tensor(derivative, name=f'weight[{z.name}]'))
+                if self._reuse:
+                    idx = next(i
+                               for i, v in enumerate(tensor.grad_dependencies)
+                               if v[0] is self._z_placeholder)
 
-        return z
+                    tensor.grad_dependencies[idx][0].value = z
+                    tensor.grad_dependencies[idx][1] = derivative
+                else:
+                    tensor.add_grad_dependency(self._z_placeholder, derivative)
+
+        return self._z_placeholder

@@ -42,7 +42,7 @@ class Tensor(_Node):
 
         # (Tensor, weight) pair, used to backpropagate through the network
         # See: `Chain Rule` Wikipedia page for more info
-        self._grad_dependencies: List[Tuple['Tensor', 'Tensor']] = []
+        self.grad_dependencies: List[List['Tensor', ndarray]] = []
 
         # Gradient cache
         self._grad: 'Tensor' = None
@@ -52,15 +52,20 @@ class Tensor(_Node):
 
     @property
     def grad(self) -> 'Tensor':
-        if self._grad is None:
+        if not isinstance(self._grad, Tensor):
+            self._grad = Tensor(None, name=f'grad[{self.name}]')
+
+        if self._grad.value is None:
             self._compute_grad()
 
         return self._grad
 
     @grad.setter
     def grad(self, value: Union['Tensor', ndarray, List[Number], Number]):
-        self._grad = value if isinstance(value, Tensor) else Tensor(
-            value, name=f'grad[{self.name}]')
+        if not isinstance(self._grad, Tensor):
+            self._grad = Tensor(None, name=f'grad[{self.name}]')
+
+        self._grad.value = value.value if isinstance(value, Tensor) else value
 
     @grad.deleter
     def grad(self):
@@ -68,11 +73,12 @@ class Tensor(_Node):
 
     @property
     def T(self) -> 'Tensor':
-        if self._T is None:
-            transposed = copy(self)
-            transposed.value = self.value.T
+        if not isinstance(self._T, Tensor):
+            self._T = copy(self)
+            self._T.value = None
 
-            self._T = transposed
+        if self._T.value is None:
+            self._T.value = self.value.T
 
         return self._T
 
@@ -127,27 +133,39 @@ class Tensor(_Node):
 
     # Gradient computation
 
-    def add_grad_dependency(self, wrt: 'Tensor', weight: 'Tensor') -> None:
-        self._grad_dependencies.append((wrt, weight))
+    def add_grad_dependency(self, wrt: 'Tensor', weight: ndarray) -> None:
+        self.grad_dependencies.append([wrt, weight])
+
+    def get_common_outputs(self, *others: 'Tensor') -> Optional['Tensor']:
+        common_outputs = set([dep[0] for dep in self.grad_dependencies])
+
+        for other in others:
+            if isinstance(other, Tensor):
+                common_outputs.intersection_update(
+                    set([dep[0] for dep in other.grad_dependencies]))
+
+        return common_outputs
 
     def _compute_grad(self, _debug=False) -> None:
-        if modes.DIFF_ENABLED and self.diff and self._grad is None:
+        if modes.DIFF_ENABLED and self.diff:
+            if not isinstance(self._grad, Tensor):
+                self._grad = Tensor(None, name=f'grad[{self.name}]')
+
             if _debug:
                 print()
                 print('=' * 30)
                 print(self, end='\n\n')
                 print('Shape:', self.shape)
-                print(f'Has {len(self._grad_dependencies)} dependencies:')
-                print('Grad Dependecies:', self._grad_dependencies, end='\n\n')
+                print(f'Has {len(self.grad_dependencies)} dependencies:')
+                print('Grad Dependecies:', self.grad_dependencies, end='\n\n')
 
             # Top-parent grad
-            if len(self._grad_dependencies) == 0:
-                self._grad = Tensor(ones(self.shape),
-                                    name=f'grad[{self.name}]')
+            if len(self.grad_dependencies) == 0:
+                self._grad.value = ones(self.shape)
                 return
 
-            self._grad = Tensor(zeros(self.shape), name=f'grad[{self.name}]')
-            for z, weight in self._grad_dependencies:
+            self._grad.value = zeros(self.shape)
+            for z, weight in self.grad_dependencies:
                 if _debug:
                     print('~' * 10)
                     print('Z Grad:', z.grad)
@@ -159,15 +177,15 @@ class Tensor(_Node):
                 if z.creator.name == 'MatMul':
                     if self.id == z.creator.children[0].id:
                         # XW = Z, dX ...
-                        self._grad.value += z.grad.value @ weight.value.T
+                        self._grad.value += z.grad.value @ weight.T
 
                     else:
                         # XW = Z, dW ...
-                        self._grad.value += (z.grad.value.T @ weight.value).T
+                        self._grad.value += (z.grad.value.T @ weight).T
 
                 else:
                     self._grad.value = self._grad.value + \
-                        z.grad.value * weight.value
+                        z.grad.value * weight
 
             if _debug:
                 print('#' * 10)
@@ -179,9 +197,14 @@ class Tensor(_Node):
         # `zero_grad` is called after an iteration.
         # The value of weight tensors is updated after an iteration.
 
-        self._grad_dependencies = []
-        self._grad = None
-        self._T = None
+        if not isinstance(self._grad, Tensor):
+            self._grad = Tensor(None, name=f'grad[{self.name}]')
+        self._grad.value = None
+
+        if not isinstance(self._T, Tensor):
+            self._T = copy(self)
+            self._T.value = None
+        self._T.value = None
 
     def backward(self, _debug=False) -> None:
         ''' It uses Breadth First Search to traverse the computation graph
@@ -250,6 +273,8 @@ class Tensor(_Node):
                 pass
 
         self.value = getattr(other, 'value', other)
+        self._grad = getattr(other, '_grad', None)
+        self._T = getattr(other, '_T', None)
 
         return self
 
@@ -277,6 +302,12 @@ class Tensor(_Node):
 
     def __add__(self, other):
         from nujo.autodiff._functions._elementary import _Addition
+
+        outputs = self.get_common_outputs(other)
+        for output in outputs:
+            if isinstance(output.creator, _Addition):
+                return output.creator()
+
         return _Addition(self, other)()
 
     def __radd__(self, other):
@@ -284,6 +315,12 @@ class Tensor(_Node):
 
     def __neg__(self):
         from nujo.autodiff._functions._elementary import _Negation
+
+        outputs = self.get_common_outputs()
+        for output in outputs:
+            if isinstance(output.creator, _Negation):
+                return output.creator()
+
         return _Negation(self)()
 
     def __sub__(self, other):
@@ -294,6 +331,12 @@ class Tensor(_Node):
 
     def __mul__(self, other):
         from nujo.autodiff._functions._elementary import _Multiplication
+
+        outputs = self.get_common_outputs(other)
+        for output in outputs:
+            if isinstance(output.creator, _Multiplication):
+                return output.creator()
+
         return _Multiplication(self, other)()
 
     def __rmul__(self, other):
@@ -301,28 +344,65 @@ class Tensor(_Node):
 
     def __truediv__(self, other):
         from nujo.autodiff._functions._elementary import _Reciprocal
+
+        if isinstance(other, Tensor):
+            outputs = other.get_common_outputs()
+            for output in outputs:
+                if isinstance(output.creator, _Reciprocal):
+                    return self.__mul__(output.creator())
+
         return self.__mul__(_Reciprocal(other)())
 
     def __rtruediv__(self, other):
         from nujo.autodiff._functions._elementary import _Reciprocal
+
+        outputs = self.get_common_outputs()
+        for output in outputs:
+            if isinstance(output.creator, _Reciprocal):
+                return output.creator().__mul__(other)
+
         return _Reciprocal(self)().__mul__(other)
 
     def __pow__(self, other):
         from nujo.autodiff._functions._elementary import _Power
+
+        outputs = self.get_common_outputs(other)
+        for output in outputs:
+            if isinstance(output.creator, _Power):
+                return output.creator()
+
         return _Power(self, other)()
 
     def __rpow__(self, other):
         from nujo.autodiff._functions._elementary import _Power
+
+        outputs = other.get_common_outputs(self)
+        for output in outputs:
+            if isinstance(output.creator, _Power):
+                return output.creator()
+
         return _Power(other, self)()
 
     # More complex arithmetic operations
 
     def __matmul__(self, other):
         from nujo.autodiff._functions._elementary import _MatrixMul
+
+        outputs = self.get_common_outputs(other)
+        for output in outputs:
+            if isinstance(output.creator, _MatrixMul):
+                return output.creator()
+
         return _MatrixMul(self, other)()
 
     def __rmatmul__(self, other):
         from nujo.autodiff._functions._elementary import _MatrixMul
+
+        outputs = other.get_common_outputs(self)
+        for output in outputs:
+            if isinstance(output.creator, _MatrixMul):
+                return output.creator()
+
         return _MatrixMul(other, self)()
 
     # Representations

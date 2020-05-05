@@ -1,48 +1,41 @@
 import nujo as nj
-import nujo.nn as nn
-import nujo.objective as obj
-import nujo.optim as optim
-
-# Define the net and optimizer
-net = nn.Linear(3, 1)
-print('Defined net:', net)
-
-loss_fn = obj.L2Loss()
-print('Loss:', loss_fn)
-
-optimizer = optim.SGD(net.parameters)
-print('Optimizer:', optimizer)
+from nujo.utils.viz import ComputationGraphPlotter
 
 
 # Training loop
-def train(net, x, y, num_epochs):
+def train(param, x, y, num_epochs):
     for epoch in range(1, num_epochs + 1):
 
         # Forward
-        output = net(x)
+        output = param * x
         # Compute Loss
-        loss = loss_fn(output, y)
+        loss = (output - y)**2
 
         # Print the loss every 10th epoch for monitoring
-        if epoch % 10 == 0:
-            print('EPOCH:', epoch, '| LOSS: ', loss.value)
+        print('EPOCH:', epoch, '| LOSS: ', loss.value)
 
         # Backprop
         loss.backward()
 
         # Update
-        optimizer.step()
+        with nj.no_diff():
+            param <<= param - 0.01 * param.grad
 
         # Zero grad
-        optimizer.zero_grad()
+        param.zero_grad()
 
     return loss
 
 
 if __name__ == '__main__':
     # Create example data
-    x = nj.rand(30, 3, name='X_train')
-    y = nj.Tensor(x @ [[2], [3], [4]] - 10, name='y_train')
+    x = nj.rand(1, 1, name='X_train')
+    y = nj.Tensor(x * nj.rand(1, 1), name='y_train')
+    w = nj.randn(1, 1, diff=True, name='weight')
 
     # Train
-    train(net, x, y, 100)
+    loss = train(w, x, y, 100)
+
+    # Visualize the Neural Network as a computation graph
+    cg_plot = ComputationGraphPlotter(filename='graph').create(loss)
+    cg_plot.view()
