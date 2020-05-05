@@ -12,7 +12,8 @@ def train(param, x, y, num_epochs):
         loss = (output - y)**2
 
         # Print the loss every 10th epoch for monitoring
-        print('EPOCH:', epoch, '| LOSS: ', loss.value)
+        if epoch % 100 == 0:
+            print('EPOCH:', epoch, '| LOSS: ', loss.value)
 
         # Backprop
         loss.backward()
@@ -34,7 +35,7 @@ if __name__ == '__main__':
     w = nj.randn(1, 1, diff=True, name='weight')
 
     # Train
-    loss = train(w, x, y, 100)
+    loss = train(w, x, y, 10000)
 
     # Visualize the Neural Network as a computation graph
     cg_plot = ComputationGraphPlotter(filename='graph').create(loss)

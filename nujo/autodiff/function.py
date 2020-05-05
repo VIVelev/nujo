@@ -74,13 +74,12 @@ class Function(_Node):
             # Compute gradient for this tensor
             for tensor, derivative in zip(self.children, self.backward()):
                 if self._reuse:
-                    idx = next(i
-                               for i, v in enumerate(tensor.grad_dependencies)
+                    idx = next(i for i, v in enumerate(tensor.backward_depend)
                                if v[0] is self._z_placeholder)
 
-                    tensor.grad_dependencies[idx][0].value = z
-                    tensor.grad_dependencies[idx][1] = derivative
+                    tensor.backward_depend[idx][0].value = z
+                    tensor.backward_depend[idx][1] = derivative
                 else:
-                    tensor.add_grad_dependency(self._z_placeholder, derivative)
+                    tensor.add_backward_dep(self._z_placeholder, derivative)
 
         return self._z_placeholder
