@@ -35,8 +35,9 @@ class Tensor(_Node):
 
         super(Tensor, self).__init__(*_if_not_none(creator), name=name)
 
-        self.value: ndarray = value.value if isinstance(
+        self._value: ndarray = value.value if isinstance(
             value, Tensor) else array(value)
+
         self.diff = diff
         self.creator = creator
 
@@ -49,6 +50,19 @@ class Tensor(_Node):
 
         # Transposed tensor cache
         self._T: 'Tensor' = None
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value: Union['Tensor', ndarray, List[Number], Number]):
+        self._value = value.value if isinstance(value,
+                                                Tensor) else array(value)
+
+    @value.deleter
+    def value(self):
+        del self._value
 
     @property
     def grad(self) -> 'Tensor':
@@ -65,7 +79,7 @@ class Tensor(_Node):
         if not isinstance(self._grad, Tensor):
             self._grad = Tensor(None, name=f'grad[{self.name}]')
 
-        self._grad.value = value.value if isinstance(value, Tensor) else value
+        self._grad.value = value
 
     @grad.deleter
     def grad(self):
@@ -78,7 +92,7 @@ class Tensor(_Node):
             self._T.value = None
 
         if self._T.value is None:
-            self._T.value = self.value.T
+            self._T.value = self._value.T
 
         return self._T
 
@@ -86,11 +100,12 @@ class Tensor(_Node):
 
     @property
     def shape(self) -> Tuple[int, ...]:
-        return self.value.shape
+        return self._value.shape
 
+    # TODO: Inplace?
     def reshape(self, *shape: int, inplace=False) -> 'Tensor':
         reshaped = self if inplace else copy(self)
-        reshaped.value = self.value.reshape(shape)
+        reshaped.value = self._value.reshape(shape)
         return reshaped
 
     def repeat(self,
@@ -99,7 +114,7 @@ class Tensor(_Node):
                inplace=False) -> 'Tensor':
 
         repeated = self if inplace else copy(self)
-        repeated.value = self.value.repeat(repeats, axis=axis)
+        repeated.value = self._value.repeat(repeats, axis=axis)
         return repeated
 
     def squeeze(self, dim=-1, inplace=False) -> 'Tensor':
@@ -197,14 +212,8 @@ class Tensor(_Node):
         # `zero_grad` is called after an iteration.
         # The value of weight tensors is updated after an iteration.
 
-        if not isinstance(self._grad, Tensor):
-            self._grad = Tensor(None, name=f'grad[{self.name}]')
-        self._grad.value = None
-
-        if not isinstance(self._T, Tensor):
-            self._T = copy(self)
-            self._T.value = None
-        self._T.value = None
+        self.grad.value = None
+        self.T.value = None
 
     def backward(self, _debug=False) -> None:
         ''' It uses Breadth First Search to traverse the computation graph
@@ -232,18 +241,18 @@ class Tensor(_Node):
     # Useful methods
 
     def all(self) -> ndarray:
-        return self.value.all()
+        return self._value.all()
 
     def any(self) -> ndarray:
-        return self.value.any()
+        return self._value.any()
 
     def __getitem__(self, position: Union[int, Tuple[int, ...]]):
-        return self.value[position]
+        return self._value[position]
 
     def __setitem__(self, position: Union[int, Tuple[int, ...]],
                     value: Union['Tensor', ndarray, List[Number], Number]):
 
-        self.value[position] = value
+        self._value[position] = value
 
     def __hash__(self):
         return hash(self.name)
@@ -276,29 +285,29 @@ class Tensor(_Node):
             except ValueError:  # self is not in children
                 pass
 
-        self.value = getattr(other, 'value', other)
+        self._value = getattr(other, 'value', other)
 
         return self
 
     # Comparison operations
 
     def __lt__(self, other):
-        return self.value < getattr(other, 'value', other)
+        return self._value < getattr(other, 'value', other)
 
     def __le__(self, other):
-        return self.value <= getattr(other, 'value', other)
+        return self._value <= getattr(other, 'value', other)
 
     def __eq__(self, other):
-        return self.value == getattr(other, 'value', other)
+        return self._value == getattr(other, 'value', other)
 
     def __ne__(self, other):
-        return self.value != getattr(other, 'value', other)
+        return self._value != getattr(other, 'value', other)
 
     def __gt__(self, other):
-        return self.value > getattr(other, 'value', other)
+        return self._value > getattr(other, 'value', other)
 
     def __ge__(self, other):
-        return self.value >= getattr(other, 'value', other)
+        return self._value >= getattr(other, 'value', other)
 
     # Arithmetic operations
 
@@ -419,4 +428,4 @@ class Tensor(_Node):
 
     def __str__(self):
         # TODO: Come up with a better representation
-        return self.__repr__() + '\n' + '-' * 32 + '\n' + str(self.value)
+        return self.__repr__() + '\n' + '-' * 32 + '\n' + str(self._value)
