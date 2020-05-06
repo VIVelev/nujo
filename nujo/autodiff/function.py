@@ -60,7 +60,7 @@ class Function(_Node):
             # Initialize the placeholder
             self._z_placeholder = Tensor(
                 z,
-                diff=[x.diff for x in self.children],
+                diff=any([x.diff for x in self.children]),
                 creator=self if modes.DIFF_ENABLED else None,
                 name=self._generate_tensor_name())
 
@@ -70,16 +70,20 @@ class Function(_Node):
             self._z_placeholder.value = z
             self._reuse = True
 
-        if modes.DIFF_ENABLED and self._z_placeholder.diff:
-            # Compute gradient for this tensor
+        if modes.DIFF_ENABLED:
+            # Build/update the backpropagation graph.
             for tensor, derivative in zip(self.children, self.backward()):
                 if self._reuse:
                     idx = next(i for i, v in enumerate(tensor.backward_depend)
                                if v[0] is self._z_placeholder)
 
                     tensor.backward_depend[idx][0].value = z
-                    tensor.backward_depend[idx][1] = derivative
+                    tensor.backward_depend[idx][1] = (
+                        derivative if self._z_placeholder.diff else None)
+
                 else:
-                    tensor.add_backward_dep(self._z_placeholder, derivative)
+                    tensor.add_backward_dep(
+                        self._z_placeholder,
+                        derivative if self._z_placeholder.diff else None)
 
         return self._z_placeholder
