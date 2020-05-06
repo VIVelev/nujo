@@ -136,7 +136,7 @@ class Tensor(_Node):
     def add_backward_dep(self, wrt: 'Tensor', weight: ndarray) -> None:
         self.backward_depend.append([wrt, weight])
 
-    def intersect_parents(self, *others: 'Tensor') -> Optional['Tensor']:
+    def _intersect_parents(self, *others: 'Tensor') -> Optional['Tensor']:
         common_parents = set([dep[0] for dep in self.backward_depend])
 
         for other in others:
@@ -259,8 +259,6 @@ class Tensor(_Node):
             >>> self.children = other.children
             >>> self.creator = other.creator
             >>> self.value = other.value
-            >>> self.grad = other.grad
-            >>> self.T = other.T
 
         '''
 
@@ -279,8 +277,6 @@ class Tensor(_Node):
                 pass
 
         self.value = getattr(other, 'value', other)
-        self._grad = getattr(other, '_grad', None)
-        self._T = getattr(other, '_T', None)
 
         return self
 
@@ -309,7 +305,7 @@ class Tensor(_Node):
     def __add__(self, other):
         from nujo.autodiff._functions._elementary import _Addition
 
-        outputs = self.intersect_parents(other)
+        outputs = self._intersect_parents(other)
         for output in outputs:
             if isinstance(output.creator, _Addition):
                 return output.creator()
@@ -322,7 +318,7 @@ class Tensor(_Node):
     def __neg__(self):
         from nujo.autodiff._functions._elementary import _Negation
 
-        outputs = self.intersect_parents()
+        outputs = self._intersect_parents()
         for output in outputs:
             if isinstance(output.creator, _Negation):
                 return output.creator()
@@ -338,7 +334,7 @@ class Tensor(_Node):
     def __mul__(self, other):
         from nujo.autodiff._functions._elementary import _Multiplication
 
-        outputs = self.intersect_parents(other)
+        outputs = self._intersect_parents(other)
         for output in outputs:
             if isinstance(output.creator, _Multiplication):
                 return output.creator()
@@ -352,7 +348,7 @@ class Tensor(_Node):
         from nujo.autodiff._functions._elementary import _Reciprocal
 
         if isinstance(other, Tensor):
-            outputs = other.intersect_parents()
+            outputs = other._intersect_parents()
             for output in outputs:
                 if isinstance(output.creator, _Reciprocal):
                     return self.__mul__(output.creator())
@@ -362,7 +358,7 @@ class Tensor(_Node):
     def __rtruediv__(self, other):
         from nujo.autodiff._functions._elementary import _Reciprocal
 
-        outputs = self.intersect_parents()
+        outputs = self._intersect_parents()
         for output in outputs:
             if isinstance(output.creator, _Reciprocal):
                 return output.creator().__mul__(other)
@@ -372,7 +368,7 @@ class Tensor(_Node):
     def __pow__(self, other):
         from nujo.autodiff._functions._elementary import _Power
 
-        outputs = self.intersect_parents(other)
+        outputs = self._intersect_parents(other)
         for output in outputs:
             if isinstance(output.creator, _Power) and \
                output.creator.children[0] is self:
@@ -384,7 +380,7 @@ class Tensor(_Node):
     def __rpow__(self, other):
         from nujo.autodiff._functions._elementary import _Power
 
-        outputs = self.intersect_parents(other)
+        outputs = self._intersect_parents(other)
         for output in outputs:
             if isinstance(output.creator, _Power) and \
                output.creator.children[1] is self:
@@ -398,7 +394,7 @@ class Tensor(_Node):
     def __matmul__(self, other):
         from nujo.autodiff._functions._elementary import _MatrixMul
 
-        outputs = self.intersect_parents(other)
+        outputs = self._intersect_parents(other)
         for output in outputs:
             if isinstance(output.creator, _MatrixMul) and \
                output.creator.children[0] is self:
@@ -410,7 +406,7 @@ class Tensor(_Node):
     def __rmatmul__(self, other):
         from nujo.autodiff._functions._elementary import _MatrixMul
 
-        outputs = self.intersect_parents(other)
+        outputs = self._intersect_parents(other)
         for output in outputs:
             if isinstance(output.creator, _MatrixMul) and \
                output.creator.children[1] is self:
