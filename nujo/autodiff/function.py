@@ -68,6 +68,7 @@ class Function(_Node):
 
         else:
             self._z_placeholder.value = z
+            self._z_placeholder.zero_grad()
             self._reuse = True
 
         if modes.DIFF_ENABLED:
@@ -77,7 +78,6 @@ class Function(_Node):
                     idx = next(i for i, v in enumerate(tensor.backward_depend)
                                if v[0] is self._z_placeholder)
 
-                    tensor.backward_depend[idx][0].value = z
                     tensor.backward_depend[idx][1] = (
                         derivative if self._z_placeholder.diff else None)
 

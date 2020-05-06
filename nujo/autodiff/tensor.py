@@ -45,7 +45,7 @@ class Tensor(_Node):
         # See: `Chain Rule` Wikipedia page for more info
         self.backward_depend: List[List['Tensor', ndarray]] = []
 
-        # Gradient cache
+        # Gradient of the current tensor
         self._grad: 'Tensor' = None
 
         # Transposed tensor cache
@@ -159,10 +159,7 @@ class Tensor(_Node):
         return common_parents
 
     def _compute_grad(self, _debug=False) -> None:
-        if modes.DIFF_ENABLED and self.diff:
-            if not isinstance(self._grad, Tensor):
-                self._grad = Tensor(None, name=f'grad[{self.name}]')
-
+        if modes.DIFF_ENABLED and self.diff and self.grad.value.item() is None:
             if _debug:
                 print()
                 print('=' * 30)
@@ -173,10 +170,10 @@ class Tensor(_Node):
 
             # Top-parent grad
             if len(self.backward_depend) == 0:
-                self._grad.value = ones(self.shape)
+                self.grad.value = ones(self.shape)
                 return
 
-            self._grad.value = zeros(self.shape)
+            self.grad.value = zeros(self.shape)
             for z, weight in self.backward_depend:
                 if _debug:
                     print('~' * 10)
@@ -189,20 +186,20 @@ class Tensor(_Node):
                 if z.creator.name == 'MatMul':
                     if self.id == z.creator.children[0].id:
                         # XW = Z, dX ...
-                        self._grad.value += z.grad.value @ weight.T
+                        self.grad.value += z.grad.value @ weight.T
 
                     else:
                         # XW = Z, dW ...
-                        self._grad.value += (z.grad.value.T @ weight).T
+                        self.grad.value += (z.grad.value.T @ weight).T
 
                 else:
-                    self._grad.value = self._grad.value + \
+                    self.grad.value = self.grad.value + \
                         z.grad.value * weight
 
             if _debug:
                 print('#' * 10)
-                print('Current Grad:', self._grad)
-                print('Shape:', self._grad.shape)
+                print('Current Grad:', self.grad)
+                print('Shape:', self.grad.shape)
                 print('-' * 5, end='\n\n')
 
     def zero_grad(self) -> None:
