@@ -1,6 +1,6 @@
 from copy import copy
 from numbers import Number
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Set, Tuple, Union
 
 from numpy import array, ndarray, ones, zeros
 
@@ -71,17 +71,6 @@ class Tensor(_Node):
 
         return self._grad
 
-    @grad.setter
-    def grad(self, value: Union['Tensor', ndarray, List[Number], Number]):
-        if not isinstance(self._grad, Tensor):
-            self._grad = Tensor(None, name=f'grad[{self.name}]')
-
-        self._grad.value = value
-
-    @grad.deleter
-    def grad(self):
-        del self._grad
-
     @property
     def T(self) -> 'Tensor':
         if not isinstance(self._T, Tensor):
@@ -148,7 +137,7 @@ class Tensor(_Node):
     def add_backward_dep(self, wrt: 'Tensor', weight: ndarray) -> None:
         self.backward_depend.append([wrt, weight])
 
-    def _intersect_parents(self, *others: 'Tensor') -> Optional['Tensor']:
+    def _intersect_parents(self, *others: 'Tensor') -> Set['Tensor']:
         common_parents = set([dep[0] for dep in self.backward_depend])
 
         for other in others:

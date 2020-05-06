@@ -1,0 +1,35 @@
+digraph {
+	"<Pow>#15" [color=gold2 shape=oval style=filled]
+	<Z<Pow>#15> [color=lightblue shape=box style=filled]
+	"<Pow>#15" -> <Z<Pow>#15>
+	<Z<Add>#11> [color=lightblue shape=box style=filled]
+	"<Pow>#15" [color=gold2 shape=oval style=filled]
+	<Z<Add>#11> -> "<Pow>#15"
+	"<Add>#11" [color=gold2 shape=oval style=filled]
+	<Z<Add>#11> [color=lightblue shape=box style=filled]
+	"<Add>#11" -> <Z<Add>#11>
+	<Z<Mul>#6> [color=lightblue shape=box style=filled]
+	"<Add>#11" [color=gold2 shape=oval style=filled]
+	<Z<Mul>#6> -> "<Add>#11"
+	"<Mul>#6" [color=gold2 shape=oval style=filled]
+	<Z<Mul>#6> [color=lightblue shape=box style=filled]
+	"<Mul>#6" -> <Z<Mul>#6>
+	<weight> [color=indianred1 shape=box style=filled]
+	"<Mul>#6" [color=gold2 shape=oval style=filled]
+	<weight> -> "<Mul>#6"
+	<X_train> [color=indianred1 shape=box style=filled]
+	"<Mul>#6" [color=gold2 shape=oval style=filled]
+	<X_train> -> "<Mul>#6"
+	<Z<Neg>#9> [color=lightblue shape=box style=filled]
+	"<Add>#11" [color=gold2 shape=oval style=filled]
+	<Z<Neg>#9> -> "<Add>#11"
+	"<Neg>#9" [color=gold2 shape=oval style=filled]
+	<Z<Neg>#9> [color=lightblue shape=box style=filled]
+	"<Neg>#9" -> <Z<Neg>#9>
+	<y_train> [color=indianred1 shape=box style=filled]
+	"<Neg>#9" [color=gold2 shape=oval style=filled]
+	<y_train> -> "<Neg>#9"
+	<2> [color=indianred1 shape=box style=filled]
+	"<Pow>#15" [color=gold2 shape=oval style=filled]
+	<2> -> "<Pow>#15"
+}
