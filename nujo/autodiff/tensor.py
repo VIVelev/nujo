@@ -69,9 +69,6 @@ class Tensor(_Node):
         if not isinstance(self._grad, Tensor):
             self._grad = Tensor(None, name=f'grad[{self.name}]')
 
-        if self._grad.value is None:
-            self._compute_grad()
-
         return self._grad
 
     @grad.setter
