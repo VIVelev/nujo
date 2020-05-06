@@ -57,7 +57,7 @@ class Function(_Node):
 
         z = self.forward()
         if self._z_placeholder is None:
-            # Register in the computation (init the placeholder)
+            # Initialize the placeholder
             self._z_placeholder = Tensor(
                 z,
                 diff=[x.diff for x in self.children],

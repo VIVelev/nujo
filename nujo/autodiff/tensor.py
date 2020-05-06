@@ -254,11 +254,15 @@ class Tensor(_Node):
                                        Number]):
         ''' In-place assignment operator: `<<=`
 
-        Essentially used to achieve static evaluation.
+        Transfering key properties from `other` to `self`.
+        Essentially a shortcut for:
+            >>> self.children = other.children
+            >>> self.creator = other.creator
+            >>> self.value = other.value
+            >>> self.grad = other.grad
+            >>> self.T = other.T
 
         '''
-
-        # TODO: Is this really usefull?
 
         self.children = getattr(other, 'children', None)
         if self.children:
