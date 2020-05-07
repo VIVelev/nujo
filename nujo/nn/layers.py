@@ -10,7 +10,7 @@ __all__ = [
 class Linear(Flow):
     ''' Linear Layer
 
-        f(x) = xW + b
+        f(x) = Wx + b
 
     Parameters:
     -----------
@@ -33,13 +33,13 @@ class Linear(Flow):
         self.out_features = out_features
         self.bias = bias
 
-        self.W = randn(self.in_features,
-                       self.out_features,
+        self.W = randn(self.out_features,
+                       self.in_features,
                        name=self.name + '.W')
 
         if self.bias:
-            self.b = randn(1, self.out_features, name=self.name + '.bias')
+            self.b = randn(self.out_features, 1, name=self.name + '.bias')
 
     def forward(self, x: Tensor) -> Tensor:
-        out = x @ self.W
+        out = self.W @ x
         return out + self.b if self.bias else out

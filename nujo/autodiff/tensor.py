@@ -161,8 +161,11 @@ class Tensor(_Node):
                             poutput._grad._value.T @ weight).T
 
                 else:
-                    self._grad._value = self._grad._value + \
-                        poutput._grad._value * weight
+                    update = poutput._grad._value * weight
+                    if self._grad._value.shape == (1, 1):  # Is scalar?
+                        self._grad._value = self._grad._value + update.sum()
+                    else:
+                        self._grad._value = self._grad._value + update
 
     def zero_grad(self) -> None:
         # `zero_grad` is called after an iteration.
