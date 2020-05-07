@@ -1,6 +1,6 @@
-from copy import copy
+from copy import copy, deepcopy
 from numbers import Number
-from typing import List, Optional, Set, Tuple, Union
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 from numpy import array, ndarray, ones, zeros
 
@@ -35,15 +35,17 @@ class Tensor(_Node):
 
         super(Tensor, self).__init__(*_if_not_none(creator), name=name)
 
-        self._value: ndarray = value.value if isinstance(
-            value, Tensor) else array(value)
+        self._value: ndarray = None
+        self.value = value  # set value
 
         self.diff = diff
         self.creator = creator
 
-        # (Tensor, weight) pair, used to backpropagate through the network
-        # See: `Chain Rule` Wikipedia page for more info
-        self.backward_depend: List[List['Tensor', ndarray]] = []
+        self.parents_outputs: List['Tensor'] = []
+        # The weight of tensor (derivative of creator)
+        self.weights: List[ndarray] = []
+
+        self._sibling_to_parents_outputs: Dict[int, Set['Tensor']] = {}
 
         # Gradient of the current tensor
         self._grad: 'Tensor' = None
@@ -57,8 +59,12 @@ class Tensor(_Node):
 
     @value.setter
     def value(self, value: Union['Tensor', ndarray, List[Number], Number]):
-        self._value = value.value if isinstance(value,
-                                                Tensor) else array(value)
+        if isinstance(value, Tensor):
+            self._value = value.value
+        elif isinstance(value, ndarray):
+            self._value = value
+        else:
+            self._value = array(value)
 
     @value.deleter
     def value(self):
@@ -66,14 +72,14 @@ class Tensor(_Node):
 
     @property
     def grad(self) -> 'Tensor':
-        if not isinstance(self._grad, Tensor):
+        if self._grad is None:
             self._grad = Tensor(None, name=f'grad[{self.name}]')
 
         return self._grad
 
     @property
     def T(self) -> 'Tensor':
-        if not isinstance(self._T, Tensor):
+        if self._T is None:
             self._T = copy(self)
             self._T.value = None
 
@@ -88,9 +94,8 @@ class Tensor(_Node):
     def shape(self) -> Tuple[int, ...]:
         return self._value.shape
 
-    # TODO: Inplace?
     def reshape(self, *shape: int, inplace=False) -> 'Tensor':
-        reshaped = self if inplace else copy(self)
+        reshaped = self if inplace else deepcopy(self)
         reshaped.value = self._value.reshape(shape)
         return reshaped
 
@@ -99,7 +104,7 @@ class Tensor(_Node):
                axis: Optional[int] = None,
                inplace=False) -> 'Tensor':
 
-        repeated = self if inplace else copy(self)
+        repeated = self if inplace else deepcopy(self)
         repeated.value = self._value.repeat(repeats, axis=axis)
         return repeated
 
@@ -134,69 +139,37 @@ class Tensor(_Node):
 
     # Gradient computation
 
-    def add_backward_dep(self, wrt: 'Tensor', weight: ndarray) -> None:
-        self.backward_depend.append([wrt, weight])
-
-    def _intersect_parents(self, *others: 'Tensor') -> Set['Tensor']:
-        common_parents = set([dep[0] for dep in self.backward_depend])
-
-        for other in others:
-            if isinstance(other, Tensor):
-                common_parents.intersection_update(
-                    set([dep[0] for dep in other.backward_depend]))
-
-        return common_parents
-
-    def _compute_grad(self, _debug=False) -> None:
-        if modes.DIFF_ENABLED and self.diff and self.grad.value.item() is None:
-            if _debug:
-                print()
-                print('=' * 30)
-                print(self, end='\n\n')
-                print('Shape:', self.shape)
-                print(f'Has {len(self.backward_depend)} dependencies:')
-                print('Grad Dependecies:', self.backward_depend, end='\n\n')
+    def _compute_grad(self) -> None:
+        if modes.DIFF_ENABLED and self.diff and \
+           self.grad._value.item() is None:
 
             # Top-parent grad
-            if len(self.backward_depend) == 0:
-                self.grad.value = ones(self.shape)
+            if len(self.parents_outputs) == 0:
+                self._grad._value = ones(self._value.shape)
                 return
 
-            self.grad.value = zeros(self.shape)
-            for z, weight in self.backward_depend:
-                if _debug:
-                    print('~' * 10)
-                    print('Z Grad:', z.grad)
-                    print('Shape:', z.grad.shape, end='\n\n')
-                    print('-' * 5)
-                    print('Z Weight:', weight)
-                    print('Shape:', weight.shape, end='\n\n')
-
-                if z.creator.name == 'MatMul':
-                    if self.id == z.creator.children[0].id:
+            self._grad._value = zeros(self._value.shape)
+            for poutput, weight in zip(self.parents_outputs, self.weights):
+                if poutput.creator.name == 'MatMul':
+                    if self is poutput.creator.children[0]:
                         # XW = Z, dX ...
-                        self.grad.value += z.grad.value @ weight.T
+                        self._grad._value += poutput._grad._value @ weight.T
 
                     else:
                         # XW = Z, dW ...
-                        self.grad.value += (z.grad.value.T @ weight).T
+                        self._grad._value += (
+                            poutput._grad._value.T @ weight).T
 
                 else:
-                    self.grad.value = self.grad.value + \
-                        z.grad.value * weight
-
-            if _debug:
-                print('#' * 10)
-                print('Current Grad:', self.grad)
-                print('Shape:', self.grad.shape)
-                print('-' * 5, end='\n\n')
+                    self._grad._value = self._grad._value + \
+                        poutput._grad._value * weight
 
     def zero_grad(self) -> None:
         # `zero_grad` is called after an iteration.
         # The value of weight tensors is updated after an iteration.
 
-        self.grad.value = None
-        self.T.value = None
+        self.grad._value = array(None)
+        self.T._value = array(None)
 
     def backward(self, _debug=False) -> None:
         ''' It uses Breadth First Search to traverse the computation graph
@@ -210,7 +183,7 @@ class Tensor(_Node):
 
         while nodes_to_visit:
             node = nodes_to_visit.pop()
-            node._compute_grad(_debug=_debug)
+            node._compute_grad()
 
             if _debug:
                 nstr = f' [{i}]'
@@ -294,15 +267,32 @@ class Tensor(_Node):
 
     # Arithmetic operations
 
+    def _binary_function_exec(self, other, other_pos: int, func_type: type):
+        parents_outputs = self._sibling_to_parents_outputs.get(
+            getattr(other, 'id', -1), self.parents_outputs)
+
+        for po in parents_outputs:
+            if (isinstance(po.creator, func_type) and
+               po.creator.children[other_pos] is other) or \
+               po.creator.children[other_pos] == other:
+
+                return po.creator()
+
+        if other_pos == 0:
+            creator = func_type(other, self)
+        else:
+            creator = func_type(self, other)
+        new_parent_output = creator()
+
+        if modes.DIFF_ENABLED:
+            self._sibling_to_parents_outputs.setdefault(
+                creator.children[other_pos].id, set()).add(new_parent_output)
+
+        return new_parent_output
+
     def __add__(self, other):
         from nujo.autodiff._functions._elementary import _Addition
-
-        outputs = self._intersect_parents(other)
-        for output in outputs:
-            if isinstance(output.creator, _Addition):
-                return output.creator()
-
-        return _Addition(self, other)()
+        return self._binary_function_exec(other, 1, _Addition)
 
     def __radd__(self, other):
         return self.__add__(other)
@@ -310,10 +300,9 @@ class Tensor(_Node):
     def __neg__(self):
         from nujo.autodiff._functions._elementary import _Negation
 
-        outputs = self._intersect_parents()
-        for output in outputs:
-            if isinstance(output.creator, _Negation):
-                return output.creator()
+        for po in self.parents_outputs:
+            if isinstance(po.creator, _Negation):
+                return po.creator()
 
         return _Negation(self)()
 
@@ -325,87 +314,41 @@ class Tensor(_Node):
 
     def __mul__(self, other):
         from nujo.autodiff._functions._elementary import _Multiplication
-
-        outputs = self._intersect_parents(other)
-        for output in outputs:
-            if isinstance(output.creator, _Multiplication):
-                return output.creator()
-
-        return _Multiplication(self, other)()
+        return self._binary_function_exec(other, 1, _Multiplication)
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        from nujo.autodiff._functions._elementary import _Reciprocal
-
-        if isinstance(other, Tensor):
-            outputs = other._intersect_parents()
-            for output in outputs:
-                if isinstance(output.creator, _Reciprocal):
-                    return self.__mul__(output.creator())
-
-        return self.__mul__(_Reciprocal(other)())
+        from nujo.autodiff._functions._elementary import _Multiplication
+        return self._binary_function_exec(1 / other, 1, _Multiplication)
 
     def __rtruediv__(self, other):
         from nujo.autodiff._functions._elementary import _Reciprocal
 
-        outputs = self._intersect_parents()
-        for output in outputs:
-            if isinstance(output.creator, _Reciprocal):
-                return output.creator().__mul__(other)
+        for po in self.parents_outputs:
+            if isinstance(po.creator, _Reciprocal):
+                return po.creator().__mul__(other)
 
         return _Reciprocal(self)().__mul__(other)
 
     def __pow__(self, other):
         from nujo.autodiff._functions._elementary import _Power
-
-        outputs = self._intersect_parents(other)
-        for output in outputs:
-            if isinstance(output.creator, _Power) and \
-               output.creator.children[0] is self:
-
-                return output.creator()
-
-        return _Power(self, other)()
+        return self._binary_function_exec(other, 1, _Power)
 
     def __rpow__(self, other):
         from nujo.autodiff._functions._elementary import _Power
-
-        outputs = self._intersect_parents(other)
-        for output in outputs:
-            if isinstance(output.creator, _Power) and \
-               output.creator.children[1] is self:
-
-                return output.creator()
-
-        return _Power(other, self)()
+        return self._binary_function_exec(other, 0, _Power)
 
     # More complex arithmetic operations
 
     def __matmul__(self, other):
         from nujo.autodiff._functions._elementary import _MatrixMul
-
-        outputs = self._intersect_parents(other)
-        for output in outputs:
-            if isinstance(output.creator, _MatrixMul) and \
-               output.creator.children[0] is self:
-
-                return output.creator()
-
-        return _MatrixMul(self, other)()
+        return self._binary_function_exec(other, 1, _MatrixMul)
 
     def __rmatmul__(self, other):
         from nujo.autodiff._functions._elementary import _MatrixMul
-
-        outputs = self._intersect_parents(other)
-        for output in outputs:
-            if isinstance(output.creator, _MatrixMul) and \
-               output.creator.children[1] is self:
-
-                return output.creator()
-
-        return _MatrixMul(other, self)()
+        return self._binary_function_exec(other, 0, _MatrixMul)
 
     # Representations
 

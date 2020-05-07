@@ -31,11 +31,17 @@ class Function(_Node):
 
         super(Function, self).__init__(*children, name=name)
 
-        self._z_placeholder = Tensor(
+        # This placeholder is reused when possible
+        self._output_placeholder = Tensor(
             None,
-            diff=any([x.diff for x in self.children]),
+            diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
             creator=self if modes.DIFF_ENABLED else None,
             name=self._generate_tensor_name())
+
+        if modes.DIFF_ENABLED:  # If graph building is enabled.
+            for child in self.children:
+                child.parents_outputs.append(self._output_placeholder)
+                child.weights.append(None)
 
     def __repr__(self):
         return super(Function, self).__repr__() + f'#{self.id}'
@@ -52,31 +58,18 @@ class Function(_Node):
         pass
 
     def __call__(self) -> Tensor:
-        ''' This method controls what gets registered in the
-        computation graph and what gets a gradient.
-
-        It also builds the backpropagation graph.
-
+        ''' Executes forward pass and
+        updates the weights (derivatives) for the dependent children.
         '''
 
-        if self._z_placeholder.diff:
-            self._z_placeholder.zero_grad()
+        self._output_placeholder.value = self.forward()
 
-        self._z_placeholder.value = self.forward()
+        if self._output_placeholder.diff:  # Is gradient dependecy?
+            self._output_placeholder.zero_grad()
 
-        if modes.DIFF_ENABLED:
-            # Build/update the backpropagation graph.
+            # Update the weights
             for tensor, derivative in zip(self.children, self.backward()):
-                try:
-                    idx = next(i for i, v in enumerate(tensor.backward_depend)
-                               if v[0] is self._z_placeholder)
+                idx = tensor.parents_outputs.index(self._output_placeholder)
+                tensor.weights[idx] = derivative
 
-                    tensor.backward_depend[idx][1] = (
-                        derivative if self._z_placeholder.diff else None)
-
-                except StopIteration:
-                    tensor.add_backward_dep(
-                        self._z_placeholder,
-                        derivative if self._z_placeholder.diff else None)
-
-        return self._z_placeholder
+        return self._output_placeholder
