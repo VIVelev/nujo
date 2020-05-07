@@ -110,20 +110,20 @@ class Tensor(_Node):
 
     def squeeze(self, dim=-1, inplace=False) -> 'Tensor':
         if dim < 0:
-            num_dims = len(self.shape)
+            num_dims = len(self._value.shape)
 
             if dim < -num_dims:
                 dim = num_dims
             else:
                 dim += num_dims
 
-        return self.reshape(*self.shape[:dim],
-                            *self.shape[dim + 1:],
+        return self.reshape(*self._value.shape[:dim],
+                            *self._value.shape[dim + 1:],
                             inplace=inplace)
 
     def unsqueeze(self, dim=-1, inplace=False) -> 'Tensor':
         if dim < 0:
-            num_dims = len(self.shape)
+            num_dims = len(self._value.shape)
 
             if dim < -num_dims:
                 dim = 0
@@ -132,9 +132,9 @@ class Tensor(_Node):
                     dim += 1
                 dim += num_dims
 
-        return self.reshape(*self.shape[:dim],
+        return self.reshape(*self._value.shape[:dim],
                             1,
-                            *self.shape[dim:],
+                            *self._value.shape[dim:],
                             inplace=inplace)
 
     # Gradient computation
