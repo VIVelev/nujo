@@ -267,24 +267,26 @@ class Tensor(_Node):
 
     # Arithmetic operations
 
-    def _binary_function_exec(self, other, other_pos: int, func_type: type):
+    def _cached_binary_function_exec(self, other, other_pos: int,
+                                     FuncType: type):
+
         parents_outputs = self._sibling_to_parents_outputs.get(
             getattr(other, 'id', -1), self.parents_outputs)
 
         for po in parents_outputs:
-            if (isinstance(po.creator, func_type) and
+            if (isinstance(po.creator, FuncType) and
                po.creator.children[other_pos] is other) or \
                po.creator.children[other_pos] == other:
 
                 return po.creator()
 
         if other_pos == 0:
-            creator = func_type(other, self)
+            creator = FuncType(other, self)
         else:
-            creator = func_type(self, other)
+            creator = FuncType(self, other)
         new_parent_output = creator()
 
-        if modes.DIFF_ENABLED:
+        if modes.DIFF_ENABLED:  # If graph building is enabled.
             self._sibling_to_parents_outputs.setdefault(
                 creator.children[other_pos].id, set()).add(new_parent_output)
 
@@ -292,7 +294,7 @@ class Tensor(_Node):
 
     def __add__(self, other):
         from nujo.autodiff._functions._elementary import _Addition
-        return self._binary_function_exec(other, 1, _Addition)
+        return self._cached_binary_function_exec(other, 1, _Addition)
 
     def __radd__(self, other):
         return self.__add__(other)
@@ -314,14 +316,14 @@ class Tensor(_Node):
 
     def __mul__(self, other):
         from nujo.autodiff._functions._elementary import _Multiplication
-        return self._binary_function_exec(other, 1, _Multiplication)
+        return self._cached_binary_function_exec(other, 1, _Multiplication)
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
         from nujo.autodiff._functions._elementary import _Multiplication
-        return self._binary_function_exec(1 / other, 1, _Multiplication)
+        return self._cached_binary_function_exec(1 / other, 1, _Multiplication)
 
     def __rtruediv__(self, other):
         from nujo.autodiff._functions._elementary import _Reciprocal
@@ -334,21 +336,21 @@ class Tensor(_Node):
 
     def __pow__(self, other):
         from nujo.autodiff._functions._elementary import _Power
-        return self._binary_function_exec(other, 1, _Power)
+        return self._cached_binary_function_exec(other, 1, _Power)
 
     def __rpow__(self, other):
         from nujo.autodiff._functions._elementary import _Power
-        return self._binary_function_exec(other, 0, _Power)
+        return self._cached_binary_function_exec(other, 0, _Power)
 
     # More complex arithmetic operations
 
     def __matmul__(self, other):
         from nujo.autodiff._functions._elementary import _MatrixMul
-        return self._binary_function_exec(other, 1, _MatrixMul)
+        return self._cached_binary_function_exec(other, 1, _MatrixMul)
 
     def __rmatmul__(self, other):
         from nujo.autodiff._functions._elementary import _MatrixMul
-        return self._binary_function_exec(other, 0, _MatrixMul)
+        return self._cached_binary_function_exec(other, 0, _MatrixMul)
 
     # Representations
 
