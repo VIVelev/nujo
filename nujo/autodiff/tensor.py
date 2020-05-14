@@ -2,7 +2,7 @@ from copy import copy, deepcopy
 from numbers import Number
 from typing import Dict, List, Optional, Tuple, Union
 
-from numpy import array, ndarray, ones, zeros
+from numpy import array, ndarray, zeros
 
 from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
@@ -75,7 +75,7 @@ class Tensor(_Node):
     @property
     def grad(self) -> 'Tensor':
         if self._grad is None:
-            self._grad = Tensor([], name=f'grad[{self.name}]')
+            self._grad = Tensor([[None]], name=f'grad[{self.name}]')
 
         return self._grad
 
@@ -147,12 +147,14 @@ class Tensor(_Node):
 
             self._grad_is_zeroed = False
 
+            # Make sure grad is Tensor (`grad property call`) and init value
+            self.grad._value = zeros(self._value.shape)
+
             # Top-parent grad
             if len(self.parents_outputs) == 0:
-                self.grad._value = ones(self._value.shape)
+                self._grad._value += 1
                 return
 
-            self.grad._value = zeros(self._value.shape)
             for poutput, weight in zip(self.parents_outputs, self.weights):
                 if poutput.creator.name == 'MatMul':
                     if self is poutput.creator.children[0]:

@@ -33,7 +33,7 @@ class Function(_Node):
 
         # This placeholder is reused when possible
         self._output_placeholder = Tensor(
-            None,
+            [[None]],
             diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
             creator=self if modes.DIFF_ENABLED else None,
             name=self._generate_tensor_name())
