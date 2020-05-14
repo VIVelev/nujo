@@ -1,6 +1,6 @@
 from copy import copy, deepcopy
 from numbers import Number
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from numpy import array, ndarray, ones, zeros
 
@@ -45,7 +45,7 @@ class Tensor(_Node):
         # The weight of tensor (derivative of creator)
         self.weights: List[ndarray] = []
 
-        self._sibling_to_parents_outputs: Dict[int, Set['Tensor']] = {}
+        self._sibling_to_parents_outputs: Dict[int, List['Tensor']] = {}
 
         # Gradient of the current tensor
         self._grad: 'Tensor' = None
@@ -214,12 +214,13 @@ class Tensor(_Node):
         self._value[position] = value
 
     def __hash__(self):
-        return hash(self.name)
+        return hash(self.name + str(self.id))
 
     # Static evaluation operator
 
-    def __ilshift__(self, other: Union['Tensor', ndarray, List[Number],
-                                       Number]):
+    def __ilshift__(
+            self, other: Union['Tensor', ndarray, List[Number],
+                               Number]) -> 'Tensor':
         ''' In-place assignment operator: `<<=`
 
         Transfering key properties from `other` to `self`.
@@ -273,13 +274,13 @@ class Tensor(_Node):
     def _cached_binary_function_exec(self, other, other_pos: int,
                                      FuncType: type):
 
-        parents_outputs = self._sibling_to_parents_outputs.get(
+        parents_outputs: List['Tensor'] = self._sibling_to_parents_outputs.get(
             getattr(other, 'id', -1), self.parents_outputs)
 
         for po in parents_outputs:
-            if (isinstance(po.creator, FuncType) and
-               po.creator.children[other_pos] is other) or \
-               po.creator.children[other_pos] == other:
+            if isinstance(po.creator, FuncType) and \
+               (po.creator.children[other_pos] is other or
+               po.creator.children[other_pos] == other):
 
                 return po.creator()
 
@@ -291,7 +292,7 @@ class Tensor(_Node):
 
         if modes.DIFF_ENABLED:  # If graph building is enabled.
             self._sibling_to_parents_outputs.setdefault(
-                creator.children[other_pos].id, set()).add(new_parent_output)
+                creator.children[other_pos].id, []).append(new_parent_output)
 
         return new_parent_output
 
