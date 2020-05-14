@@ -33,17 +33,17 @@ def test_tensor_backward(tensors):
 
     C.backward()
 
-    assert len(C._grad_dependencies) == 0
+    assert len(C.parents_outputs) == len(C.weights) == 0
     assert (C.grad == 1).all()
 
-    assert len(A._grad_dependencies) == 1
-    assert (A._grad_dependencies[0][0] == C).all()
-    assert (A._grad_dependencies[0][1] == 1).all()
+    assert len(A.parents_outputs) == len(A.weights) == 1
+    assert (A.parents_outputs[0] == C).all()
+    assert (A.weights[0] == 1).all()
     assert (A.grad == 1).all()
 
-    assert len(B._grad_dependencies) == 1
-    assert (B._grad_dependencies[0][0] == C).all()
-    assert (B._grad_dependencies[0][1] == 1).all()
+    assert len(B.parents_outputs) == len(B.weights) == 1
+    assert (B.parents_outputs[0] == C).all()
+    assert (B.weights[0] == 1).all()
     assert (B.grad == 1).all()
 
 
@@ -55,6 +55,9 @@ def test_tensor_backward(tensors):
 def test_tensor_transpose(tensors):
     A, _, _ = tensors
 
+    print(A)
+    print(A.T.value)
+    print(A.value.T)
     assert (A.T.value == A.value.T).all()
 
 
@@ -78,9 +81,7 @@ def test_tensor_zero_grad(tensors):
     A, _, _ = tensors
 
     A.zero_grad()
-    assert len(A._grad_dependencies) == 0
-    assert A._grad is None
-    assert A._T is None
+    assert A.grad.value.item() is None
 
 
 # ====================================================================================================

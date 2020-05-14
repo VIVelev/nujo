@@ -49,9 +49,11 @@ class Tensor(_Node):
 
         # Gradient of the current tensor
         self._grad: 'Tensor' = None
+        self._grad_is_zeroed = True
 
         # Transposed tensor cache
         self._T: 'Tensor' = None
+        self._prev_value: ndarray = None
 
     @property
     def value(self):
@@ -81,10 +83,10 @@ class Tensor(_Node):
     def T(self) -> 'Tensor':
         if self._T is None:
             self._T = copy(self)
-            self._T.value = None
 
-        if self._T.value is None:
-            self._T.value = self._value.T
+        if (self._value != self._prev_value).any():
+            self._T._value = self._value.T
+            self._prev_value = self._value
 
         return self._T
 
@@ -141,14 +143,16 @@ class Tensor(_Node):
 
     def _compute_grad(self) -> None:
         if modes.DIFF_ENABLED and self.diff and \
-           self.grad._value.item() is None:
+           self._grad_is_zeroed:
+
+            self._grad_is_zeroed = False
 
             # Top-parent grad
             if len(self.parents_outputs) == 0:
-                self._grad._value = ones(self._value.shape)
+                self.grad._value = ones(self._value.shape)
                 return
 
-            self._grad._value = zeros(self._value.shape)
+            self.grad._value = zeros(self._value.shape)
             for poutput, weight in zip(self.parents_outputs, self.weights):
                 if poutput.creator.name == 'MatMul':
                     if self is poutput.creator.children[0]:
@@ -171,8 +175,7 @@ class Tensor(_Node):
         # `zero_grad` is called after an iteration.
         # The value of weight tensors is updated after an iteration.
 
-        self.grad._value = array(None)
-        self.T._value = array(None)
+        self._grad_is_zeroed = True
 
     def backward(self, _debug=False) -> None:
         ''' It uses Breadth First Search to traverse the computation graph
