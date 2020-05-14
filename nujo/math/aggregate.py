@@ -32,6 +32,11 @@ def sum(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -> Tensor:
     '''
 
     if len(inputs) == 1:
+
+        for po in inputs[0].parents_outputs:
+            if isinstance(po.creator, _InnerSum):
+                return po.creator()
+
         return _InnerSum(inputs[0], dim=dim, keepdim=keepdim)()
     else:
         return np_sum(inputs, axis=dim, keepdims=keepdim)
@@ -57,6 +62,11 @@ def prod(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -> Tensor:
     '''
 
     if len(inputs) == 1:
+
+        for po in inputs[0].parents_outputs:
+            if isinstance(po.creator, _InnerProd):
+                return po.creator()
+
         return _InnerProd(inputs[0], dim=dim, keepdim=keepdim)()
     else:
         return np_prod(inputs, axis=dim, keepdims=keepdim)
