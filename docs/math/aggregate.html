@@ -58,6 +58,11 @@ def sum(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -&gt; Tensor:
     &#39;&#39;&#39;
 
     if len(inputs) == 1:
+
+        for po in inputs[0].parents_outputs:
+            if isinstance(po.creator, _InnerSum):
+                return po.creator()
+
         return _InnerSum(inputs[0], dim=dim, keepdim=keepdim)()
     else:
         return np_sum(inputs, axis=dim, keepdims=keepdim)
@@ -83,6 +88,11 @@ def prod(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -&gt; Tensor
     &#39;&#39;&#39;
 
     if len(inputs) == 1:
+
+        for po in inputs[0].parents_outputs:
+            if isinstance(po.creator, _InnerProd):
+                return po.creator()
+
         return _InnerProd(inputs[0], dim=dim, keepdim=keepdim)()
     else:
         return np_prod(inputs, axis=dim, keepdims=keepdim)
@@ -216,6 +226,11 @@ if a single tensor is passed, its elements will be multiplied</li>
     &#39;&#39;&#39;
 
     if len(inputs) == 1:
+
+        for po in inputs[0].parents_outputs:
+            if isinstance(po.creator, _InnerProd):
+                return po.creator()
+
         return _InnerProd(inputs[0], dim=dim, keepdim=keepdim)()
     else:
         return np_prod(inputs, axis=dim, keepdims=keepdim)</code></pre>
@@ -258,6 +273,11 @@ if a single tensor is passed, its elements will be summed</li>
     &#39;&#39;&#39;
 
     if len(inputs) == 1:
+
+        for po in inputs[0].parents_outputs:
+            if isinstance(po.creator, _InnerSum):
+                return po.creator()
+
         return _InnerSum(inputs[0], dim=dim, keepdim=keepdim)()
     else:
         return np_sum(inputs, axis=dim, keepdims=keepdim)</code></pre>

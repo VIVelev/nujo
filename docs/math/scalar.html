@@ -30,7 +30,6 @@ from math import e
 from numpy import around as np_round
 from numpy import ceil as np_ceil
 from numpy import floor as np_floor
-from numpy import where
 
 from nujo.autodiff._functions._elementary import _Logarithm, _Power
 from nujo.autodiff.tensor import Tensor
@@ -51,14 +50,29 @@ __all__ = [
 
 
 def log(x: Tensor, base: float = e) -&gt; Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Logarithm) and \
+           (po.creator.children[1] == base).all():
+            return po.creator()
+
     return _Logarithm(x, base)()
 
 
 def log2(x: Tensor) -&gt; Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Logarithm) and \
+           (po.creator.children[1] == 2).all():
+            return po.creator()
+
     return _Logarithm(x, 2, name=&#39;Log2&#39;)()
 
 
 def log10(x: Tensor) -&gt; Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Logarithm) and \
+           (po.creator.children[1] == 10).all():
+            return po.creator()
+
     return _Logarithm(x, 10, name=&#39;Log10&#39;)()
 
 
@@ -66,15 +80,25 @@ def log10(x: Tensor) -&gt; Tensor:
 
 
 def exp(x: Tensor) -&gt; Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Power) and \
+           (po.creator.children[0] == e).all():
+            return po.creator()
+
     return _Power(e, x, name=&#39;Exp&#39;)()
 
 
 def sqrt(x: Tensor) -&gt; Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Power) and \
+           (po.creator.children[1] == 1 / 2).all():
+            return po.creator()
+
     return _Power(x, 1 / 2, name=&#39;Sqrt&#39;)()
 
 
 def abs(x: Tensor) -&gt; Tensor:
-    return x * where(x &lt; 0, -1, 1)
+    return sqrt(x**2)
 
 
 # ====================================================================================================
@@ -124,7 +148,7 @@ def floor(x: Tensor, inplace=False) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def abs(x: Tensor) -&gt; Tensor:
-    return x * where(x &lt; 0, -1, 1)</code></pre>
+    return sqrt(x**2)</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.scalar.ceil"><code class="name flex">
@@ -154,6 +178,11 @@ def floor(x: Tensor, inplace=False) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def exp(x: Tensor) -&gt; Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Power) and \
+           (po.creator.children[0] == e).all():
+            return po.creator()
+
     return _Power(e, x, name=&#39;Exp&#39;)()</code></pre>
 </details>
 </dd>
@@ -184,6 +213,11 @@ def floor(x: Tensor, inplace=False) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def log(x: Tensor, base: float = e) -&gt; Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Logarithm) and \
+           (po.creator.children[1] == base).all():
+            return po.creator()
+
     return _Logarithm(x, base)()</code></pre>
 </details>
 </dd>
@@ -197,6 +231,11 @@ def floor(x: Tensor, inplace=False) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def log10(x: Tensor) -&gt; Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Logarithm) and \
+           (po.creator.children[1] == 10).all():
+            return po.creator()
+
     return _Logarithm(x, 10, name=&#39;Log10&#39;)()</code></pre>
 </details>
 </dd>
@@ -210,6 +249,11 @@ def floor(x: Tensor, inplace=False) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def log2(x: Tensor) -&gt; Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Logarithm) and \
+           (po.creator.children[1] == 2).all():
+            return po.creator()
+
     return _Logarithm(x, 2, name=&#39;Log2&#39;)()</code></pre>
 </details>
 </dd>
@@ -240,6 +284,11 @@ def floor(x: Tensor, inplace=False) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def sqrt(x: Tensor) -&gt; Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Power) and \
+           (po.creator.children[1] == 1 / 2).all():
+            return po.creator()
+
     return _Power(x, 1 / 2, name=&#39;Sqrt&#39;)()</code></pre>
 </details>
 </dd>
