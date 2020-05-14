@@ -283,7 +283,7 @@ class Tensor(_Node):
         for po in parents_outputs:
             if isinstance(po.creator, FuncType) and \
                (po.creator.children[other_pos] is other or
-               po.creator.children[other_pos] == other):
+               (po.creator.children[other_pos] == other).all()):
 
                 return po.creator()
 
