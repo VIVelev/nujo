@@ -40,6 +40,11 @@ class BinaryStep(Flow):
         self.threshold = threshold
 
     def forward(self, x: Tensor) -> Tensor:
+        for po in x.parents_outputs:
+            if isinstance(po.creator, _BinaryStep) and \
+               po.creator.threshold == self.threshold:
+                return po.creator()
+
         return _BinaryStep(x, threshold=self.threshold)()
 
 
@@ -56,6 +61,10 @@ class Sigmoid(Flow):
         super(Sigmoid, self).__init__(name=name)
 
     def forward(self, x: Tensor) -> Tensor:
+        for po in x.parents_outputs:
+            if isinstance(po.creator, _Sigmoid):
+                return po.creator()
+
         return _Sigmoid(x)()
 
 
@@ -72,6 +81,10 @@ class TanH(Flow):
         super(TanH, self).__init__(name=name)
 
     def forward(self, x: Tensor) -> Tensor:
+        for po in x.parents_outputs:
+            if isinstance(po.creator, _TanH):
+                return po.creator()
+
         return _TanH(x)()
 
 
@@ -88,6 +101,10 @@ class ReLU(Flow):
         super(ReLU, self).__init__(name=name)
 
     def forward(self, x: Tensor) -> Tensor:
+        for po in x.parents_outputs:
+            if isinstance(po.creator, _ReLU):
+                return po.creator()
+
         return _ReLU(x)()
 
 
@@ -105,6 +122,11 @@ class LeakyReLU(Flow):
         self.eps = eps
 
     def forward(self, x: Tensor) -> Tensor:
+        for po in x.parents_outputs:
+            if isinstance(po.creator, _LeakyReLU) and \
+               po.creator.eps == self.eps:
+                return po.creator()
+
         return _LeakyReLU(x, eps=self.eps)()
 
 
@@ -126,6 +148,11 @@ class Swish(Flow):
         self.beta = beta
 
     def forward(self, x: Tensor) -> Tensor:
+        for po in x.parents_outputs:
+            if isinstance(po.creator, _Swish) and \
+               po.creator.beta == self.beta:
+                return po.creator()
+
         return _Swish(x, beta=self.beta)()
 
 
@@ -147,6 +174,10 @@ class Softmax(Flow):
         super(Softmax, self).__init__(name=name)
 
     def forward(self, x: Tensor) -> Tensor:
+        for po in x.parents_outputs:
+            if isinstance(po.creator, _Softmax):
+                return po.creator()
+
         return _Softmax(x)()
 
 

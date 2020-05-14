@@ -4,7 +4,6 @@ from math import e
 from numpy import around as np_round
 from numpy import ceil as np_ceil
 from numpy import floor as np_floor
-from numpy import where
 
 from nujo.autodiff._functions._elementary import _Logarithm, _Power
 from nujo.autodiff.tensor import Tensor
@@ -25,14 +24,29 @@ __all__ = [
 
 
 def log(x: Tensor, base: float = e) -> Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Logarithm) and \
+           (po.creator.children[1] == base).all():
+            return po.creator()
+
     return _Logarithm(x, base)()
 
 
 def log2(x: Tensor) -> Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Logarithm) and \
+           (po.creator.children[1] == 2).all():
+            return po.creator()
+
     return _Logarithm(x, 2, name='Log2')()
 
 
 def log10(x: Tensor) -> Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Logarithm) and \
+           (po.creator.children[1] == 10).all():
+            return po.creator()
+
     return _Logarithm(x, 10, name='Log10')()
 
 
@@ -40,15 +54,25 @@ def log10(x: Tensor) -> Tensor:
 
 
 def exp(x: Tensor) -> Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Power) and \
+           (po.creator.children[0] == e).all():
+            return po.creator()
+
     return _Power(e, x, name='Exp')()
 
 
 def sqrt(x: Tensor) -> Tensor:
+    for po in x.parents_outputs:
+        if isinstance(po.creator, _Power) and \
+           (po.creator.children[1] == 1 / 2).all():
+            return po.creator()
+
     return _Power(x, 1 / 2, name='Sqrt')()
 
 
 def abs(x: Tensor) -> Tensor:
-    return x * where(x < 0, -1, 1)
+    return sqrt(x**2)
 
 
 # ====================================================================================================
