@@ -57,6 +57,18 @@ class Function(_Node):
 
         super(Function, self).__init__(*children, name=name)
 
+        # This placeholder is reused when possible
+        self._output_placeholder = Tensor(
+            [[None]],
+            diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
+            creator=self if modes.DIFF_ENABLED else None,
+            name=self._generate_tensor_name())
+
+        if modes.DIFF_ENABLED:  # If graph building is enabled.
+            for child in self.children:
+                child.parents_outputs.append(self._output_placeholder)
+                child.weights.append(None)
+
     def __repr__(self):
         return super(Function, self).__repr__() + f&#39;#{self.id}&#39;
 
@@ -72,28 +84,23 @@ class Function(_Node):
         pass
 
     def __call__(self) -&gt; Tensor:
-        &#39;&#39;&#39; This method controls what gets registered in the
-        computation graph and what gets a gradient.
-
-        It also builds the backpropagation graph.
-
+        &#39;&#39;&#39; Executes forward pass and
+        updates the weights (derivatives) for the dependent children.
         &#39;&#39;&#39;
 
-        z = self.forward()
-        if not isinstance(z, Tensor):
-            # Register in the computation graph only if in diff mode
-            z = Tensor(z,
-                       diff=any([x.diff for x in self.children]),
-                       creator=self if modes.DIFF_ENABLED else None,
-                       name=self._generate_tensor_name())
+        self._output_placeholder.value = self.forward()
 
-        if modes.DIFF_ENABLED and z.diff:
-            # Compute gradient for this tensor
+        if self._output_placeholder.diff:  # Is gradient dependecy?
+            self._output_placeholder.zero_grad()
+
+            # Update the weights
             for tensor, derivative in zip(self.children, self.backward()):
-                tensor.add_grad_dependency(
-                    z, Tensor(derivative, name=f&#39;weight[{z.name}]&#39;))
+                idx = next(i for i, v in enumerate(tensor.parents_outputs)
+                           if (v == self._output_placeholder).all())
 
-        return z</code></pre>
+                tensor.weights[idx] = derivative
+
+        return self._output_placeholder</code></pre>
 </details>
 </section>
 <section>
@@ -146,6 +153,18 @@ and produces only one tensor as output.</p>
 
         super(Function, self).__init__(*children, name=name)
 
+        # This placeholder is reused when possible
+        self._output_placeholder = Tensor(
+            [[None]],
+            diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
+            creator=self if modes.DIFF_ENABLED else None,
+            name=self._generate_tensor_name())
+
+        if modes.DIFF_ENABLED:  # If graph building is enabled.
+            for child in self.children:
+                child.parents_outputs.append(self._output_placeholder)
+                child.weights.append(None)
+
     def __repr__(self):
         return super(Function, self).__repr__() + f&#39;#{self.id}&#39;
 
@@ -161,28 +180,23 @@ and produces only one tensor as output.</p>
         pass
 
     def __call__(self) -&gt; Tensor:
-        &#39;&#39;&#39; This method controls what gets registered in the
-        computation graph and what gets a gradient.
-
-        It also builds the backpropagation graph.
-
+        &#39;&#39;&#39; Executes forward pass and
+        updates the weights (derivatives) for the dependent children.
         &#39;&#39;&#39;
 
-        z = self.forward()
-        if not isinstance(z, Tensor):
-            # Register in the computation graph only if in diff mode
-            z = Tensor(z,
-                       diff=any([x.diff for x in self.children]),
-                       creator=self if modes.DIFF_ENABLED else None,
-                       name=self._generate_tensor_name())
+        self._output_placeholder.value = self.forward()
 
-        if modes.DIFF_ENABLED and z.diff:
-            # Compute gradient for this tensor
+        if self._output_placeholder.diff:  # Is gradient dependecy?
+            self._output_placeholder.zero_grad()
+
+            # Update the weights
             for tensor, derivative in zip(self.children, self.backward()):
-                tensor.add_grad_dependency(
-                    z, Tensor(derivative, name=f&#39;weight[{z.name}]&#39;))
+                idx = next(i for i, v in enumerate(tensor.parents_outputs)
+                           if (v == self._output_placeholder).all())
 
-        return z</code></pre>
+                tensor.weights[idx] = derivative
+
+        return self._output_placeholder</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
