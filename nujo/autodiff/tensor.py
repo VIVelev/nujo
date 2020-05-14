@@ -75,7 +75,7 @@ class Tensor(_Node):
     @property
     def grad(self) -> 'Tensor':
         if self._grad is None:
-            self._grad = Tensor(None, name=f'grad[{self.name}]')
+            self._grad = Tensor([], name=f'grad[{self.name}]')
 
         return self._grad
 
