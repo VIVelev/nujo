@@ -83,6 +83,11 @@ def mean(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -> Tensor:
 
     if len(inputs) == 1:
         n = np_prod(inputs[0].shape) if dim is None else inputs[0].shape[dim]
+
+        for po in inputs[0].parents_outputs:
+            if isinstance(po.creator, _InnerSum):
+                return po.creator() / n
+
         return _InnerSum(inputs[0], dim=dim, keepdim=keepdim)() / n
 
     else:
