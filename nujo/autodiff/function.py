@@ -69,7 +69,9 @@ class Function(_Node):
 
             # Update the weights
             for tensor, derivative in zip(self.children, self.backward()):
-                idx = tensor.parents_outputs.index(self._output_placeholder)
+                idx = next(i for i, v in enumerate(tensor.parents_outputs)
+                           if (v == self._output_placeholder).all())
+
                 tensor.weights[idx] = derivative
 
         return self._output_placeholder
