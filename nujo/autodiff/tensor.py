@@ -41,6 +41,7 @@ class Tensor(_Node):
         self.diff = diff
         self.creator = creator
 
+        # Outputs of the functions the current tensor is input to.
         self.parents_outputs: List['Tensor'] = []
         # The weight of tensor (derivative of creator)
         self.weights: List[ndarray] = []
@@ -251,6 +252,7 @@ class Tensor(_Node):
 
         self._value = getattr(other, 'value', other)
 
+        # Transfer the gradient
         self._grad = getattr(other, 'grad', None)
         self._grad_is_zeroed = getattr(other, '_grad_is_zeroed', True)
 
