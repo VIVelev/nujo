@@ -128,7 +128,9 @@ and produces only one tensor as output.</p>
                 **kwargs):
 
         if modes.DIFF_ENABLED:
-            key = &#39; &#39;.join((str(x.id) if isinstance(x, Tensor) else str(x)
+            key = str(hash(cls))  # Inlcude the function type hash in the key
+            # Include the arguments&#39; uids in the key
+            key += &#39;&#39;.join((str(x.id) if isinstance(x, Tensor) else str(x)
                             for x in children))
 
             if key in cls._children_history:
