@@ -54,8 +54,7 @@ class Function(_Node, object):
 
     &#39;&#39;&#39;
 
-    _children_history: Dict[Tuple[Union[Tensor, ndarray, List[Number], Number],
-                                  ...], &#39;Function&#39;] = {}
+    _children_history: Dict[str, &#39;Function&#39;] = {}
     _cache_hit = False
 
     def __init__(self,
@@ -180,8 +179,7 @@ and produces only one tensor as output.</p>
 
     &#39;&#39;&#39;
 
-    _children_history: Dict[Tuple[Union[Tensor, ndarray, List[Number], Number],
-                                  ...], &#39;Function&#39;] = {}
+    _children_history: Dict[str, &#39;Function&#39;] = {}
     _cache_hit = False
 
     def __init__(self,
