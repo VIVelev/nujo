@@ -55,7 +55,9 @@ class Function(_Node, object):
                 **kwargs):
 
         if modes.DIFF_ENABLED:
-            key = ' '.join((str(x.id) if isinstance(x, Tensor) else str(x)
+            key = str(hash(cls))  # Inlcude the function type hash in the key
+            # Include the arguments' uids in the key
+            key += ''.join((str(x.id) if isinstance(x, Tensor) else str(x)
                             for x in children))
 
             if key in cls._children_history:
