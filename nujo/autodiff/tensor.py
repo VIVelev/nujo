@@ -73,7 +73,7 @@ class Tensor(_Node):
     @property
     def grad(self) -> 'Tensor':
         if self._grad is None:
-            self._grad = Tensor([[None]], name=f'grad[{self.name}]')
+            self._grad = Tensor(None, name=f'grad[{self.name}]')
 
         return self._grad
 
@@ -96,7 +96,7 @@ class Tensor(_Node):
 
     def reshape(self, *shape: int, inplace=False) -> 'Tensor':
         reshaped = self if inplace else deepcopy(self)
-        reshaped.value = self._value.reshape(shape)
+        reshaped._value = self._value.reshape(shape)
         return reshaped
 
     def repeat(self,
@@ -105,7 +105,7 @@ class Tensor(_Node):
                inplace=False) -> 'Tensor':
 
         repeated = self if inplace else deepcopy(self)
-        repeated.value = self._value.repeat(repeats, axis=axis)
+        repeated._value = self._value.repeat(repeats, axis=axis)
         return repeated
 
     def squeeze(self, dim=-1, inplace=False) -> 'Tensor':
@@ -139,7 +139,7 @@ class Tensor(_Node):
 
     # Gradient computation
 
-    def _compute_grad(self) -> None:
+    def compute_grad(self) -> None:
         if modes.DIFF_ENABLED and self.diff and \
            self._grad_is_zeroed:
 
@@ -189,7 +189,7 @@ class Tensor(_Node):
 
         while nodes_to_visit:
             node = nodes_to_visit.pop()
-            node._compute_grad()
+            node.compute_grad()
 
             if _debug:
                 nstr = f' [{i}]'
