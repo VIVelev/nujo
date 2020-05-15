@@ -231,6 +231,7 @@ class Tensor(_Node):
             >>> self.children = other.children
             >>> self.creator = other.creator
             >>> self.value = other.value
+            >>> self.grad = other.grad
 
         '''
 
@@ -249,6 +250,9 @@ class Tensor(_Node):
                 pass
 
         self._value = getattr(other, 'value', other)
+
+        self._grad = getattr(other, 'grad', None)
+        self._grad_is_zeroed = getattr(other, '_grad_is_zeroed', True)
 
         return self
 
