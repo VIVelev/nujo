@@ -672,7 +672,7 @@ the only child of a tensor</li>
     @property
     def grad(self) -&gt; &#39;Tensor&#39;:
         if self._grad is None:
-            self._grad = Tensor([[None]], name=f&#39;grad[{self.name}]&#39;)
+            self._grad = Tensor(None, name=f&#39;grad[{self.name}]&#39;)
 
         return self._grad
 
@@ -695,7 +695,7 @@ the only child of a tensor</li>
 
     def reshape(self, *shape: int, inplace=False) -&gt; &#39;Tensor&#39;:
         reshaped = self if inplace else deepcopy(self)
-        reshaped.value = self._value.reshape(shape)
+        reshaped._value = self._value.reshape(shape)
         return reshaped
 
     def repeat(self,
@@ -704,7 +704,7 @@ the only child of a tensor</li>
                inplace=False) -&gt; &#39;Tensor&#39;:
 
         repeated = self if inplace else deepcopy(self)
-        repeated.value = self._value.repeat(repeats, axis=axis)
+        repeated._value = self._value.repeat(repeats, axis=axis)
         return repeated
 
     def squeeze(self, dim=-1, inplace=False) -&gt; &#39;Tensor&#39;:
@@ -738,7 +738,7 @@ the only child of a tensor</li>
 
     # Gradient computation
 
-    def _compute_grad(self) -&gt; None:
+    def compute_grad(self) -&gt; None:
         if modes.DIFF_ENABLED and self.diff and \
            self._grad_is_zeroed:
 
@@ -788,7 +788,7 @@ the only child of a tensor</li>
 
         while nodes_to_visit:
             node = nodes_to_visit.pop()
-            node._compute_grad()
+            node.compute_grad()
 
             if _debug:
                 nstr = f&#39; [{i}]&#39;
@@ -964,7 +964,7 @@ def T(self) -&gt; &#39;Tensor&#39;:
 <pre><code class="python">@property
 def grad(self) -&gt; &#39;Tensor&#39;:
     if self._grad is None:
-        self._grad = Tensor([[None]], name=f&#39;grad[{self.name}]&#39;)
+        self._grad = Tensor(None, name=f&#39;grad[{self.name}]&#39;)
 
     return self._grad</code></pre>
 </details>
@@ -1044,7 +1044,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 
     while nodes_to_visit:
         node = nodes_to_visit.pop()
-        node._compute_grad()
+        node.compute_grad()
 
         if _debug:
             nstr = f&#39; [{i}]&#39;
@@ -1054,6 +1054,48 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
         if node.creator:
             for child in node.creator.children:
                 nodes_to_visit.insert(0, child)</code></pre>
+</details>
+</dd>
+<dt id="nujo.Tensor.compute_grad"><code class="name flex">
+<span>def <span class="ident">compute_grad</span></span>(<span>self) -> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def compute_grad(self) -&gt; None:
+    if modes.DIFF_ENABLED and self.diff and \
+       self._grad_is_zeroed:
+
+        self._grad_is_zeroed = False
+
+        # Make sure grad is Tensor (`grad property call`) and init value
+        self.grad._value = zeros(self._value.shape)
+
+        # Top-parent grad
+        if len(self.parents_outputs) == 0:
+            self._grad._value += 1
+            return
+
+        for poutput, weight in zip(self.parents_outputs, self.weights):
+            if poutput.creator.name == &#39;MatMul&#39;:
+                if self is poutput.creator.children[0]:
+                    # XW = Z, dX ...
+                    self._grad._value += poutput._grad._value @ weight.T
+
+                else:
+                    # XW = Z, dW ...
+                    self._grad._value += (
+                        poutput._grad._value.T @ weight).T
+
+            else:
+                update = poutput._grad._value * weight
+                if self._grad._value.shape == (1, 1):  # Is scalar?
+                    self._grad._value = self._grad._value + update.sum()
+                else:
+                    self._grad._value = self._grad._value + update</code></pre>
 </details>
 </dd>
 <dt id="nujo.Tensor.repeat"><code class="name flex">
@@ -1071,7 +1113,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
            inplace=False) -&gt; &#39;Tensor&#39;:
 
     repeated = self if inplace else deepcopy(self)
-    repeated.value = self._value.repeat(repeats, axis=axis)
+    repeated._value = self._value.repeat(repeats, axis=axis)
     return repeated</code></pre>
 </details>
 </dd>
@@ -1086,7 +1128,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 </summary>
 <pre><code class="python">def reshape(self, *shape: int, inplace=False) -&gt; &#39;Tensor&#39;:
     reshaped = self if inplace else deepcopy(self)
-    reshaped.value = self._value.reshape(shape)
+    reshaped._value = self._value.reshape(shape)
     return reshaped</code></pre>
 </details>
 </dd>
@@ -1231,6 +1273,7 @@ a.k.a. No gradients are computed for whatever tensor.</p></div>
 <li><code><a title="nujo.Tensor.all" href="#nujo.Tensor.all">all</a></code></li>
 <li><code><a title="nujo.Tensor.any" href="#nujo.Tensor.any">any</a></code></li>
 <li><code><a title="nujo.Tensor.backward" href="#nujo.Tensor.backward">backward</a></code></li>
+<li><code><a title="nujo.Tensor.compute_grad" href="#nujo.Tensor.compute_grad">compute_grad</a></code></li>
 <li><code><a title="nujo.Tensor.grad" href="#nujo.Tensor.grad">grad</a></code></li>
 <li><code><a title="nujo.Tensor.repeat" href="#nujo.Tensor.repeat">repeat</a></code></li>
 <li><code><a title="nujo.Tensor.reshape" href="#nujo.Tensor.reshape">reshape</a></code></li>
