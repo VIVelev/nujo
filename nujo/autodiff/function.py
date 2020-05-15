@@ -54,13 +54,16 @@ class Function(_Node, object):
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
 
-        if children in cls._children_history:
+        key = ' '.join(
+            (str(x.id) if isinstance(x, Tensor) else str(x) for x in children))
+
+        if key in cls._children_history:
             cls._cache_hit = True
-            return cls._children_history[children]
+            return cls._children_history[key]
         else:
             cls._cache_hit = False
             creator = super(Function, cls).__new__(cls)
-            cls._children_history[children] = creator
+            cls._children_history[key] = creator
             return creator
 
     def __repr__(self):
