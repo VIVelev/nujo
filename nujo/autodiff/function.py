@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from numbers import Number
-from typing import List, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 from numpy import ndarray
 
@@ -9,7 +9,7 @@ from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
 
 
-class Function(_Node):
+class Function(_Node, object):
     ''' Base Class for functions
 
     Functions are applied to tensors.
@@ -25,9 +25,17 @@ class Function(_Node):
      - name : string, the name of the function
 
     '''
+
+    _children_history: Dict[Tuple[Union[Tensor, ndarray, List[Number], Number],
+                                  ...], 'Function'] = {}
+    _cache_hit = False
+
     def __init__(self,
                  *children: Union[Tensor, ndarray, List[Number], Number],
                  name='Function'):
+
+        if self._cache_hit:
+            return
 
         super(Function, self).__init__(*children, name=name)
 
@@ -42,6 +50,19 @@ class Function(_Node):
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
                 child.weights.append(None)
+
+    def __new__(cls,
+                *children: Union[Tensor, ndarray, List[Number], Number],
+                name='Function'):
+
+        if children in cls._children_history:
+            cls._cache_hit = True
+            return cls._children_history[children]
+        else:
+            cls._cache_hit = False
+            creator = super(Function, cls).__new__(cls)
+            cls._children_history[children] = creator
+            return creator
 
     def __repr__(self):
         return super(Function, self).__repr__() + f'#{self.id}'
