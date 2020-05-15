@@ -8,6 +8,8 @@ from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
 
+# TODO: Document Function
+
 
 class Function(_Node, object):
     ''' Base Class for functions
