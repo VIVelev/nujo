@@ -69,11 +69,6 @@ class BinaryStep(Flow):
         self.threshold = threshold
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _BinaryStep) and \
-               po.creator.threshold == self.threshold:
-                return po.creator()
-
         return _BinaryStep(x, threshold=self.threshold)()
 
 
@@ -90,10 +85,6 @@ class Sigmoid(Flow):
         super(Sigmoid, self).__init__(name=name)
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _Sigmoid):
-                return po.creator()
-
         return _Sigmoid(x)()
 
 
@@ -110,10 +101,6 @@ class TanH(Flow):
         super(TanH, self).__init__(name=name)
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _TanH):
-                return po.creator()
-
         return _TanH(x)()
 
 
@@ -130,10 +117,6 @@ class ReLU(Flow):
         super(ReLU, self).__init__(name=name)
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _ReLU):
-                return po.creator()
-
         return _ReLU(x)()
 
 
@@ -151,11 +134,6 @@ class LeakyReLU(Flow):
         self.eps = eps
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _LeakyReLU) and \
-               po.creator.eps == self.eps:
-                return po.creator()
-
         return _LeakyReLU(x, eps=self.eps)()
 
 
@@ -177,11 +155,6 @@ class Swish(Flow):
         self.beta = beta
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _Swish) and \
-               po.creator.beta == self.beta:
-                return po.creator()
-
         return _Swish(x, beta=self.beta)()
 
 
@@ -203,10 +176,6 @@ class Softmax(Flow):
         super(Softmax, self).__init__(name=name)
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _Softmax):
-                return po.creator()
-
         return _Softmax(x)()
 
 
@@ -250,11 +219,6 @@ return 0</p></div>
         self.threshold = threshold
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _BinaryStep) and \
-               po.creator.threshold == self.threshold:
-                return po.creator()
-
         return _BinaryStep(x, threshold=self.threshold)()</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -295,11 +259,6 @@ return 0</p></div>
         self.eps = eps
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _LeakyReLU) and \
-               po.creator.eps == self.eps:
-                return po.creator()
-
         return _LeakyReLU(x, eps=self.eps)()</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -339,10 +298,6 @@ return 0</p></div>
         super(ReLU, self).__init__(name=name)
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _ReLU):
-                return po.creator()
-
         return _ReLU(x)()</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -382,10 +337,6 @@ return 0</p></div>
         super(Sigmoid, self).__init__(name=name)
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _Sigmoid):
-                return po.creator()
-
         return _Sigmoid(x)()</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -431,10 +382,6 @@ return 0</p></div>
         super(Softmax, self).__init__(name=name)
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _Softmax):
-                return po.creator()
-
         return _Softmax(x)()</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -483,11 +430,6 @@ Prajit Ramachandran, Barret Zoph, Quoc V. Le
         self.beta = beta
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _Swish) and \
-               po.creator.beta == self.beta:
-                return po.creator()
-
         return _Swish(x, beta=self.beta)()</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -528,10 +470,6 @@ Prajit Ramachandran, Barret Zoph, Quoc V. Le
         super(TanH, self).__init__(name=name)
 
     def forward(self, x: Tensor) -&gt; Tensor:
-        for po in x.parents_outputs:
-            if isinstance(po.creator, _TanH):
-                return po.creator()
-
         return _TanH(x)()</code></pre>
 </details>
 <h3>Ancestors</h3>

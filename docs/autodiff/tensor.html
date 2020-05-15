@@ -26,7 +26,7 @@
 </summary>
 <pre><code class="python">from copy import copy, deepcopy
 from numbers import Number
-from typing import Dict, List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from numpy import array, ndarray, zeros
 
@@ -70,8 +70,6 @@ class Tensor(_Node):
         self.parents_outputs: List[&#39;Tensor&#39;] = []
         # The weight of tensor (derivative of creator)
         self.weights: List[ndarray] = []
-
-        self._sibling_to_parents_outputs: Dict[int, List[&#39;Tensor&#39;]] = {}
 
         # Gradient of the current tensor
         self._grad: &#39;Tensor&#39; = None
@@ -302,45 +300,15 @@ class Tensor(_Node):
 
     # Arithmetic operations
 
-    def _cached_binary_function_exec(self, other, other_pos: int,
-                                     FuncType: type):
-
-        parents_outputs: List[&#39;Tensor&#39;] = self._sibling_to_parents_outputs.get(
-            getattr(other, &#39;id&#39;, -1), self.parents_outputs)
-
-        for po in parents_outputs:
-            if isinstance(po.creator, FuncType) and \
-               (po.creator.children[other_pos] is other or
-               (po.creator.children[other_pos] == other).all()):
-
-                return po.creator()
-
-        if other_pos == 0:
-            creator = FuncType(other, self)
-        else:
-            creator = FuncType(self, other)
-        new_parent_output = creator()
-
-        if modes.DIFF_ENABLED:  # If graph building is enabled.
-            self._sibling_to_parents_outputs.setdefault(
-                creator.children[other_pos].id, []).append(new_parent_output)
-
-        return new_parent_output
-
     def __add__(self, other):
         from nujo.autodiff._functions._elementary import _Addition
-        return self._cached_binary_function_exec(other, 1, _Addition)
+        return _Addition(self, other)()
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __neg__(self):
         from nujo.autodiff._functions._elementary import _Negation
-
-        for po in self.parents_outputs:
-            if isinstance(po.creator, _Negation):
-                return po.creator()
-
         return _Negation(self)()
 
     def __sub__(self, other):
@@ -351,41 +319,36 @@ class Tensor(_Node):
 
     def __mul__(self, other):
         from nujo.autodiff._functions._elementary import _Multiplication
-        return self._cached_binary_function_exec(other, 1, _Multiplication)
+        return _Multiplication(self, other)()
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
         from nujo.autodiff._functions._elementary import _Multiplication
-        return self._cached_binary_function_exec(1 / other, 1, _Multiplication)
+        return _Multiplication(self, 1 / other)()
 
     def __rtruediv__(self, other):
         from nujo.autodiff._functions._elementary import _Reciprocal
-
-        for po in self.parents_outputs:
-            if isinstance(po.creator, _Reciprocal):
-                return po.creator().__mul__(other)
-
         return _Reciprocal(self)().__mul__(other)
 
     def __pow__(self, other):
         from nujo.autodiff._functions._elementary import _Power
-        return self._cached_binary_function_exec(other, 1, _Power)
+        return _Power(self, other)()
 
     def __rpow__(self, other):
         from nujo.autodiff._functions._elementary import _Power
-        return self._cached_binary_function_exec(other, 0, _Power)
+        return _Power(other, self)()
 
     # More complex arithmetic operations
 
     def __matmul__(self, other):
         from nujo.autodiff._functions._elementary import _MatrixMul
-        return self._cached_binary_function_exec(other, 1, _MatrixMul)
+        return _MatrixMul(self, other)()
 
     def __rmatmul__(self, other):
         from nujo.autodiff._functions._elementary import _MatrixMul
-        return self._cached_binary_function_exec(other, 0, _MatrixMul)
+        return _MatrixMul(other, self)()
 
     # Representations
 
@@ -461,8 +424,6 @@ the only child of a tensor</li>
         # The weight of tensor (derivative of creator)
         self.weights: List[ndarray] = []
 
-        self._sibling_to_parents_outputs: Dict[int, List[&#39;Tensor&#39;]] = {}
-
         # Gradient of the current tensor
         self._grad: &#39;Tensor&#39; = None
         self._grad_is_zeroed = True
@@ -692,45 +653,15 @@ the only child of a tensor</li>
 
     # Arithmetic operations
 
-    def _cached_binary_function_exec(self, other, other_pos: int,
-                                     FuncType: type):
-
-        parents_outputs: List[&#39;Tensor&#39;] = self._sibling_to_parents_outputs.get(
-            getattr(other, &#39;id&#39;, -1), self.parents_outputs)
-
-        for po in parents_outputs:
-            if isinstance(po.creator, FuncType) and \
-               (po.creator.children[other_pos] is other or
-               (po.creator.children[other_pos] == other).all()):
-
-                return po.creator()
-
-        if other_pos == 0:
-            creator = FuncType(other, self)
-        else:
-            creator = FuncType(self, other)
-        new_parent_output = creator()
-
-        if modes.DIFF_ENABLED:  # If graph building is enabled.
-            self._sibling_to_parents_outputs.setdefault(
-                creator.children[other_pos].id, []).append(new_parent_output)
-
-        return new_parent_output
-
     def __add__(self, other):
         from nujo.autodiff._functions._elementary import _Addition
-        return self._cached_binary_function_exec(other, 1, _Addition)
+        return _Addition(self, other)()
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __neg__(self):
         from nujo.autodiff._functions._elementary import _Negation
-
-        for po in self.parents_outputs:
-            if isinstance(po.creator, _Negation):
-                return po.creator()
-
         return _Negation(self)()
 
     def __sub__(self, other):
@@ -741,41 +672,36 @@ the only child of a tensor</li>
 
     def __mul__(self, other):
         from nujo.autodiff._functions._elementary import _Multiplication
-        return self._cached_binary_function_exec(other, 1, _Multiplication)
+        return _Multiplication(self, other)()
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
         from nujo.autodiff._functions._elementary import _Multiplication
-        return self._cached_binary_function_exec(1 / other, 1, _Multiplication)
+        return _Multiplication(self, 1 / other)()
 
     def __rtruediv__(self, other):
         from nujo.autodiff._functions._elementary import _Reciprocal
-
-        for po in self.parents_outputs:
-            if isinstance(po.creator, _Reciprocal):
-                return po.creator().__mul__(other)
-
         return _Reciprocal(self)().__mul__(other)
 
     def __pow__(self, other):
         from nujo.autodiff._functions._elementary import _Power
-        return self._cached_binary_function_exec(other, 1, _Power)
+        return _Power(self, other)()
 
     def __rpow__(self, other):
         from nujo.autodiff._functions._elementary import _Power
-        return self._cached_binary_function_exec(other, 0, _Power)
+        return _Power(other, self)()
 
     # More complex arithmetic operations
 
     def __matmul__(self, other):
         from nujo.autodiff._functions._elementary import _MatrixMul
-        return self._cached_binary_function_exec(other, 1, _MatrixMul)
+        return _MatrixMul(self, other)()
 
     def __rmatmul__(self, other):
         from nujo.autodiff._functions._elementary import _MatrixMul
-        return self._cached_binary_function_exec(other, 0, _MatrixMul)
+        return _MatrixMul(other, self)()
 
     # Representations
 

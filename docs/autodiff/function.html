@@ -26,7 +26,7 @@
 </summary>
 <pre><code class="python">from abc import abstractmethod
 from numbers import Number
-from typing import List, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 from numpy import ndarray
 
@@ -35,7 +35,7 @@ from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
 
 
-class Function(_Node):
+class Function(_Node, object):
     &#39;&#39;&#39; Base Class for functions
 
     Functions are applied to tensors.
@@ -51,9 +51,17 @@ class Function(_Node):
      - name : string, the name of the function
 
     &#39;&#39;&#39;
+
+    _children_history: Dict[Tuple[Union[Tensor, ndarray, List[Number], Number],
+                                  ...], &#39;Function&#39;] = {}
+    _cache_hit = False
+
     def __init__(self,
                  *children: Union[Tensor, ndarray, List[Number], Number],
                  name=&#39;Function&#39;):
+
+        if self._cache_hit:
+            return
 
         super(Function, self).__init__(*children, name=name)
 
@@ -68,6 +76,21 @@ class Function(_Node):
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
                 child.weights.append(None)
+
+    def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
+                **kwargs):
+
+        key = &#39; &#39;.join(
+            (str(x.id) if isinstance(x, Tensor) else str(x) for x in children))
+
+        if key in cls._children_history:
+            cls._cache_hit = True
+            return cls._children_history[key]
+        else:
+            cls._cache_hit = False
+            creator = super(Function, cls).__new__(cls)
+            cls._children_history[key] = creator
+            return creator
 
     def __repr__(self):
         return super(Function, self).__repr__() + f&#39;#{self.id}&#39;
@@ -114,7 +137,7 @@ class Function(_Node):
 <dl>
 <dt id="nujo.autodiff.function.Function"><code class="flex name class">
 <span>class <span class="ident">Function</span></span>
-<span>(</span><span>*children: Union[nujo.autodiff.tensor.Tensor, numpy.ndarray, List[numbers.Number], numbers.Number], name='Function')</span>
+<span>(</span><span>*children: Union[nujo.autodiff.tensor.Tensor, numpy.ndarray, List[numbers.Number], numbers.Number], **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Base Class for functions</p>
@@ -131,7 +154,7 @@ and produces only one tensor as output.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Function(_Node):
+<pre><code class="python">class Function(_Node, object):
     &#39;&#39;&#39; Base Class for functions
 
     Functions are applied to tensors.
@@ -147,9 +170,17 @@ and produces only one tensor as output.</p>
      - name : string, the name of the function
 
     &#39;&#39;&#39;
+
+    _children_history: Dict[Tuple[Union[Tensor, ndarray, List[Number], Number],
+                                  ...], &#39;Function&#39;] = {}
+    _cache_hit = False
+
     def __init__(self,
                  *children: Union[Tensor, ndarray, List[Number], Number],
                  name=&#39;Function&#39;):
+
+        if self._cache_hit:
+            return
 
         super(Function, self).__init__(*children, name=name)
 
@@ -164,6 +195,21 @@ and produces only one tensor as output.</p>
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
                 child.weights.append(None)
+
+    def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
+                **kwargs):
+
+        key = &#39; &#39;.join(
+            (str(x.id) if isinstance(x, Tensor) else str(x) for x in children))
+
+        if key in cls._children_history:
+            cls._cache_hit = True
+            return cls._children_history[key]
+        else:
+            cls._cache_hit = False
+            creator = super(Function, cls).__new__(cls)
+            cls._children_history[key] = creator
+            return creator
 
     def __repr__(self):
         return super(Function, self).__repr__() + f&#39;#{self.id}&#39;
