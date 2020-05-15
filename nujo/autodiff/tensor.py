@@ -299,8 +299,8 @@ class Tensor(_Node):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        from nujo.autodiff._functions._elementary import _Multiplication
-        return _Multiplication(self, 1 / other)()
+        from nujo.autodiff._functions._elementary import _Reciprocal
+        return self.__mul__(_Reciprocal(other)())
 
     def __rtruediv__(self, other):
         from nujo.autodiff._functions._elementary import _Reciprocal
