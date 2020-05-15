@@ -73,6 +73,10 @@ __all__ = [
 <p>A Function takes multiple tensors as input
 and produces only one tensor as output.</p>
 <p>Functions do not change tensors in-place.</p>
+<p>Functions are written so they reuse the input/output tensors when
+possible, which results in the computation graph being:
+- "Dynamically defined, statically evaluated."
+taking the best from both worlds.</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
 <li>children : varargs, the inpute tensors</li>
@@ -92,6 +96,11 @@ and produces only one tensor as output.</p>
 
     Functions do not change tensors in-place.
 
+    Functions are written so they reuse the input/output tensors when
+    possible, which results in the computation graph being:
+     - &#34;Dynamically defined, statically evaluated.&#34;
+    taking the best from both worlds.
+
     Parameters:
     -----------
      - children : varargs, the inpute tensors
@@ -100,8 +109,13 @@ and produces only one tensor as output.</p>
     &#39;&#39;&#39;
 
     _children_history: Dict[str, &#39;Function&#39;] = {}
-    _cache_hit = False
+    &#39;&#39;&#39; Cache where input tensors for
+    the current function type are stored.
+    &#39;&#39;&#39;
 
+    _cache_hit = False
+    &#39;&#39;&#39; Flag signaling cache hit/miss.
+    &#39;&#39;&#39;
     def __init__(self,
                  *children: Union[Tensor, ndarray, List[Number], Number],
                  name=&#39;Function&#39;):
@@ -111,7 +125,7 @@ and produces only one tensor as output.</p>
 
         super(Function, self).__init__(*children, name=name)
 
-        # This placeholder is reused when possible
+        # This output placeholder is reused when possible
         self._output_placeholder = Tensor(
             None,
             diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
@@ -125,6 +139,9 @@ and produces only one tensor as output.</p>
 
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
+        &#39;&#39;&#39; Used to review the cache for hit and return the cached tensor
+        or otherwise add the new tensor to the cache.
+        &#39;&#39;&#39;
 
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
@@ -287,6 +304,7 @@ the only child of a tensor</li>
         self.diff = diff
         self.creator = creator
 
+        # Outputs of the functions the current tensor is input to.
         self.parents_outputs: List[&#39;Tensor&#39;] = []
         # The weight of tensor (derivative of creator)
         self.weights: List[ndarray] = []
@@ -477,6 +495,7 @@ the only child of a tensor</li>
             &gt;&gt;&gt; self.children = other.children
             &gt;&gt;&gt; self.creator = other.creator
             &gt;&gt;&gt; self.value = other.value
+            &gt;&gt;&gt; self.grad = other.grad
 
         &#39;&#39;&#39;
 
@@ -495,6 +514,10 @@ the only child of a tensor</li>
                 pass
 
         self._value = getattr(other, &#39;value&#39;, other)
+
+        # Transfer the gradient
+        self._grad = getattr(other, &#39;grad&#39;, None)
+        self._grad_is_zeroed = getattr(other, &#39;_grad_is_zeroed&#39;, True)
 
         return self
 
