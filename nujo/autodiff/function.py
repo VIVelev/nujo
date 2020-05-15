@@ -51,9 +51,8 @@ class Function(_Node, object):
                 child.parents_outputs.append(self._output_placeholder)
                 child.weights.append(None)
 
-    def __new__(cls,
-                *children: Union[Tensor, ndarray, List[Number], Number],
-                name='Function'):
+    def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
+                **kwargs):
 
         if children in cls._children_history:
             cls._cache_hit = True
