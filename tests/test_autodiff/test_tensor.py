@@ -55,9 +55,6 @@ def test_tensor_backward(tensors):
 def test_tensor_transpose(tensors):
     A, _, _ = tensors
 
-    print(A)
-    print(A.T.value)
-    print(A.value.T)
     assert (A.T.value == A.value.T).all()
 
 
