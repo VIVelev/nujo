@@ -217,7 +217,7 @@ class Tensor(_Node):
         self._value[position] = value
 
     def __hash__(self):
-        return hash(self.name + str(self.id))
+        return self.id
 
     # Static evaluation operator
 

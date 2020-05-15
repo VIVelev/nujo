@@ -41,7 +41,7 @@ class Function(_Node, object):
 
         # This placeholder is reused when possible
         self._output_placeholder = Tensor(
-            [[None]],
+            None,
             diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
             creator=self if modes.DIFF_ENABLED else None,
             name=self._generate_tensor_name())
@@ -54,17 +54,22 @@ class Function(_Node, object):
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
 
-        key = ' '.join(
-            (str(x.id) if isinstance(x, Tensor) else str(x) for x in children))
+        if modes.DIFF_ENABLED:
+            key = ' '.join((str(x.id) if isinstance(x, Tensor) else str(x)
+                            for x in children))
 
-        if key in cls._children_history:
-            cls._cache_hit = True
-            return cls._children_history[key]
+            if key in cls._children_history:
+                cls._cache_hit = True
+                return cls._children_history[key]
+            else:
+                cls._cache_hit = False
+                creator = super(Function, cls).__new__(cls)
+                cls._children_history[key] = creator
+                return creator
+
         else:
             cls._cache_hit = False
-            creator = super(Function, cls).__new__(cls)
-            cls._children_history[key] = creator
-            return creator
+            return super(Function, cls).__new__(cls)
 
     def __repr__(self):
         return super(Function, self).__repr__() + f'#{self.id}'
