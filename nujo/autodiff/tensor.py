@@ -1,8 +1,8 @@
-from copy import deepcopy
+from copy import copy, deepcopy
 from numbers import Number
 from typing import List, Optional, Tuple, Union
 
-from numpy import array, ndarray, ones, zeros
+from numpy import array, ndarray, zeros
 
 from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
@@ -35,44 +35,56 @@ class Tensor(_Node):
 
         super(Tensor, self).__init__(*_if_not_none(creator), name=name)
 
-        self.value: ndarray = value.value if isinstance(
-            value, Tensor) else array(value)
+        self._value: ndarray = None
+        self.value = value  # set value
+
         self.diff = diff
         self.creator = creator
 
-        # (Tensor, weight) pair, used to backpropagate through the network
-        # See: `Chain Rule` Wikipedia page for more info
-        self._grad_dependencies: List[Tuple['Tensor', 'Tensor']] = []
+        self.parents_outputs: List['Tensor'] = []
+        # The weight of tensor (derivative of creator)
+        self.weights: List[ndarray] = []
 
-        # Gradient cache
+        # Gradient of the current tensor
         self._grad: 'Tensor' = None
+        self._grad_is_zeroed = True
 
         # Transposed tensor cache
         self._T: 'Tensor' = None
+        self._prev_value: ndarray = None
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value: Union['Tensor', ndarray, List[Number], Number]):
+        if isinstance(value, Tensor):
+            self._value = value.value
+        elif isinstance(value, ndarray):
+            self._value = value
+        else:
+            self._value = array(value)
+
+    @value.deleter
+    def value(self):
+        del self._value
 
     @property
     def grad(self) -> 'Tensor':
         if self._grad is None:
-            self._compute_grad()
+            self._grad = Tensor(None, name=f'grad[{self.name}]')
 
         return self._grad
-
-    @grad.setter
-    def grad(self, value: Union['Tensor', ndarray, List[Number], Number]):
-        self._grad = value if isinstance(value, Tensor) else Tensor(
-            value, name=f'grad[{self.name}]')
-
-    @grad.deleter
-    def grad(self):
-        del self._grad
 
     @property
     def T(self) -> 'Tensor':
         if self._T is None:
-            transposed = deepcopy(self)
-            transposed.value = self.value.T
+            self._T = copy(self)
 
-            self._T = transposed
+        if (self._value != self._prev_value).any():
+            self._T._value = self._value.T
+            self._prev_value = self._value
 
         return self._T
 
@@ -80,11 +92,11 @@ class Tensor(_Node):
 
     @property
     def shape(self) -> Tuple[int, ...]:
-        return self.value.shape
+        return self._value.shape
 
     def reshape(self, *shape: int, inplace=False) -> 'Tensor':
         reshaped = self if inplace else deepcopy(self)
-        reshaped.value = self.value.reshape(shape)
+        reshaped._value = self._value.reshape(shape)
         return reshaped
 
     def repeat(self,
@@ -93,25 +105,25 @@ class Tensor(_Node):
                inplace=False) -> 'Tensor':
 
         repeated = self if inplace else deepcopy(self)
-        repeated.value = self.value.repeat(repeats, axis=axis)
+        repeated._value = self._value.repeat(repeats, axis=axis)
         return repeated
 
     def squeeze(self, dim=-1, inplace=False) -> 'Tensor':
         if dim < 0:
-            num_dims = len(self.shape)
+            num_dims = len(self._value.shape)
 
             if dim < -num_dims:
                 dim = num_dims
             else:
                 dim += num_dims
 
-        return self.reshape(*self.shape[:dim],
-                            *self.shape[dim + 1:],
+        return self.reshape(*self._value.shape[:dim],
+                            *self._value.shape[dim + 1:],
                             inplace=inplace)
 
     def unsqueeze(self, dim=-1, inplace=False) -> 'Tensor':
         if dim < 0:
-            num_dims = len(self.shape)
+            num_dims = len(self._value.shape)
 
             if dim < -num_dims:
                 dim = 0
@@ -120,71 +132,50 @@ class Tensor(_Node):
                     dim += 1
                 dim += num_dims
 
-        return self.reshape(*self.shape[:dim],
+        return self.reshape(*self._value.shape[:dim],
                             1,
-                            *self.shape[dim:],
+                            *self._value.shape[dim:],
                             inplace=inplace)
 
     # Gradient computation
 
-    def add_grad_dependency(self, wrt: 'Tensor', weight: 'Tensor') -> None:
-        self._grad_dependencies.append((wrt, weight))
+    def compute_grad(self) -> None:
+        if modes.DIFF_ENABLED and self.diff and \
+           self._grad_is_zeroed:
 
-    def _compute_grad(self, _debug=False) -> None:
-        if modes.DIFF_ENABLED and self.diff and self._grad is None:
-            if _debug:
-                print()
-                print('=' * 30)
-                print(self, end='\n\n')
-                print('Shape:', self.shape)
-                print(f'Has {len(self._grad_dependencies)} dependencies:')
-                print('Grad Dependecies:', self._grad_dependencies, end='\n\n')
+            self._grad_is_zeroed = False
+
+            # Make sure grad is Tensor (`grad property call`) and init value
+            self.grad._value = zeros(self._value.shape)
 
             # Top-parent grad
-            if len(self._grad_dependencies) == 0:
-                self._grad = Tensor(ones(self.shape),
-                                    name=f'grad[{self.name}]')
+            if len(self.parents_outputs) == 0:
+                self._grad._value += 1
                 return
 
-            self._grad = Tensor(zeros(self.shape), name=f'grad[{self.name}]')
-            for z, weight in self._grad_dependencies:
-                if _debug:
-                    print('~' * 10)
-                    print('Z Grad:', z.grad)
-                    print('Shape:', z.grad.shape, end='\n\n')
-                    print('-' * 5)
-                    print('Z Weight:', weight)
-                    print('Shape:', weight.shape, end='\n\n')
-
-                if z.creator.name == 'MatMul':
-                    if self.id == z.creator.children[0].id:
+            for poutput, weight in zip(self.parents_outputs, self.weights):
+                if poutput.creator.name == 'MatMul':
+                    if self is poutput.creator.children[0]:
                         # XW = Z, dX ...
-                        self._grad.value += z.grad.value @ weight.value.T
+                        self._grad._value += poutput._grad._value @ weight.T
 
                     else:
                         # XW = Z, dW ...
-                        self._grad.value += (z.grad.value.T @ weight.value).T
+                        self._grad._value += (
+                            poutput._grad._value.T @ weight).T
 
                 else:
-                    update = z.grad.value * weight.value
-                    if self._grad.value.shape == (1, 1):
-                        self._grad.value = self._grad.value + update.sum()
+                    update = poutput._grad._value * weight
+                    if self._grad._value.shape == (1, 1):  # Is scalar?
+                        self._grad._value = self._grad._value + update.sum()
                     else:
-                        self._grad.value = self._grad.value + update
-
-            if _debug:
-                print('#' * 10)
-                print('Current Grad:', self._grad)
-                print('Shape:', self._grad.shape)
-                print('-' * 5, end='\n\n')
+                        self._grad._value = self._grad._value + update
 
     def zero_grad(self) -> None:
         # `zero_grad` is called after an iteration.
         # The value of weight tensors is updated after an iteration.
 
-        self._grad_dependencies = []
-        self._grad = None
-        self._T = None
+        self._grad_is_zeroed = True
 
     def backward(self, _debug=False) -> None:
         ''' It uses Breadth First Search to traverse the computation graph
@@ -198,7 +189,7 @@ class Tensor(_Node):
 
         while nodes_to_visit:
             node = nodes_to_visit.pop()
-            node._compute_grad(_debug=_debug)
+            node.compute_grad()
 
             if _debug:
                 nstr = f' [{i}]'
@@ -212,29 +203,34 @@ class Tensor(_Node):
     # Useful methods
 
     def all(self) -> ndarray:
-        return self.value.all()
+        return self._value.all()
 
     def any(self) -> ndarray:
-        return self.value.any()
+        return self._value.any()
 
     def __getitem__(self, position: Union[int, Tuple[int, ...]]):
-        return self.value[position]
+        return self._value[position]
 
     def __setitem__(self, position: Union[int, Tuple[int, ...]],
                     value: Union['Tensor', ndarray, List[Number], Number]):
 
-        self.value[position] = value
+        self._value[position] = value
 
     def __hash__(self):
-        return hash(self.name)
+        return self.id
 
     # Static evaluation operator
 
-    def __ilshift__(self, other: Union['Tensor', ndarray, List[Number],
-                                       Number]):
+    def __ilshift__(
+            self, other: Union['Tensor', ndarray, List[Number],
+                               Number]) -> 'Tensor':
         ''' In-place assignment operator: `<<=`
 
-        Essentially used to achieve static evaluation.
+        Transfering key properties from `other` to `self`.
+        Essentially a shortcut for:
+            >>> self.children = other.children
+            >>> self.creator = other.creator
+            >>> self.value = other.value
 
         '''
 
@@ -252,29 +248,29 @@ class Tensor(_Node):
             except ValueError:  # self is not in children
                 pass
 
-        self.value = getattr(other, 'value', other)
+        self._value = getattr(other, 'value', other)
 
         return self
 
     # Comparison operations
 
     def __lt__(self, other):
-        return self.value < getattr(other, 'value', other)
+        return self._value < getattr(other, 'value', other)
 
     def __le__(self, other):
-        return self.value <= getattr(other, 'value', other)
+        return self._value <= getattr(other, 'value', other)
 
     def __eq__(self, other):
-        return self.value == getattr(other, 'value', other)
+        return self._value == getattr(other, 'value', other)
 
     def __ne__(self, other):
-        return self.value != getattr(other, 'value', other)
+        return self._value != getattr(other, 'value', other)
 
     def __gt__(self, other):
-        return self.value > getattr(other, 'value', other)
+        return self._value > getattr(other, 'value', other)
 
     def __ge__(self, other):
-        return self.value >= getattr(other, 'value', other)
+        return self._value >= getattr(other, 'value', other)
 
     # Arithmetic operations
 
@@ -332,4 +328,4 @@ class Tensor(_Node):
 
     def __str__(self):
         # TODO: Come up with a better representation
-        return self.__repr__() + '\n' + '-' * 32 + '\n' + str(self.value)
+        return self.__repr__() + '\n' + '-' * 32 + '\n' + str(self._value)

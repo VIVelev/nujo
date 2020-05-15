@@ -22,7 +22,7 @@ def test_sgd_basic(scalar_params, get_generator_for, num_iters,
         optimizer.zero_grad()
 
         assert loss < prev_loss
-        prev_loss = loss
+        prev_loss = loss.value
 
 
 @pytest.mark.slow
@@ -38,7 +38,7 @@ def test_sgd_matrix(vec_params, get_generator_for, num_iters, matrix_mse_loss):
         optimizer.zero_grad()
 
         assert loss < prev_loss
-        prev_loss = loss
+        prev_loss = loss.value
 
 
 # ====================================================================================================
@@ -60,7 +60,7 @@ def test_momentum_basic(scalar_params, get_generator_for, num_iters,
         optimizer.zero_grad()
 
         assert loss < prev_loss
-        prev_loss = loss
+        prev_loss = loss.value
 
 
 @pytest.mark.slow
@@ -78,7 +78,7 @@ def test_momentum_matrix(vec_params, get_generator_for, num_iters,
         optimizer.zero_grad()
 
         assert loss < prev_loss
-        prev_loss = loss
+        prev_loss = loss.value
 
 
 # ====================================================================================================
@@ -100,7 +100,7 @@ def test_rmsprop_basic(scalar_params, get_generator_for, num_iters,
         optimizer.zero_grad()
 
         assert loss < prev_loss
-        prev_loss = loss
+        prev_loss = loss.value
 
 
 @pytest.mark.slow
@@ -118,7 +118,7 @@ def test_rmsprop_matrix(vec_params, get_generator_for, num_iters,
         optimizer.zero_grad()
 
         assert loss < prev_loss
-        prev_loss = loss
+        prev_loss = loss.value
 
 
 # ====================================================================================================
@@ -140,7 +140,7 @@ def test_adam_basic(scalar_params, get_generator_for, num_iters,
         optimizer.zero_grad()
 
         assert loss < prev_loss
-        prev_loss = loss
+        prev_loss = loss.value
 
 
 @pytest.mark.slow
@@ -158,7 +158,7 @@ def test_adam_matrix(vec_params, get_generator_for, num_iters,
         optimizer.zero_grad()
 
         assert loss < prev_loss
-        prev_loss = loss
+        prev_loss = loss.value
 
 
 # ====================================================================================================

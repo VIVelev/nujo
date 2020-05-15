@@ -30,7 +30,6 @@ from math import e
 from numpy import around as np_round
 from numpy import ceil as np_ceil
 from numpy import floor as np_floor
-from numpy import where
 
 from nujo.autodiff._functions._elementary import _Logarithm, _Power
 from nujo.autodiff.tensor import Tensor
@@ -74,7 +73,7 @@ def sqrt(x: Tensor) -&gt; Tensor:
 
 
 def abs(x: Tensor) -&gt; Tensor:
-    return x * where(x &lt; 0, -1, 1)
+    return sqrt(x**2)
 
 
 # ====================================================================================================
@@ -124,7 +123,7 @@ def floor(x: Tensor, inplace=False) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def abs(x: Tensor) -&gt; Tensor:
-    return x * where(x &lt; 0, -1, 1)</code></pre>
+    return sqrt(x**2)</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.scalar.ceil"><code class="name flex">

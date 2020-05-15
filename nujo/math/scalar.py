@@ -4,7 +4,6 @@ from math import e
 from numpy import around as np_round
 from numpy import ceil as np_ceil
 from numpy import floor as np_floor
-from numpy import where
 
 from nujo.autodiff._functions._elementary import _Logarithm, _Power
 from nujo.autodiff.tensor import Tensor
@@ -48,7 +47,7 @@ def sqrt(x: Tensor) -> Tensor:
 
 
 def abs(x: Tensor) -> Tensor:
-    return x * where(x < 0, -1, 1)
+    return sqrt(x**2)
 
 
 # ====================================================================================================

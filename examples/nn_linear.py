@@ -12,7 +12,7 @@ loss_fn = obj.L2Loss()
 print('Loss:', loss_fn)
 
 print(net.parameters)
-optimizer = optim.Adam(net.parameters, lr=0.5)
+optimizer = optim.Adam(net.parameters, lr=0.1)
 print('Optimizer:', optimizer)
 
 
@@ -43,8 +43,8 @@ def train(net, x, y, num_epochs):
 
 if __name__ == '__main__':
     # Create example data
-    x = nj.rand(30, 3, name='X_train')
-    y = nj.Tensor(x @ [[2], [3], [4]] - 10, name='y_train')
+    x = nj.rand(3, 30, name='X_train')
+    y = nj.Tensor([2, 3, 4] @ x - 10, name='y_train')
 
     # Train
     loss = train(net, x, y, 100)
