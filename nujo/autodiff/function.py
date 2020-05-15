@@ -28,8 +28,7 @@ class Function(_Node, object):
 
     '''
 
-    _children_history: Dict[Tuple[Union[Tensor, ndarray, List[Number], Number],
-                                  ...], 'Function'] = {}
+    _children_history: Dict[str, ...], 'Function'] = {}
     _cache_hit = False
 
     def __init__(self,
