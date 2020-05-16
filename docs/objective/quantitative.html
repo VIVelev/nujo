@@ -38,6 +38,9 @@ __all__ = [
 
 class L1Loss(QuantitativeLoss):
     &#39;&#39;&#39; L1 loss (or Absolute Error)
+
+        | ÿ - y |
+
     &#39;&#39;&#39;
     def forward(self, input: Tensor, target: Tensor) -&gt; Tensor:
         return self.reduction_fn(abs(input - target),
@@ -50,6 +53,9 @@ class L1Loss(QuantitativeLoss):
 
 class L2Loss(QuantitativeLoss):
     &#39;&#39;&#39; L2 loss (or Squared Error)
+
+        (ÿ - y)^2
+
     &#39;&#39;&#39;
     def forward(self, input: Tensor, target: Tensor) -&gt; Tensor:
         return self.reduction_fn((input - target)**2,
@@ -74,13 +80,17 @@ class L2Loss(QuantitativeLoss):
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>L1 loss (or Absolute Error)</p></div>
+<div class="desc"><p>L1 loss (or Absolute Error)</p>
+<p>| ÿ - y |</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class L1Loss(QuantitativeLoss):
     &#39;&#39;&#39; L1 loss (or Absolute Error)
+
+        | ÿ - y |
+
     &#39;&#39;&#39;
     def forward(self, input: Tensor, target: Tensor) -&gt; Tensor:
         return self.reduction_fn(abs(input - target),
@@ -110,13 +120,17 @@ class L2Loss(QuantitativeLoss):
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>L2 loss (or Squared Error)</p></div>
+<div class="desc"><p>L2 loss (or Squared Error)</p>
+<p>(ÿ - y)^2</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class L2Loss(QuantitativeLoss):
     &#39;&#39;&#39; L2 loss (or Squared Error)
+
+        (ÿ - y)^2
+
     &#39;&#39;&#39;
     def forward(self, input: Tensor, target: Tensor) -&gt; Tensor:
         return self.reduction_fn((input - target)**2,

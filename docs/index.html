@@ -428,8 +428,8 @@ def forward(self, *args, **kwargs) -&gt; Tensor:
 <p>A Function takes multiple tensors as input
 and produces only one tensor as output.</p>
 <p>Functions do not change tensors in-place.</p>
-<p>Functions are written so they reuse the input/output tensors when
-possible, which results in the computation graph being:
+<p>Functions are written so they reuse the input/output tensors
+when possible, which results in the computation graph being:
 - "Dynamically defined, statically evaluated."
 taking the best from both worlds.</p>
 <h2 id="parameters">Parameters:</h2>
@@ -451,8 +451,8 @@ taking the best from both worlds.</p>
 
     Functions do not change tensors in-place.
 
-    Functions are written so they reuse the input/output tensors when
-    possible, which results in the computation graph being:
+    Functions are written so they reuse the input/output tensors
+    when possible, which results in the computation graph being:
      - &#34;Dynamically defined, statically evaluated.&#34;
     taking the best from both worlds.
 
@@ -488,6 +488,9 @@ taking the best from both worlds.</p>
             name=self._generate_tensor_name())
 
         if modes.DIFF_ENABLED:  # If graph building is enabled.
+            # Allocate space for parent&#39;s output (output placeholder)
+            # and its weight (derivative).
+
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
                 child.weights.append(None)
@@ -525,10 +528,17 @@ taking the best from both worlds.</p>
 
     @abstractmethod
     def forward(self) -&gt; ndarray:
+        &#39;&#39;&#39; Implement forward pass of the function here.
+        &#39;&#39;&#39;
+
         pass
 
     @abstractmethod
     def backward(self) -&gt; Tuple[ndarray, ...]:
+        &#39;&#39;&#39; Implement backward pass of the function here
+        (a.k.a. derivative calculation).
+        &#39;&#39;&#39;
+
         pass
 
     def __call__(self) -&gt; Tensor:
@@ -536,6 +546,7 @@ taking the best from both worlds.</p>
         updates the weights (derivatives) for the dependent children.
         &#39;&#39;&#39;
 
+        # Forward pass
         self._output_placeholder.value = self.forward()
 
         if self._output_placeholder.diff:  # Is gradient dependecy?
@@ -579,13 +590,18 @@ taking the best from both worlds.</p>
 <span>def <span class="ident">backward</span></span>(<span>self) -> Tuple[numpy.ndarray, ...]</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Implement backward pass of the function here
+(a.k.a. derivative calculation).</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
 def backward(self) -&gt; Tuple[ndarray, ...]:
+    &#39;&#39;&#39; Implement backward pass of the function here
+    (a.k.a. derivative calculation).
+    &#39;&#39;&#39;
+
     pass</code></pre>
 </details>
 </dd>
@@ -593,13 +609,16 @@ def backward(self) -&gt; Tuple[ndarray, ...]:
 <span>def <span class="ident">forward</span></span>(<span>self) -> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Implement forward pass of the function here.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
 def forward(self) -&gt; ndarray:
+    &#39;&#39;&#39; Implement forward pass of the function here.
+    &#39;&#39;&#39;
+
     pass</code></pre>
 </details>
 </dd>
@@ -794,6 +813,7 @@ the only child of a tensor</li>
         # `zero_grad` is called after an iteration.
         # The value of weight tensors is updated after an iteration.
 
+        self.grad._value.fill(0)
         self._grad_is_zeroed = True
 
     def backward(self, _debug=False) -&gt; None:
@@ -1219,6 +1239,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
     # `zero_grad` is called after an iteration.
     # The value of weight tensors is updated after an iteration.
 
+    self.grad._value.fill(0)
     self._grad_is_zeroed = True</code></pre>
 </details>
 </dd>
