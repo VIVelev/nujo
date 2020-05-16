@@ -19,8 +19,8 @@ class Function(_Node, object):
 
     Functions do not change tensors in-place.
 
-    Functions are written so they reuse the input/output tensors when
-    possible, which results in the computation graph being:
+    Functions are written so they reuse the input/output tensors
+    when possible, which results in the computation graph being:
      - "Dynamically defined, statically evaluated."
     taking the best from both worlds.
 
@@ -56,6 +56,9 @@ class Function(_Node, object):
             name=self._generate_tensor_name())
 
         if modes.DIFF_ENABLED:  # If graph building is enabled.
+            # Allocate space for parent's output (output placeholder)
+            # and its weight (derivative).
+
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
                 child.weights.append(None)
@@ -93,10 +96,17 @@ class Function(_Node, object):
 
     @abstractmethod
     def forward(self) -> ndarray:
+        ''' Implement forward pass of the function here.
+        '''
+
         pass
 
     @abstractmethod
     def backward(self) -> Tuple[ndarray, ...]:
+        ''' Implement backward pass of the function here
+        (a.k.a. derivative calculation).
+        '''
+
         pass
 
     def __call__(self) -> Tensor:
@@ -104,6 +114,7 @@ class Function(_Node, object):
         updates the weights (derivatives) for the dependent children.
         '''
 
+        # Forward pass
         self._output_placeholder.value = self.forward()
 
         if self._output_placeholder.diff:  # Is gradient dependecy?
