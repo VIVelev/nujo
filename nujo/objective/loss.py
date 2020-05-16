@@ -12,7 +12,18 @@ __all__ = [
 
 
 class _Loss(Flow):
-    ''' Base loss class
+    ''' Base Loss Function Class
+
+    Do NOT inherit this class directly. Instead, inherit either
+    `QualitativeLoss` or `QuantitativeLoss`, depending on the task
+    for which you implement the loss function (classification/regression).
+
+    Parameters:
+    -----------
+     - dim : int (optional), the dimension along which to reduce
+     - keepdim : bool, whether to keep the dimension
+     - reduction, string (optional), reduction function ('sum', 'mean', etc.)
+
     '''
     def __init__(self,
                  dim: Optional[int] = None,
@@ -35,7 +46,17 @@ class _Loss(Flow):
 
 
 class QualitativeLoss(_Loss):
-    ''' Base qualitative loss class
+    ''' Base Qualitative (Classification) Loss Function Class
+
+    If you want to implement a custom loss function for classification,
+    inherit this class.
+
+    Parameters:
+    -----------
+     - dim : int (optional), the dimension along which to reduce
+     - keepdim : bool, whether to keep the dimension
+     - reduction, string (optional), reduction function (default: 'sum')
+
     '''
     def __init__(self,
                  dim: Optional[int] = None,
@@ -49,7 +70,17 @@ class QualitativeLoss(_Loss):
 
 
 class QuantitativeLoss(_Loss):
-    ''' Base quantitative loss class
+    ''' Base Quantitative (Regression) Loss Function Class
+
+    If you want to implement a custom loss function for regression,
+    inherit this class.
+
+    Parameters:
+    -----------
+     - dim : int (optional), the dimension along which to reduce
+     - keepdim : bool, whether to keep the dimension
+     - reduction, string (optional), reduction function (default: 'mean')
+
     '''
     def __init__(self,
                  dim: Optional[int] = None,
