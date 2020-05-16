@@ -176,6 +176,7 @@ class Tensor(_Node):
         # `zero_grad` is called after an iteration.
         # The value of weight tensors is updated after an iteration.
 
+        self.grad._value.fill(0)
         self._grad_is_zeroed = True
 
     def backward(self, _debug=False) -> None:
