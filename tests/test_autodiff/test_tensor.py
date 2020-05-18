@@ -78,7 +78,7 @@ def test_tensor_zero_grad(tensors):
     A, _, _ = tensors
 
     A.zero_grad()
-    assert (A._grad == 0).all()
+    assert (A.grad == 0).all()
     assert A._grad_is_zeroed
 
 
