@@ -15,6 +15,7 @@ def test_sum(inputs):
 
     # Test Backward pass
     output.backward()
+    assert (inputs[0].grad.shape == inputs[0].shape)
     assert (inputs[0].grad == 1).all()
 
     assert (aggregate.sum(*inputs) == sum(inputs)).all()
@@ -31,6 +32,7 @@ def test_prod(inputs):
 
     # Test Backward pass
     output.backward()
+    assert (inputs[0].grad.shape == inputs[0].shape)
     assert allclose(inputs[0].grad.value, (output / inputs[0]).value)
 
     assert (aggregate.prod(*inputs) == prod(inputs)).all()
@@ -47,6 +49,7 @@ def test_mean(inputs):
 
     # Test Backward pass
     output.backward()
+    assert (inputs[0].grad.shape == inputs[0].shape)
     assert (inputs[0].grad == 1 / prod(inputs[0].shape)).all()
 
     assert (aggregate.mean(*inputs) == mean(inputs)).all()
