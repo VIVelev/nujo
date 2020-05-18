@@ -424,11 +424,10 @@ def forward(self, *args, **kwargs) -&gt; Tensor:
 </code></dt>
 <dd>
 <div class="desc"><p>Base Class for functions</p>
-<p>Functions are applied to tensors.</p>
-<p>A Function takes multiple tensors as input
-and produces only one tensor as output.</p>
-<p>Functions do not change tensors in-place.</p>
-<p>Functions are written so they reuse the input/output tensors
+<p>Functions are applied to tensors. They take multiple
+tensors as input and produces only one tensor as output.
+They do NOT change tensors in-place.</p>
+<p>Functions were also written so they reuse the input/output tensors
 when possible, which results in the computation graph being:
 - "Dynamically defined, statically evaluated."
 taking the best from both worlds.</p>
@@ -444,14 +443,11 @@ taking the best from both worlds.</p>
 <pre><code class="python">class Function(_Node, object):
     &#39;&#39;&#39; Base Class for functions
 
-    Functions are applied to tensors.
+    Functions are applied to tensors. They take multiple
+    tensors as input and produces only one tensor as output.
+    They do NOT change tensors in-place.
 
-    A Function takes multiple tensors as input
-    and produces only one tensor as output.
-
-    Functions do not change tensors in-place.
-
-    Functions are written so they reuse the input/output tensors
+    Functions were also written so they reuse the input/output tensors
     when possible, which results in the computation graph being:
      - &#34;Dynamically defined, statically evaluated.&#34;
     taking the best from both worlds.
@@ -630,7 +626,7 @@ def forward(self) -&gt; ndarray:
 </code></dt>
 <dd>
 <div class="desc"><p>Tensor - a multi-dimensional array</p>
-<p>Tensors are the main units of data and computation in nujo.
+<p>Tensors are the main units of data in nujo.
 They "flow" in the computation graph. :)</p>
 <p>Tensors can be either constants or trainable weights,
 depending on whether gradients are computed for the given tensor.</p>
@@ -649,7 +645,7 @@ the only child of a tensor</li>
 <pre><code class="python">class Tensor(_Node):
     &#39;&#39;&#39; Tensor - a multi-dimensional array
 
-    Tensors are the main units of data and computation in nujo.
+    Tensors are the main units of data in nujo.
     They &#34;flow&#34; in the computation graph. :)
 
     Tensors can be either constants or trainable weights,
@@ -679,8 +675,9 @@ the only child of a tensor</li>
         self.creator = creator
 
         # Outputs of the functions the current tensor is input to.
+        # Used for backpropagation of the gradients.
         self.parents_outputs: List[&#39;Tensor&#39;] = []
-        # The weight of tensor (derivative of creator)
+        # The weights of the outputs (a.k.a. derivatives of the functions).
         self.weights: List[ndarray] = []
 
         # Gradient of the current tensor
@@ -810,9 +807,6 @@ the only child of a tensor</li>
                         self._grad._value = self._grad._value + update
 
     def zero_grad(self) -&gt; None:
-        # `zero_grad` is called after an iteration.
-        # The value of weight tensors is updated after an iteration.
-
         self.grad._value.fill(0)
         self._grad_is_zeroed = True
 
@@ -1236,9 +1230,6 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def zero_grad(self) -&gt; None:
-    # `zero_grad` is called after an iteration.
-    # The value of weight tensors is updated after an iteration.
-
     self.grad._value.fill(0)
     self._grad_is_zeroed = True</code></pre>
 </details>

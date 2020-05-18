@@ -42,7 +42,7 @@ __all__ = [
 
 
 def empty(*shape: int, diff=False, name=&#39;Tensor[empty]&#39;) -&gt; Tensor:
-    &#39;&#39;&#39; Return a new array of given shape, without initializing entries.
+    &#39;&#39;&#39; Return a new Tensor of given shape, without initializing entries.
     &#39;&#39;&#39;
 
     return Tensor(np_empty(shape), diff=diff, name=name)
@@ -52,7 +52,7 @@ def full(*shape: int,
          fill_value=0,
          diff=False,
          name=&#39;Tensor[full]]&#39;) -&gt; Tensor:
-    &#39;&#39;&#39; Return a new array of given shape, filled with `fill_value`.
+    &#39;&#39;&#39; Return a new Tensor of given shape, filled with `fill_value`.
     &#39;&#39;&#39;
 
     return Tensor(np_full(shape, fill_value), diff=diff, name=name)
@@ -62,7 +62,7 @@ def full(*shape: int,
 
 
 def ones(*shape: int, diff=False, name=&#39;Tensor[ones]&#39;) -&gt; Tensor:
-    &#39;&#39;&#39; Return a new array of given shape, filled with ones.
+    &#39;&#39;&#39; Return a new Tensor of given shape, filled with ones.
     &#39;&#39;&#39;
 
     return full(*shape, fill_value=1, diff=diff, name=name)
@@ -76,7 +76,7 @@ def ones_like(x: Tensor, diff=False, name=&#39;Tensor[ones]&#39;) -&gt; Tensor:
 
 
 def zeros(*shape: int, diff=False, name=&#39;Tensor[zeros]&#39;) -&gt; Tensor:
-    &#39;&#39;&#39; Return a new array of given shape, filled with zeros.
+    &#39;&#39;&#39; Return a new Tensor of given shape, filled with zeros.
     &#39;&#39;&#39;
 
     return full(*shape, fill_value=0, diff=diff, name=name)
@@ -100,13 +100,13 @@ def zeros_like(x: Tensor, diff=False, name=&#39;Tensor[zeros]&#39;) -&gt; Tensor
 <span>def <span class="ident">empty</span></span>(<span>*shape: int, diff=False, name='Tensor[empty]') -> <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Return a new array of given shape, without initializing entries.</p></div>
+<div class="desc"><p>Return a new Tensor of given shape, without initializing entries.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def empty(*shape: int, diff=False, name=&#39;Tensor[empty]&#39;) -&gt; Tensor:
-    &#39;&#39;&#39; Return a new array of given shape, without initializing entries.
+    &#39;&#39;&#39; Return a new Tensor of given shape, without initializing entries.
     &#39;&#39;&#39;
 
     return Tensor(np_empty(shape), diff=diff, name=name)</code></pre>
@@ -116,7 +116,7 @@ def zeros_like(x: Tensor, diff=False, name=&#39;Tensor[zeros]&#39;) -&gt; Tensor
 <span>def <span class="ident">full</span></span>(<span>*shape: int, fill_value=0, diff=False, name='Tensor[full]]') -> <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Return a new array of given shape, filled with <code>fill_value</code>.</p></div>
+<div class="desc"><p>Return a new Tensor of given shape, filled with <code>fill_value</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -125,7 +125,7 @@ def zeros_like(x: Tensor, diff=False, name=&#39;Tensor[zeros]&#39;) -&gt; Tensor
          fill_value=0,
          diff=False,
          name=&#39;Tensor[full]]&#39;) -&gt; Tensor:
-    &#39;&#39;&#39; Return a new array of given shape, filled with `fill_value`.
+    &#39;&#39;&#39; Return a new Tensor of given shape, filled with `fill_value`.
     &#39;&#39;&#39;
 
     return Tensor(np_full(shape, fill_value), diff=diff, name=name)</code></pre>
@@ -135,13 +135,13 @@ def zeros_like(x: Tensor, diff=False, name=&#39;Tensor[zeros]&#39;) -&gt; Tensor
 <span>def <span class="ident">ones</span></span>(<span>*shape: int, diff=False, name='Tensor[ones]') -> <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Return a new array of given shape, filled with ones.</p></div>
+<div class="desc"><p>Return a new Tensor of given shape, filled with ones.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def ones(*shape: int, diff=False, name=&#39;Tensor[ones]&#39;) -&gt; Tensor:
-    &#39;&#39;&#39; Return a new array of given shape, filled with ones.
+    &#39;&#39;&#39; Return a new Tensor of given shape, filled with ones.
     &#39;&#39;&#39;
 
     return full(*shape, fill_value=1, diff=diff, name=name)</code></pre>
@@ -164,13 +164,13 @@ def zeros_like(x: Tensor, diff=False, name=&#39;Tensor[zeros]&#39;) -&gt; Tensor
 <span>def <span class="ident">zeros</span></span>(<span>*shape: int, diff=False, name='Tensor[zeros]') -> <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Return a new array of given shape, filled with zeros.</p></div>
+<div class="desc"><p>Return a new Tensor of given shape, filled with zeros.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def zeros(*shape: int, diff=False, name=&#39;Tensor[zeros]&#39;) -&gt; Tensor:
-    &#39;&#39;&#39; Return a new array of given shape, filled with zeros.
+    &#39;&#39;&#39; Return a new Tensor of given shape, filled with zeros.
     &#39;&#39;&#39;
 
     return full(*shape, fill_value=0, diff=diff, name=name)</code></pre>
