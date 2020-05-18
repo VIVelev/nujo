@@ -4,28 +4,42 @@ from nujo.autodiff.tensor import Tensor
 from nujo.init.random import rand
 from nujo.objective.quantitative import L1Loss, L2Loss
 
+# ====================================================================================================
+# Test L1 Loss
 
-def test_l1_loss(input, target):
+
+def test_l1_loss(inputs, targets):
     loss_fn = L1Loss()
-    loss = loss_fn(input, target)
+    loss = loss_fn(inputs, targets)
 
     assert isinstance(loss, Tensor)
-    assert loss.shape == ()
+    assert loss.shape == (1, 1)
 
 
-def test_l2_loss(input, target):
+# ====================================================================================================
+# Test L2 Loss
+
+
+def test_l2_loss(inputs, targets):
     loss_fn = L2Loss()
-    loss = loss_fn(input, target)
+    loss = loss_fn(inputs, targets)
 
     assert isinstance(loss, Tensor)
-    assert loss.shape == ()
+    assert loss.shape == (1, 1)
+
+
+# ====================================================================================================
+# Unit Test fixtures
 
 
 @pytest.fixture
-def input():
+def inputs():
     return rand(100, 1)
 
 
 @pytest.fixture
-def target():
+def targets():
     return rand(100, 1)
+
+
+# ====================================================================================================

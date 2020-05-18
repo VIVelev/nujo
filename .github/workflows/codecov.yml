@@ -1,6 +1,6 @@
 name: codecov
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   run:
@@ -19,11 +19,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install torch
 
     - name: Generate coverage report
       run: |
         pip install pytest pytest-cov
-        pytest --cov=nujo --cov-report=xml
+        pytest --cov=nujo --cov-report=xml --runslow
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1

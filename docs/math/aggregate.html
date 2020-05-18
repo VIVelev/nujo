@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.7.5" />
+<meta name="generator" content="pdoc 0.8.1" />
 <title>nujo.math.aggregate API documentation</title>
 <meta name="description" content="" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 </head>
 <body>
@@ -24,270 +24,94 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from numbers import Number
+<pre><code class="python">from typing import Optional
 
-from numpy import max as np_max
-from numpy import mean as np_mean
-from numpy import median as np_median
-from numpy import min as np_min
 from numpy import prod as np_prod
-from numpy import std as np_stddev
 from numpy import sum as np_sum
-from numpy import var as np_variance
 
+from nujo.autodiff._functions._aggregate import _InnerProd, _InnerSum
 from nujo.autodiff.tensor import Tensor
 
 __all__ = [
     &#39;sum&#39;,
     &#39;prod&#39;,
     &#39;mean&#39;,
-    &#39;median&#39;,
-    &#39;min&#39;,
-    &#39;max&#39;,
-    &#39;stddev&#39;,
-    &#39;variance&#39;,
 ]
 
 # ====================================================================================================
 
 
-def sum(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Summation of tensors
+def sum(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -&gt; Tensor:
+    &#39;&#39;&#39; Summation of tensor(s)
 
     Parameters:
     -----------
-    args : varargs, tensors to be summed;
-    if a single tensor is passed, its elements will be summed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to be summed;
+       if a single tensor is passed, its elements will be summed
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     &#39;&#39;&#39;
 
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_sum(args, axis=dim, keepdims=keepdim)
-
+    if len(inputs) == 1:
+        return _InnerSum(inputs[0], dim=dim, keepdim=keepdim)()
     else:
-        return Tensor(np_sum(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (sum)&#39;)
+        return np_sum(inputs, axis=dim, keepdims=keepdim)
 
 
 # ====================================================================================================
 
 
-def prod(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Product of tensors
+def prod(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -&gt; Tensor:
+    &#39;&#39;&#39; Product of tensor(s)
 
     Parameters:
     -----------
-    args : varargs, tensors to be multiplied;
-    if a single tensor is passed, its elements will be multiplied
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to be multiplied;
+       if a single tensor is passed, its elements will be multiplied
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     &#39;&#39;&#39;
 
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_prod(args, axis=dim, keepdims=keepdim)
-
+    if len(inputs) == 1:
+        return _InnerProd(inputs[0], dim=dim, keepdim=keepdim)()
     else:
-        return Tensor(np_prod(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (prod)&#39;)
+        return np_prod(inputs, axis=dim, keepdims=keepdim)
 
 
 # ====================================================================================================
 
 
-def mean(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Mean of tensors
+def mean(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -&gt; Tensor:
+    &#39;&#39;&#39; Mean of tensor(s)
 
     Parameters:
     -----------
-    args : varargs, tensors to compute the mean of;
-    if a single tensor is passed, the mean of its elements will be computed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to compute the mean of;
+       if a single tensor is passed, the mean of its elements will be computed
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     &#39;&#39;&#39;
 
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_mean(args, axis=dim, keepdims=keepdim)
-
+    if len(inputs) == 1:
+        n = np_prod(inputs[0].shape) if dim is None else inputs[0].shape[dim]
+        return _InnerSum(inputs[0], dim=dim, keepdim=keepdim)() / n
     else:
-        return Tensor(np_mean(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (mean)&#39;)
-
-
-# ====================================================================================================
-
-
-def median(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Median of tensors
-
-    Parameters:
-    -----------
-    args : varargs, tensors to compute the median of;
-    if a single tensor is passed, the median of its elements will be computed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
-
-    Returns:
-    --------
-    result : Tensor
-
-    &#39;&#39;&#39;
-
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_median(args, axis=dim, keepdims=keepdim)
-
-    else:
-        return Tensor(np_median(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (median)&#39;)
-
-
-# ====================================================================================================
-
-
-def min(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Min of tensors
-
-    Parameters:
-    -----------
-    args : varargs, tensors to compute the min of;
-    if a single tensor is passed, the min of its elements will be computed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
-
-    Returns:
-    --------
-    result : Tensor
-
-    &#39;&#39;&#39;
-
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_min(args, axis=dim, keepdims=keepdim)
-
-    else:
-        return Tensor(np_min(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (min)&#39;)
-
-
-# ====================================================================================================
-
-
-def max(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Max of tensors
-
-    Parameters:
-    -----------
-    args : varargs, tensors to compute the max of;
-    if a single tensor is passed, the max of its elements will be computed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
-
-    Returns:
-    --------
-    result : Tensor
-
-    &#39;&#39;&#39;
-
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_max(args, axis=dim, keepdims=keepdim)
-
-    else:
-        return Tensor(np_max(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (max)&#39;)
-
-
-# ====================================================================================================
-
-
-def stddev(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Standard Deviation of tensors
-
-    Parameters:
-    -----------
-    args : varargs, tensors to compute the std dev of;
-    if a single tensor is passed, the std dev of its elements will be computed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
-
-    Returns:
-    --------
-    result : Tensor
-
-    &#39;&#39;&#39;
-
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_stddev(args, axis=dim, keepdims=keepdim)
-
-    else:
-        return Tensor(np_stddev(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (stddev)&#39;)
-
-
-# ====================================================================================================
-
-
-def variance(*args: Number or Tensor,
-             dim: int = None,
-             keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Variance of tensors
-
-    Parameters:
-    -----------
-    args : varargs, tensors to compute the variance of;
-    if a single tensor is passed, the variance of its elements will be computed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
-
-    Returns:
-    --------
-    result : Tensor
-
-    &#39;&#39;&#39;
-
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_variance(args, axis=dim, keepdims=keepdim)
-
-    else:
-        return Tensor(np_variance(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (variance)&#39;)
+        return np_sum(inputs, axis=dim, keepdims=keepdim) / len(inputs)
 
 
 # ====================================================================================================</code></pre>
@@ -300,350 +124,131 @@ def variance(*args: Number or Tensor,
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="nujo.math.aggregate.max"><code class="name flex">
-<span>def <span class="ident">max</span></span>(<span>*args, dim=None, keepdim=False)</span>
-</code></dt>
-<dd>
-<section class="desc"><p>Max of tensors</p>
-<h2 id="parameters">Parameters:</h2>
-<p>args : varargs, tensors to compute the max of;
-if a single tensor is passed, the max of its elements will be computed
-dim : int, dimension to reduce over
-keepdim : bool, whether to keep <code>dim</code></p>
-<h2 id="returns">Returns:</h2>
-<p>result : Tensor</p></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def max(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Max of tensors
-
-    Parameters:
-    -----------
-    args : varargs, tensors to compute the max of;
-    if a single tensor is passed, the max of its elements will be computed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
-
-    Returns:
-    --------
-    result : Tensor
-
-    &#39;&#39;&#39;
-
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_max(args, axis=dim, keepdims=keepdim)
-
-    else:
-        return Tensor(np_max(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (max)&#39;)</code></pre>
-</details>
-</dd>
 <dt id="nujo.math.aggregate.mean"><code class="name flex">
-<span>def <span class="ident">mean</span></span>(<span>*args, dim=None, keepdim=False)</span>
+<span>def <span class="ident">mean</span></span>(<span>*inputs: <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>, dim: Union[int, NoneType] = None, keepdim=False) -> <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Mean of tensors</p>
+<div class="desc"><p>Mean of tensor(s)</p>
 <h2 id="parameters">Parameters:</h2>
-<p>args : varargs, tensors to compute the mean of;
-if a single tensor is passed, the mean of its elements will be computed
-dim : int, dimension to reduce over
-keepdim : bool, whether to keep <code>dim</code></p>
+<ul>
+<li>inputs : varargs, tensors to compute the mean of;
+if a single tensor is passed, the mean of its elements will be computed</li>
+<li>dim : int (optional), dimension to reduce over</li>
+<li>keepdim : bool, whether to keep <code>dim</code></li>
+</ul>
 <h2 id="returns">Returns:</h2>
-<p>result : Tensor</p></section>
+<ul>
+<li>result : Tensor</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def mean(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Mean of tensors
+<pre><code class="python">def mean(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -&gt; Tensor:
+    &#39;&#39;&#39; Mean of tensor(s)
 
     Parameters:
     -----------
-    args : varargs, tensors to compute the mean of;
-    if a single tensor is passed, the mean of its elements will be computed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to compute the mean of;
+       if a single tensor is passed, the mean of its elements will be computed
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     &#39;&#39;&#39;
 
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_mean(args, axis=dim, keepdims=keepdim)
-
+    if len(inputs) == 1:
+        n = np_prod(inputs[0].shape) if dim is None else inputs[0].shape[dim]
+        return _InnerSum(inputs[0], dim=dim, keepdim=keepdim)() / n
     else:
-        return Tensor(np_mean(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (mean)&#39;)</code></pre>
-</details>
-</dd>
-<dt id="nujo.math.aggregate.median"><code class="name flex">
-<span>def <span class="ident">median</span></span>(<span>*args, dim=None, keepdim=False)</span>
-</code></dt>
-<dd>
-<section class="desc"><p>Median of tensors</p>
-<h2 id="parameters">Parameters:</h2>
-<p>args : varargs, tensors to compute the median of;
-if a single tensor is passed, the median of its elements will be computed
-dim : int, dimension to reduce over
-keepdim : bool, whether to keep <code>dim</code></p>
-<h2 id="returns">Returns:</h2>
-<p>result : Tensor</p></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def median(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Median of tensors
-
-    Parameters:
-    -----------
-    args : varargs, tensors to compute the median of;
-    if a single tensor is passed, the median of its elements will be computed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
-
-    Returns:
-    --------
-    result : Tensor
-
-    &#39;&#39;&#39;
-
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_median(args, axis=dim, keepdims=keepdim)
-
-    else:
-        return Tensor(np_median(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (median)&#39;)</code></pre>
-</details>
-</dd>
-<dt id="nujo.math.aggregate.min"><code class="name flex">
-<span>def <span class="ident">min</span></span>(<span>*args, dim=None, keepdim=False)</span>
-</code></dt>
-<dd>
-<section class="desc"><p>Min of tensors</p>
-<h2 id="parameters">Parameters:</h2>
-<p>args : varargs, tensors to compute the min of;
-if a single tensor is passed, the min of its elements will be computed
-dim : int, dimension to reduce over
-keepdim : bool, whether to keep <code>dim</code></p>
-<h2 id="returns">Returns:</h2>
-<p>result : Tensor</p></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def min(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Min of tensors
-
-    Parameters:
-    -----------
-    args : varargs, tensors to compute the min of;
-    if a single tensor is passed, the min of its elements will be computed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
-
-    Returns:
-    --------
-    result : Tensor
-
-    &#39;&#39;&#39;
-
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_min(args, axis=dim, keepdims=keepdim)
-
-    else:
-        return Tensor(np_min(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (min)&#39;)</code></pre>
+        return np_sum(inputs, axis=dim, keepdims=keepdim) / len(inputs)</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.aggregate.prod"><code class="name flex">
-<span>def <span class="ident">prod</span></span>(<span>*args, dim=None, keepdim=False)</span>
+<span>def <span class="ident">prod</span></span>(<span>*inputs: <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>, dim: Union[int, NoneType] = None, keepdim=False) -> <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Product of tensors</p>
+<div class="desc"><p>Product of tensor(s)</p>
 <h2 id="parameters">Parameters:</h2>
-<p>args : varargs, tensors to be multiplied;
-if a single tensor is passed, its elements will be multiplied
-dim : int, dimension to reduce over
-keepdim : bool, whether to keep <code>dim</code></p>
+<ul>
+<li>inputs : varargs, tensors to be multiplied;
+if a single tensor is passed, its elements will be multiplied</li>
+<li>dim : int (optional), dimension to reduce over</li>
+<li>keepdim : bool, whether to keep <code>dim</code></li>
+</ul>
 <h2 id="returns">Returns:</h2>
-<p>result : Tensor</p></section>
+<ul>
+<li>result : Tensor</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def prod(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Product of tensors
+<pre><code class="python">def prod(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -&gt; Tensor:
+    &#39;&#39;&#39; Product of tensor(s)
 
     Parameters:
     -----------
-    args : varargs, tensors to be multiplied;
-    if a single tensor is passed, its elements will be multiplied
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to be multiplied;
+       if a single tensor is passed, its elements will be multiplied
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     &#39;&#39;&#39;
 
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_prod(args, axis=dim, keepdims=keepdim)
-
+    if len(inputs) == 1:
+        return _InnerProd(inputs[0], dim=dim, keepdim=keepdim)()
     else:
-        return Tensor(np_prod(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (prod)&#39;)</code></pre>
-</details>
-</dd>
-<dt id="nujo.math.aggregate.stddev"><code class="name flex">
-<span>def <span class="ident">stddev</span></span>(<span>*args, dim=None, keepdim=False)</span>
-</code></dt>
-<dd>
-<section class="desc"><p>Standard Deviation of tensors</p>
-<h2 id="parameters">Parameters:</h2>
-<p>args : varargs, tensors to compute the std dev of;
-if a single tensor is passed, the std dev of its elements will be computed
-dim : int, dimension to reduce over
-keepdim : bool, whether to keep <code>dim</code></p>
-<h2 id="returns">Returns:</h2>
-<p>result : Tensor</p></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def stddev(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Standard Deviation of tensors
-
-    Parameters:
-    -----------
-    args : varargs, tensors to compute the std dev of;
-    if a single tensor is passed, the std dev of its elements will be computed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
-
-    Returns:
-    --------
-    result : Tensor
-
-    &#39;&#39;&#39;
-
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_stddev(args, axis=dim, keepdims=keepdim)
-
-    else:
-        return Tensor(np_stddev(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (stddev)&#39;)</code></pre>
+        return np_prod(inputs, axis=dim, keepdims=keepdim)</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.aggregate.sum"><code class="name flex">
-<span>def <span class="ident">sum</span></span>(<span>*args, dim=None, keepdim=False)</span>
+<span>def <span class="ident">sum</span></span>(<span>*inputs: <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>, dim: Union[int, NoneType] = None, keepdim=False) -> <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Summation of tensors</p>
+<div class="desc"><p>Summation of tensor(s)</p>
 <h2 id="parameters">Parameters:</h2>
-<p>args : varargs, tensors to be summed;
-if a single tensor is passed, its elements will be summed
-dim : int, dimension to reduce over
-keepdim : bool, whether to keep <code>dim</code></p>
+<ul>
+<li>inputs : varargs, tensors to be summed;
+if a single tensor is passed, its elements will be summed</li>
+<li>dim : int (optional), dimension to reduce over</li>
+<li>keepdim : bool, whether to keep <code>dim</code></li>
+</ul>
 <h2 id="returns">Returns:</h2>
-<p>result : Tensor</p></section>
+<ul>
+<li>result : Tensor</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def sum(*args: Number or Tensor, dim: int = None, keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Summation of tensors
+<pre><code class="python">def sum(*inputs: Tensor, dim: Optional[int] = None, keepdim=False) -&gt; Tensor:
+    &#39;&#39;&#39; Summation of tensor(s)
 
     Parameters:
     -----------
-    args : varargs, tensors to be summed;
-    if a single tensor is passed, its elements will be summed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
+     - inputs : varargs, tensors to be summed;
+       if a single tensor is passed, its elements will be summed
+     - dim : int (optional), dimension to reduce over
+     - keepdim : bool, whether to keep `dim`
 
     Returns:
     --------
-    result : Tensor
+     - result : Tensor
 
     &#39;&#39;&#39;
 
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_sum(args, axis=dim, keepdims=keepdim)
-
+    if len(inputs) == 1:
+        return _InnerSum(inputs[0], dim=dim, keepdim=keepdim)()
     else:
-        return Tensor(np_sum(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (sum)&#39;)</code></pre>
-</details>
-</dd>
-<dt id="nujo.math.aggregate.variance"><code class="name flex">
-<span>def <span class="ident">variance</span></span>(<span>*args, dim=None, keepdim=False)</span>
-</code></dt>
-<dd>
-<section class="desc"><p>Variance of tensors</p>
-<h2 id="parameters">Parameters:</h2>
-<p>args : varargs, tensors to compute the variance of;
-if a single tensor is passed, the variance of its elements will be computed
-dim : int, dimension to reduce over
-keepdim : bool, whether to keep <code>dim</code></p>
-<h2 id="returns">Returns:</h2>
-<p>result : Tensor</p></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def variance(*args: Number or Tensor,
-             dim: int = None,
-             keepdim=False) -&gt; Tensor:
-    &#39;&#39;&#39; Variance of tensors
-
-    Parameters:
-    -----------
-    args : varargs, tensors to compute the variance of;
-    if a single tensor is passed, the variance of its elements will be computed
-    dim : int, dimension to reduce over
-    keepdim : bool, whether to keep `dim`
-
-    Returns:
-    --------
-    result : Tensor
-
-    &#39;&#39;&#39;
-
-    args = list(map(Tensor, args))
-
-    if len(args) &gt; 1:
-        return np_variance(args, axis=dim, keepdims=keepdim)
-
-    else:
-        return Tensor(np_variance(args[0].value, axis=dim, keepdims=keepdim),
-                      creator=args[0].creator,
-                      name=args[0].name + &#39; (variance)&#39;)</code></pre>
+        return np_sum(inputs, axis=dim, keepdims=keepdim)</code></pre>
 </details>
 </dd>
 </dl>
@@ -663,22 +268,17 @@ keepdim : bool, whether to keep <code>dim</code></p>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="two-column">
-<li><code><a title="nujo.math.aggregate.max" href="#nujo.math.aggregate.max">max</a></code></li>
+<ul class="">
 <li><code><a title="nujo.math.aggregate.mean" href="#nujo.math.aggregate.mean">mean</a></code></li>
-<li><code><a title="nujo.math.aggregate.median" href="#nujo.math.aggregate.median">median</a></code></li>
-<li><code><a title="nujo.math.aggregate.min" href="#nujo.math.aggregate.min">min</a></code></li>
 <li><code><a title="nujo.math.aggregate.prod" href="#nujo.math.aggregate.prod">prod</a></code></li>
-<li><code><a title="nujo.math.aggregate.stddev" href="#nujo.math.aggregate.stddev">stddev</a></code></li>
 <li><code><a title="nujo.math.aggregate.sum" href="#nujo.math.aggregate.sum">sum</a></code></li>
-<li><code><a title="nujo.math.aggregate.variance" href="#nujo.math.aggregate.variance">variance</a></code></li>
 </ul>
 </li>
 </ul>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.1</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

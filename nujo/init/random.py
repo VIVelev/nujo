@@ -11,14 +11,14 @@ __all__ = [
 ]
 
 
-def rand(*shape: int, diff=True, name='rand::Tensor') -> Tensor:
+def rand(*shape: int, diff=False, name='Tensor[rand]') -> Tensor:
     ''' Random values in a given shape.
     '''
 
     return Tensor(np_rand(*shape), diff=diff, name=name)
 
 
-def randn(*shape: int, diff=True, name='randn::Tensor') -> Tensor:
+def randn(*shape: int, diff=False, name='Tensor[randn]') -> Tensor:
     ''' Return a sample (or samples) from the "standard normal" distribution.
     '''
 
@@ -28,8 +28,8 @@ def randn(*shape: int, diff=True, name='randn::Tensor') -> Tensor:
 def randint(*shape: int,
             low=0,
             high=100,
-            diff=True,
-            name='randint::Tensor') -> Tensor:
+            diff=False,
+            name='Tensor[randint]') -> Tensor:
     ''' Return random integers from low (inclusive) to high (exclusive).
     '''
 

@@ -15,14 +15,15 @@ $ pip install nujo
 ```
 
 Now run the following to make sure nujo was installed properly:
+
 ```bash
 $ python
 >>> import nujo as nj
 >>> nj.__version__
-'0.1.5'
+'0.2.0'
 ```
 
-***Read the docs at [vivelev.github.io/nujo](https://vivelev.github.io/nujo/)***
+**_Read the docs at [vivelev.github.io/nujo](https://vivelev.github.io/nujo/)_**
 
 ## Examples
 
@@ -32,7 +33,8 @@ Check out the [examples/](examples/) folder.
 
 -   [NumPy](http://www.numpy.org/) - Fundamental package for scientific computing with Python
 -   [Graphviz](https://www.graphviz.org/) - Open source graph visualization software
--   [Requests](https://requests.readthedocs.io/en/master/) - HTTP for Humans
+-   [Requests](https://requests.readthedocs.io/) - HTTP for Humans
+-   [Pillow](https://pillow.readthedocs.io/) - Image processing
 
 ## Contributing
 
