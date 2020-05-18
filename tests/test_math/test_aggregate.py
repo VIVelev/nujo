@@ -9,14 +9,16 @@ from nujo.init.random import rand
 
 
 def test_sum(inputs):
-    # Test Forward pass
+    # Test Forward pass (Inner sum)
     output = aggregate.sum(inputs[0])
     assert (output == sum(inputs[0].value)).all()
 
-    # Test Backward pass
+    # Test Backward pass (Inner sum)
     output.backward()
+    assert (inputs[0].grad.shape == inputs[0].shape)
     assert (inputs[0].grad == 1).all()
 
+    # Test several tensors sum
     assert (aggregate.sum(*inputs) == sum(inputs)).all()
 
 
@@ -25,14 +27,16 @@ def test_sum(inputs):
 
 
 def test_prod(inputs):
-    # Test Forward pass
+    # Test Forward pass (Inner product)
     output = aggregate.prod(inputs[0])
     assert (output == prod(inputs[0].value)).all()
 
-    # Test Backward pass
+    # Test Backward pass (Inner product)
     output.backward()
+    assert (inputs[0].grad.shape == inputs[0].shape)
     assert allclose(inputs[0].grad.value, (output / inputs[0]).value)
 
+    # Test several tensors prod
     assert (aggregate.prod(*inputs) == prod(inputs)).all()
 
 
@@ -41,14 +45,16 @@ def test_prod(inputs):
 
 
 def test_mean(inputs):
-    # Test Forward pass
+    # Test Forward pass (Inner mean)
     output = aggregate.mean(inputs[0])
     assert allclose(output.value, mean(inputs[0].value))
 
-    # Test Backward pass
+    # Test Backward pass (Inner mean)
     output.backward()
+    assert (inputs[0].grad.shape == inputs[0].shape)
     assert (inputs[0].grad == 1 / prod(inputs[0].shape)).all()
 
+    # Test several tensors mean
     assert (aggregate.mean(*inputs) == mean(inputs)).all()
 
 

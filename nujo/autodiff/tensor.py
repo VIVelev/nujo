@@ -12,7 +12,7 @@ from nujo.autodiff._utils import _if_not_none
 class Tensor(_Node):
     ''' Tensor - a multi-dimensional array
 
-    Tensors are the main units of data and computation in nujo.
+    Tensors are the main units of data in nujo.
     They "flow" in the computation graph. :)
 
     Tensors can be either constants or trainable weights,
@@ -42,8 +42,9 @@ class Tensor(_Node):
         self.creator = creator
 
         # Outputs of the functions the current tensor is input to.
+        # Used for backpropagation of the gradients.
         self.parents_outputs: List['Tensor'] = []
-        # The weight of tensor (derivative of creator)
+        # The weights of the outputs (a.k.a. derivatives of the functions).
         self.weights: List[ndarray] = []
 
         # Gradient of the current tensor
@@ -173,9 +174,6 @@ class Tensor(_Node):
                         self._grad._value = self._grad._value + update
 
     def zero_grad(self) -> None:
-        # `zero_grad` is called after an iteration.
-        # The value of weight tensors is updated after an iteration.
-
         self.grad._value.fill(0)
         self._grad_is_zeroed = True
 

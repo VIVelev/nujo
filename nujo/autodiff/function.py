@@ -12,14 +12,11 @@ from nujo.autodiff.tensor import Tensor
 class Function(_Node, object):
     ''' Base Class for functions
 
-    Functions are applied to tensors.
+    Functions are applied to tensors. They take multiple
+    tensors as input and produces only one tensor as output.
+    They do NOT change tensors in-place.
 
-    A Function takes multiple tensors as input
-    and produces only one tensor as output.
-
-    Functions do not change tensors in-place.
-
-    Functions are written so they reuse the input/output tensors
+    Functions were also written so they reuse the input/output tensors
     when possible, which results in the computation graph being:
      - "Dynamically defined, statically evaluated."
     taking the best from both worlds.

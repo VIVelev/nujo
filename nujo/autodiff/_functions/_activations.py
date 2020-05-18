@@ -176,13 +176,6 @@ class _Softmax(Function):
         return self._output
 
     def backward(self) -> Tuple[ndarray]:
-        # TODO: The current backward implementation is kind of hacky;
-        # when there is a sum after the softmax, the grad are still
-        # bigger than zero, when they actually should be 0.
-        # see pytorch for reassureance
-        #
-        # Try to fix that in future releases.
-
         return self._output * (1 - self._output),
 
 

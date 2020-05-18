@@ -38,14 +38,11 @@ from nujo.autodiff.tensor import Tensor
 class Function(_Node, object):
     &#39;&#39;&#39; Base Class for functions
 
-    Functions are applied to tensors.
+    Functions are applied to tensors. They take multiple
+    tensors as input and produces only one tensor as output.
+    They do NOT change tensors in-place.
 
-    A Function takes multiple tensors as input
-    and produces only one tensor as output.
-
-    Functions do not change tensors in-place.
-
-    Functions are written so they reuse the input/output tensors
+    Functions were also written so they reuse the input/output tensors
     when possible, which results in the computation graph being:
      - &#34;Dynamically defined, statically evaluated.&#34;
     taking the best from both worlds.
@@ -171,11 +168,10 @@ class Function(_Node, object):
 </code></dt>
 <dd>
 <div class="desc"><p>Base Class for functions</p>
-<p>Functions are applied to tensors.</p>
-<p>A Function takes multiple tensors as input
-and produces only one tensor as output.</p>
-<p>Functions do not change tensors in-place.</p>
-<p>Functions are written so they reuse the input/output tensors
+<p>Functions are applied to tensors. They take multiple
+tensors as input and produces only one tensor as output.
+They do NOT change tensors in-place.</p>
+<p>Functions were also written so they reuse the input/output tensors
 when possible, which results in the computation graph being:
 - "Dynamically defined, statically evaluated."
 taking the best from both worlds.</p>
@@ -191,14 +187,11 @@ taking the best from both worlds.</p>
 <pre><code class="python">class Function(_Node, object):
     &#39;&#39;&#39; Base Class for functions
 
-    Functions are applied to tensors.
+    Functions are applied to tensors. They take multiple
+    tensors as input and produces only one tensor as output.
+    They do NOT change tensors in-place.
 
-    A Function takes multiple tensors as input
-    and produces only one tensor as output.
-
-    Functions do not change tensors in-place.
-
-    Functions are written so they reuse the input/output tensors
+    Functions were also written so they reuse the input/output tensors
     when possible, which results in the computation graph being:
      - &#34;Dynamically defined, statically evaluated.&#34;
     taking the best from both worlds.

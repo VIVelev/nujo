@@ -27,7 +27,10 @@ def test_addition(inputs):
     assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
+    assert grad[0].shape == A.shape
     assert (grad[0] == 1).all()
+
+    assert grad[1].shape == B.shape
     assert (grad[1] == 1).all()
 
 
@@ -51,6 +54,7 @@ def test_negation(inputs):
     assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
 
     # Test Derivative computation
+    assert grad[0].shape == A.shape
     assert (grad[0] == -1).all()
 
 
@@ -75,7 +79,10 @@ def test_multiplication(inputs):
     assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
+    assert grad[0].shape == A.shape
     assert (grad[0] == B.value).all()
+
+    assert grad[1].shape == B.shape
     assert (grad[1] == A.value).all()
 
 
@@ -99,6 +106,7 @@ def test_reciprocal(inputs):
     assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
 
     # Test Derivative computation
+    assert grad[0].shape == A.shape
     assert (grad[0] == -1 / (A.value**2)).all()
 
 
@@ -123,7 +131,9 @@ def test_power(inputs):
     assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
+    assert grad[0].shape == A.shape
     assert (grad[0] == 2 * A.value).all()
+
     assert grad[1] == 1
 
 
@@ -148,7 +158,9 @@ def test_logarithm(inputs):
     assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
+    assert grad[0].shape == A.shape
     assert allclose(grad[0], 1 / (A.value * log(2)))
+
     assert grad[1] == 1
 
 
@@ -173,7 +185,10 @@ def test_matrixmul(inputs):
     assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
 
     # Test Derivative computation
+    assert grad[0].shape[0] == A.shape[1]
     assert (grad[0] == B.value).all()
+
+    assert grad[1].shape[1] == B.shape[0]
     assert (grad[1] == A.value).all()
 
 
