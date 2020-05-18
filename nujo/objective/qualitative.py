@@ -32,6 +32,9 @@ class BinaryCrossEntropy(QualitativeLoss):
 
 class CrossEntropy(QualitativeLoss):
     ''' Multi-class Cross-Entropy loss
+
+        -∑ y * log(p)
+
     '''
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         # Avoid division by zero

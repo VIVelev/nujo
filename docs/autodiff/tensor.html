@@ -67,6 +67,7 @@ class Tensor(_Node):
         self.diff = diff
         self.creator = creator
 
+        # Outputs of the functions the current tensor is input to.
         self.parents_outputs: List[&#39;Tensor&#39;] = []
         # The weight of tensor (derivative of creator)
         self.weights: List[ndarray] = []
@@ -201,6 +202,7 @@ class Tensor(_Node):
         # `zero_grad` is called after an iteration.
         # The value of weight tensors is updated after an iteration.
 
+        self.grad._value.fill(0)
         self._grad_is_zeroed = True
 
     def backward(self, _debug=False) -&gt; None:
@@ -257,6 +259,7 @@ class Tensor(_Node):
             &gt;&gt;&gt; self.children = other.children
             &gt;&gt;&gt; self.creator = other.creator
             &gt;&gt;&gt; self.value = other.value
+            &gt;&gt;&gt; self.grad = other.grad
 
         &#39;&#39;&#39;
 
@@ -275,6 +278,10 @@ class Tensor(_Node):
                 pass
 
         self._value = getattr(other, &#39;value&#39;, other)
+
+        # Transfer the gradient
+        self._grad = getattr(other, &#39;grad&#39;, None)
+        self._grad_is_zeroed = getattr(other, &#39;_grad_is_zeroed&#39;, True)
 
         return self
 
@@ -420,6 +427,7 @@ the only child of a tensor</li>
         self.diff = diff
         self.creator = creator
 
+        # Outputs of the functions the current tensor is input to.
         self.parents_outputs: List[&#39;Tensor&#39;] = []
         # The weight of tensor (derivative of creator)
         self.weights: List[ndarray] = []
@@ -554,6 +562,7 @@ the only child of a tensor</li>
         # `zero_grad` is called after an iteration.
         # The value of weight tensors is updated after an iteration.
 
+        self.grad._value.fill(0)
         self._grad_is_zeroed = True
 
     def backward(self, _debug=False) -&gt; None:
@@ -610,6 +619,7 @@ the only child of a tensor</li>
             &gt;&gt;&gt; self.children = other.children
             &gt;&gt;&gt; self.creator = other.creator
             &gt;&gt;&gt; self.value = other.value
+            &gt;&gt;&gt; self.grad = other.grad
 
         &#39;&#39;&#39;
 
@@ -628,6 +638,10 @@ the only child of a tensor</li>
                 pass
 
         self._value = getattr(other, &#39;value&#39;, other)
+
+        # Transfer the gradient
+        self._grad = getattr(other, &#39;grad&#39;, None)
+        self._grad_is_zeroed = getattr(other, &#39;_grad_is_zeroed&#39;, True)
 
         return self
 
@@ -974,6 +988,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
     # `zero_grad` is called after an iteration.
     # The value of weight tensors is updated after an iteration.
 
+    self.grad._value.fill(0)
     self._grad_is_zeroed = True</code></pre>
 </details>
 </dd>

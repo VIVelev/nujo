@@ -8,8 +8,6 @@ from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
 
-# TODO: Document Function
-
 
 class Function(_Node, object):
     ''' Base Class for functions
@@ -21,6 +19,11 @@ class Function(_Node, object):
 
     Functions do not change tensors in-place.
 
+    Functions are written so they reuse the input/output tensors
+    when possible, which results in the computation graph being:
+     - "Dynamically defined, statically evaluated."
+    taking the best from both worlds.
+
     Parameters:
     -----------
      - children : varargs, the inpute tensors
@@ -29,8 +32,13 @@ class Function(_Node, object):
     '''
 
     _children_history: Dict[str, 'Function'] = {}
-    _cache_hit = False
+    ''' Cache where input tensors for
+    the current function type are stored.
+    '''
 
+    _cache_hit = False
+    ''' Flag signaling cache hit/miss.
+    '''
     def __init__(self,
                  *children: Union[Tensor, ndarray, List[Number], Number],
                  name='Function'):
@@ -40,7 +48,7 @@ class Function(_Node, object):
 
         super(Function, self).__init__(*children, name=name)
 
-        # This placeholder is reused when possible
+        # This output placeholder is reused when possible
         self._output_placeholder = Tensor(
             None,
             diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
@@ -48,12 +56,18 @@ class Function(_Node, object):
             name=self._generate_tensor_name())
 
         if modes.DIFF_ENABLED:  # If graph building is enabled.
+            # Allocate space for parent's output (output placeholder)
+            # and its weight (derivative).
+
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
                 child.weights.append(None)
 
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
+        ''' Used to review the cache for hit and return the cached tensor
+        or otherwise add the new tensor to the cache.
+        '''
 
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
@@ -82,10 +96,17 @@ class Function(_Node, object):
 
     @abstractmethod
     def forward(self) -> ndarray:
+        ''' Implement forward pass of the function here.
+        '''
+
         pass
 
     @abstractmethod
     def backward(self) -> Tuple[ndarray, ...]:
+        ''' Implement backward pass of the function here
+        (a.k.a. derivative calculation).
+        '''
+
         pass
 
     def __call__(self) -> Tensor:
@@ -93,6 +114,7 @@ class Function(_Node, object):
         updates the weights (derivatives) for the dependent children.
         '''
 
+        # Forward pass
         self._output_placeholder.value = self.forward()
 
         if self._output_placeholder.diff:  # Is gradient dependecy?

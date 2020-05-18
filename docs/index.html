@@ -48,7 +48,7 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 </dd>
 <dt><code class="name"><a title="nujo.flow" href="flow.html">nujo.flow</a></code></dt>
 <dd>
-<div class="desc"><p>a computational Flow</p></div>
+<div class="desc"><p>a computation Flow</p></div>
 </dd>
 <dt><code class="name"><a title="nujo.init" href="init/index.html">nujo.init</a></code></dt>
 <dd>
@@ -88,26 +88,36 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>A computational Flow</p>
-<p>Flow of tensors through nujo functions.</p>
+<div class="desc"><p>A computation Flow</p>
+<p>A Flow is just a sequance of functions (addition, multiplication, etc.)
+that are grouped in a single object (Flow) and can be applied on a tensor.</p>
+<p>Each nujo Flow has a list of flow objects (<code>subflows</code>) that
+a tensor will pass through when the Flow is called on that tensor.</p>
+<p>This allows the chaining of flows.</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
-<li>name : string</li>
-<li>subflows : list of flows, only if the current flow is a supflow</li>
+<li>name : string, name of the current flow</li>
+<li>subflows : list of flows</li>
 </ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Flow(metaclass=_FlowSetup):
-    &#39;&#39;&#39; A computational Flow
+    &#39;&#39;&#39; A computation Flow
 
-    Flow of tensors through nujo functions.
+    A Flow is just a sequance of functions (addition, multiplication, etc.)
+    that are grouped in a single object (Flow) and can be applied on a tensor.
+
+    Each nujo Flow has a list of flow objects (`subflows`) that
+    a tensor will pass through when the Flow is called on that tensor.
+
+    This allows the chaining of flows.
 
     Parameters:
     -----------
-     - name : string
-     - subflows : list of flows, only if the current flow is a supflow
+     - name : string, name of the current flow
+     - subflows : list of flows
 
     &#39;&#39;&#39;
     def __init__(self, name=&#39;Flow&#39;, subflows: List[&#39;Flow&#39;] = []):
@@ -153,7 +163,7 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 
         Returns:
         --------
-         - supflow : Flow, the total computational flow
+         - flow : Flow, the total computation flow
 
         &#39;&#39;&#39;
 
@@ -169,16 +179,13 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 
         Removes a flow at a given index, defaults to the last one (-1).
 
-        Once a supflow is a supflow it stays a supflow.
-        No mather how many subflows it contains.
-
         Parameters:
         -----------
          - idx : integer, index of the flow to remove
 
         Returns:
         --------
-         - flow : Flow, the total computational flow
+         - flow : Flow, the total computation flow
 
         &#39;&#39;&#39;
 
@@ -217,8 +224,8 @@ __version__ = &#39;0.1.5&#39;</code></pre>
         Example:
             &gt;&gt;&gt; a = nj.Flow()
             &gt;&gt;&gt; b = nj.Flow()
-            &gt;&gt;&gt; chained_supflow = a &gt;&gt; b
-            &gt;&gt;&gt; result = chained_supflow(...)
+            &gt;&gt;&gt; chained_flow = a &gt;&gt; b
+            &gt;&gt;&gt; result = chained_flow(...)
             &gt;&gt;&gt; ...
 
         &#39;&#39;&#39;
@@ -226,15 +233,15 @@ __version__ = &#39;0.1.5&#39;</code></pre>
         return Flow(subflows=[*self.subflows, *other.subflows])
 
     def __getitem__(self, key: Union[int, str]) -&gt; &#39;Flow&#39;:
-        &#39;&#39;&#39; Subflow getter of a supflow
+        &#39;&#39;&#39; Get subflows by index/name
 
         Example:
             &gt;&gt;&gt; a = nj.Flow(&#39;A&#39;)
             &gt;&gt;&gt; b = nj.Flow(&#39;B&#39;)
-            &gt;&gt;&gt; chained_supflow = a &gt;&gt; b
-            &gt;&gt;&gt; chained_supflow[0]  # a subflow can be get by index
+            &gt;&gt;&gt; chained_flow = a &gt;&gt; b
+            &gt;&gt;&gt; chained_flow[0]  # a subflow can be get by index
             &#39;A&#39; (this is the repr for `a`)
-            &gt;&gt;&gt; chained_supflow[&#39;A&#39;]  # can also be get by name
+            &gt;&gt;&gt; chained_flow[&#39;A&#39;]  # can also be get by name
             &#39;A&#39;
 
         &#39;&#39;&#39;
@@ -283,7 +290,7 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 </ul>
 <h2 id="returns">Returns:</h2>
 <ul>
-<li>supflow : Flow, the total computational flow</li>
+<li>flow : Flow, the total computation flow</li>
 </ul></div>
 <details class="source">
 <summary>
@@ -300,7 +307,7 @@ __version__ = &#39;0.1.5&#39;</code></pre>
 
     Returns:
     --------
-     - supflow : Flow, the total computational flow
+     - flow : Flow, the total computation flow
 
     &#39;&#39;&#39;
 
@@ -376,15 +383,13 @@ def forward(self, *args, **kwargs) -&gt; Tensor:
 <dd>
 <div class="desc"><p>Flow Pop</p>
 <p>Removes a flow at a given index, defaults to the last one (-1).</p>
-<p>Once a supflow is a supflow it stays a supflow.
-No mather how many subflows it contains.</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
 <li>idx : integer, index of the flow to remove</li>
 </ul>
 <h2 id="returns">Returns:</h2>
 <ul>
-<li>flow : Flow, the total computational flow</li>
+<li>flow : Flow, the total computation flow</li>
 </ul></div>
 <details class="source">
 <summary>
@@ -395,16 +400,13 @@ No mather how many subflows it contains.</p>
 
     Removes a flow at a given index, defaults to the last one (-1).
 
-    Once a supflow is a supflow it stays a supflow.
-    No mather how many subflows it contains.
-
     Parameters:
     -----------
      - idx : integer, index of the flow to remove
 
     Returns:
     --------
-     - flow : Flow, the total computational flow
+     - flow : Flow, the total computation flow
 
     &#39;&#39;&#39;
 
@@ -426,6 +428,10 @@ No mather how many subflows it contains.</p>
 <p>A Function takes multiple tensors as input
 and produces only one tensor as output.</p>
 <p>Functions do not change tensors in-place.</p>
+<p>Functions are written so they reuse the input/output tensors
+when possible, which results in the computation graph being:
+- "Dynamically defined, statically evaluated."
+taking the best from both worlds.</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
 <li>children : varargs, the inpute tensors</li>
@@ -445,6 +451,11 @@ and produces only one tensor as output.</p>
 
     Functions do not change tensors in-place.
 
+    Functions are written so they reuse the input/output tensors
+    when possible, which results in the computation graph being:
+     - &#34;Dynamically defined, statically evaluated.&#34;
+    taking the best from both worlds.
+
     Parameters:
     -----------
      - children : varargs, the inpute tensors
@@ -453,8 +464,13 @@ and produces only one tensor as output.</p>
     &#39;&#39;&#39;
 
     _children_history: Dict[str, &#39;Function&#39;] = {}
-    _cache_hit = False
+    &#39;&#39;&#39; Cache where input tensors for
+    the current function type are stored.
+    &#39;&#39;&#39;
 
+    _cache_hit = False
+    &#39;&#39;&#39; Flag signaling cache hit/miss.
+    &#39;&#39;&#39;
     def __init__(self,
                  *children: Union[Tensor, ndarray, List[Number], Number],
                  name=&#39;Function&#39;):
@@ -464,7 +480,7 @@ and produces only one tensor as output.</p>
 
         super(Function, self).__init__(*children, name=name)
 
-        # This placeholder is reused when possible
+        # This output placeholder is reused when possible
         self._output_placeholder = Tensor(
             None,
             diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
@@ -472,12 +488,18 @@ and produces only one tensor as output.</p>
             name=self._generate_tensor_name())
 
         if modes.DIFF_ENABLED:  # If graph building is enabled.
+            # Allocate space for parent&#39;s output (output placeholder)
+            # and its weight (derivative).
+
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
                 child.weights.append(None)
 
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
+        &#39;&#39;&#39; Used to review the cache for hit and return the cached tensor
+        or otherwise add the new tensor to the cache.
+        &#39;&#39;&#39;
 
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
@@ -506,10 +528,17 @@ and produces only one tensor as output.</p>
 
     @abstractmethod
     def forward(self) -&gt; ndarray:
+        &#39;&#39;&#39; Implement forward pass of the function here.
+        &#39;&#39;&#39;
+
         pass
 
     @abstractmethod
     def backward(self) -&gt; Tuple[ndarray, ...]:
+        &#39;&#39;&#39; Implement backward pass of the function here
+        (a.k.a. derivative calculation).
+        &#39;&#39;&#39;
+
         pass
 
     def __call__(self) -&gt; Tensor:
@@ -517,6 +546,7 @@ and produces only one tensor as output.</p>
         updates the weights (derivatives) for the dependent children.
         &#39;&#39;&#39;
 
+        # Forward pass
         self._output_placeholder.value = self.forward()
 
         if self._output_placeholder.diff:  # Is gradient dependecy?
@@ -560,13 +590,18 @@ and produces only one tensor as output.</p>
 <span>def <span class="ident">backward</span></span>(<span>self) -> Tuple[numpy.ndarray, ...]</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Implement backward pass of the function here
+(a.k.a. derivative calculation).</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
 def backward(self) -&gt; Tuple[ndarray, ...]:
+    &#39;&#39;&#39; Implement backward pass of the function here
+    (a.k.a. derivative calculation).
+    &#39;&#39;&#39;
+
     pass</code></pre>
 </details>
 </dd>
@@ -574,13 +609,16 @@ def backward(self) -&gt; Tuple[ndarray, ...]:
 <span>def <span class="ident">forward</span></span>(<span>self) -> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Implement forward pass of the function here.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
 def forward(self) -&gt; ndarray:
+    &#39;&#39;&#39; Implement forward pass of the function here.
+    &#39;&#39;&#39;
+
     pass</code></pre>
 </details>
 </dd>
@@ -640,6 +678,7 @@ the only child of a tensor</li>
         self.diff = diff
         self.creator = creator
 
+        # Outputs of the functions the current tensor is input to.
         self.parents_outputs: List[&#39;Tensor&#39;] = []
         # The weight of tensor (derivative of creator)
         self.weights: List[ndarray] = []
@@ -774,6 +813,7 @@ the only child of a tensor</li>
         # `zero_grad` is called after an iteration.
         # The value of weight tensors is updated after an iteration.
 
+        self.grad._value.fill(0)
         self._grad_is_zeroed = True
 
     def backward(self, _debug=False) -&gt; None:
@@ -830,6 +870,7 @@ the only child of a tensor</li>
             &gt;&gt;&gt; self.children = other.children
             &gt;&gt;&gt; self.creator = other.creator
             &gt;&gt;&gt; self.value = other.value
+            &gt;&gt;&gt; self.grad = other.grad
 
         &#39;&#39;&#39;
 
@@ -848,6 +889,10 @@ the only child of a tensor</li>
                 pass
 
         self._value = getattr(other, &#39;value&#39;, other)
+
+        # Transfer the gradient
+        self._grad = getattr(other, &#39;grad&#39;, None)
+        self._grad_is_zeroed = getattr(other, &#39;_grad_is_zeroed&#39;, True)
 
         return self
 
@@ -1194,6 +1239,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
     # `zero_grad` is called after an iteration.
     # The value of weight tensors is updated after an iteration.
 
+    self.grad._value.fill(0)
     self._grad_is_zeroed = True</code></pre>
 </details>
 </dd>

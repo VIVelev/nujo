@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.1" />
 <title>nujo.flow API documentation</title>
-<meta name="description" content="a computational Flow" />
+<meta name="description" content="a computation Flow" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,12 +20,12 @@
 <h1 class="title">Module <code>nujo.flow</code></h1>
 </header>
 <section id="section-intro">
-<p>a computational Flow</p>
+<p>a computation Flow</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#39;&#39;&#39; a computational Flow
+<pre><code class="python">&#39;&#39;&#39; a computation Flow
 &#39;&#39;&#39;
 
 from abc import abstractmethod
@@ -36,7 +36,7 @@ from nujo.autodiff.tensor import Tensor
 
 
 class _FlowSetup(type):
-    &#39;&#39;&#39; Flow&#39;s metaclass used to setup the computational flow
+    &#39;&#39;&#39; Flow&#39;s metaclass used to setup the computation flow
     &#39;&#39;&#39;
     def __call__(cls, *args, **kwargs):
         &#39;&#39;&#39; Flow() init call &#39;&#39;&#39;
@@ -50,14 +50,20 @@ class _FlowSetup(type):
 
 
 class Flow(metaclass=_FlowSetup):
-    &#39;&#39;&#39; A computational Flow
+    &#39;&#39;&#39; A computation Flow
 
-    Flow of tensors through nujo functions.
+    A Flow is just a sequance of functions (addition, multiplication, etc.)
+    that are grouped in a single object (Flow) and can be applied on a tensor.
+
+    Each nujo Flow has a list of flow objects (`subflows`) that
+    a tensor will pass through when the Flow is called on that tensor.
+
+    This allows the chaining of flows.
 
     Parameters:
     -----------
-     - name : string
-     - subflows : list of flows, only if the current flow is a supflow
+     - name : string, name of the current flow
+     - subflows : list of flows
 
     &#39;&#39;&#39;
     def __init__(self, name=&#39;Flow&#39;, subflows: List[&#39;Flow&#39;] = []):
@@ -103,7 +109,7 @@ class Flow(metaclass=_FlowSetup):
 
         Returns:
         --------
-         - supflow : Flow, the total computational flow
+         - flow : Flow, the total computation flow
 
         &#39;&#39;&#39;
 
@@ -119,16 +125,13 @@ class Flow(metaclass=_FlowSetup):
 
         Removes a flow at a given index, defaults to the last one (-1).
 
-        Once a supflow is a supflow it stays a supflow.
-        No mather how many subflows it contains.
-
         Parameters:
         -----------
          - idx : integer, index of the flow to remove
 
         Returns:
         --------
-         - flow : Flow, the total computational flow
+         - flow : Flow, the total computation flow
 
         &#39;&#39;&#39;
 
@@ -167,8 +170,8 @@ class Flow(metaclass=_FlowSetup):
         Example:
             &gt;&gt;&gt; a = nj.Flow()
             &gt;&gt;&gt; b = nj.Flow()
-            &gt;&gt;&gt; chained_supflow = a &gt;&gt; b
-            &gt;&gt;&gt; result = chained_supflow(...)
+            &gt;&gt;&gt; chained_flow = a &gt;&gt; b
+            &gt;&gt;&gt; result = chained_flow(...)
             &gt;&gt;&gt; ...
 
         &#39;&#39;&#39;
@@ -176,15 +179,15 @@ class Flow(metaclass=_FlowSetup):
         return Flow(subflows=[*self.subflows, *other.subflows])
 
     def __getitem__(self, key: Union[int, str]) -&gt; &#39;Flow&#39;:
-        &#39;&#39;&#39; Subflow getter of a supflow
+        &#39;&#39;&#39; Get subflows by index/name
 
         Example:
             &gt;&gt;&gt; a = nj.Flow(&#39;A&#39;)
             &gt;&gt;&gt; b = nj.Flow(&#39;B&#39;)
-            &gt;&gt;&gt; chained_supflow = a &gt;&gt; b
-            &gt;&gt;&gt; chained_supflow[0]  # a subflow can be get by index
+            &gt;&gt;&gt; chained_flow = a &gt;&gt; b
+            &gt;&gt;&gt; chained_flow[0]  # a subflow can be get by index
             &#39;A&#39; (this is the repr for `a`)
-            &gt;&gt;&gt; chained_supflow[&#39;A&#39;]  # can also be get by name
+            &gt;&gt;&gt; chained_flow[&#39;A&#39;]  # can also be get by name
             &#39;A&#39;
 
         &#39;&#39;&#39;
@@ -222,26 +225,36 @@ class Flow(metaclass=_FlowSetup):
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>A computational Flow</p>
-<p>Flow of tensors through nujo functions.</p>
+<div class="desc"><p>A computation Flow</p>
+<p>A Flow is just a sequance of functions (addition, multiplication, etc.)
+that are grouped in a single object (Flow) and can be applied on a tensor.</p>
+<p>Each nujo Flow has a list of flow objects (<code>subflows</code>) that
+a tensor will pass through when the Flow is called on that tensor.</p>
+<p>This allows the chaining of flows.</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
-<li>name : string</li>
-<li>subflows : list of flows, only if the current flow is a supflow</li>
+<li>name : string, name of the current flow</li>
+<li>subflows : list of flows</li>
 </ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Flow(metaclass=_FlowSetup):
-    &#39;&#39;&#39; A computational Flow
+    &#39;&#39;&#39; A computation Flow
 
-    Flow of tensors through nujo functions.
+    A Flow is just a sequance of functions (addition, multiplication, etc.)
+    that are grouped in a single object (Flow) and can be applied on a tensor.
+
+    Each nujo Flow has a list of flow objects (`subflows`) that
+    a tensor will pass through when the Flow is called on that tensor.
+
+    This allows the chaining of flows.
 
     Parameters:
     -----------
-     - name : string
-     - subflows : list of flows, only if the current flow is a supflow
+     - name : string, name of the current flow
+     - subflows : list of flows
 
     &#39;&#39;&#39;
     def __init__(self, name=&#39;Flow&#39;, subflows: List[&#39;Flow&#39;] = []):
@@ -287,7 +300,7 @@ class Flow(metaclass=_FlowSetup):
 
         Returns:
         --------
-         - supflow : Flow, the total computational flow
+         - flow : Flow, the total computation flow
 
         &#39;&#39;&#39;
 
@@ -303,16 +316,13 @@ class Flow(metaclass=_FlowSetup):
 
         Removes a flow at a given index, defaults to the last one (-1).
 
-        Once a supflow is a supflow it stays a supflow.
-        No mather how many subflows it contains.
-
         Parameters:
         -----------
          - idx : integer, index of the flow to remove
 
         Returns:
         --------
-         - flow : Flow, the total computational flow
+         - flow : Flow, the total computation flow
 
         &#39;&#39;&#39;
 
@@ -351,8 +361,8 @@ class Flow(metaclass=_FlowSetup):
         Example:
             &gt;&gt;&gt; a = nj.Flow()
             &gt;&gt;&gt; b = nj.Flow()
-            &gt;&gt;&gt; chained_supflow = a &gt;&gt; b
-            &gt;&gt;&gt; result = chained_supflow(...)
+            &gt;&gt;&gt; chained_flow = a &gt;&gt; b
+            &gt;&gt;&gt; result = chained_flow(...)
             &gt;&gt;&gt; ...
 
         &#39;&#39;&#39;
@@ -360,15 +370,15 @@ class Flow(metaclass=_FlowSetup):
         return Flow(subflows=[*self.subflows, *other.subflows])
 
     def __getitem__(self, key: Union[int, str]) -&gt; &#39;Flow&#39;:
-        &#39;&#39;&#39; Subflow getter of a supflow
+        &#39;&#39;&#39; Get subflows by index/name
 
         Example:
             &gt;&gt;&gt; a = nj.Flow(&#39;A&#39;)
             &gt;&gt;&gt; b = nj.Flow(&#39;B&#39;)
-            &gt;&gt;&gt; chained_supflow = a &gt;&gt; b
-            &gt;&gt;&gt; chained_supflow[0]  # a subflow can be get by index
+            &gt;&gt;&gt; chained_flow = a &gt;&gt; b
+            &gt;&gt;&gt; chained_flow[0]  # a subflow can be get by index
             &#39;A&#39; (this is the repr for `a`)
-            &gt;&gt;&gt; chained_supflow[&#39;A&#39;]  # can also be get by name
+            &gt;&gt;&gt; chained_flow[&#39;A&#39;]  # can also be get by name
             &#39;A&#39;
 
         &#39;&#39;&#39;
@@ -417,7 +427,7 @@ class Flow(metaclass=_FlowSetup):
 </ul>
 <h2 id="returns">Returns:</h2>
 <ul>
-<li>supflow : Flow, the total computational flow</li>
+<li>flow : Flow, the total computation flow</li>
 </ul></div>
 <details class="source">
 <summary>
@@ -434,7 +444,7 @@ class Flow(metaclass=_FlowSetup):
 
     Returns:
     --------
-     - supflow : Flow, the total computational flow
+     - flow : Flow, the total computation flow
 
     &#39;&#39;&#39;
 
@@ -510,15 +520,13 @@ def forward(self, *args, **kwargs) -&gt; Tensor:
 <dd>
 <div class="desc"><p>Flow Pop</p>
 <p>Removes a flow at a given index, defaults to the last one (-1).</p>
-<p>Once a supflow is a supflow it stays a supflow.
-No mather how many subflows it contains.</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
 <li>idx : integer, index of the flow to remove</li>
 </ul>
 <h2 id="returns">Returns:</h2>
 <ul>
-<li>flow : Flow, the total computational flow</li>
+<li>flow : Flow, the total computation flow</li>
 </ul></div>
 <details class="source">
 <summary>
@@ -529,16 +537,13 @@ No mather how many subflows it contains.</p>
 
     Removes a flow at a given index, defaults to the last one (-1).
 
-    Once a supflow is a supflow it stays a supflow.
-    No mather how many subflows it contains.
-
     Parameters:
     -----------
      - idx : integer, index of the flow to remove
 
     Returns:
     --------
-     - flow : Flow, the total computational flow
+     - flow : Flow, the total computation flow
 
     &#39;&#39;&#39;
 

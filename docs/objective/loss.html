@@ -38,7 +38,18 @@ __all__ = [
 
 
 class _Loss(Flow):
-    &#39;&#39;&#39; Base loss class
+    &#39;&#39;&#39; Base Loss Function Class
+
+    Do NOT inherit this class directly. Instead, inherit either
+    `QualitativeLoss` or `QuantitativeLoss`, depending on the task
+    for which you implement the loss function (classification/regression).
+
+    Parameters:
+    -----------
+     - dim : int (optional), the dimension along which to reduce
+     - keepdim : bool, whether to keep the dimension
+     - reduction, string (optional), reduction function (&#39;sum&#39;, &#39;mean&#39;, etc.)
+
     &#39;&#39;&#39;
     def __init__(self,
                  dim: Optional[int] = None,
@@ -61,7 +72,17 @@ class _Loss(Flow):
 
 
 class QualitativeLoss(_Loss):
-    &#39;&#39;&#39; Base qualitative loss class
+    &#39;&#39;&#39; Base Qualitative (Classification) Loss Function Class
+
+    If you want to implement a custom loss function for classification,
+    inherit this class.
+
+    Parameters:
+    -----------
+     - dim : int (optional), the dimension along which to reduce
+     - keepdim : bool, whether to keep the dimension
+     - reduction, string (optional), reduction function (default: &#39;sum&#39;)
+
     &#39;&#39;&#39;
     def __init__(self,
                  dim: Optional[int] = None,
@@ -75,7 +96,17 @@ class QualitativeLoss(_Loss):
 
 
 class QuantitativeLoss(_Loss):
-    &#39;&#39;&#39; Base quantitative loss class
+    &#39;&#39;&#39; Base Quantitative (Regression) Loss Function Class
+
+    If you want to implement a custom loss function for regression,
+    inherit this class.
+
+    Parameters:
+    -----------
+     - dim : int (optional), the dimension along which to reduce
+     - keepdim : bool, whether to keep the dimension
+     - reduction, string (optional), reduction function (default: &#39;mean&#39;)
+
     &#39;&#39;&#39;
     def __init__(self,
                  dim: Optional[int] = None,
@@ -102,13 +133,31 @@ class QuantitativeLoss(_Loss):
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Base qualitative loss class</p></div>
+<div class="desc"><p>Base Qualitative (Classification) Loss Function Class</p>
+<p>If you want to implement a custom loss function for classification,
+inherit this class.</p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>dim : int (optional), the dimension along which to reduce</li>
+<li>keepdim : bool, whether to keep the dimension</li>
+<li>reduction, string (optional), reduction function (default: 'sum')</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class QualitativeLoss(_Loss):
-    &#39;&#39;&#39; Base qualitative loss class
+    &#39;&#39;&#39; Base Qualitative (Classification) Loss Function Class
+
+    If you want to implement a custom loss function for classification,
+    inherit this class.
+
+    Parameters:
+    -----------
+     - dim : int (optional), the dimension along which to reduce
+     - keepdim : bool, whether to keep the dimension
+     - reduction, string (optional), reduction function (default: &#39;sum&#39;)
+
     &#39;&#39;&#39;
     def __init__(self,
                  dim: Optional[int] = None,
@@ -144,13 +193,31 @@ class QuantitativeLoss(_Loss):
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Base quantitative loss class</p></div>
+<div class="desc"><p>Base Quantitative (Regression) Loss Function Class</p>
+<p>If you want to implement a custom loss function for regression,
+inherit this class.</p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>dim : int (optional), the dimension along which to reduce</li>
+<li>keepdim : bool, whether to keep the dimension</li>
+<li>reduction, string (optional), reduction function (default: 'mean')</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class QuantitativeLoss(_Loss):
-    &#39;&#39;&#39; Base quantitative loss class
+    &#39;&#39;&#39; Base Quantitative (Regression) Loss Function Class
+
+    If you want to implement a custom loss function for regression,
+    inherit this class.
+
+    Parameters:
+    -----------
+     - dim : int (optional), the dimension along which to reduce
+     - keepdim : bool, whether to keep the dimension
+     - reduction, string (optional), reduction function (default: &#39;mean&#39;)
+
     &#39;&#39;&#39;
     def __init__(self,
                  dim: Optional[int] = None,

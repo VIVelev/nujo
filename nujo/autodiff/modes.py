@@ -10,6 +10,9 @@ for the tensors in the computation graph:
       for the diff enabled (diff=True) tensors.
     - False = differentiation disabled, do NOT compute gradients.
 
+Another way to see it is:
+ - if DIFF_ENABLED is True, the computation graph is updated,
+ otherwise it is not.
 '''
 
 

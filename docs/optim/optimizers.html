@@ -293,41 +293,16 @@ squared gradient (RMSprop) coefficients</li>
 <ul class="hlist">
 <li><a title="nujo.optim.optimizer.Optimizer" href="optimizer.html#nujo.optim.optimizer.Optimizer">Optimizer</a></li>
 </ul>
-<h3>Methods</h3>
-<dl>
-<dt id="nujo.optim.optimizers.Adam.update_rule"><code class="name flex">
-<span>def <span class="ident">update_rule</span></span>(<span>self, param: <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>, grad: <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>) -> <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
-    # Get the corresponding velocity and squared gradient
-    key = param.name
-    if key not in self._velocity:
-        self._velocity[key] = zeros_like(param)
-        self._squared[key] = zeros_like(param)
-
-    # Exponentially Weighted Moving Average
-    self._velocity[key] = self.betas[0]*self._velocity[key] +\
-        (1 - self.betas[0]) * grad
-
-    self._squared[key] = self.betas[1] * self._squared[key] +\
-        (1 - self.betas[1]) * grad**2
-
-    # Bias correction
-    v_corrected = self._velocity[key] / (1 - self.betas[0]**self._t)
-    s_corrected = self._squared[key] / (1 - self.betas[1]**self._t)
-    self._t += 1
-
-    # Update rule
-    return param - self.lr * v_corrected / (sqrt(s_corrected) + self.eps)</code></pre>
-</details>
-</dd>
-</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="nujo.optim.optimizer.Optimizer" href="optimizer.html#nujo.optim.optimizer.Optimizer">Optimizer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="nujo.optim.optimizer.Optimizer.step" href="optimizer.html#nujo.optim.optimizer.Optimizer.step">step</a></code></li>
+<li><code><a title="nujo.optim.optimizer.Optimizer.update_rule" href="optimizer.html#nujo.optim.optimizer.Optimizer.update_rule">update_rule</a></code></li>
+<li><code><a title="nujo.optim.optimizer.Optimizer.zero_grad" href="optimizer.html#nujo.optim.optimizer.Optimizer.zero_grad">zero_grad</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="nujo.optim.optimizers.Momentum"><code class="flex name class">
 <span>class <span class="ident">Momentum</span></span>
@@ -387,32 +362,16 @@ time step to be added to the current update vector</li>
 <ul class="hlist">
 <li><a title="nujo.optim.optimizer.Optimizer" href="optimizer.html#nujo.optim.optimizer.Optimizer">Optimizer</a></li>
 </ul>
-<h3>Methods</h3>
-<dl>
-<dt id="nujo.optim.optimizers.Momentum.update_rule"><code class="name flex">
-<span>def <span class="ident">update_rule</span></span>(<span>self, param: <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>, grad: <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>) -> <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
-    # Get the corresponding velocity
-    key = param.name
-    if key not in self._velocity:
-        self._velocity[key] = zeros_like(param)
-
-    # Exponentially Weighted Moving Average
-    self._velocity[key] = self.beta * self._velocity[key] +\
-        (1 - self.beta) * grad
-
-    # Update rule
-    return param - self.lr * self._velocity[key]</code></pre>
-</details>
-</dd>
-</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="nujo.optim.optimizer.Optimizer" href="optimizer.html#nujo.optim.optimizer.Optimizer">Optimizer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="nujo.optim.optimizer.Optimizer.step" href="optimizer.html#nujo.optim.optimizer.Optimizer.step">step</a></code></li>
+<li><code><a title="nujo.optim.optimizer.Optimizer.update_rule" href="optimizer.html#nujo.optim.optimizer.Optimizer.update_rule">update_rule</a></code></li>
+<li><code><a title="nujo.optim.optimizer.Optimizer.zero_grad" href="optimizer.html#nujo.optim.optimizer.Optimizer.zero_grad">zero_grad</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="nujo.optim.optimizers.RMSprop"><code class="flex name class">
 <span>class <span class="ident">RMSprop</span></span>
@@ -473,32 +432,16 @@ of squared gradients to normalize the gradient itself.</p>
 <ul class="hlist">
 <li><a title="nujo.optim.optimizer.Optimizer" href="optimizer.html#nujo.optim.optimizer.Optimizer">Optimizer</a></li>
 </ul>
-<h3>Methods</h3>
-<dl>
-<dt id="nujo.optim.optimizers.RMSprop.update_rule"><code class="name flex">
-<span>def <span class="ident">update_rule</span></span>(<span>self, param: <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>, grad: <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>) -> <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
-    # Get the corresponding squared gradient
-    key = param.name
-    if key not in self._squared:
-        self._squared[key] = zeros_like(param)
-
-    # Exponentially Weighted Moving Average
-    self._squared[key] = self.beta * self._squared[key] +\
-        (1 - self.beta) * grad**2
-
-    # Update rule
-    return param - self.lr * grad / (sqrt(self._squared[key]) + self.eps)</code></pre>
-</details>
-</dd>
-</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="nujo.optim.optimizer.Optimizer" href="optimizer.html#nujo.optim.optimizer.Optimizer">Optimizer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="nujo.optim.optimizer.Optimizer.step" href="optimizer.html#nujo.optim.optimizer.Optimizer.step">step</a></code></li>
+<li><code><a title="nujo.optim.optimizer.Optimizer.update_rule" href="optimizer.html#nujo.optim.optimizer.Optimizer.update_rule">update_rule</a></code></li>
+<li><code><a title="nujo.optim.optimizer.Optimizer.zero_grad" href="optimizer.html#nujo.optim.optimizer.Optimizer.zero_grad">zero_grad</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="nujo.optim.optimizers.SGD"><code class="flex name class">
 <span>class <span class="ident">SGD</span></span>
@@ -537,22 +480,16 @@ of squared gradients to normalize the gradient itself.</p>
 <ul class="hlist">
 <li><a title="nujo.optim.optimizer.Optimizer" href="optimizer.html#nujo.optim.optimizer.Optimizer">Optimizer</a></li>
 </ul>
-<h3>Methods</h3>
-<dl>
-<dt id="nujo.optim.optimizers.SGD.update_rule"><code class="name flex">
-<span>def <span class="ident">update_rule</span></span>(<span>self, param: <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>, grad: <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a>) -> <a title="nujo.autodiff.tensor.Tensor" href="../autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
-    return param - self.lr * grad</code></pre>
-</details>
-</dd>
-</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="nujo.optim.optimizer.Optimizer" href="optimizer.html#nujo.optim.optimizer.Optimizer">Optimizer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="nujo.optim.optimizer.Optimizer.step" href="optimizer.html#nujo.optim.optimizer.Optimizer.step">step</a></code></li>
+<li><code><a title="nujo.optim.optimizer.Optimizer.update_rule" href="optimizer.html#nujo.optim.optimizer.Optimizer.update_rule">update_rule</a></code></li>
+<li><code><a title="nujo.optim.optimizer.Optimizer.zero_grad" href="optimizer.html#nujo.optim.optimizer.Optimizer.zero_grad">zero_grad</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -572,27 +509,15 @@ of squared gradients to normalize the gradient itself.</p>
 <ul>
 <li>
 <h4><code><a title="nujo.optim.optimizers.Adam" href="#nujo.optim.optimizers.Adam">Adam</a></code></h4>
-<ul class="">
-<li><code><a title="nujo.optim.optimizers.Adam.update_rule" href="#nujo.optim.optimizers.Adam.update_rule">update_rule</a></code></li>
-</ul>
 </li>
 <li>
 <h4><code><a title="nujo.optim.optimizers.Momentum" href="#nujo.optim.optimizers.Momentum">Momentum</a></code></h4>
-<ul class="">
-<li><code><a title="nujo.optim.optimizers.Momentum.update_rule" href="#nujo.optim.optimizers.Momentum.update_rule">update_rule</a></code></li>
-</ul>
 </li>
 <li>
 <h4><code><a title="nujo.optim.optimizers.RMSprop" href="#nujo.optim.optimizers.RMSprop">RMSprop</a></code></h4>
-<ul class="">
-<li><code><a title="nujo.optim.optimizers.RMSprop.update_rule" href="#nujo.optim.optimizers.RMSprop.update_rule">update_rule</a></code></li>
-</ul>
 </li>
 <li>
 <h4><code><a title="nujo.optim.optimizers.SGD" href="#nujo.optim.optimizers.SGD">SGD</a></code></h4>
-<ul class="">
-<li><code><a title="nujo.optim.optimizers.SGD.update_rule" href="#nujo.optim.optimizers.SGD.update_rule">update_rule</a></code></li>
-</ul>
 </li>
 </ul>
 </li>
