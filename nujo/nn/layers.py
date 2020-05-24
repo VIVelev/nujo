@@ -116,7 +116,12 @@ class Conv2d(Flow):
         assert x.shape[1] == self.in_channels
 
         # pad the input images (before and after)
-        x.value = pad(x.value, ((0, 0), (0, 0), self.padding, self.padding))
+        x.value = pad(x.value, (
+            (0, 0),
+            (0, 0),
+            (self.padding[0], self.padding[0]),
+            (self.padding[1], self.padding[1]),
+        ))
 
         # The following are stored, because they are
         # later used to compute the shape of the output
