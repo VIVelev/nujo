@@ -6,12 +6,13 @@ from nujo.autodiff.tensor import Tensor
 
 __all__ = [
     '_get_image_section',
+    '_flatten_image_sections',
 ]
 
 
 def _get_image_section(image: Tensor, row_from: int, row_to: int,
                        col_from: int, col_to: int) -> ndarray:
-    ''' Returns a subsection of an image (2d plane)
+    ''' Returns a subsection of an image
 
     Parameters:
     -----------
@@ -24,7 +25,7 @@ def _get_image_section(image: Tensor, row_from: int, row_to: int,
     Returns:
     --------
     - section : ndarray of shape:
-        (Batch size, 1, Channels, row_to - row_from, col_to - col_from)
+        (Batch size, 1, Channels, `row_to - row_from`, `col_to - col_from`)
 
     '''
 
@@ -34,5 +35,22 @@ def _get_image_section(image: Tensor, row_from: int, row_to: int,
 
 
 def _flatten_image_sections(sections: List[ndarray]) -> ndarray:
-    extended = concatenate(sections, axis=1)
-    return extended.reshape(extended.shape[0] * extended.shape[1], -1)
+    ''' Flatten sections of an image
+
+    Flattens the sections of an image in a Tensor
+    that can be passed to nn.Linear.
+
+    Parameters:
+    -----------
+     - sections : list of ndarrays, each ndarray is of shape:
+        (Batch size, 1, Channels, Hight, Width)
+
+    Returns:
+    --------
+     - flatten : a Tensor of shape:
+        (Batch size * len(sections), Channels * Hight * Width)
+
+    '''
+
+    grouped = concatenate(sections, axis=1)
+    return grouped.reshape(grouped.shape[0] * grouped.shape[1], -1).T

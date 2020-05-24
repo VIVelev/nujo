@@ -113,10 +113,15 @@ class Conv2d(Flow):
     def forward(self, x: Tensor) -> Tensor:
         # x is of shape (batch_size, channels, height, width)
 
+        assert x.shape[1] == self.in_channels
+
+        # pad the input images (before and after)
+        x.value = pad(x.value, ((0, 0), (0, 0), self.padding, self.padding))
+
+        # The following are stored, because they are
+        # later used to compute the shape of the output
         batch_size = x.shape[0]
         height, width = x.shape[2], x.shape[3]
-
-        x.value = pad(x.value, self.padding)  # pad the input images
 
         sections: List[ndarray] = []
         for row_start in range(0, x.shape[2] - self.kernel_size[0] + 1,
@@ -129,8 +134,9 @@ class Conv2d(Flow):
                                        col_start,
                                        col_start + self.kernel_size[1]))
 
-        x.value = _flatten_image_sections(sections).T  # flatten x
+        x.value = _flatten_image_sections(sections)  # flatten x
         flatten_output = self.apply_kernels(x)
+        # the output need to be reshaped into volume
         return flatten_output.reshape(
             batch_size, self.out_channels,
             (height - self.kernel_size[0]) // self.stride[0] + 1,
