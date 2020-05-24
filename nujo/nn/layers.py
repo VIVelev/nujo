@@ -1,8 +1,11 @@
-from typing import Tuple, Union
+from typing import List, Tuple, Union
+
+from numpy import ndarray, pad
 
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 from nujo.init import randn
+from nujo.nn._transform import _flatten_image_sections, _get_image_section
 
 __all__ = [
     'Linear',
@@ -64,6 +67,7 @@ class Conv2d(Flow):
     -----------
      - in_channels : int, number of channels in the input image
      - out_channels : int, number of channels produced by the convolution
+        (in other word, the number of kernels)
      - kernel_size : int or tuple, size of the convolving kernel
      - stride : int or tuple, optional, stride of the convolution. Default: 1
      - padding : int or tuple, optional, zero-padding added to both sides of
@@ -89,14 +93,48 @@ class Conv2d(Flow):
 
         self.in_channels = in_channels
         self.out_channels = out_channels
-        self.kernel_size = kernel_size
-        self.stride = stride
-        self.padding = padding
-        self.dilation = dilation
-        self.bias = bias
+
+        self.kernel_size = kernel_size if isinstance(
+            kernel_size, tuple) else (kernel_size, kernel_size)
+        self.stride = stride if isinstance(stride, tuple) else (stride, stride)
+        self.padding = padding if isinstance(padding, tuple) else (padding,
+                                                                   padding)
+
+        # May not be used
+        self.dilation = dilation if isinstance(dilation, tuple) else (dilation,
+                                                                      dilation)
+
+        self.apply_kernels = Linear(self.in_channels * self.kernel_size[0] *
+                                    self.kernel_size[1],
+                                    self.out_channels,
+                                    bias=bias,
+                                    name=f'{self.name}.kernels')
 
     def forward(self, x: Tensor) -> Tensor:
-        pass
+        # x is of shape (batch_size, channels, height, width)
+
+        batch_size = x.shape[0]
+        height, width = x.shape[2], x.shape[3]
+
+        x.value = pad(x.value, self.padding)  # pad the input images
+
+        sections: List[ndarray] = []
+        for row_start in range(0, x.shape[2] - self.kernel_size[0] + 1,
+                               self.stride[0]):
+            for col_start in range(0, x.shape[3] - self.kernel_size[1] + 1,
+                                   self.stride[1]):
+                sections.append(
+                    _get_image_section(x, row_start,
+                                       row_start + self.kernel_size[0],
+                                       col_start,
+                                       col_start + self.kernel_size[1]))
+
+        x.value = _flatten_image_sections(sections).T  # flatten x
+        flatten_output = self.apply_kernels(x)
+        return flatten_output.reshape(
+            batch_size, self.out_channels,
+            (height - self.kernel_size[0]) // self.stride[0] + 1,
+            (width - self.kernel_size[1]) // self.stride[1] + 1)
 
 
 # ====================================================================================================
