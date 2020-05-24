@@ -209,7 +209,10 @@ class Tensor(_Node):
         return self._value.any()
 
     def __getitem__(self, position: Union[int, Tuple[int, ...]]):
-        return self._value[position]
+        return Tensor(self._value[position],
+                      diff=self.diff,
+                      creator=self.creator,
+                      name=f'{self.name}[{position}]')
 
     def __setitem__(self, position: Union[int, Tuple[int, ...]],
                     value: Union['Tensor', ndarray, List[Number], Number]):
