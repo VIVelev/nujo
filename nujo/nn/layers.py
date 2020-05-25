@@ -1,6 +1,6 @@
-from typing import List, Tuple, Union
+from typing import Tuple, Union
 
-from numpy import ndarray, pad
+from numpy import arange, pad, repeat, tile
 
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
@@ -109,11 +109,64 @@ class Conv2d(Flow):
                              name=self.name + '.kernels')
 
     def forward(self, x: Tensor) -> Tensor:
-        # x is of shape (batch_size, channels, height, width)
+        batch_size, channels, height, width = x.shape
+        assert channels == self.in_channels
 
-        assert x.shape[1] == self.in_channels
+        padded_x = pad(x.value, (
+            (0, 0),
+            (0, 0),
+            (self.padding[0], self.padding[0]),
+            (self.padding[1], self.padding[1]),
+        ))
 
+        # Turn image shape into column shape
+        # (enables dot product between input and weights)
         pass
+
+
+def get_im2col_indices(images_shape, kernel_size, stride):
+    ''' Reference: CS231n Stanford '''
+
+    batch_size, channels, height, width = images_shape
+    kernel_height, kernel_width = kernel_size
+
+    out_height = (height - kernel_height) // stride + 1
+    out_width = (width - kernel_width) // stride + 1
+
+    i0 = repeat(arange(kernel_height), kernel_width)
+    i0 = tile(i0, channels)
+    i1 = stride * repeat(arange(out_height), out_width)
+    i = i0.reshape(-1, 1) + i1.reshape(1, -1)
+
+    j0 = tile(arange(kernel_width), kernel_height * channels)
+    j1 = stride * tile(arange(out_width), out_height)
+    j = j0.reshape(-1, 1) + j1.reshape(1, -1)
+
+    k = repeat(arange(channels), kernel_height * kernel_width).reshape(-1, 1)
+
+    return (k, i, j)
+
+
+def im2col(images, kernel_size, stride):
+    ''' Method which turns the image shaped input to column shape.
+    Used during the forward pass.
+
+    Reference: CS231n Stanford
+
+    '''
+
+    # Calculate the indices where the dot products are
+    # to be applied between weights and the image
+    k, i, j = get_im2col_indices(images.shape, kernel_size, stride)
+
+    # Get content from image at those indices
+    cols = images[:, k, i, j]
+    channels = images.shape[1]
+    # Reshape content into column shape
+    cols = cols.transpose(1, 2, 0) \
+        .reshape(kernel_size[0] * kernel_size[1] * channels, -1)
+
+    return cols
 
 
 # ====================================================================================================
