@@ -5,7 +5,6 @@ from numpy import ndarray, pad
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 from nujo.init import randn
-from nujo.nn._transform import _flatten_image_sections, _get_image_section
 
 __all__ = [
     'Linear',
@@ -100,52 +99,21 @@ class Conv2d(Flow):
         self.padding = padding if isinstance(padding, tuple) else (padding,
                                                                    padding)
 
-        # May not be used
+        # Not used for now
         self.dilation = dilation if isinstance(dilation, tuple) else (dilation,
                                                                       dilation)
 
-        self.apply_kernels = Linear(self.in_channels * self.kernel_size[0] *
-                                    self.kernel_size[1],
-                                    self.out_channels,
-                                    bias=bias,
-                                    name=f'{self.name}.kernels')
+        self.kernels = randn(self.out_channels,
+                             self.in_channels,
+                             *self.kernel_size,
+                             name=self.name + '.kernels')
 
     def forward(self, x: Tensor) -> Tensor:
         # x is of shape (batch_size, channels, height, width)
 
         assert x.shape[1] == self.in_channels
 
-        # pad the input images (before and after)
-        x.value = pad(x.value, (
-            (0, 0),
-            (0, 0),
-            (self.padding[0], self.padding[0]),
-            (self.padding[1], self.padding[1]),
-        ))
-
-        # The following are stored, because they are
-        # later used to compute the shape of the output
-        batch_size = x.shape[0]
-        height, width = x.shape[2], x.shape[3]
-
-        sections: List[ndarray] = []
-        for row_start in range(0, x.shape[2] - self.kernel_size[0] + 1,
-                               self.stride[0]):
-            for col_start in range(0, x.shape[3] - self.kernel_size[1] + 1,
-                                   self.stride[1]):
-                sections.append(
-                    _get_image_section(x, row_start,
-                                       row_start + self.kernel_size[0],
-                                       col_start,
-                                       col_start + self.kernel_size[1]))
-
-        x.value = _flatten_image_sections(sections)  # flatten x
-        flatten_output = self.apply_kernels(x)
-        # the output need to be reshaped into volume
-        return flatten_output.reshape(
-            batch_size, self.out_channels,
-            (height - self.kernel_size[0]) // self.stride[0] + 1,
-            (width - self.kernel_size[1]) // self.stride[1] + 1)
+        pass
 
 
 # ====================================================================================================
