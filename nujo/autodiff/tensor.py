@@ -1,6 +1,5 @@
-from copy import copy, deepcopy
 from numbers import Number
-from typing import List, Optional, Tuple, Union
+from typing import List, Tuple, Union
 
 from numpy import array, ndarray, zeros
 
@@ -79,37 +78,29 @@ class Tensor(_Node):
 
         return self._grad
 
-    @property
-    def T(self) -> 'Tensor':
-        if self._T is None:
-            self._T = copy(self)
-
-        if (self._value != self._prev_value).any():
-            self._T._value = self._value.T
-            self._prev_value = self._value
-
-        return self._T
-
     # Shape and shape transformations
 
     @property
     def shape(self) -> Tuple[int, ...]:
         return self._value.shape
 
-    def reshape(self, *shape: int, inplace=False) -> 'Tensor':
+    @property
+    def T(self) -> 'Tensor':
+        if (self._value != self._prev_value).any():
+            self._T = self.transpose()
+            self._prev_value = self._value
+
+        return self._T
+
+    def transpose(self, *dims: int) -> 'Tensor':
+        from nujo.autodiff._functions._transform import _Transpose
+        return _Transpose(self, dims)()
+
+    def reshape(self, *shape: int) -> 'Tensor':
         from nujo.autodiff._functions._transform import _Reshape
         return _Reshape(self, shape)()
 
-    def repeat(self,
-               *repeats: int,
-               axis: Optional[int] = None,
-               inplace=False) -> 'Tensor':
-
-        repeated = self if inplace else deepcopy(self)
-        repeated._value = self._value.repeat(repeats, axis=axis)
-        return repeated
-
-    def squeeze(self, dim=-1, inplace=False) -> 'Tensor':
+    def squeeze(self, dim=-1) -> 'Tensor':
         if dim < 0:
             num_dims = len(self._value.shape)
 
@@ -119,10 +110,9 @@ class Tensor(_Node):
                 dim += num_dims
 
         return self.reshape(*self._value.shape[:dim],
-                            *self._value.shape[dim + 1:],
-                            inplace=inplace)
+                            *self._value.shape[dim + 1:])
 
-    def unsqueeze(self, dim=-1, inplace=False) -> 'Tensor':
+    def unsqueeze(self, dim=-1) -> 'Tensor':
         if dim < 0:
             num_dims = len(self._value.shape)
 
@@ -133,10 +123,8 @@ class Tensor(_Node):
                     dim += 1
                 dim += num_dims
 
-        return self.reshape(*self._value.shape[:dim],
-                            1,
-                            *self._value.shape[dim:],
-                            inplace=inplace)
+        return self.reshape(*self._value.shape[:dim], 1,
+                            *self._value.shape[dim:])
 
     # Gradient computation
 
@@ -167,6 +155,9 @@ class Tensor(_Node):
 
                 elif poutput.creator.name == '_Reshape':
                     self._grad._value += poutput._grad._value.reshape(weight)
+
+                elif poutput.creator.name == '_Transpose':
+                    self._grad._value += poutput._grad._value.transpose(weight)
 
                 else:
                     update = poutput._grad._value * weight
