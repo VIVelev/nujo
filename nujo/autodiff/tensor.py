@@ -97,9 +97,8 @@ class Tensor(_Node):
         return self._value.shape
 
     def reshape(self, *shape: int, inplace=False) -> 'Tensor':
-        reshaped = self if inplace else deepcopy(self)
-        reshaped._value = self._value.reshape(shape)
-        return reshaped
+        from nujo.autodiff._functions._transform import _Reshape
+        return _Reshape(self, shape)()
 
     def repeat(self,
                *repeats: int,
@@ -165,6 +164,9 @@ class Tensor(_Node):
                         # XW = Z, dW ...
                         self._grad._value += (
                             poutput._grad._value.T @ weight).T
+
+                elif poutput.creator.name == 'Reshape':
+                    self._grad._value += poutput._grad._value.reshape(weight)
 
                 else:
                     update = poutput._grad._value * weight
