@@ -21,7 +21,7 @@ class _InnerSum(Function):
                  keepdim=False,
                  name='InnerSum'):
 
-        super(_InnerSum, self).__init__(input, name=name)
+        super(_InnerSum, self).__init__(input, name=self.__class__.__name__)
         self.dim = dim
         self.keepdim = keepdim
 
@@ -44,7 +44,7 @@ class _InnerProd(Function):
                  keepdim=False,
                  name='InnerProd'):
 
-        super(_InnerProd, self).__init__(input, name=name)
+        super(_InnerProd, self).__init__(input, name=self.__class__.__name__)
         self.dim = dim
         self.keepdim = keepdim
 

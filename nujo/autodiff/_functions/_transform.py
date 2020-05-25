@@ -12,12 +12,10 @@ __all__ = [
 
 
 class _Reshape(Function):
-    def __init__(self,
-                 input: Union[Tensor, ndarray, List[Number], Number],
-                 shape: Tuple[int, ...],
-                 name='Reshape'):
+    def __init__(self, input: Union[Tensor, ndarray, List[Number], Number],
+                 shape: Tuple[int, ...]):
 
-        super(_Reshape, self).__init__(input, name=name)
+        super(_Reshape, self).__init__(input, name=self.__class__.__name__)
         self.shape = shape
         self._input_shape = self.children[0].shape
 

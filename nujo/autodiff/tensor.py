@@ -155,7 +155,7 @@ class Tensor(_Node):
                 return
 
             for poutput, weight in zip(self.parents_outputs, self.weights):
-                if poutput.creator.name == 'MatMul':
+                if poutput.creator.name == '_MatrixMul':
                     if self is poutput.creator.children[0]:
                         # XW = Z, dX ...
                         self._grad._value += poutput._grad._value @ weight.T
@@ -165,7 +165,7 @@ class Tensor(_Node):
                         self._grad._value += (
                             poutput._grad._value.T @ weight).T
 
-                elif poutput.creator.name == 'Reshape':
+                elif poutput.creator.name == '_Reshape':
                     self._grad._value += poutput._grad._value.reshape(weight)
 
                 else:
