@@ -26,7 +26,7 @@
 </summary>
 <pre><code class="python">from abc import abstractmethod
 from numbers import Number
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, TypeVar, Union
 
 from numpy import ndarray
 
@@ -62,6 +62,9 @@ class Function(_Node, object):
     _cache_hit = False
     &#39;&#39;&#39; Flag signaling cache hit/miss.
     &#39;&#39;&#39;
+
+    T = TypeVar(&#39;T&#39;, Tensor, ndarray)
+
     def __init__(self,
                  *children: Union[Tensor, ndarray, List[Number], Number],
                  name=&#39;Function&#39;):
@@ -80,11 +83,8 @@ class Function(_Node, object):
 
         if modes.DIFF_ENABLED:  # If graph building is enabled.
             # Allocate space for parent&#39;s output (output placeholder)
-            # and its weight (derivative).
-
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
-                child.weights.append(None)
 
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
@@ -92,6 +92,7 @@ class Function(_Node, object):
         or otherwise add the new tensor to the cache.
         &#39;&#39;&#39;
 
+        # Only cache tensors that are in the computation graph
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
             # Include the arguments&#39; uids in the key
@@ -101,12 +102,15 @@ class Function(_Node, object):
             if key in cls._children_history:
                 cls._cache_hit = True
                 return cls._children_history[key]
+
             else:
                 cls._cache_hit = False
                 creator = super(Function, cls).__new__(cls)
                 cls._children_history[key] = creator
                 return creator
 
+        # If the tensors are not in the computation graph,
+        # perform standard python init
         else:
             cls._cache_hit = False
             return super(Function, cls).__new__(cls)
@@ -120,36 +124,54 @@ class Function(_Node, object):
     @abstractmethod
     def forward(self) -&gt; ndarray:
         &#39;&#39;&#39; Implement forward pass of the function here.
+
+        Use the `self.children` list to access the inputs.
         &#39;&#39;&#39;
 
         pass
 
     @abstractmethod
-    def backward(self) -&gt; Tuple[ndarray, ...]:
+    def backward(self, idx: int, acumm_grad: T) -&gt; T:
         &#39;&#39;&#39; Implement backward pass of the function here
-        (a.k.a. derivative calculation).
+
+        Compute the gradient of children[idx] w.r.t. output of the
+        computation graph from the acummulated gradient (the gradient
+        of the output of the function w.r.t. the output of the graph).
+
+        Parameters:
+        -----------
+        - idx : int, the index of the children for which to compute the
+         gradient w.r.t. output of the computation graph
+        - acumm_grad : T (Tensor or ndarray), the accumulated grad in the graph
+         so far, you can otherwise think of it as the gradient of the output of
+         the function w.r.t. the output of the graph.
+
+            - `acumm_grad` is Tensor if differentiantion is enabled
+             (`DIFF_ENABLED`) and the children has opted for differentiation
+             (`diff` is True), thus the computations will be recorded in the
+             computation graph and higher-order derivatives could be computed.
+            - otherwise, `acumm_grad` is ndarray and the computations are not
+             recorded; ndarrays are used since the computations with them are
+             more efficient.
+
+        Returns:
+        --------
+        - grad : T (Tensor or ndarray), the computed gradient of
+         `self.children[idx]`
+
         &#39;&#39;&#39;
 
         pass
 
     def __call__(self) -&gt; Tensor:
-        &#39;&#39;&#39; Executes forward pass and
-        updates the weights (derivatives) for the dependent children.
+        &#39;&#39;&#39; Zeros the gradient and executes forward pass.
         &#39;&#39;&#39;
+
+        if self._output_placeholder.diff:
+            self._output_placeholder.zero_grad()
 
         # Forward pass
         self._output_placeholder.value = self.forward()
-
-        if self._output_placeholder.diff:  # Is gradient dependecy?
-            self._output_placeholder.zero_grad()
-
-            # Update the weights
-            for tensor, derivative in zip(self.children, self.backward()):
-                idx = next(i for i, v in enumerate(tensor.parents_outputs)
-                           if v is self._output_placeholder)
-
-                tensor.weights[idx] = derivative
-
         return self._output_placeholder</code></pre>
 </details>
 </section>
@@ -211,6 +233,9 @@ taking the best from both worlds.</p>
     _cache_hit = False
     &#39;&#39;&#39; Flag signaling cache hit/miss.
     &#39;&#39;&#39;
+
+    T = TypeVar(&#39;T&#39;, Tensor, ndarray)
+
     def __init__(self,
                  *children: Union[Tensor, ndarray, List[Number], Number],
                  name=&#39;Function&#39;):
@@ -229,11 +254,8 @@ taking the best from both worlds.</p>
 
         if modes.DIFF_ENABLED:  # If graph building is enabled.
             # Allocate space for parent&#39;s output (output placeholder)
-            # and its weight (derivative).
-
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
-                child.weights.append(None)
 
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
@@ -241,6 +263,7 @@ taking the best from both worlds.</p>
         or otherwise add the new tensor to the cache.
         &#39;&#39;&#39;
 
+        # Only cache tensors that are in the computation graph
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
             # Include the arguments&#39; uids in the key
@@ -250,12 +273,15 @@ taking the best from both worlds.</p>
             if key in cls._children_history:
                 cls._cache_hit = True
                 return cls._children_history[key]
+
             else:
                 cls._cache_hit = False
                 creator = super(Function, cls).__new__(cls)
                 cls._children_history[key] = creator
                 return creator
 
+        # If the tensors are not in the computation graph,
+        # perform standard python init
         else:
             cls._cache_hit = False
             return super(Function, cls).__new__(cls)
@@ -269,36 +295,54 @@ taking the best from both worlds.</p>
     @abstractmethod
     def forward(self) -&gt; ndarray:
         &#39;&#39;&#39; Implement forward pass of the function here.
+
+        Use the `self.children` list to access the inputs.
         &#39;&#39;&#39;
 
         pass
 
     @abstractmethod
-    def backward(self) -&gt; Tuple[ndarray, ...]:
+    def backward(self, idx: int, acumm_grad: T) -&gt; T:
         &#39;&#39;&#39; Implement backward pass of the function here
-        (a.k.a. derivative calculation).
+
+        Compute the gradient of children[idx] w.r.t. output of the
+        computation graph from the acummulated gradient (the gradient
+        of the output of the function w.r.t. the output of the graph).
+
+        Parameters:
+        -----------
+        - idx : int, the index of the children for which to compute the
+         gradient w.r.t. output of the computation graph
+        - acumm_grad : T (Tensor or ndarray), the accumulated grad in the graph
+         so far, you can otherwise think of it as the gradient of the output of
+         the function w.r.t. the output of the graph.
+
+            - `acumm_grad` is Tensor if differentiantion is enabled
+             (`DIFF_ENABLED`) and the children has opted for differentiation
+             (`diff` is True), thus the computations will be recorded in the
+             computation graph and higher-order derivatives could be computed.
+            - otherwise, `acumm_grad` is ndarray and the computations are not
+             recorded; ndarrays are used since the computations with them are
+             more efficient.
+
+        Returns:
+        --------
+        - grad : T (Tensor or ndarray), the computed gradient of
+         `self.children[idx]`
+
         &#39;&#39;&#39;
 
         pass
 
     def __call__(self) -&gt; Tensor:
-        &#39;&#39;&#39; Executes forward pass and
-        updates the weights (derivatives) for the dependent children.
+        &#39;&#39;&#39; Zeros the gradient and executes forward pass.
         &#39;&#39;&#39;
+
+        if self._output_placeholder.diff:
+            self._output_placeholder.zero_grad()
 
         # Forward pass
         self._output_placeholder.value = self.forward()
-
-        if self._output_placeholder.diff:  # Is gradient dependecy?
-            self._output_placeholder.zero_grad()
-
-            # Update the weights
-            for tensor, derivative in zip(self.children, self.backward()):
-                idx = next(i for i, v in enumerate(tensor.parents_outputs)
-                           if v is self._output_placeholder)
-
-                tensor.weights[idx] = derivative
-
         return self._output_placeholder</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -324,22 +368,80 @@ taking the best from both worlds.</p>
 <li>nujo.autodiff._functions._elementary._Power</li>
 <li>nujo.autodiff._functions._elementary._Reciprocal</li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="nujo.autodiff.function.Function.T"><code class="name">var <span class="ident">T</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="nujo.autodiff.function.Function.backward"><code class="name flex">
-<span>def <span class="ident">backward</span></span>(<span>self) -> Tuple[numpy.ndarray, ...]</span>
+<span>def <span class="ident">backward</span></span>(<span>self, idx: int, acumm_grad: ~T) -> ~T</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Implement backward pass of the function here
-(a.k.a. derivative calculation).</p></div>
+<div class="desc"><p>Implement backward pass of the function here</p>
+<p>Compute the gradient of children[idx] w.r.t. output of the
+computation graph from the acummulated gradient (the gradient
+of the output of the function w.r.t. the output of the graph).</p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>idx : int, the index of the children for which to compute the
+gradient w.r.t. output of the computation graph</li>
+<li>
+<p>acumm_grad : T (Tensor or ndarray), the accumulated grad in the graph
+so far, you can otherwise think of it as the gradient of the output of
+the function w.r.t. the output of the graph.</p>
+<ul>
+<li><code>acumm_grad</code> is Tensor if differentiantion is enabled
+(<code>DIFF_ENABLED</code>) and the children has opted for differentiation
+(<code>diff</code> is True), thus the computations will be recorded in the
+computation graph and higher-order derivatives could be computed.</li>
+<li>otherwise, <code>acumm_grad</code> is ndarray and the computations are not
+recorded; ndarrays are used since the computations with them are
+more efficient.</li>
+</ul>
+</li>
+</ul>
+<h2 id="returns">Returns:</h2>
+<ul>
+<li>grad : T (Tensor or ndarray), the computed gradient of
+<code>self.children[idx]</code></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-def backward(self) -&gt; Tuple[ndarray, ...]:
+def backward(self, idx: int, acumm_grad: T) -&gt; T:
     &#39;&#39;&#39; Implement backward pass of the function here
-    (a.k.a. derivative calculation).
+
+    Compute the gradient of children[idx] w.r.t. output of the
+    computation graph from the acummulated gradient (the gradient
+    of the output of the function w.r.t. the output of the graph).
+
+    Parameters:
+    -----------
+    - idx : int, the index of the children for which to compute the
+     gradient w.r.t. output of the computation graph
+    - acumm_grad : T (Tensor or ndarray), the accumulated grad in the graph
+     so far, you can otherwise think of it as the gradient of the output of
+     the function w.r.t. the output of the graph.
+
+        - `acumm_grad` is Tensor if differentiantion is enabled
+         (`DIFF_ENABLED`) and the children has opted for differentiation
+         (`diff` is True), thus the computations will be recorded in the
+         computation graph and higher-order derivatives could be computed.
+        - otherwise, `acumm_grad` is ndarray and the computations are not
+         recorded; ndarrays are used since the computations with them are
+         more efficient.
+
+    Returns:
+    --------
+    - grad : T (Tensor or ndarray), the computed gradient of
+     `self.children[idx]`
+
     &#39;&#39;&#39;
 
     pass</code></pre>
@@ -349,7 +451,8 @@ def backward(self) -&gt; Tuple[ndarray, ...]:
 <span>def <span class="ident">forward</span></span>(<span>self) -> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Implement forward pass of the function here.</p></div>
+<div class="desc"><p>Implement forward pass of the function here.</p>
+<p>Use the <code>self.children</code> list to access the inputs.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -357,6 +460,8 @@ def backward(self) -&gt; Tuple[ndarray, ...]:
 <pre><code class="python">@abstractmethod
 def forward(self) -&gt; ndarray:
     &#39;&#39;&#39; Implement forward pass of the function here.
+
+    Use the `self.children` list to access the inputs.
     &#39;&#39;&#39;
 
     pass</code></pre>
@@ -383,6 +488,7 @@ def forward(self) -&gt; ndarray:
 <li>
 <h4><code><a title="nujo.autodiff.function.Function" href="#nujo.autodiff.function.Function">Function</a></code></h4>
 <ul class="">
+<li><code><a title="nujo.autodiff.function.Function.T" href="#nujo.autodiff.function.Function.T">T</a></code></li>
 <li><code><a title="nujo.autodiff.function.Function.backward" href="#nujo.autodiff.function.Function.backward">backward</a></code></li>
 <li><code><a title="nujo.autodiff.function.Function.forward" href="#nujo.autodiff.function.Function.forward">forward</a></code></li>
 </ul>
