@@ -1,6 +1,6 @@
 from typing import Tuple, Union
 
-from numpy import arange, pad, repeat, tile
+from numpy import arange, repeat, tile
 
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
@@ -111,13 +111,6 @@ class Conv2d(Flow):
     def forward(self, x: Tensor) -> Tensor:
         batch_size, channels, height, width = x.shape
         assert channels == self.in_channels
-
-        padded_x = pad(x.value, (
-            (0, 0),
-            (0, 0),
-            (self.padding[0], self.padding[0]),
-            (self.padding[1], self.padding[1]),
-        ))
 
         # Turn image shape into column shape
         # (enables dot product between input and weights)
