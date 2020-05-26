@@ -24,13 +24,21 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from nujo.autodiff.tensor import Tensor
+<pre><code class="python">from typing import List, Tuple, Union
+
+from numpy import ndarray, pad
+
+from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 from nujo.init import randn
+from nujo.nn._transform import _flatten_image_sections, _get_image_section
 
 __all__ = [
     &#39;Linear&#39;,
+    &#39;Conv2d&#39;,
 ]
+
+# ====================================================================================================
 
 
 class Linear(Flow):
@@ -68,7 +76,105 @@ class Linear(Flow):
 
     def forward(self, x: Tensor) -&gt; Tensor:
         out = self.W @ x
-        return out + self.b if self.bias else out</code></pre>
+        return out + self.b if self.bias else out
+
+
+# ====================================================================================================
+
+
+class Conv2d(Flow):
+    &#39;&#39;&#39; A 2-dimensional convolutional layer
+
+    Applies a 2D convolution over an input signal composed of
+    several input planes.
+    More info: https://cs231n.github.io/convolutional-networks/
+
+    Parameters:
+    -----------
+     - in_channels : int, number of channels in the input image
+     - out_channels : int, number of channels produced by the convolution
+        (in other word, the number of kernels)
+     - kernel_size : int or tuple, size of the convolving kernel
+     - stride : int or tuple, optional, stride of the convolution. Default: 1
+     - padding : int or tuple, optional, zero-padding added to both sides of
+        the input. Default: 0
+     - dilation : int or tuple, optional - spacing between kernel elements.
+        Default: 0
+     - bias : bool, optional, if True, adds a learnable bias to the output.
+        Default: True
+
+    &#39;&#39;&#39;
+    def __init__(self,
+                 in_channels: int,
+                 out_channels: int,
+                 kernel_size: Union[int, Tuple[int, int]],
+                 stride: Union[int, Tuple[int, int]] = 1,
+                 padding: Union[int, Tuple[int, int]] = 0,
+                 dilation: Union[int, Tuple[int, int]] = 0,
+                 bias=True,
+                 name=&#39;Conv2d&#39;):
+
+        super(Conv2d,
+              self).__init__(name=f&#39;{name}({in_channels}, {out_channels})&#39;)
+
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+
+        self.kernel_size = kernel_size if isinstance(
+            kernel_size, tuple) else (kernel_size, kernel_size)
+        self.stride = stride if isinstance(stride, tuple) else (stride, stride)
+        self.padding = padding if isinstance(padding, tuple) else (padding,
+                                                                   padding)
+
+        # May not be used
+        self.dilation = dilation if isinstance(dilation, tuple) else (dilation,
+                                                                      dilation)
+
+        self.apply_kernels = Linear(self.in_channels * self.kernel_size[0] *
+                                    self.kernel_size[1],
+                                    self.out_channels,
+                                    bias=bias,
+                                    name=f&#39;{self.name}.kernels&#39;)
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        # x is of shape (batch_size, channels, height, width)
+
+        assert x.shape[1] == self.in_channels
+
+        # pad the input images (before and after)
+        x.value = pad(x.value, (
+            (0, 0),
+            (0, 0),
+            (self.padding[0], self.padding[0]),
+            (self.padding[1], self.padding[1]),
+        ))
+
+        # The following are stored, because they are
+        # later used to compute the shape of the output
+        batch_size = x.shape[0]
+        height, width = x.shape[2], x.shape[3]
+
+        sections: List[ndarray] = []
+        for row_start in range(0, x.shape[2] - self.kernel_size[0] + 1,
+                               self.stride[0]):
+            for col_start in range(0, x.shape[3] - self.kernel_size[1] + 1,
+                                   self.stride[1]):
+                sections.append(
+                    _get_image_section(x, row_start,
+                                       row_start + self.kernel_size[0],
+                                       col_start,
+                                       col_start + self.kernel_size[1]))
+
+        x.value = _flatten_image_sections(sections)  # flatten x
+        flatten_output = self.apply_kernels(x)
+        # the output need to be reshaped into volume
+        return flatten_output.reshape(
+            batch_size, self.out_channels,
+            (height - self.kernel_size[0]) // self.stride[0] + 1,
+            (width - self.kernel_size[1]) // self.stride[1] + 1)
+
+
+# ====================================================================================================</code></pre>
 </details>
 </section>
 <section>
@@ -80,6 +186,140 @@ class Linear(Flow):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="nujo.nn.layers.Conv2d"><code class="flex name class">
+<span>class <span class="ident">Conv2d</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A 2-dimensional convolutional layer</p>
+<p>Applies a 2D convolution over an input signal composed of
+several input planes.
+More info: <a href="https://cs231n.github.io/convolutional-networks/">https://cs231n.github.io/convolutional-networks/</a></p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>in_channels : int, number of channels in the input image</li>
+<li>out_channels : int, number of channels produced by the convolution
+(in other word, the number of kernels)</li>
+<li>kernel_size : int or tuple, size of the convolving kernel</li>
+<li>stride : int or tuple, optional, stride of the convolution. Default: 1</li>
+<li>padding : int or tuple, optional, zero-padding added to both sides of
+the input. Default: 0</li>
+<li>dilation : int or tuple, optional - spacing between kernel elements.
+Default: 0</li>
+<li>bias : bool, optional, if True, adds a learnable bias to the output.
+Default: True</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Conv2d(Flow):
+    &#39;&#39;&#39; A 2-dimensional convolutional layer
+
+    Applies a 2D convolution over an input signal composed of
+    several input planes.
+    More info: https://cs231n.github.io/convolutional-networks/
+
+    Parameters:
+    -----------
+     - in_channels : int, number of channels in the input image
+     - out_channels : int, number of channels produced by the convolution
+        (in other word, the number of kernels)
+     - kernel_size : int or tuple, size of the convolving kernel
+     - stride : int or tuple, optional, stride of the convolution. Default: 1
+     - padding : int or tuple, optional, zero-padding added to both sides of
+        the input. Default: 0
+     - dilation : int or tuple, optional - spacing between kernel elements.
+        Default: 0
+     - bias : bool, optional, if True, adds a learnable bias to the output.
+        Default: True
+
+    &#39;&#39;&#39;
+    def __init__(self,
+                 in_channels: int,
+                 out_channels: int,
+                 kernel_size: Union[int, Tuple[int, int]],
+                 stride: Union[int, Tuple[int, int]] = 1,
+                 padding: Union[int, Tuple[int, int]] = 0,
+                 dilation: Union[int, Tuple[int, int]] = 0,
+                 bias=True,
+                 name=&#39;Conv2d&#39;):
+
+        super(Conv2d,
+              self).__init__(name=f&#39;{name}({in_channels}, {out_channels})&#39;)
+
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+
+        self.kernel_size = kernel_size if isinstance(
+            kernel_size, tuple) else (kernel_size, kernel_size)
+        self.stride = stride if isinstance(stride, tuple) else (stride, stride)
+        self.padding = padding if isinstance(padding, tuple) else (padding,
+                                                                   padding)
+
+        # May not be used
+        self.dilation = dilation if isinstance(dilation, tuple) else (dilation,
+                                                                      dilation)
+
+        self.apply_kernels = Linear(self.in_channels * self.kernel_size[0] *
+                                    self.kernel_size[1],
+                                    self.out_channels,
+                                    bias=bias,
+                                    name=f&#39;{self.name}.kernels&#39;)
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        # x is of shape (batch_size, channels, height, width)
+
+        assert x.shape[1] == self.in_channels
+
+        # pad the input images (before and after)
+        x.value = pad(x.value, (
+            (0, 0),
+            (0, 0),
+            (self.padding[0], self.padding[0]),
+            (self.padding[1], self.padding[1]),
+        ))
+
+        # The following are stored, because they are
+        # later used to compute the shape of the output
+        batch_size = x.shape[0]
+        height, width = x.shape[2], x.shape[3]
+
+        sections: List[ndarray] = []
+        for row_start in range(0, x.shape[2] - self.kernel_size[0] + 1,
+                               self.stride[0]):
+            for col_start in range(0, x.shape[3] - self.kernel_size[1] + 1,
+                                   self.stride[1]):
+                sections.append(
+                    _get_image_section(x, row_start,
+                                       row_start + self.kernel_size[0],
+                                       col_start,
+                                       col_start + self.kernel_size[1]))
+
+        x.value = _flatten_image_sections(sections)  # flatten x
+        flatten_output = self.apply_kernels(x)
+        # the output need to be reshaped into volume
+        return flatten_output.reshape(
+            batch_size, self.out_channels,
+            (height - self.kernel_size[0]) // self.stride[0] + 1,
+            (width - self.kernel_size[1]) // self.stride[1] + 1)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></b></code>:
+<ul class="hlist">
+<li><code><a title="nujo.flow.Flow.append" href="../flow.html#nujo.flow.Flow.append">append</a></code></li>
+<li><code><a title="nujo.flow.Flow.copy" href="../flow.html#nujo.flow.Flow.copy">copy</a></code></li>
+<li><code><a title="nujo.flow.Flow.forward" href="../flow.html#nujo.flow.Flow.forward">forward</a></code></li>
+<li><code><a title="nujo.flow.Flow.pop" href="../flow.html#nujo.flow.Flow.pop">pop</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
 <dt id="nujo.nn.layers.Linear"><code class="flex name class">
 <span>class <span class="ident">Linear</span></span>
 <span>(</span><span>*args, **kwargs)</span>
@@ -168,6 +408,9 @@ class Linear(Flow):
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="nujo.nn.layers.Conv2d" href="#nujo.nn.layers.Conv2d">Conv2d</a></code></h4>
+</li>
 <li>
 <h4><code><a title="nujo.nn.layers.Linear" href="#nujo.nn.layers.Linear">Linear</a></code></h4>
 </li>

@@ -65,7 +65,6 @@ def test_tensor_shape_manipulation(tensors):
     A, A_np = A.reshape(-1, 1), A.value.reshape(-1, 1)
     assert (A == A_np).all()
 
-    assert (A.repeat(5, axis=1) == A_np.repeat(5, axis=1)).all()
     assert (A.squeeze(1) == A_np.squeeze(1)).all()
     assert (A.unsqueeze(1) == expand_dims(A_np, 1)).all()
 

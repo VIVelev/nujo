@@ -273,6 +273,7 @@ a tensor will pass through when the Flow is called on that tensor.</p>
 <li><a title="nujo.nn.activations.Softmax" href="nn/activations.html#nujo.nn.activations.Softmax">Softmax</a></li>
 <li><a title="nujo.nn.activations.Swish" href="nn/activations.html#nujo.nn.activations.Swish">Swish</a></li>
 <li><a title="nujo.nn.activations.TanH" href="nn/activations.html#nujo.nn.activations.TanH">TanH</a></li>
+<li><a title="nujo.nn.layers.Conv2d" href="nn/layers.html#nujo.nn.layers.Conv2d">Conv2d</a></li>
 <li><a title="nujo.nn.layers.Linear" href="nn/layers.html#nujo.nn.layers.Linear">Linear</a></li>
 <li>nujo.objective.loss._Loss</li>
 </ul>
@@ -712,38 +713,29 @@ the only child of a tensor</li>
 
         return self._grad
 
-    @property
-    def T(self) -&gt; &#39;Tensor&#39;:
-        if self._T is None:
-            self._T = copy(self)
-
-        if (self._value != self._prev_value).any():
-            self._T._value = self._value.T
-            self._prev_value = self._value
-
-        return self._T
-
     # Shape and shape transformations
 
     @property
     def shape(self) -&gt; Tuple[int, ...]:
         return self._value.shape
 
-    def reshape(self, *shape: int, inplace=False) -&gt; &#39;Tensor&#39;:
-        reshaped = self if inplace else deepcopy(self)
-        reshaped._value = self._value.reshape(shape)
-        return reshaped
+    @property
+    def T(self) -&gt; &#39;Tensor&#39;:
+        if (self._value != self._prev_value).any():
+            self._T = self.transpose()
+            self._prev_value = self._value
 
-    def repeat(self,
-               *repeats: int,
-               axis: Optional[int] = None,
-               inplace=False) -&gt; &#39;Tensor&#39;:
+        return self._T
 
-        repeated = self if inplace else deepcopy(self)
-        repeated._value = self._value.repeat(repeats, axis=axis)
-        return repeated
+    def transpose(self, *dims: int) -&gt; &#39;Tensor&#39;:
+        from nujo.autodiff._functions._transform import _Transpose
+        return _Transpose(self, dims)()
 
-    def squeeze(self, dim=-1, inplace=False) -&gt; &#39;Tensor&#39;:
+    def reshape(self, *shape: int) -&gt; &#39;Tensor&#39;:
+        from nujo.autodiff._functions._transform import _Reshape
+        return _Reshape(self, shape)()
+
+    def squeeze(self, dim=-1) -&gt; &#39;Tensor&#39;:
         if dim &lt; 0:
             num_dims = len(self._value.shape)
 
@@ -753,10 +745,9 @@ the only child of a tensor</li>
                 dim += num_dims
 
         return self.reshape(*self._value.shape[:dim],
-                            *self._value.shape[dim + 1:],
-                            inplace=inplace)
+                            *self._value.shape[dim + 1:])
 
-    def unsqueeze(self, dim=-1, inplace=False) -&gt; &#39;Tensor&#39;:
+    def unsqueeze(self, dim=-1) -&gt; &#39;Tensor&#39;:
         if dim &lt; 0:
             num_dims = len(self._value.shape)
 
@@ -767,10 +758,8 @@ the only child of a tensor</li>
                     dim += 1
                 dim += num_dims
 
-        return self.reshape(*self._value.shape[:dim],
-                            1,
-                            *self._value.shape[dim:],
-                            inplace=inplace)
+        return self.reshape(*self._value.shape[:dim], 1,
+                            *self._value.shape[dim:])
 
     # Gradient computation
 
@@ -789,7 +778,7 @@ the only child of a tensor</li>
                 return
 
             for poutput, weight in zip(self.parents_outputs, self.weights):
-                if poutput.creator.name == &#39;MatMul&#39;:
+                if poutput.creator.name == &#39;_MatrixMul&#39;:
                     if self is poutput.creator.children[0]:
                         # XW = Z, dX ...
                         self._grad._value += poutput._grad._value @ weight.T
@@ -798,6 +787,12 @@ the only child of a tensor</li>
                         # XW = Z, dW ...
                         self._grad._value += (
                             poutput._grad._value.T @ weight).T
+
+                elif poutput.creator.name == &#39;_Reshape&#39;:
+                    self._grad._value += poutput._grad._value.reshape(weight)
+
+                elif poutput.creator.name == &#39;_Transpose&#39;:
+                    self._grad._value += poutput._grad._value.transpose(weight)
 
                 else:
                     update = poutput._grad._value * weight
@@ -842,7 +837,10 @@ the only child of a tensor</li>
         return self._value.any()
 
     def __getitem__(self, position: Union[int, Tuple[int, ...]]):
-        return self._value[position]
+        return Tensor(self._value[position],
+                      diff=self.diff,
+                      creator=self.creator,
+                      name=f&#39;{self.name}[{position}]&#39;)
 
     def __setitem__(self, position: Union[int, Tuple[int, ...]],
                     value: Union[&#39;Tensor&#39;, ndarray, List[Number], Number]):
@@ -983,11 +981,8 @@ the only child of a tensor</li>
 </summary>
 <pre><code class="python">@property
 def T(self) -&gt; &#39;Tensor&#39;:
-    if self._T is None:
-        self._T = copy(self)
-
     if (self._value != self._prev_value).any():
-        self._T._value = self._value.T
+        self._T = self.transpose()
         self._prev_value = self._value
 
     return self._T</code></pre>
@@ -1119,7 +1114,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
             return
 
         for poutput, weight in zip(self.parents_outputs, self.weights):
-            if poutput.creator.name == &#39;MatMul&#39;:
+            if poutput.creator.name == &#39;_MatrixMul&#39;:
                 if self is poutput.creator.children[0]:
                     # XW = Z, dX ...
                     self._grad._value += poutput._grad._value @ weight.T
@@ -1129,6 +1124,12 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
                     self._grad._value += (
                         poutput._grad._value.T @ weight).T
 
+            elif poutput.creator.name == &#39;_Reshape&#39;:
+                self._grad._value += poutput._grad._value.reshape(weight)
+
+            elif poutput.creator.name == &#39;_Transpose&#39;:
+                self._grad._value += poutput._grad._value.transpose(weight)
+
             else:
                 update = poutput._grad._value * weight
                 if self._grad._value.shape == (1, 1):  # Is scalar?
@@ -1137,27 +1138,8 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
                     self._grad._value = self._grad._value + update</code></pre>
 </details>
 </dd>
-<dt id="nujo.Tensor.repeat"><code class="name flex">
-<span>def <span class="ident">repeat</span></span>(<span>self, *repeats: int, axis: Union[int, NoneType] = None, inplace=False) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def repeat(self,
-           *repeats: int,
-           axis: Optional[int] = None,
-           inplace=False) -&gt; &#39;Tensor&#39;:
-
-    repeated = self if inplace else deepcopy(self)
-    repeated._value = self._value.repeat(repeats, axis=axis)
-    return repeated</code></pre>
-</details>
-</dd>
 <dt id="nujo.Tensor.reshape"><code class="name flex">
-<span>def <span class="ident">reshape</span></span>(<span>self, *shape: int, inplace=False) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
+<span>def <span class="ident">reshape</span></span>(<span>self, *shape: int) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1165,14 +1147,13 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def reshape(self, *shape: int, inplace=False) -&gt; &#39;Tensor&#39;:
-    reshaped = self if inplace else deepcopy(self)
-    reshaped._value = self._value.reshape(shape)
-    return reshaped</code></pre>
+<pre><code class="python">def reshape(self, *shape: int) -&gt; &#39;Tensor&#39;:
+    from nujo.autodiff._functions._transform import _Reshape
+    return _Reshape(self, shape)()</code></pre>
 </details>
 </dd>
 <dt id="nujo.Tensor.squeeze"><code class="name flex">
-<span>def <span class="ident">squeeze</span></span>(<span>self, dim=-1, inplace=False) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
+<span>def <span class="ident">squeeze</span></span>(<span>self, dim=-1) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1180,7 +1161,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def squeeze(self, dim=-1, inplace=False) -&gt; &#39;Tensor&#39;:
+<pre><code class="python">def squeeze(self, dim=-1) -&gt; &#39;Tensor&#39;:
     if dim &lt; 0:
         num_dims = len(self._value.shape)
 
@@ -1190,12 +1171,11 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
             dim += num_dims
 
     return self.reshape(*self._value.shape[:dim],
-                        *self._value.shape[dim + 1:],
-                        inplace=inplace)</code></pre>
+                        *self._value.shape[dim + 1:])</code></pre>
 </details>
 </dd>
-<dt id="nujo.Tensor.unsqueeze"><code class="name flex">
-<span>def <span class="ident">unsqueeze</span></span>(<span>self, dim=-1, inplace=False) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
+<dt id="nujo.Tensor.transpose"><code class="name flex">
+<span>def <span class="ident">transpose</span></span>(<span>self, *dims: int) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1203,7 +1183,21 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def unsqueeze(self, dim=-1, inplace=False) -&gt; &#39;Tensor&#39;:
+<pre><code class="python">def transpose(self, *dims: int) -&gt; &#39;Tensor&#39;:
+    from nujo.autodiff._functions._transform import _Transpose
+    return _Transpose(self, dims)()</code></pre>
+</details>
+</dd>
+<dt id="nujo.Tensor.unsqueeze"><code class="name flex">
+<span>def <span class="ident">unsqueeze</span></span>(<span>self, dim=-1) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def unsqueeze(self, dim=-1) -&gt; &#39;Tensor&#39;:
     if dim &lt; 0:
         num_dims = len(self._value.shape)
 
@@ -1214,10 +1208,8 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
                 dim += 1
             dim += num_dims
 
-    return self.reshape(*self._value.shape[:dim],
-                        1,
-                        *self._value.shape[dim:],
-                        inplace=inplace)</code></pre>
+    return self.reshape(*self._value.shape[:dim], 1,
+                        *self._value.shape[dim:])</code></pre>
 </details>
 </dd>
 <dt id="nujo.Tensor.zero_grad"><code class="name flex">
@@ -1312,10 +1304,10 @@ a.k.a. No gradients are computed for whatever tensor.</p></div>
 <li><code><a title="nujo.Tensor.backward" href="#nujo.Tensor.backward">backward</a></code></li>
 <li><code><a title="nujo.Tensor.compute_grad" href="#nujo.Tensor.compute_grad">compute_grad</a></code></li>
 <li><code><a title="nujo.Tensor.grad" href="#nujo.Tensor.grad">grad</a></code></li>
-<li><code><a title="nujo.Tensor.repeat" href="#nujo.Tensor.repeat">repeat</a></code></li>
 <li><code><a title="nujo.Tensor.reshape" href="#nujo.Tensor.reshape">reshape</a></code></li>
 <li><code><a title="nujo.Tensor.shape" href="#nujo.Tensor.shape">shape</a></code></li>
 <li><code><a title="nujo.Tensor.squeeze" href="#nujo.Tensor.squeeze">squeeze</a></code></li>
+<li><code><a title="nujo.Tensor.transpose" href="#nujo.Tensor.transpose">transpose</a></code></li>
 <li><code><a title="nujo.Tensor.unsqueeze" href="#nujo.Tensor.unsqueeze">unsqueeze</a></code></li>
 <li><code><a title="nujo.Tensor.value" href="#nujo.Tensor.value">value</a></code></li>
 <li><code><a title="nujo.Tensor.zero_grad" href="#nujo.Tensor.zero_grad">zero_grad</a></code></li>

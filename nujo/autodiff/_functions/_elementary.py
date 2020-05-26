@@ -25,7 +25,9 @@ class _Addition(Function):
                  input_b: Union[Tensor, ndarray, List[Number], Number],
                  name='Add'):
 
-        super(_Addition, self).__init__(input_a, input_b, name=name)
+        super(_Addition, self).__init__(input_a,
+                                        input_b,
+                                        name=self.__class__.__name__)
 
         # The following assert will not allow numpy's
         # vector broadcasts such as:
@@ -54,7 +56,7 @@ class _Negation(Function):
                  input: Union[Tensor, ndarray, List[Number], Number],
                  name='Neg'):
 
-        super(_Negation, self).__init__(input, name=name)
+        super(_Negation, self).__init__(input, name=self.__class__.__name__)
 
     def forward(self) -> ndarray:
         return -self.children[0].value
@@ -72,7 +74,9 @@ class _Multiplication(Function):
                  input_b: Union[Tensor, ndarray, List[Number], Number],
                  name='Mul'):
 
-        super(_Multiplication, self).__init__(input_a, input_b, name=name)
+        super(_Multiplication, self).__init__(input_a,
+                                              input_b,
+                                              name=self.__class__.__name__)
 
         # The following assert will not allow numpy's
         # vector broadcasts such as:
@@ -102,7 +106,7 @@ class _Reciprocal(Function):
                  name='Recipr',
                  eps=1e-18):
 
-        super(_Reciprocal, self).__init__(input, name=name)
+        super(_Reciprocal, self).__init__(input, name=self.__class__.__name__)
         self.eps = eps
 
     def forward(self) -> ndarray:
@@ -121,7 +125,9 @@ class _Power(Function):
                  input_b: Union[Tensor, ndarray, List[Number], Number],
                  name='Pow'):
 
-        super(_Power, self).__init__(input_a, input_b, name=name)
+        super(_Power, self).__init__(input_a,
+                                     input_b,
+                                     name=self.__class__.__name__)
 
     def forward(self) -> ndarray:
         return self.children[0].value**self.children[1].value
@@ -142,7 +148,9 @@ class _Logarithm(Function):
                  input_b: Union[Tensor, ndarray, List[Number], Number],
                  name='Log'):
 
-        super(_Logarithm, self).__init__(input_a, input_b, name=name)
+        super(_Logarithm, self).__init__(input_a,
+                                         input_b,
+                                         name=self.__class__.__name__)
 
         assert (self.children[0] > 0).all()  # argument value limit
         assert (self.children[1] > 0).all()  # base value limit
@@ -164,7 +172,9 @@ class _MatrixMul(Function):
                  input_b: Union[Tensor, ndarray, List[Number], Number],
                  name='MatMul'):
 
-        super(_MatrixMul, self).__init__(input_a, input_b, name=name)
+        super(_MatrixMul, self).__init__(input_a,
+                                         input_b,
+                                         name=self.__class__.__name__)
 
         # Assert valid dimensions for matrix multiplication
         assert self.children[0].shape[-1] == self.children[1].shape[0]
