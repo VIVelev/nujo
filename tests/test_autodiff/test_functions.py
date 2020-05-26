@@ -1,10 +1,8 @@
-from numbers import Number
-
 import pytest
-from numpy import allclose, log, log2, ndarray
+from numpy import allclose, log, log2
 
 import nujo.autodiff._functions._elementary as funcs
-from nujo import Tensor
+from nujo import Tensor, ones
 
 # ====================================================================================================
 # Unit Testing Addition
@@ -20,18 +18,17 @@ def test_addition(inputs):
     assert (A.value + B.value == C.value).all()
 
     # Test Backprop
-    grad = add.backward()
-    assert len(grad) == 2
+    grad_A, grad_B = add.backward(0, Tensor(1)), add.backward(1, Tensor(1))
 
-    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
-    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
+    assert isinstance(grad_A, Tensor)
+    assert isinstance(grad_B, Tensor)
 
     # Test Derivative computation
-    assert grad[0].shape == A.shape
-    assert (grad[0] == 1).all()
+    assert grad_A.shape == A.shape
+    assert (grad_A == 1).all()
 
-    assert grad[1].shape == B.shape
-    assert (grad[1] == 1).all()
+    assert grad_B.shape == B.shape
+    assert (grad_B == 1).all()
 
 
 # ====================================================================================================
@@ -48,14 +45,13 @@ def test_negation(inputs):
     assert (-A.value == C.value).all()
 
     # Test Backprop
-    grad = neg.backward()
-    assert len(grad) == 1
+    grad_A = neg.backward(0, Tensor(1))
 
-    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
+    assert isinstance(grad_A, Tensor)
 
     # Test Derivative computation
-    assert grad[0].shape == A.shape
-    assert (grad[0] == -1).all()
+    assert grad_A.shape == A.shape
+    assert (grad_A == -1).all()
 
 
 # ====================================================================================================
@@ -72,18 +68,17 @@ def test_multiplication(inputs):
     assert (A.value * B.value == C.value).all()
 
     # Test Backprop
-    grad = mul.backward()
-    assert len(grad) == 2
+    grad_A, grad_B = mul.backward(0, Tensor(1)), mul.backward(1, Tensor(1))
 
-    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
-    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
+    assert isinstance(grad_A, Tensor)
+    assert isinstance(grad_B, Tensor)
 
     # Test Derivative computation
-    assert grad[0].shape == A.shape
-    assert (grad[0] == B.value).all()
+    assert grad_A.shape == A.shape
+    assert (grad_A == B).all()
 
-    assert grad[1].shape == B.shape
-    assert (grad[1] == A.value).all()
+    assert grad_B.shape == B.shape
+    assert (grad_B == A).all()
 
 
 # ====================================================================================================
@@ -100,14 +95,13 @@ def test_reciprocal(inputs):
     assert (1 / A.value == C.value).all()
 
     # Test Backprop
-    grad = recipr.backward()
-    assert len(grad) == 1
+    grad_A = recipr.backward(0, Tensor(1))
 
-    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
+    assert isinstance(grad_A, Tensor)
 
     # Test Derivative computation
-    assert grad[0].shape == A.shape
-    assert (grad[0] == -1 / (A.value**2)).all()
+    assert grad_A.shape == A.shape
+    assert (grad_A == -1 / A**2).all()
 
 
 # ====================================================================================================
@@ -124,17 +118,16 @@ def test_power(inputs):
     assert (A.value**2 == C.value).all()
 
     # Test Backprop
-    grad = pow.backward()
-    assert len(grad) == 2
+    grad_A, grad_B = pow.backward(0, Tensor(1)), pow.backward(1, Tensor(1))
 
-    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
-    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
+    assert isinstance(grad_A, Tensor)
+    assert isinstance(grad_B, Tensor)
 
     # Test Derivative computation
-    assert grad[0].shape == A.shape
-    assert (grad[0] == 2 * A.value).all()
+    assert grad_A.shape == A.shape
+    assert (grad_A == 2 * A).all()
 
-    assert grad[1] == 1
+    assert grad_B == 1
 
 
 # ====================================================================================================
@@ -151,17 +144,16 @@ def test_logarithm(inputs):
     assert allclose(log2(A.value), C.value)
 
     # Test Backprop
-    grad = log_2.backward()
-    assert len(grad) == 2
+    grad_A, grad_B = log_2.backward(0, Tensor(1)), log_2.backward(1, Tensor(1))
 
-    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
-    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
+    assert isinstance(grad_A, Tensor)
+    assert isinstance(grad_B, Tensor)
 
     # Test Derivative computation
-    assert grad[0].shape == A.shape
-    assert allclose(grad[0], 1 / (A.value * log(2)))
+    assert grad_A.shape == A.shape
+    assert allclose(grad_A.value, 1 / (A.value * log(2)))
 
-    assert grad[1] == 1
+    assert grad_B == 1
 
 
 # ====================================================================================================
@@ -178,18 +170,19 @@ def test_matrixmul(inputs):
     assert (A.value @ B.value == C.value).all()
 
     # Test Backprop
-    grad = matmul.backward()
-    assert len(grad) == 2
+    output_shape = (A.shape[0], B.shape[1])
+    doutput = ones(*output_shape)
+    grad_A, grad_B = matmul.backward(0, doutput), matmul.backward(1, doutput)
 
-    assert isinstance(grad[0], Number) or isinstance(grad[0], ndarray)
-    assert isinstance(grad[1], Number) or isinstance(grad[1], ndarray)
+    assert isinstance(grad_A, Tensor)
+    assert isinstance(grad_B, Tensor)
 
     # Test Derivative computation
-    assert grad[0].shape[0] == A.shape[1]
-    assert (grad[0] == B.value).all()
+    assert grad_A.shape[0] == A.shape[1]
+    assert (grad_A == doutput @ B.T).all()
 
-    assert grad[1].shape[1] == B.shape[0]
-    assert (grad[1] == A.value).all()
+    assert grad_B.shape[1] == B.shape[0]
+    assert (grad_B == (doutput.T @ A).T).all()
 
 
 # ====================================================================================================

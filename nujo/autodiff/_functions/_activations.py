@@ -1,5 +1,5 @@
 from numbers import Number
-from typing import List, Tuple, Union
+from typing import List, Union
 
 from numpy import exp, max, maximum, ndarray, ones, sum, zeros
 
@@ -35,8 +35,8 @@ class _BinaryStep(Function):
         output[self.children[0].value > self.threshold] = 1
         return output
 
-    def backward(self) -> Tuple[ndarray]:
-        return zeros(self.children[0].shape),
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        return acumm_grad * zeros(self.children[0].shape)
 
 
 # ====================================================================================================
@@ -51,8 +51,8 @@ class _Sigmoid(Function):
         self._output = 1 / (1 + exp(-self.children[0].value))
         return self._output
 
-    def backward(self) -> Tuple[ndarray]:
-        return self._output * (1 - self._output),
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        return acumm_grad * self._output * (1 - self._output)
 
 
 # ====================================================================================================
@@ -72,8 +72,8 @@ class _TanH(Function):
         self._output = (2 / (1 + exp(-2 * self.children[0].value))) - 1
         return self._output
 
-    def backward(self) -> Tuple[ndarray]:
-        return 1 - self._output**2,
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        return acumm_grad * (1 - self._output**2)
 
 
 # ====================================================================================================
@@ -86,8 +86,9 @@ class _ReLU(Function):
     def forward(self) -> ndarray:
         return self.children[0].value * (self.children[0].value > 0)
 
-    def backward(self) -> Tuple[ndarray]:
-        return ones(self.children[0].shape) * (self.children[0].value > 0),
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        return acumm_grad * ones(
+            self.children[0].shape) * (self.children[0].value > 0)
 
 
 # ====================================================================================================
@@ -105,10 +106,10 @@ class _LeakyReLU(Function):
         return maximum(self.eps * self.children[0].value,
                        self.children[0].value)
 
-    def backward(self) -> Tuple[ndarray]:
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
         dinput = ones(self.children[0].shape)
         dinput[self.children[0].value < 0] = self.eps
-        return dinput,
+        return acumm_grad * dinput
 
 
 # ====================================================================================================
@@ -132,8 +133,9 @@ class _Swish(Function):
         self._output = self.children[0].value * self._sigmoid.forward()
         return self._output
 
-    def backward(self) -> Tuple[ndarray]:
-        return self._output + self._sigmoid._output * (1 - self._output),
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        return acumm_grad * (self._output + self._sigmoid._output *
+                             (1 - self._output))
 
 
 # ====================================================================================================
@@ -160,8 +162,8 @@ class _Softmax(Function):
         self._output = exps / sums
         return self._output
 
-    def backward(self) -> Tuple[ndarray]:
-        return self._output * (1 - self._output),
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        return acumm_grad * self._output * (1 - self._output)
 
 
 # ====================================================================================================

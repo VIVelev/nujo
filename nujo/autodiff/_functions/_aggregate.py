@@ -1,5 +1,5 @@
 from numbers import Number
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Union
 
 from numpy import ndarray, ones, prod, sum
 
@@ -30,8 +30,8 @@ class _InnerSum(Function):
                    axis=self.dim,
                    keepdims=self.keepdim)
 
-    def backward(self) -> Tuple[ndarray]:
-        return ones(self.children[0].shape),
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        return acumm_grad * ones(self.children[0].shape)
 
 
 # ====================================================================================================
@@ -57,8 +57,8 @@ class _InnerProd(Function):
 
         return self._output
 
-    def backward(self) -> Tuple[ndarray]:
-        return self._output / self.children[0].value,
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        return acumm_grad * self._output / self.children[0].value
 
 
 # ====================================================================================================

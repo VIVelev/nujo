@@ -33,17 +33,15 @@ def test_tensor_backward(tensors):
 
     C.backward()
 
-    assert len(C.parents_outputs) == len(C.weights) == 0
+    assert len(C.parents_outputs) == 0
     assert (C.grad == 1).all()
 
-    assert len(A.parents_outputs) == len(A.weights) == 1
+    assert len(A.parents_outputs) == 1
     assert (A.parents_outputs[0] == C).all()
-    assert (A.weights[0] == 1).all()
     assert (A.grad == 1).all()
 
-    assert len(B.parents_outputs) == len(B.weights) == 1
+    assert len(B.parents_outputs) == 1
     assert (B.parents_outputs[0] == C).all()
-    assert (B.weights[0] == 1).all()
     assert (B.grad == 1).all()
 
 

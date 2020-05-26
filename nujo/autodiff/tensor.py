@@ -43,8 +43,6 @@ class Tensor(_Node):
         # Outputs of the functions the current tensor is input to.
         # Used for backpropagation of the gradients.
         self.parents_outputs: List['Tensor'] = []
-        # The weights of the outputs (a.k.a. derivatives of the functions).
-        self.weights: List[ndarray] = []
 
         # Gradient of the current tensor
         self._grad: 'Tensor' = None
@@ -132,39 +130,25 @@ class Tensor(_Node):
         if modes.DIFF_ENABLED and self.diff and \
            self._grad_is_zeroed:
 
-            self._grad_is_zeroed = False
-
             # Make sure grad is Tensor (`grad property call`) and init value
             self.grad._value = zeros(self._value.shape)
+            self._grad_is_zeroed = False
 
             # Top-parent grad
             if len(self.parents_outputs) == 0:
                 self._grad._value += 1
                 return
 
-            for poutput, weight in zip(self.parents_outputs, self.weights):
-                if poutput.creator.name == '_MatrixMul':
-                    if self is poutput.creator.children[0]:
-                        # XW = Z, dX ...
-                        self._grad._value += poutput._grad._value @ weight.T
+            for poutput in self.parents_outputs:
+                idx = next(i for i, v in enumerate(poutput.creator.children)
+                           if v is self)
 
-                    else:
-                        # XW = Z, dW ...
-                        self._grad._value += (
-                            poutput._grad._value.T @ weight).T
-
-                elif poutput.creator.name == '_Reshape':
-                    self._grad._value += poutput._grad._value.reshape(weight)
-
-                elif poutput.creator.name == '_Transpose':
-                    self._grad._value += poutput._grad._value.transpose(weight)
-
+                if self._grad.diff:
+                    # Record grad computations in the computation graph
+                    self._grad += poutput.creator.backward(idx, poutput._grad)
                 else:
-                    update = poutput._grad._value * weight
-                    if self._grad._value.shape == (1, 1):  # Is scalar?
-                        self._grad._value = self._grad._value + update.sum()
-                    else:
-                        self._grad._value = self._grad._value + update
+                    self._grad.value += poutput.creator.backward(
+                        idx, poutput._grad._value)
 
     def zero_grad(self) -> None:
         self.grad._value.fill(0)

@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from numbers import Number
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, TypeVar, Union
 
 from numpy import ndarray
 
@@ -36,6 +36,9 @@ class Function(_Node, object):
     _cache_hit = False
     ''' Flag signaling cache hit/miss.
     '''
+
+    T = TypeVar('T', Tensor, ndarray)
+
     def __init__(self,
                  *children: Union[Tensor, ndarray, List[Number], Number],
                  name='Function'):
@@ -54,11 +57,8 @@ class Function(_Node, object):
 
         if modes.DIFF_ENABLED:  # If graph building is enabled.
             # Allocate space for parent's output (output placeholder)
-            # and its weight (derivative).
-
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
-                child.weights.append(None)
 
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
@@ -66,6 +66,7 @@ class Function(_Node, object):
         or otherwise add the new tensor to the cache.
         '''
 
+        # Only cache tensors that are in the computation graph
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
             # Include the arguments' uids in the key
@@ -75,12 +76,15 @@ class Function(_Node, object):
             if key in cls._children_history:
                 cls._cache_hit = True
                 return cls._children_history[key]
+
             else:
                 cls._cache_hit = False
                 creator = super(Function, cls).__new__(cls)
                 cls._children_history[key] = creator
                 return creator
 
+        # If the tensors are not in the computation graph,
+        # perform standard python init
         else:
             cls._cache_hit = False
             return super(Function, cls).__new__(cls)
@@ -94,34 +98,52 @@ class Function(_Node, object):
     @abstractmethod
     def forward(self) -> ndarray:
         ''' Implement forward pass of the function here.
+
+        Use the `self.children` list to access the inputs.
         '''
 
         pass
 
     @abstractmethod
-    def backward(self) -> Tuple[ndarray, ...]:
+    def backward(self, idx: int, acumm_grad: T) -> T:
         ''' Implement backward pass of the function here
-        (a.k.a. derivative calculation).
+
+        Compute the gradient of children[idx] w.r.t. output of the
+        computation graph from the acummulated gradient (the gradient
+        of the output of the function w.r.t. the output of the graph).
+
+        Parameters:
+        -----------
+        - idx : int, the index of the children for which to compute the
+         gradient w.r.t. output of the computation graph
+        - acumm_grad : T (Tensor or ndarray), the accumulated grad in the graph
+         so far, you can otherwise think of it as the gradient of the output of
+         the function w.r.t. the output of the graph.
+
+            - `acumm_grad` is Tensor if differentiantion is enabled
+             (`DIFF_ENABLED`) and the children has opted for differentiation
+             (`diff` is True), thus the computations will be recorded in the
+             computation graph and higher-order derivatives could be computed.
+            - otherwise, `acumm_grad` is ndarray and the computations are not
+             recorded; ndarrays are used since the computations with them are
+             more efficient.
+
+        Returns:
+        --------
+        - grad : T (Tensor or ndarray), the computed gradient of
+         `self.children[idx]`
+
         '''
 
         pass
 
     def __call__(self) -> Tensor:
-        ''' Executes forward pass and
-        updates the weights (derivatives) for the dependent children.
+        ''' Zeros the gradient and executes forward pass.
         '''
+
+        if self._output_placeholder.diff:
+            self._output_placeholder.zero_grad()
 
         # Forward pass
         self._output_placeholder.value = self.forward()
-
-        if self._output_placeholder.diff:  # Is gradient dependecy?
-            self._output_placeholder.zero_grad()
-
-            # Update the weights
-            for tensor, derivative in zip(self.children, self.backward()):
-                idx = next(i for i, v in enumerate(tensor.parents_outputs)
-                           if v is self._output_placeholder)
-
-                tensor.weights[idx] = derivative
-
         return self._output_placeholder

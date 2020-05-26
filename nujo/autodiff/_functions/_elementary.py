@@ -1,5 +1,5 @@
 from numbers import Number
-from typing import List, Tuple, Union
+from typing import List, Union
 
 from numpy import log, ndarray, ones
 
@@ -44,8 +44,8 @@ class _Addition(Function):
     def forward(self) -> ndarray:
         return self.children[0].value + self.children[1].value
 
-    def backward(self) -> Tuple[ndarray, ndarray]:
-        return ones(self.children[0].shape), ones(self.children[1].shape)
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        return acumm_grad * ones(self.children[idx].shape)
 
 
 # ====================================================================================================
@@ -61,8 +61,8 @@ class _Negation(Function):
     def forward(self) -> ndarray:
         return -self.children[0].value
 
-    def backward(self) -> Tuple[ndarray]:
-        return -ones(self.children[0].shape),
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        return acumm_grad * -ones(self.children[0].shape)
 
 
 # ====================================================================================================
@@ -93,8 +93,11 @@ class _Multiplication(Function):
     def forward(self) -> ndarray:
         return self.children[0].value * self.children[1].value
 
-    def backward(self) -> Tuple[ndarray, ndarray]:
-        return self.children[1].value, self.children[0].value
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        if idx == 0:
+            return acumm_grad * self.children[1].value
+        else:
+            return acumm_grad * self.children[0].value
 
 
 # ====================================================================================================
@@ -112,8 +115,8 @@ class _Reciprocal(Function):
     def forward(self) -> ndarray:
         return 1 / (self.children[0].value + self.eps)
 
-    def backward(self) -> Tuple[ndarray]:
-        return -1 / ((self.children[0].value + self.eps)**2),
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        return acumm_grad * -1 / ((self.children[0].value + self.eps)**2)
 
 
 # ====================================================================================================
@@ -132,11 +135,14 @@ class _Power(Function):
     def forward(self) -> ndarray:
         return self.children[0].value**self.children[1].value
 
-    def backward(self) -> Tuple[ndarray, ndarray]:
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
         # TODO: FIX wrong partial - the second
 
-        return (self.children[1].value *
-                self.children[0].value**(self.children[1].value - 1), 1)
+        if idx == 0:
+            return acumm_grad * self.children[1].value *\
+                    self.children[0].value**(self.children[1].value - 1)
+        else:
+            return Tensor(1)
 
 
 # ====================================================================================================
@@ -159,8 +165,12 @@ class _Logarithm(Function):
     def forward(self) -> ndarray:
         return log(self.children[0].value) / log(self.children[1].value)
 
-    def backward(self) -> Tuple[ndarray, ndarray]:
-        return 1 / (self.children[0].value * log(self.children[1].value)), 1
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        if idx == 0:
+            return acumm_grad /\
+                    (self.children[0].value * log(self.children[1].value))
+        else:
+            return Tensor(1)
 
 
 # ====================================================================================================
@@ -182,8 +192,11 @@ class _MatrixMul(Function):
     def forward(self) -> ndarray:
         return self.children[0].value @ self.children[1].value
 
-    def backward(self) -> Tuple[ndarray, ndarray]:
-        return self.children[1].value, self.children[0].value
+    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        if idx == 0:
+            return acumm_grad @ self.children[1].value.T
+        else:
+            return (acumm_grad.T @ self.children[0].value).T
 
 
 # ====================================================================================================
