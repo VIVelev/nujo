@@ -1,7 +1,7 @@
 from numbers import Number
 from typing import List, Tuple, Union
 
-from numpy import array, ndarray, zeros
+from numpy import array, empty, ndarray
 
 from nujo.autodiff import modes
 from nujo.autodiff._node import _Node
@@ -46,7 +46,6 @@ class Tensor(_Node):
 
         # Gradient of the current tensor
         self._grad: 'Tensor' = None
-        self._grad_is_zeroed = True
 
         # Transposed tensor cache
         self._T: 'Tensor' = None
@@ -72,7 +71,8 @@ class Tensor(_Node):
     @property
     def grad(self) -> 'Tensor':
         if self._grad is None:
-            self._grad = Tensor(None, name=f'grad[{self.name}]')
+            self._grad = Tensor(empty(self._value.shape),
+                                name=f'grad[{self.name}]')
 
         return self._grad
 
@@ -127,32 +127,58 @@ class Tensor(_Node):
     # Gradient computation
 
     def compute_grad(self) -> None:
-        if modes.DIFF_ENABLED and self.diff and \
-           self._grad_is_zeroed:
+        if modes.DIFF_ENABLED and self.diff:
 
             # Make sure grad is Tensor (`grad property call`) and init value
-            self.grad._value = zeros(self._value.shape)
-            self._grad_is_zeroed = False
+            if self._grad is None:
+                self.zero_grad(propagate=False)
+
+            # Used only for test, to be removed
+            assert self._grad._value.shape == self._value.shape
+            assert (self._grad._value == 0).all()
 
             # Top-parent grad
             if len(self.parents_outputs) == 0:
                 self._grad._value += 1
                 return
 
+            # This can be refactored
             for poutput in self.parents_outputs:
                 idx = next(i for i, v in enumerate(poutput.creator.children)
                            if v is self)
 
                 if self._grad.diff:
-                    # Record grad computations in the computation graph
-                    self._grad += poutput.creator.backward(idx, poutput._grad)
-                else:
-                    self._grad.value += poutput.creator.backward(
-                        idx, poutput._grad._value)
+                    # Record grad computations in the computation grap
 
-    def zero_grad(self) -> None:
+                    update = poutput.creator.backward(idx, poutput._grad)
+
+                    # Check if `self` is scalar and needs to be averaged
+                    if self._value.shape != () and\
+                       self._value.shape[-1] == 1:
+
+                        from nujo.math.aggregate import mean
+                        update = mean(update, dim=-1, keepdim=True)
+
+                    self._grad += update
+
+                else:
+                    update = poutput.creator.backward(idx,
+                                                      poutput._grad._value)
+
+                    # Check if `self` is scalar and needs to be averaged
+                    if self._value.shape != () and\
+                       self._value.shape[-1] == 1:
+
+                        update = update.mean(axis=-1, keepdims=True)
+
+                    self._grad.value += update
+
+    def zero_grad(self, propagate=True) -> None:
         self.grad._value.fill(0)
-        self._grad_is_zeroed = True
+
+        if propagate:
+            for poutput in self.parents_outputs:
+                poutput.zero_grad()
 
     def backward(self, _debug=False) -> None:
         ''' It uses Breadth First Search to traverse the computation graph
@@ -175,7 +201,9 @@ class Tensor(_Node):
 
             if node.creator:
                 for child in node.creator.children:
-                    nodes_to_visit.insert(0, child)
+                    # Avoid visiting  the same node twice
+                    if all(child is not node for node in nodes_to_visit):
+                        nodes_to_visit.insert(0, child)
 
     # Useful methods
 
@@ -233,7 +261,6 @@ class Tensor(_Node):
 
         # Transfer the gradient
         self._grad = getattr(other, 'grad', None)
-        self._grad_is_zeroed = getattr(other, '_grad_is_zeroed', True)
 
         return self
 

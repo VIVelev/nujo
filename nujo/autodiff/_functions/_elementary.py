@@ -38,8 +38,8 @@ class _Addition(Function):
         #
         # In future versions of nujo this may be supported.
 
-        assert (self.children[0].shape == self.children[1].shape
-                or self.children[0].shape != self.children[1].T.shape)
+        assert (self.children[0].value.shape == self.children[1].value.shape or
+                self.children[0].value.shape != self.children[1].value.T.shape)
 
     def forward(self) -> ndarray:
         return self.children[0].value + self.children[1].value
@@ -87,8 +87,8 @@ class _Multiplication(Function):
         #
         # In future versions of nujo this may be supported.
 
-        assert (self.children[0].shape == self.children[1].shape
-                or self.children[0].shape != self.children[1].T.shape)
+        assert (self.children[0].value.shape == self.children[1].value.shape or
+                self.children[0].value.shape != self.children[1].value.T.shape)
 
     def forward(self) -> ndarray:
         return self.children[0].value * self.children[1].value
@@ -158,9 +158,9 @@ class _Logarithm(Function):
                                          input_b,
                                          name=self.__class__.__name__)
 
-        assert (self.children[0] > 0).all()  # argument value limit
-        assert (self.children[1] > 0).all()  # base value limit
-        assert (self.children[1] != 0).all()  # base value limit
+        assert (self.children[0].value > 0).all()  # argument value limit
+        assert (self.children[1].value > 0).all()  # base value limit
+        assert (self.children[1].value != 0).all()  # base value limit
 
     def forward(self) -> ndarray:
         return log(self.children[0].value) / log(self.children[1].value)
@@ -187,7 +187,8 @@ class _MatrixMul(Function):
                                          name=self.__class__.__name__)
 
         # Assert valid dimensions for matrix multiplication
-        assert self.children[0].shape[-1] == self.children[1].shape[0]
+        assert self.children[0].value.shape[-1] ==\
+               self.children[1].value.shape[0]
 
     def forward(self) -> ndarray:
         return self.children[0].value @ self.children[1].value

@@ -138,11 +138,8 @@ class Function(_Node, object):
         pass
 
     def __call__(self) -> Tensor:
-        ''' Zeros the gradient and executes forward pass.
+        ''' Executes cached forward pass
         '''
-
-        if self._output_placeholder.diff:
-            self._output_placeholder.zero_grad()
 
         # Forward pass
         self._output_placeholder.value = self.forward()
