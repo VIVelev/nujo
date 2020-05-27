@@ -3,7 +3,7 @@ from typing import List, Tuple, Union
 
 from numpy import array, empty, ndarray
 
-from nujo.autodiff import modes
+import nujo.autodiff.modes as modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff._utils import _if_not_none
 

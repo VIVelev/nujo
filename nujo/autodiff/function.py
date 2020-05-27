@@ -4,7 +4,7 @@ from typing import Dict, List, TypeVar, Union
 
 from numpy import ndarray
 
-from nujo.autodiff import modes
+import nujo.autodiff.modes as modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
 
@@ -28,9 +28,13 @@ class Function(_Node, object):
 
     '''
 
-    _children_history: Dict[str, 'Function'] = {}
-    ''' Cache where input tensors for
-    the current function type are stored.
+    _func_children_lookup_cache: Dict[str, 'Function'] = {}
+    ''' Cache used to lookup for functions that may have already been defined
+    in the computation graph.
+
+     - key : str(hash(FuncType)) + str(hash(children))
+     - value : the already defined function which will be reused
+
     '''
 
     _cache_hit = False
@@ -62,29 +66,33 @@ class Function(_Node, object):
 
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
-        ''' Used to review the cache for hit and return the cached tensor
-        or otherwise add the new tensor to the cache.
+        ''' Used to lookup the cache for an already defined function of
+        the current type using the current `children` as arguments. If a
+        function satisfying this requirements could not be found, a new
+        function is created and added to the cache, in order to be later
+        potentially reused.
+
         '''
 
-        # Only cache tensors that are in the computation graph
+        # Only cache functions that are in the computation graph
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
-            # Include the arguments' uids in the key
+            # Include the arguments' (inputs/children) identifiers in the key
             key += ''.join((str(x.id) if isinstance(x, Tensor) else str(x)
                             for x in children))
 
-            if key in cls._children_history:
+            if key in cls._func_children_lookup_cache:
                 cls._cache_hit = True
-                return cls._children_history[key]
+                return cls._func_children_lookup_cache[key]
 
             else:
                 cls._cache_hit = False
-                creator = super(Function, cls).__new__(cls)
-                cls._children_history[key] = creator
-                return creator
+                func = super(Function, cls).__new__(cls)
+                cls._func_children_lookup_cache[key] = func
+                return func
 
-        # If the tensors are not in the computation graph,
-        # perform standard python init
+        # If the functions are not in the computation graph,
+        # perform standard python init.
         else:
             cls._cache_hit = False
             return super(Function, cls).__new__(cls)
