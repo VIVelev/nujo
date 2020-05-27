@@ -164,11 +164,8 @@ class Function(_Node, object):
         pass
 
     def __call__(self) -&gt; Tensor:
-        &#39;&#39;&#39; Zeros the gradient and executes forward pass.
+        &#39;&#39;&#39; Executes cached forward pass
         &#39;&#39;&#39;
-
-        if self._output_placeholder.diff:
-            self._output_placeholder.zero_grad()
 
         # Forward pass
         self._output_placeholder.value = self.forward()
@@ -335,11 +332,8 @@ taking the best from both worlds.</p>
         pass
 
     def __call__(self) -&gt; Tensor:
-        &#39;&#39;&#39; Zeros the gradient and executes forward pass.
+        &#39;&#39;&#39; Executes cached forward pass
         &#39;&#39;&#39;
-
-        if self._output_placeholder.diff:
-            self._output_placeholder.zero_grad()
 
         # Forward pass
         self._output_placeholder.value = self.forward()

@@ -570,11 +570,8 @@ taking the best from both worlds.</p>
         pass
 
     def __call__(self) -&gt; Tensor:
-        &#39;&#39;&#39; Zeros the gradient and executes forward pass.
+        &#39;&#39;&#39; Executes cached forward pass
         &#39;&#39;&#39;
-
-        if self._output_placeholder.diff:
-            self._output_placeholder.zero_grad()
 
         # Forward pass
         self._output_placeholder.value = self.forward()
@@ -764,7 +761,6 @@ the only child of a tensor</li>
 
         # Gradient of the current tensor
         self._grad: &#39;Tensor&#39; = None
-        self._grad_is_zeroed = True
 
         # Transposed tensor cache
         self._T: &#39;Tensor&#39; = None
@@ -790,7 +786,8 @@ the only child of a tensor</li>
     @property
     def grad(self) -&gt; &#39;Tensor&#39;:
         if self._grad is None:
-            self._grad = Tensor(None, name=f&#39;grad[{self.name}]&#39;)
+            self._grad = Tensor(empty(self._value.shape),
+                                name=f&#39;grad[{self.name}]&#39;)
 
         return self._grad
 
@@ -845,32 +842,58 @@ the only child of a tensor</li>
     # Gradient computation
 
     def compute_grad(self) -&gt; None:
-        if modes.DIFF_ENABLED and self.diff and \
-           self._grad_is_zeroed:
+        if modes.DIFF_ENABLED and self.diff:
 
             # Make sure grad is Tensor (`grad property call`) and init value
-            self.grad._value = zeros(self._value.shape)
-            self._grad_is_zeroed = False
+            if self._grad is None:
+                self.zero_grad(propagate=False)
+
+            # Used only for test, to be removed
+            assert self._grad._value.shape == self._value.shape
+            assert (self._grad._value == 0).all()
 
             # Top-parent grad
             if len(self.parents_outputs) == 0:
                 self._grad._value += 1
                 return
 
+            # This can be refactored
             for poutput in self.parents_outputs:
                 idx = next(i for i, v in enumerate(poutput.creator.children)
                            if v is self)
 
                 if self._grad.diff:
-                    # Record grad computations in the computation graph
-                    self._grad += poutput.creator.backward(idx, poutput._grad)
-                else:
-                    self._grad.value += poutput.creator.backward(
-                        idx, poutput._grad._value)
+                    # Record grad computations in the computation grap
 
-    def zero_grad(self) -&gt; None:
+                    update = poutput.creator.backward(idx, poutput._grad)
+
+                    # Check if `self` is scalar and needs to be averaged
+                    if self._value.shape != () and\
+                       self._value.shape[-1] == 1:
+
+                        from nujo.math.aggregate import mean
+                        update = mean(update, dim=-1, keepdim=True)
+
+                    self._grad += update
+
+                else:
+                    update = poutput.creator.backward(idx,
+                                                      poutput._grad._value)
+
+                    # Check if `self` is scalar and needs to be averaged
+                    if self._value.shape != () and\
+                       self._value.shape[-1] == 1:
+
+                        update = update.mean(axis=-1, keepdims=True)
+
+                    self._grad.value += update
+
+    def zero_grad(self, propagate=True) -&gt; None:
         self.grad._value.fill(0)
-        self._grad_is_zeroed = True
+
+        if propagate:
+            for poutput in self.parents_outputs:
+                poutput.zero_grad()
 
     def backward(self, _debug=False) -&gt; None:
         &#39;&#39;&#39; It uses Breadth First Search to traverse the computation graph
@@ -893,7 +916,9 @@ the only child of a tensor</li>
 
             if node.creator:
                 for child in node.creator.children:
-                    nodes_to_visit.insert(0, child)
+                    # Avoid visiting  the same node twice
+                    if all(child is not node for node in nodes_to_visit):
+                        nodes_to_visit.insert(0, child)
 
     # Useful methods
 
@@ -951,7 +976,6 @@ the only child of a tensor</li>
 
         # Transfer the gradient
         self._grad = getattr(other, &#39;grad&#39;, None)
-        self._grad_is_zeroed = getattr(other, &#39;_grad_is_zeroed&#39;, True)
 
         return self
 
@@ -1065,7 +1089,8 @@ def T(self) -&gt; &#39;Tensor&#39;:
 <pre><code class="python">@property
 def grad(self) -&gt; &#39;Tensor&#39;:
     if self._grad is None:
-        self._grad = Tensor(None, name=f&#39;grad[{self.name}]&#39;)
+        self._grad = Tensor(empty(self._value.shape),
+                            name=f&#39;grad[{self.name}]&#39;)
 
     return self._grad</code></pre>
 </details>
@@ -1154,7 +1179,9 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 
         if node.creator:
             for child in node.creator.children:
-                nodes_to_visit.insert(0, child)</code></pre>
+                # Avoid visiting  the same node twice
+                if all(child is not node for node in nodes_to_visit):
+                    nodes_to_visit.insert(0, child)</code></pre>
 </details>
 </dd>
 <dt id="nujo.Tensor.compute_grad"><code class="name flex">
@@ -1167,28 +1194,51 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def compute_grad(self) -&gt; None:
-    if modes.DIFF_ENABLED and self.diff and \
-       self._grad_is_zeroed:
+    if modes.DIFF_ENABLED and self.diff:
 
         # Make sure grad is Tensor (`grad property call`) and init value
-        self.grad._value = zeros(self._value.shape)
-        self._grad_is_zeroed = False
+        if self._grad is None:
+            self.zero_grad(propagate=False)
+
+        # Used only for test, to be removed
+        assert self._grad._value.shape == self._value.shape
+        assert (self._grad._value == 0).all()
 
         # Top-parent grad
         if len(self.parents_outputs) == 0:
             self._grad._value += 1
             return
 
+        # This can be refactored
         for poutput in self.parents_outputs:
             idx = next(i for i, v in enumerate(poutput.creator.children)
                        if v is self)
 
             if self._grad.diff:
-                # Record grad computations in the computation graph
-                self._grad += poutput.creator.backward(idx, poutput._grad)
+                # Record grad computations in the computation grap
+
+                update = poutput.creator.backward(idx, poutput._grad)
+
+                # Check if `self` is scalar and needs to be averaged
+                if self._value.shape != () and\
+                   self._value.shape[-1] == 1:
+
+                    from nujo.math.aggregate import mean
+                    update = mean(update, dim=-1, keepdim=True)
+
+                self._grad += update
+
             else:
-                self._grad.value += poutput.creator.backward(
-                    idx, poutput._grad._value)</code></pre>
+                update = poutput.creator.backward(idx,
+                                                  poutput._grad._value)
+
+                # Check if `self` is scalar and needs to be averaged
+                if self._value.shape != () and\
+                   self._value.shape[-1] == 1:
+
+                    update = update.mean(axis=-1, keepdims=True)
+
+                self._grad.value += update</code></pre>
 </details>
 </dd>
 <dt id="nujo.Tensor.reshape"><code class="name flex">
@@ -1266,7 +1316,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 </details>
 </dd>
 <dt id="nujo.Tensor.zero_grad"><code class="name flex">
-<span>def <span class="ident">zero_grad</span></span>(<span>self) -> NoneType</span>
+<span>def <span class="ident">zero_grad</span></span>(<span>self, propagate=True) -> NoneType</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1274,9 +1324,12 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def zero_grad(self) -&gt; None:
+<pre><code class="python">def zero_grad(self, propagate=True) -&gt; None:
     self.grad._value.fill(0)
-    self._grad_is_zeroed = True</code></pre>
+
+    if propagate:
+        for poutput in self.parents_outputs:
+            poutput.zero_grad()</code></pre>
 </details>
 </dd>
 </dl>
