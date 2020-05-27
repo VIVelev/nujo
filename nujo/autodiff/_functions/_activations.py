@@ -67,6 +67,7 @@ class _TanH(Function):
         ''' (2 / (1 + e ^ -2x)) - 1 is equivalent to
         (e ^ x - e ^ -x) / (e ^ x + e ^ -x) it is just a
         more optimal way to compute the TanH function.
+
         '''
 
         self._output = (2 / (1 + exp(-2 * self.children[0].value))) - 1

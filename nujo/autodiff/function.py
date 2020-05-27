@@ -32,7 +32,7 @@ class Function(_Node, object):
     ''' Cache used to lookup for functions that may have already been defined
     in the computation graph.
 
-     - key : str(hash(FuncType)) + str(hash(children))
+     - key : hash(FuncType) + (children's identifiers)
      - value : the already defined function which will be reused
 
     '''
@@ -68,17 +68,17 @@ class Function(_Node, object):
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
         ''' Used to lookup the cache for an already defined function of
-        the current type using the current `children` as arguments. If a
-        function satisfying this requirements could not be found, a new
-        function is created and added to the cache, in order to be later
-        potentially reused.
+        the current type using the current `children` as inputs, and reuse
+        it. If a function satisfying this requirements could not be found,
+        a new function is created and added to the cache, in order to be,
+        potentially, later reused.
 
         '''
 
         # Only cache functions that are in the computation graph
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
-            # Include the arguments' (inputs/children) identifiers in the key
+            # Include the inputs' (children's) identifiers in the key
             key += ''.join((str(x.id) if isinstance(x, Tensor) else str(x)
                             for x in children))
 
@@ -100,7 +100,8 @@ class Function(_Node, object):
 
     @classmethod
     def _parse_inputs(cls, inputs: List[Any]) -> List[Tensor]:
-        ''' Parse all inputs that are not Nodes to Tensors '''
+        ''' Parse all inputs that are not Nodes to Tensors
+        '''
 
         return [
             x if isinstance(x, _Node) else Tensor(x, name=str(x))
