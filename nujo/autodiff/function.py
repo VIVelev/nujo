@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from numbers import Number
-from typing import Dict, List, TypeVar, Union
+from typing import Any, Dict, List, TypeVar, Union
 
 from numpy import ndarray
 
@@ -50,7 +50,8 @@ class Function(_Node, object):
         if self._cache_hit:
             return
 
-        super(Function, self).__init__(*children, name=name)
+        super(Function, self).__init__(*Function._parse_inputs(children),
+                                       name=name)
 
         # This output placeholder is reused when possible
         self._output_placeholder = Tensor(
@@ -96,6 +97,15 @@ class Function(_Node, object):
         else:
             cls._cache_hit = False
             return super(Function, cls).__new__(cls)
+
+    @classmethod
+    def _parse_inputs(cls, inputs: List[Any]) -> List[Tensor]:
+        ''' Parse all inputs that are not Nodes to Tensors '''
+
+        return [
+            x if isinstance(x, _Node) else Tensor(x, name=str(x))
+            for x in inputs
+        ]
 
     def __repr__(self):
         return super(Function, self).__repr__() + f'#{self.id}'
