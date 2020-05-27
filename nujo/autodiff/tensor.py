@@ -84,6 +84,7 @@ class Tensor(_Node):
 
     @property
     def T(self) -> 'Tensor':
+        # Only transpose if something has changed
         if (self._value != self._prev_value).any():
             self._T = self.transpose()
             self._prev_value = self._value
@@ -126,6 +127,44 @@ class Tensor(_Node):
 
     # Gradient computation
 
+    def _compute_grad_wrt(self, poutput: 'Tensor') -> Union['Tensor', ndarray]:
+        ''' Computes the gradient of `self` w.r.t. `poutput`
+
+            In other words, this functions returns: dPoutput / dSelf.
+
+        '''
+
+        # Find out for which children the gradient should be computed
+        idx = next(i for i, v in enumerate(poutput.creator.children)
+                   if v is self)
+
+        if poutput._grad.diff:
+            # Pass a diff enabled tensor to the backward call,
+            # thus recording grad computations in the computation
+            # graph, which enables higher-order differentiation.
+            update = poutput.creator.backward(idx, poutput._grad)
+
+            # Check if `self` is scalar and needs to be averaged
+            if self._value.shape != () and\
+               self._value.shape[-1] == 1:
+
+                # Record the mean in the computation graph
+                from nujo.math.aggregate import mean
+                update = mean(update, dim=-1, keepdim=True)
+
+        else:
+            # Do not leave a trace in the computation graph!
+            # Use numpy arrays! :)
+            update = poutput.creator.backward(idx, poutput._grad._value)
+
+            # Check if `self` is scalar and needs to be averaged
+            if self._value.shape != () and\
+               self._value.shape[-1] == 1:
+
+                update = update.mean(axis=-1, keepdims=True)
+
+        return update
+
     def compute_grad(self) -> None:
         if modes.DIFF_ENABLED and self.diff:
 
@@ -142,36 +181,14 @@ class Tensor(_Node):
                 self._grad._value += 1
                 return
 
-            # This can be refactored
             for poutput in self.parents_outputs:
-                idx = next(i for i, v in enumerate(poutput.creator.children)
-                           if v is self)
+                curr_grad = self._compute_grad_wrt(poutput)
 
                 if self._grad.diff:
-                    # Record grad computations in the computation grap
-
-                    update = poutput.creator.backward(idx, poutput._grad)
-
-                    # Check if `self` is scalar and needs to be averaged
-                    if self._value.shape != () and\
-                       self._value.shape[-1] == 1:
-
-                        from nujo.math.aggregate import mean
-                        update = mean(update, dim=-1, keepdim=True)
-
-                    self._grad += update
-
+                    # Record grad computations in the computation graph
+                    self._grad += curr_grad
                 else:
-                    update = poutput.creator.backward(idx,
-                                                      poutput._grad._value)
-
-                    # Check if `self` is scalar and needs to be averaged
-                    if self._value.shape != () and\
-                       self._value.shape[-1] == 1:
-
-                        update = update.mean(axis=-1, keepdims=True)
-
-                    self._grad.value += update
+                    self._grad._value += curr_grad
 
     def zero_grad(self, propagate=True) -> None:
         self.grad._value.fill(0)
@@ -201,7 +218,7 @@ class Tensor(_Node):
 
             if node.creator:
                 for child in node.creator.children:
-                    # Avoid visiting  the same node twice
+                    # Avoid visiting the same node twice
                     if all(child is not node for node in nodes_to_visit):
                         nodes_to_visit.insert(0, child)
 

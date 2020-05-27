@@ -56,7 +56,7 @@ class Function(_Node, object):
         # This output placeholder is reused when possible
         self._output_placeholder = Tensor(
             None,
-            diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
+            diff=any(x.diff for x in self.children) and modes.DIFF_ENABLED,
             creator=self if modes.DIFF_ENABLED else None,
             name=self._generate_tensor_name())
 
@@ -118,6 +118,7 @@ class Function(_Node, object):
         ''' Implement forward pass of the function here.
 
         Use the `self.children` list to access the inputs.
+
         '''
 
         pass
