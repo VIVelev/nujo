@@ -104,9 +104,13 @@ taking the best from both worlds.</p>
 
     &#39;&#39;&#39;
 
-    _children_history: Dict[str, &#39;Function&#39;] = {}
-    &#39;&#39;&#39; Cache where input tensors for
-    the current function type are stored.
+    _func_children_lookup_cache: Dict[str, &#39;Function&#39;] = {}
+    &#39;&#39;&#39; Cache used to lookup for functions that may have already been defined
+    in the computation graph.
+
+     - key : hash(FuncType) + (children&#39;s identifiers)
+     - value : the already defined function which will be reused
+
     &#39;&#39;&#39;
 
     _cache_hit = False
@@ -122,12 +126,13 @@ taking the best from both worlds.</p>
         if self._cache_hit:
             return
 
-        super(Function, self).__init__(*children, name=name)
+        super(Function, self).__init__(*Function._parse_inputs(children),
+                                       name=name)
 
         # This output placeholder is reused when possible
         self._output_placeholder = Tensor(
             None,
-            diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
+            diff=any(x.diff for x in self.children) and modes.DIFF_ENABLED,
             creator=self if modes.DIFF_ENABLED else None,
             name=self._generate_tensor_name())
 
@@ -138,32 +143,46 @@ taking the best from both worlds.</p>
 
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
-        &#39;&#39;&#39; Used to review the cache for hit and return the cached tensor
-        or otherwise add the new tensor to the cache.
+        &#39;&#39;&#39; Used to lookup the cache for an already defined function of
+        the current type using the current `children` as inputs, and reuse
+        it. If a function satisfying this requirements could not be found,
+        a new function is created and added to the cache, in order to be,
+        potentially, later reused.
+
         &#39;&#39;&#39;
 
-        # Only cache tensors that are in the computation graph
+        # Only cache functions that are in the computation graph
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
-            # Include the arguments&#39; uids in the key
+            # Include the inputs&#39; (children&#39;s) identifiers in the key
             key += &#39;&#39;.join((str(x.id) if isinstance(x, Tensor) else str(x)
                             for x in children))
 
-            if key in cls._children_history:
+            if key in cls._func_children_lookup_cache:
                 cls._cache_hit = True
-                return cls._children_history[key]
+                return cls._func_children_lookup_cache[key]
 
             else:
                 cls._cache_hit = False
-                creator = super(Function, cls).__new__(cls)
-                cls._children_history[key] = creator
-                return creator
+                func = super(Function, cls).__new__(cls)
+                cls._func_children_lookup_cache[key] = func
+                return func
 
-        # If the tensors are not in the computation graph,
-        # perform standard python init
+        # If the functions are not in the computation graph,
+        # perform standard python init.
         else:
             cls._cache_hit = False
             return super(Function, cls).__new__(cls)
+
+    @classmethod
+    def _parse_inputs(cls, inputs: List[Any]) -&gt; List[Tensor]:
+        &#39;&#39;&#39; Parse all inputs that are not Nodes to Tensors
+        &#39;&#39;&#39;
+
+        return [
+            x if isinstance(x, _Node) else Tensor(x, name=str(x))
+            for x in inputs
+        ]
 
     def __repr__(self):
         return super(Function, self).__repr__() + f&#39;#{self.id}&#39;
@@ -176,6 +195,7 @@ taking the best from both worlds.</p>
         &#39;&#39;&#39; Implement forward pass of the function here.
 
         Use the `self.children` list to access the inputs.
+
         &#39;&#39;&#39;
 
         pass
@@ -338,6 +358,7 @@ def forward(self) -&gt; ndarray:
     &#39;&#39;&#39; Implement forward pass of the function here.
 
     Use the `self.children` list to access the inputs.
+
     &#39;&#39;&#39;
 
     pass</code></pre>
@@ -443,6 +464,7 @@ the only child of a tensor</li>
 
     @property
     def T(self) -&gt; &#39;Tensor&#39;:
+        # Only transpose if something has changed
         if (self._value != self._prev_value).any():
             self._T = self.transpose()
             self._prev_value = self._value
@@ -485,6 +507,44 @@ the only child of a tensor</li>
 
     # Gradient computation
 
+    def _compute_grad_wrt(self, poutput: &#39;Tensor&#39;) -&gt; Union[&#39;Tensor&#39;, ndarray]:
+        &#39;&#39;&#39; Computes the gradient of `self` w.r.t. `poutput`
+
+            In other words, this functions returns: dPoutput / dSelf.
+
+        &#39;&#39;&#39;
+
+        # Find out for which children the gradient should be computed
+        idx = next(i for i, v in enumerate(poutput.creator.children)
+                   if v is self)
+
+        if poutput._grad.diff:
+            # Pass a diff enabled tensor to the backward call,
+            # thus recording grad computations in the computation
+            # graph, which enables higher-order differentiation.
+            update = poutput.creator.backward(idx, poutput._grad)
+
+            # Check if `self` is scalar and needs to be averaged
+            if self._value.shape != () and\
+               self._value.shape[-1] == 1:
+
+                # Record the mean in the computation graph
+                from nujo.math.aggregate import mean
+                update = mean(update, dim=-1, keepdim=True)
+
+        else:
+            # Do not leave a trace in the computation graph!
+            # Use numpy arrays! :)
+            update = poutput.creator.backward(idx, poutput._grad._value)
+
+            # Check if `self` is scalar and needs to be averaged
+            if self._value.shape != () and\
+               self._value.shape[-1] == 1:
+
+                update = update.mean(axis=-1, keepdims=True)
+
+        return update
+
     def compute_grad(self) -&gt; None:
         if modes.DIFF_ENABLED and self.diff:
 
@@ -501,36 +561,14 @@ the only child of a tensor</li>
                 self._grad._value += 1
                 return
 
-            # This can be refactored
             for poutput in self.parents_outputs:
-                idx = next(i for i, v in enumerate(poutput.creator.children)
-                           if v is self)
+                curr_grad = self._compute_grad_wrt(poutput)
 
                 if self._grad.diff:
-                    # Record grad computations in the computation grap
-
-                    update = poutput.creator.backward(idx, poutput._grad)
-
-                    # Check if `self` is scalar and needs to be averaged
-                    if self._value.shape != () and\
-                       self._value.shape[-1] == 1:
-
-                        from nujo.math.aggregate import mean
-                        update = mean(update, dim=-1, keepdim=True)
-
-                    self._grad += update
-
+                    # Record grad computations in the computation graph
+                    self._grad += curr_grad
                 else:
-                    update = poutput.creator.backward(idx,
-                                                      poutput._grad._value)
-
-                    # Check if `self` is scalar and needs to be averaged
-                    if self._value.shape != () and\
-                       self._value.shape[-1] == 1:
-
-                        update = update.mean(axis=-1, keepdims=True)
-
-                    self._grad.value += update
+                    self._grad._value += curr_grad
 
     def zero_grad(self, propagate=True) -&gt; None:
         self.grad._value.fill(0)
@@ -560,7 +598,7 @@ the only child of a tensor</li>
 
             if node.creator:
                 for child in node.creator.children:
-                    # Avoid visiting  the same node twice
+                    # Avoid visiting the same node twice
                     if all(child is not node for node in nodes_to_visit):
                         nodes_to_visit.insert(0, child)
 
@@ -716,6 +754,7 @@ the only child of a tensor</li>
 </summary>
 <pre><code class="python">@property
 def T(self) -&gt; &#39;Tensor&#39;:
+    # Only transpose if something has changed
     if (self._value != self._prev_value).any():
         self._T = self.transpose()
         self._prev_value = self._value
@@ -823,7 +862,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 
         if node.creator:
             for child in node.creator.children:
-                # Avoid visiting  the same node twice
+                # Avoid visiting the same node twice
                 if all(child is not node for node in nodes_to_visit):
                     nodes_to_visit.insert(0, child)</code></pre>
 </details>
@@ -853,36 +892,14 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
             self._grad._value += 1
             return
 
-        # This can be refactored
         for poutput in self.parents_outputs:
-            idx = next(i for i, v in enumerate(poutput.creator.children)
-                       if v is self)
+            curr_grad = self._compute_grad_wrt(poutput)
 
             if self._grad.diff:
-                # Record grad computations in the computation grap
-
-                update = poutput.creator.backward(idx, poutput._grad)
-
-                # Check if `self` is scalar and needs to be averaged
-                if self._value.shape != () and\
-                   self._value.shape[-1] == 1:
-
-                    from nujo.math.aggregate import mean
-                    update = mean(update, dim=-1, keepdim=True)
-
-                self._grad += update
-
+                # Record grad computations in the computation graph
+                self._grad += curr_grad
             else:
-                update = poutput.creator.backward(idx,
-                                                  poutput._grad._value)
-
-                # Check if `self` is scalar and needs to be averaged
-                if self._value.shape != () and\
-                   self._value.shape[-1] == 1:
-
-                    update = update.mean(axis=-1, keepdims=True)
-
-                self._grad.value += update</code></pre>
+                self._grad._value += curr_grad</code></pre>
 </details>
 </dd>
 <dt id="nujo.autodiff.Tensor.reshape"><code class="name flex">

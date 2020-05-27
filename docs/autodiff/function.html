@@ -26,11 +26,11 @@
 </summary>
 <pre><code class="python">from abc import abstractmethod
 from numbers import Number
-from typing import Dict, List, TypeVar, Union
+from typing import Any, Dict, List, TypeVar, Union
 
 from numpy import ndarray
 
-from nujo.autodiff import modes
+import nujo.autodiff.modes as modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
 
@@ -54,9 +54,13 @@ class Function(_Node, object):
 
     &#39;&#39;&#39;
 
-    _children_history: Dict[str, &#39;Function&#39;] = {}
-    &#39;&#39;&#39; Cache where input tensors for
-    the current function type are stored.
+    _func_children_lookup_cache: Dict[str, &#39;Function&#39;] = {}
+    &#39;&#39;&#39; Cache used to lookup for functions that may have already been defined
+    in the computation graph.
+
+     - key : hash(FuncType) + (children&#39;s identifiers)
+     - value : the already defined function which will be reused
+
     &#39;&#39;&#39;
 
     _cache_hit = False
@@ -72,12 +76,13 @@ class Function(_Node, object):
         if self._cache_hit:
             return
 
-        super(Function, self).__init__(*children, name=name)
+        super(Function, self).__init__(*Function._parse_inputs(children),
+                                       name=name)
 
         # This output placeholder is reused when possible
         self._output_placeholder = Tensor(
             None,
-            diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
+            diff=any(x.diff for x in self.children) and modes.DIFF_ENABLED,
             creator=self if modes.DIFF_ENABLED else None,
             name=self._generate_tensor_name())
 
@@ -88,32 +93,46 @@ class Function(_Node, object):
 
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
-        &#39;&#39;&#39; Used to review the cache for hit and return the cached tensor
-        or otherwise add the new tensor to the cache.
+        &#39;&#39;&#39; Used to lookup the cache for an already defined function of
+        the current type using the current `children` as inputs, and reuse
+        it. If a function satisfying this requirements could not be found,
+        a new function is created and added to the cache, in order to be,
+        potentially, later reused.
+
         &#39;&#39;&#39;
 
-        # Only cache tensors that are in the computation graph
+        # Only cache functions that are in the computation graph
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
-            # Include the arguments&#39; uids in the key
+            # Include the inputs&#39; (children&#39;s) identifiers in the key
             key += &#39;&#39;.join((str(x.id) if isinstance(x, Tensor) else str(x)
                             for x in children))
 
-            if key in cls._children_history:
+            if key in cls._func_children_lookup_cache:
                 cls._cache_hit = True
-                return cls._children_history[key]
+                return cls._func_children_lookup_cache[key]
 
             else:
                 cls._cache_hit = False
-                creator = super(Function, cls).__new__(cls)
-                cls._children_history[key] = creator
-                return creator
+                func = super(Function, cls).__new__(cls)
+                cls._func_children_lookup_cache[key] = func
+                return func
 
-        # If the tensors are not in the computation graph,
-        # perform standard python init
+        # If the functions are not in the computation graph,
+        # perform standard python init.
         else:
             cls._cache_hit = False
             return super(Function, cls).__new__(cls)
+
+    @classmethod
+    def _parse_inputs(cls, inputs: List[Any]) -&gt; List[Tensor]:
+        &#39;&#39;&#39; Parse all inputs that are not Nodes to Tensors
+        &#39;&#39;&#39;
+
+        return [
+            x if isinstance(x, _Node) else Tensor(x, name=str(x))
+            for x in inputs
+        ]
 
     def __repr__(self):
         return super(Function, self).__repr__() + f&#39;#{self.id}&#39;
@@ -126,6 +145,7 @@ class Function(_Node, object):
         &#39;&#39;&#39; Implement forward pass of the function here.
 
         Use the `self.children` list to access the inputs.
+
         &#39;&#39;&#39;
 
         pass
@@ -222,9 +242,13 @@ taking the best from both worlds.</p>
 
     &#39;&#39;&#39;
 
-    _children_history: Dict[str, &#39;Function&#39;] = {}
-    &#39;&#39;&#39; Cache where input tensors for
-    the current function type are stored.
+    _func_children_lookup_cache: Dict[str, &#39;Function&#39;] = {}
+    &#39;&#39;&#39; Cache used to lookup for functions that may have already been defined
+    in the computation graph.
+
+     - key : hash(FuncType) + (children&#39;s identifiers)
+     - value : the already defined function which will be reused
+
     &#39;&#39;&#39;
 
     _cache_hit = False
@@ -240,12 +264,13 @@ taking the best from both worlds.</p>
         if self._cache_hit:
             return
 
-        super(Function, self).__init__(*children, name=name)
+        super(Function, self).__init__(*Function._parse_inputs(children),
+                                       name=name)
 
         # This output placeholder is reused when possible
         self._output_placeholder = Tensor(
             None,
-            diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
+            diff=any(x.diff for x in self.children) and modes.DIFF_ENABLED,
             creator=self if modes.DIFF_ENABLED else None,
             name=self._generate_tensor_name())
 
@@ -256,32 +281,46 @@ taking the best from both worlds.</p>
 
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
-        &#39;&#39;&#39; Used to review the cache for hit and return the cached tensor
-        or otherwise add the new tensor to the cache.
+        &#39;&#39;&#39; Used to lookup the cache for an already defined function of
+        the current type using the current `children` as inputs, and reuse
+        it. If a function satisfying this requirements could not be found,
+        a new function is created and added to the cache, in order to be,
+        potentially, later reused.
+
         &#39;&#39;&#39;
 
-        # Only cache tensors that are in the computation graph
+        # Only cache functions that are in the computation graph
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
-            # Include the arguments&#39; uids in the key
+            # Include the inputs&#39; (children&#39;s) identifiers in the key
             key += &#39;&#39;.join((str(x.id) if isinstance(x, Tensor) else str(x)
                             for x in children))
 
-            if key in cls._children_history:
+            if key in cls._func_children_lookup_cache:
                 cls._cache_hit = True
-                return cls._children_history[key]
+                return cls._func_children_lookup_cache[key]
 
             else:
                 cls._cache_hit = False
-                creator = super(Function, cls).__new__(cls)
-                cls._children_history[key] = creator
-                return creator
+                func = super(Function, cls).__new__(cls)
+                cls._func_children_lookup_cache[key] = func
+                return func
 
-        # If the tensors are not in the computation graph,
-        # perform standard python init
+        # If the functions are not in the computation graph,
+        # perform standard python init.
         else:
             cls._cache_hit = False
             return super(Function, cls).__new__(cls)
+
+    @classmethod
+    def _parse_inputs(cls, inputs: List[Any]) -&gt; List[Tensor]:
+        &#39;&#39;&#39; Parse all inputs that are not Nodes to Tensors
+        &#39;&#39;&#39;
+
+        return [
+            x if isinstance(x, _Node) else Tensor(x, name=str(x))
+            for x in inputs
+        ]
 
     def __repr__(self):
         return super(Function, self).__repr__() + f&#39;#{self.id}&#39;
@@ -294,6 +333,7 @@ taking the best from both worlds.</p>
         &#39;&#39;&#39; Implement forward pass of the function here.
 
         Use the `self.children` list to access the inputs.
+
         &#39;&#39;&#39;
 
         pass
@@ -456,6 +496,7 @@ def forward(self) -&gt; ndarray:
     &#39;&#39;&#39; Implement forward pass of the function here.
 
     Use the `self.children` list to access the inputs.
+
     &#39;&#39;&#39;
 
     pass</code></pre>
