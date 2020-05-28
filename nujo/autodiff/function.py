@@ -125,26 +125,26 @@ class Function(_Node, object):
         pass
 
     @abstractmethod
-    def backward(self, idx: int, acumm_grad: T) -> T:
+    def backward(self, idx: int, accum_grad: T) -> T:
         ''' Implement backward pass of the function here
 
         Compute the gradient of children[idx] w.r.t. output of the
-        computation graph from the acummulated gradient (the gradient
+        computation graph from the accumulated gradient (the gradient
         of the output of the function w.r.t. the output of the graph).
 
         Parameters:
         -----------
         - idx : int, the index of the children for which to compute the
          gradient w.r.t. output of the computation graph
-        - acumm_grad : T (Tensor or ndarray), the accumulated grad in the graph
+        - accum_grad : T (Tensor or ndarray), the accumulated grad in the graph
          so far, you can otherwise think of it as the gradient of the output of
          the function w.r.t. the output of the graph.
 
-            - `acumm_grad` is Tensor if differentiantion is enabled
+            - `accum_grad` is Tensor if differentiantion is enabled
              (`DIFF_ENABLED`) and the children has opted for differentiation
              (`diff` is True), thus the computations will be recorded in the
              computation graph and higher-order derivatives could be computed.
-            - otherwise, `acumm_grad` is ndarray and the computations are not
+            - otherwise, `accum_grad` is ndarray and the computations are not
              recorded; ndarrays are used since the computations with them are
              more efficient.
 

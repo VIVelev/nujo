@@ -30,8 +30,8 @@ class _InnerSum(Function):
                    axis=self.dim,
                    keepdims=self.keepdim)
 
-    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
-        return acumm_grad * ones(self.children[0].shape)
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad * ones(self.children[0].shape)
 
 
 # ====================================================================================================
@@ -57,8 +57,8 @@ class _InnerProd(Function):
 
         return self._output
 
-    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
-        return acumm_grad * self._output / self.children[0].value
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad * self._output / self.children[0].value
 
 
 # ====================================================================================================

@@ -25,8 +25,8 @@ class _Reshape(Function):
     def forward(self) -> ndarray:
         return self.children[0].value.reshape(self.shape)
 
-    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
-        return acumm_grad.reshape(self._input_shape)
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad.reshape(self._input_shape)
 
 
 # ====================================================================================================
@@ -46,8 +46,8 @@ class _Transpose(Function):
     def forward(self) -> ndarray:
         return self.children[0].value.transpose(*self.dims)
 
-    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
-        return acumm_grad.transpose(self._detranspose_dims)
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad.transpose(self._detranspose_dims)
 
 
 # ====================================================================================================

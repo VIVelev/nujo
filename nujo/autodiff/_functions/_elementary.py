@@ -44,8 +44,8 @@ class _Addition(Function):
     def forward(self) -> ndarray:
         return self.children[0].value + self.children[1].value
 
-    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
-        return acumm_grad * ones(self.children[idx].shape)
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad * ones(self.children[idx].shape)
 
 
 # ====================================================================================================
@@ -61,8 +61,8 @@ class _Negation(Function):
     def forward(self) -> ndarray:
         return -self.children[0].value
 
-    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
-        return acumm_grad * -ones(self.children[0].shape)
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad * -ones(self.children[0].shape)
 
 
 # ====================================================================================================
@@ -93,11 +93,11 @@ class _Multiplication(Function):
     def forward(self) -> ndarray:
         return self.children[0].value * self.children[1].value
 
-    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
         if idx == 0:
-            return acumm_grad * self.children[1].value
+            return accum_grad * self.children[1].value
         else:
-            return acumm_grad * self.children[0].value
+            return accum_grad * self.children[0].value
 
 
 # ====================================================================================================
@@ -115,8 +115,8 @@ class _Reciprocal(Function):
     def forward(self) -> ndarray:
         return 1 / (self.children[0].value + self.eps)
 
-    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
-        return acumm_grad * -1 / ((self.children[0].value + self.eps)**2)
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad * -1 / ((self.children[0].value + self.eps)**2)
 
 
 # ====================================================================================================
@@ -135,14 +135,14 @@ class _Power(Function):
     def forward(self) -> ndarray:
         return self.children[0].value**self.children[1].value
 
-    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
         # TODO: FIX wrong partial - the second
 
         if idx == 0:
-            return acumm_grad * self.children[1].value *\
+            return accum_grad * self.children[1].value *\
                     self.children[0].value**(self.children[1].value - 1)
         else:
-            return type(acumm_grad)(1)
+            return type(accum_grad)(1)
 
 
 # ====================================================================================================
@@ -165,14 +165,14 @@ class _Logarithm(Function):
     def forward(self) -> ndarray:
         return log(self.children[0].value) / log(self.children[1].value)
 
-    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
         # TODO: FIX wrong partial - the second
 
         if idx == 0:
-            return acumm_grad /\
+            return accum_grad /\
                     (self.children[0].value * log(self.children[1].value))
         else:
-            return type(acumm_grad)(1)
+            return type(accum_grad)(1)
 
 
 # ====================================================================================================
@@ -195,11 +195,11 @@ class _MatrixMul(Function):
     def forward(self) -> ndarray:
         return self.children[0].value @ self.children[1].value
 
-    def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
         if idx == 0:
-            return acumm_grad @ self.children[1].value.T
+            return accum_grad @ self.children[1].value.T
         else:
-            return (acumm_grad.T @ self.children[0].value).T
+            return (accum_grad.T @ self.children[0].value).T
 
 
 # ====================================================================================================
