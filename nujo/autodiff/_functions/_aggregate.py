@@ -18,10 +18,9 @@ class _InnerSum(Function):
     def __init__(self,
                  input: Union[Tensor, ndarray, List[Number], Number],
                  dim: Optional[int] = None,
-                 keepdim=False,
-                 name='InnerSum'):
+                 keepdim=False):
 
-        super(_InnerSum, self).__init__(input, name=self.__class__.__name__)
+        super(_InnerSum, self).__init__(input)
         self.dim = dim
         self.keepdim = keepdim
 
@@ -41,10 +40,9 @@ class _InnerProd(Function):
     def __init__(self,
                  input: Union[Tensor, ndarray, List[Number], Number],
                  dim: Optional[int] = None,
-                 keepdim=False,
-                 name='InnerProd'):
+                 keepdim=False):
 
-        super(_InnerProd, self).__init__(input, name=self.__class__.__name__)
+        super(_InnerProd, self).__init__(input)
         self.dim = dim
         self.keepdim = keepdim
 

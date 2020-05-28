@@ -28,22 +28,22 @@ def log(x: Tensor, base: float = e) -> Tensor:
 
 
 def log2(x: Tensor) -> Tensor:
-    return _Logarithm(x, 2, name='Log2')()
+    return _Logarithm(x, 2)()
 
 
 def log10(x: Tensor) -> Tensor:
-    return _Logarithm(x, 10, name='Log10')()
+    return _Logarithm(x, 10)()
 
 
 # ====================================================================================================
 
 
 def exp(x: Tensor) -> Tensor:
-    return _Power(e, x, name='Exp')()
+    return _Power(e, x)()
 
 
 def sqrt(x: Tensor) -> Tensor:
-    return _Power(x, 1 / 2, name='Sqrt')()
+    return _Power(x, 1 / 2)()
 
 
 def abs(x: Tensor) -> Tensor:

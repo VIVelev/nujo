@@ -24,7 +24,6 @@ class Function(_Node, object):
     Parameters:
     -----------
      - children : varargs, the inpute tensors
-     - name : string, the name of the function
 
     '''
 
@@ -43,15 +42,14 @@ class Function(_Node, object):
 
     T = TypeVar('T', Tensor, ndarray)
 
-    def __init__(self,
-                 *children: Union[Tensor, ndarray, List[Number], Number],
-                 name='Function'):
+    def __init__(self, *children: Union[Tensor, ndarray, List[Number],
+                                        Number]):
 
         if self._cache_hit:
             return
 
         super(Function, self).__init__(*Function._parse_inputs(children),
-                                       name=name)
+                                       name=self.__class__.__name__)
 
         # This output placeholder is reused when possible
         self._output_placeholder = Tensor(

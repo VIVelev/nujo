@@ -76,7 +76,7 @@ class Tensor(_Node):
 
         return self._grad
 
-    # Shape and shape transformations
+    # Shape and shape manipulations
 
     @property
     def shape(self) -> Tuple[int, ...]:

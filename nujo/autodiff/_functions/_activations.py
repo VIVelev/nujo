@@ -27,7 +27,7 @@ class _BinaryStep(Function):
                  input: Union[Tensor, ndarray, List[Number], Number],
                  threshold=0.5):
 
-        super(_BinaryStep, self).__init__(input, name=self.__class__.__name__)
+        super(_BinaryStep, self).__init__(input)
         self.threshold = threshold
 
     def forward(self) -> ndarray:
@@ -44,7 +44,7 @@ class _BinaryStep(Function):
 
 class _Sigmoid(Function):
     def __init__(self, input: Union[Tensor, ndarray, List[Number], Number]):
-        super(_Sigmoid, self).__init__(input, name=self.__class__.__name__)
+        super(_Sigmoid, self).__init__(input)
         self._output: ndarray = None  # Used to compute the derivative
 
     def forward(self) -> ndarray:
@@ -60,7 +60,7 @@ class _Sigmoid(Function):
 
 class _TanH(Function):
     def __init__(self, input: Union[Tensor, ndarray, List[Number], Number]):
-        super(_TanH, self).__init__(input, name=self.__class__.__name__)
+        super(_TanH, self).__init__(input)
         self._output: ndarray = None  # Used to compute the derivative
 
     def forward(self) -> ndarray:
@@ -82,7 +82,7 @@ class _TanH(Function):
 
 class _ReLU(Function):
     def __init__(self, input: Union[Tensor, ndarray, List[Number], Number]):
-        super(_ReLU, self).__init__(input, name=self.__class__.__name__)
+        super(_ReLU, self).__init__(input)
 
     def forward(self) -> ndarray:
         return self.children[0].value * (self.children[0].value > 0)
@@ -100,7 +100,7 @@ class _LeakyReLU(Function):
                  input: Union[Tensor, ndarray, List[Number], Number],
                  eps=0.1):
 
-        super(_LeakyReLU, self).__init__(input, name=self.__class__.__name__)
+        super(_LeakyReLU, self).__init__(input)
         self.eps = eps
 
     def forward(self) -> ndarray:
@@ -123,7 +123,7 @@ class _Swish(Function):
                  input: Union[Tensor, ndarray, List[Number], Number],
                  beta=1):
 
-        super(_Swish, self).__init__(input, name=self.__class__.__name__)
+        super(_Swish, self).__init__(input)
         self.beta = beta
 
         # Reuse the sigmoid activation function
@@ -148,7 +148,7 @@ class _Softmax(Function):
 
     '''
     def __init__(self, input: Union[Tensor, ndarray, List[Number], Number]):
-        super(_Softmax, self).__init__(input, name=self.__class__.__name__)
+        super(_Softmax, self).__init__(input)
         self._output: ndarray = None  # Used to compute the derivative
 
     def forward(self) -> ndarray:

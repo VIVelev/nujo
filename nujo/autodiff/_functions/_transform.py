@@ -18,7 +18,8 @@ class _Reshape(Function):
     def __init__(self, input: Union[Tensor, ndarray, List[Number], Number],
                  shape: Tuple[int, ...]):
 
-        super(_Reshape, self).__init__(input, name=self.__class__.__name__)
+        super(_Reshape, self).__init__(input)
+
         self.shape = shape
         self._input_shape = self.children[0].shape
 
@@ -37,7 +38,8 @@ class _Transpose(Function):
                  input: Union[Tensor, ndarray, List[Number], Number],
                  dims: Optional[Tuple[int, ...]] = None):
 
-        super(_Transpose, self).__init__(input, name=self.__class__.__name__)
+        super(_Transpose, self).__init__(input)
+
         self.dims = dims if dims is not None else reversed(
             range(len(self.dims)))
         self._detranspose_dims = sorted(range(len(self.dims)),
@@ -47,7 +49,7 @@ class _Transpose(Function):
         return self.children[0].value.transpose(*self.dims)
 
     def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
-        return accum_grad.transpose(self._detranspose_dims)
+        return accum_grad.transpose(*self._detranspose_dims)
 
 
 # ====================================================================================================
