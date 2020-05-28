@@ -142,7 +142,7 @@ class _Power(Function):
             return acumm_grad * self.children[1].value *\
                     self.children[0].value**(self.children[1].value - 1)
         else:
-            return Tensor(1)
+            return type(acumm_grad)(1)
 
 
 # ====================================================================================================
@@ -166,11 +166,13 @@ class _Logarithm(Function):
         return log(self.children[0].value) / log(self.children[1].value)
 
     def backward(self, idx: int, acumm_grad: Function.T) -> Function.T:
+        # TODO: FIX wrong partial - the second
+
         if idx == 0:
             return acumm_grad /\
                     (self.children[0].value * log(self.children[1].value))
         else:
-            return Tensor(1)
+            return type(acumm_grad)(1)
 
 
 # ====================================================================================================
