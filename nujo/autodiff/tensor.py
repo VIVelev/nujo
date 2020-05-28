@@ -172,10 +172,6 @@ class Tensor(_Node):
             if self._grad is None:
                 self.zero_grad(propagate=False)
 
-            # Used only for test, to be removed
-            assert self._grad._value.shape == self._value.shape
-            assert (self._grad._value == 0).all()
-
             # Top-parent grad
             if len(self.parents_outputs) == 0:
                 self._grad._value += 1
