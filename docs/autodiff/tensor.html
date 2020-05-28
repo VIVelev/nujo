@@ -102,7 +102,7 @@ class Tensor(_Node):
 
         return self._grad
 
-    # Shape and shape transformations
+    # Shape and shape manipulations
 
     @property
     def shape(self) -&gt; Tuple[int, ...]:
@@ -197,10 +197,6 @@ class Tensor(_Node):
             # Make sure grad is Tensor (`grad property call`) and init value
             if self._grad is None:
                 self.zero_grad(propagate=False)
-
-            # Used only for test, to be removed
-            assert self._grad._value.shape == self._value.shape
-            assert (self._grad._value == 0).all()
 
             # Top-parent grad
             if len(self.parents_outputs) == 0:
@@ -485,7 +481,7 @@ the only child of a tensor</li>
 
         return self._grad
 
-    # Shape and shape transformations
+    # Shape and shape manipulations
 
     @property
     def shape(self) -&gt; Tuple[int, ...]:
@@ -580,10 +576,6 @@ the only child of a tensor</li>
             # Make sure grad is Tensor (`grad property call`) and init value
             if self._grad is None:
                 self.zero_grad(propagate=False)
-
-            # Used only for test, to be removed
-            assert self._grad._value.shape == self._value.shape
-            assert (self._grad._value == 0).all()
 
             # Top-parent grad
             if len(self.parents_outputs) == 0:
@@ -911,10 +903,6 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
         # Make sure grad is Tensor (`grad property call`) and init value
         if self._grad is None:
             self.zero_grad(propagate=False)
-
-        # Used only for test, to be removed
-        assert self._grad._value.shape == self._value.shape
-        assert (self._grad._value == 0).all()
 
         # Top-parent grad
         if len(self.parents_outputs) == 0:

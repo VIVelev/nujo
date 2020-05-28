@@ -54,22 +54,22 @@ def log(x: Tensor, base: float = e) -&gt; Tensor:
 
 
 def log2(x: Tensor) -&gt; Tensor:
-    return _Logarithm(x, 2, name=&#39;Log2&#39;)()
+    return _Logarithm(x, 2)()
 
 
 def log10(x: Tensor) -&gt; Tensor:
-    return _Logarithm(x, 10, name=&#39;Log10&#39;)()
+    return _Logarithm(x, 10)()
 
 
 # ====================================================================================================
 
 
 def exp(x: Tensor) -&gt; Tensor:
-    return _Power(e, x, name=&#39;Exp&#39;)()
+    return _Power(e, x)()
 
 
 def sqrt(x: Tensor) -&gt; Tensor:
-    return _Power(x, 1 / 2, name=&#39;Sqrt&#39;)()
+    return _Power(x, 1 / 2)()
 
 
 def abs(x: Tensor) -&gt; Tensor:
@@ -153,7 +153,7 @@ def floor(x: Tensor, inplace=False) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def exp(x: Tensor) -&gt; Tensor:
-    return _Power(e, x, name=&#39;Exp&#39;)()</code></pre>
+    return _Power(e, x)()</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.scalar.floor"><code class="name flex">
@@ -196,7 +196,7 @@ def floor(x: Tensor, inplace=False) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def log10(x: Tensor) -&gt; Tensor:
-    return _Logarithm(x, 10, name=&#39;Log10&#39;)()</code></pre>
+    return _Logarithm(x, 10)()</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.scalar.log2"><code class="name flex">
@@ -209,7 +209,7 @@ def floor(x: Tensor, inplace=False) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def log2(x: Tensor) -&gt; Tensor:
-    return _Logarithm(x, 2, name=&#39;Log2&#39;)()</code></pre>
+    return _Logarithm(x, 2)()</code></pre>
 </details>
 </dd>
 <dt id="nujo.math.scalar.round"><code class="name flex">
@@ -239,7 +239,7 @@ def floor(x: Tensor, inplace=False) -&gt; Tensor:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def sqrt(x: Tensor) -&gt; Tensor:
-    return _Power(x, 1 / 2, name=&#39;Sqrt&#39;)()</code></pre>
+    return _Power(x, 1 / 2)()</code></pre>
 </details>
 </dd>
 </dl>
