@@ -504,14 +504,18 @@ the only child of a tensor</li>
 
     # Gradient computation
 
-    def _compute_grad_wrt(self, poutput: &#39;Tensor&#39;) -&gt; Union[&#39;Tensor&#39;, ndarray]:
-        &#39;&#39;&#39; Computes the gradient of `self` w.r.t. `poutput`
+    def _compute_grad_from(self,
+                           poutput: &#39;Tensor&#39;) -&gt; Union[&#39;Tensor&#39;, ndarray]:
+        &#39;&#39;&#39; Computes the gradient of `self` w.r.t. the output of the computation
+        graph from `poutput` (using the path of computations from `poutput`)
 
-            In other words, this functions returns: dPoutput / dSelf.
+            In other words, this functions returns:
+                (dOutput / dPoutput) * (dPoutput / dSelf)
 
         &#39;&#39;&#39;
 
-        # Find out for which children the gradient should be computed
+        # Find the index of the children which gradient should be computed
+        # (a.k.a. find the index of `self` in `poutput.creator.children`)
         idx = next(i for i, v in enumerate(poutput.creator.children)
                    if v is self)
 
@@ -519,7 +523,7 @@ the only child of a tensor</li>
             # Pass a diff enabled tensor to the backward call,
             # thus recording grad computations in the computation
             # graph, which enables higher-order differentiation.
-            update = poutput.creator.backward(idx, poutput._grad)
+            grad = poutput.creator.backward(idx, poutput._grad)
 
             # Check if `self` is scalar and needs to be averaged
             if self._value.shape != () and\
@@ -527,20 +531,20 @@ the only child of a tensor</li>
 
                 # Record the mean in the computation graph
                 from nujo.math.aggregate import mean
-                update = mean(update, dim=-1, keepdim=True)
+                grad = mean(grad, dim=-1, keepdim=True)
 
         else:
             # Do not leave a trace in the computation graph!
             # Use numpy arrays! :)
-            update = poutput.creator.backward(idx, poutput._grad._value)
+            grad = poutput.creator.backward(idx, poutput._grad._value)
 
             # Check if `self` is scalar and needs to be averaged
             if self._value.shape != () and\
                self._value.shape[-1] == 1:
 
-                update = update.mean(axis=-1, keepdims=True)
+                grad = grad.mean(axis=-1, keepdims=True)
 
-        return update
+        return grad
 
     def compute_grad(self) -&gt; None:
         if modes.DIFF_ENABLED and self.diff:
@@ -555,7 +559,7 @@ the only child of a tensor</li>
                 return
 
             for poutput in self.parents_outputs:
-                curr_grad = self._compute_grad_wrt(poutput)
+                curr_grad = self._compute_grad_from(poutput)
 
                 if self._grad.diff:
                     # Record grad computations in the computation graph
@@ -882,7 +886,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
             return
 
         for poutput in self.parents_outputs:
-            curr_grad = self._compute_grad_wrt(poutput)
+            curr_grad = self._compute_grad_from(poutput)
 
             if self._grad.diff:
                 # Record grad computations in the computation graph
