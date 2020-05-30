@@ -1,7 +1,5 @@
 from typing import Tuple, Union
 
-from numpy import arange, repeat, tile
-
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 from nujo.init import randn
@@ -115,57 +113,6 @@ class Conv2d(Flow):
         # Turn image shape into column shape
         # (enables dot product between input and weights)
         pass
-
-
-def get_im2col_indices(images_shape, kernel_size, stride):
-    ''' Reference: CS231n Stanford
-    (https://cs231n.github.io/convolutional-networks/)
-
-    '''
-
-    # Obtain needed  information
-    _, channels, height, width = images_shape
-    kernel_height, kernel_width = kernel_size
-
-    # Calculate output shape
-    out_height = (height - kernel_height) // stride + 1
-    out_width = (width - kernel_width) // stride + 1
-
-    # Calculate sections' rows
-    section_rows = repeat(arange(kernel_height), kernel_width)
-    section_rows = tile(section_rows, channels)
-    slide_rows = stride * repeat(arange(out_height), out_width)
-    section_rows = section_rows.reshape(-1, 1) + slide_rows.reshape(1, -1)
-
-    # Calculate sections' columns
-    section_cols = tile(arange(kernel_width), kernel_height * channels)
-    slide_cols = stride * tile(arange(out_width), out_height)
-    section_cols = section_cols.reshape(-1, 1) + slide_cols.reshape(1, -1)
-
-    # Calculate sections' channels
-    section_channels = repeat(arange(channels),
-                              kernel_height * kernel_width).reshape(-1, 1)
-
-    # Return indices
-    return section_channels, section_rows, section_cols
-
-
-def im2col(images, kernel_size, stride):
-    ''' Method which turns the image shaped input to column shape.
-    Used during the forward pass.
-
-    Reference: CS231n Stanford
-    (https://cs231n.github.io/convolutional-networks/)
-
-    '''
-
-    # Calculate the indices where the dot products are
-    # to be applied between weights and the image
-    k, i, j = get_im2col_indices(images.shape, kernel_size, stride)
-
-    # Reshape content into column shape
-    return images[:, k, i, j].transpose(1, 2, 0)\
-        .reshape(kernel_size[0] * kernel_size[1] * images.shape[1], -1)
 
 
 # ====================================================================================================
