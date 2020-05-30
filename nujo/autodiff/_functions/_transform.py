@@ -90,6 +90,8 @@ class _Im2col(Function):
         self.kernel_size = kernel_size
         self.stride = stride
 
+        self._im2col_indices: Tuple[ndarray, ndarray, ndarray] = None
+
     def forward(self) -> ndarray:
         ''' Method which turns the image shaped input to column shape
 
@@ -102,8 +104,10 @@ class _Im2col(Function):
 
         # Calculate the indices where the dot products are
         # to be applied between weights and the image
-        k, i, j = _Im2col.get_im2col_indices(images.shape, self.kernel_size,
-                                             self.stride)
+        self._im2col_indices = _Im2col.get_im2col_indices(
+            images.shape, self.kernel_size, self.stride)
+
+        k, i, j = self._im2col_indices
 
         # Reshape content into column shape
         n_features = self.kernel_size[0] * self.kernel_size[1] *\
@@ -119,14 +123,11 @@ class _Im2col(Function):
 
         '''
 
-        images_shape = self.children[0].shape
-
-        # Calculate the indices where the dot products are
+        # Get the indices where the dot products are
         # to be applied between weights and the image
-        k, i, j = _Im2col.get_im2col_indices(images_shape, self.kernel_size,
-                                             self.stride)
+        k, i, j = self._im2col_indices
 
-        images = zeros(images_shape)
+        images = zeros(self.children[0].shape)
         add.at(images, (slice(None), k, i, j),
                expand_dims(accum_grad, 1).transpose(2, 0, 1))
 
