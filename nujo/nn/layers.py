@@ -117,12 +117,12 @@ class Conv2d(Flow):
 
         # Reshape
         output_shape = (
-            channels,
+            self.out_channels,
             (height - self.kernel_size[0]) // self.stride[0] + 1,
             (width - self.kernel_size[1]) // self.stride[1] + 1,
         )
 
-        return out_col.reshape(output_shape + (batch_size, ))\
+        return out_col.reshape(*output_shape, batch_size)\
             .transpose(3, 0, 1, 2)
 
 

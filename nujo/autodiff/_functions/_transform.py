@@ -77,7 +77,7 @@ class _Im2col(Function):
 
         # Calculate the indices where the dot products are
         # to be applied between weights and the image
-        k, i, j = _Im2col.get_im2col_indices(images, self.kernel_size,
+        k, i, j = _Im2col.get_im2col_indices(images.shape, self.kernel_size,
                                              self.stride)
 
         # Reshape content into column shape
@@ -126,12 +126,12 @@ class _Im2col(Function):
         # Calculate sections' rows
         section_rows = repeat(arange(kernel_height), kernel_width)
         section_rows = tile(section_rows, channels)
-        slide_rows = stride_height * repeat(arange(out_height), out_width)
+        slide_rows = stride_width * repeat(arange(out_height), out_width)
         section_rows = section_rows.reshape(-1, 1) + slide_rows.reshape(1, -1)
 
         # Calculate sections' columns
         section_cols = tile(arange(kernel_width), kernel_height * channels)
-        slide_cols = stride_width * tile(arange(out_width), out_height)
+        slide_cols = stride_height * tile(arange(out_width), out_height)
         section_cols = section_cols.reshape(-1, 1) + slide_cols.reshape(1, -1)
 
         # Calculate sections' channels
