@@ -1,5 +1,6 @@
 from typing import Tuple, Union
 
+from nujo.autodiff._functions._transform import _Im2col
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 from nujo.init import randn
@@ -110,9 +111,19 @@ class Conv2d(Flow):
         batch_size, channels, height, width = x.shape
         assert channels == self.in_channels
 
-        # Turn image shape into column shape
-        # (enables dot product between input and weights)
-        pass
+        x_col = _Im2col(x, self.kernel_size, self.stride)()
+        kernels_col = self.kernels.reshape(self.out_channels, -1)
+        out_col = kernels_col @ x_col
+
+        # Reshape
+        output_shape = (
+            channels,
+            (height - self.kernel_size[0]) // self.stride[0] + 1,
+            (width - self.kernel_size[1]) // self.stride[1] + 1,
+        )
+
+        return out_col.reshape(output_shape + (batch_size, ))\
+            .transpose(3, 0, 1, 2)
 
 
 # ====================================================================================================

@@ -66,7 +66,7 @@ class _Im2col(Function):
         self.stride = stride
 
     def forward(self) -> ndarray:
-        ''' Method which turns the image shaped input to column shape.
+        ''' Method which turns the image shaped input to column shape
 
         Reference: CS231n Stanford
         (https://cs231n.github.io/convolutional-networks/)
@@ -87,8 +87,7 @@ class _Im2col(Function):
         return images[:, k, i, j].transpose(1, 2, 0).reshape(n_features, -1)
 
     def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
-        ''' Method which turns the column shaped input to image shape.
-        Used during the backward pass.
+        ''' Method which turns the column shaped input to image shape
 
         Reference: CS231n Stanford
         (https://cs231n.github.io/convolutional-networks/)
