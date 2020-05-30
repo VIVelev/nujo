@@ -1,6 +1,6 @@
 from typing import Tuple, Union
 
-from nujo.autodiff._functions._transform import _Im2col
+from nujo.autodiff._functions._transform import _Im2col, _Padding
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 from nujo.init import randn
@@ -117,21 +117,32 @@ class Conv2d(Flow):
         batch_size, channels, height, width = x.shape
         assert channels == self.in_channels
 
-        x_col = _Im2col(x, self.kernel_size, self.stride)()
+        # Apply padding
+        x_padded = _Padding(x, self.padding)()
+
+        # Apply the kernels
+        x_col = _Im2col(x_padded, self.kernel_size, self.stride)()
         kernels_col = self.kernels.reshape(self.out_channels, -1)
         out_col = kernels_col @ x_col
         if self.bias:
             out_col += self.b
 
         # Reshape
-        output_shape = (
-            self.out_channels,
-            (height - self.kernel_size[0]) // self.stride[0] + 1,
-            (width - self.kernel_size[1]) // self.stride[1] + 1,
-        )
+        output_shape = self.get_output_shape(height, width)
 
         return out_col.reshape(*output_shape, batch_size)\
             .transpose(3, 0, 1, 2)
+
+    def get_output_shape(self, height: int,
+                         width: int) -> Tuple[int, int, int]:
+
+        return (
+            self.out_channels,
+            ((height + self.padding[0] * 2 - self.kernel_size[0]) //
+             self.stride[0]) + 1,
+            ((width + self.padding[1] * 2 - self.kernel_size[1]) //
+             self.stride[1]) + 1,
+        )
 
 
 # ====================================================================================================

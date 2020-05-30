@@ -1,7 +1,7 @@
 from numbers import Number
 from typing import List, Optional, Tuple, Union
 
-from numpy import add, arange, expand_dims, ndarray, repeat, tile, zeros
+from numpy import add, arange, expand_dims, ndarray, pad, repeat, tile, zeros
 
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
@@ -9,6 +9,7 @@ from nujo.autodiff.tensor import Tensor
 __all__ = [
     '_Reshape',
     '_Transpose',
+    '_Padding',
     '_Im2col',
 ]
 
@@ -54,6 +55,30 @@ class _Transpose(Function):
 
 
 # ====================================================================================================
+
+
+class _Padding(Function):
+    def __init__(self, input: Union[Tensor, ndarray, List[Number], Number],
+                 padding: Tuple[int, int]):
+
+        super(_Padding, self).__init__(input)
+
+        # Shape of input should be: (batch_size, channels, height, width)
+        assert len(self.children[0].shape) == 4
+
+        self.padding = padding
+
+    def forward(self):
+        return pad(self.children[0].value, (
+            (0, 0),
+            (0, 0),
+            (self.padding[0], self.padding[0]),
+            (self.padding[1], self.padding[1]),
+        ))
+
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad[:, :, self.padding[0]:-self.padding[0],
+                          self.padding[1]:-self.padding[1]]
 
 
 class _Im2col(Function):
