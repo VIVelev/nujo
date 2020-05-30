@@ -118,26 +118,36 @@ class Conv2d(Flow):
 
 
 def get_im2col_indices(images_shape, kernel_size, stride):
-    ''' Reference: CS231n Stanford '''
+    ''' Reference: CS231n Stanford
+    (https://cs231n.github.io/convolutional-networks/)
 
-    batch_size, channels, height, width = images_shape
+    '''
+
+    # Obtain needed  information
+    _, channels, height, width = images_shape
     kernel_height, kernel_width = kernel_size
 
+    # Calculate output shape
     out_height = (height - kernel_height) // stride + 1
     out_width = (width - kernel_width) // stride + 1
 
-    i0 = repeat(arange(kernel_height), kernel_width)
-    i0 = tile(i0, channels)
-    i1 = stride * repeat(arange(out_height), out_width)
-    i = i0.reshape(-1, 1) + i1.reshape(1, -1)
+    # Calculate sections' rows
+    section_rows = repeat(arange(kernel_height), kernel_width)
+    section_rows = tile(section_rows, channels)
+    slide_rows = stride * repeat(arange(out_height), out_width)
+    section_rows = section_rows.reshape(-1, 1) + slide_rows.reshape(1, -1)
 
-    j0 = tile(arange(kernel_width), kernel_height * channels)
-    j1 = stride * tile(arange(out_width), out_height)
-    j = j0.reshape(-1, 1) + j1.reshape(1, -1)
+    # Calculate sections' columns
+    section_cols = tile(arange(kernel_width), kernel_height * channels)
+    slide_cols = stride * tile(arange(out_width), out_height)
+    section_cols = section_cols.reshape(-1, 1) + slide_cols.reshape(1, -1)
 
-    k = repeat(arange(channels), kernel_height * kernel_width).reshape(-1, 1)
+    # Calculate sections' channels
+    section_channels = repeat(arange(channels),
+                              kernel_height * kernel_width).reshape(-1, 1)
 
-    return (k, i, j)
+    # Return indices
+    return section_channels, section_rows, section_cols
 
 
 def im2col(images, kernel_size, stride):
@@ -145,6 +155,7 @@ def im2col(images, kernel_size, stride):
     Used during the forward pass.
 
     Reference: CS231n Stanford
+    (https://cs231n.github.io/convolutional-networks/)
 
     '''
 
@@ -152,14 +163,9 @@ def im2col(images, kernel_size, stride):
     # to be applied between weights and the image
     k, i, j = get_im2col_indices(images.shape, kernel_size, stride)
 
-    # Get content from image at those indices
-    cols = images[:, k, i, j]
-    channels = images.shape[1]
     # Reshape content into column shape
-    cols = cols.transpose(1, 2, 0) \
-        .reshape(kernel_size[0] * kernel_size[1] * channels, -1)
-
-    return cols
+    return images[:, k, i, j].transpose(1, 2, 0)\
+        .reshape(kernel_size[0] * kernel_size[1] * images.shape[1], -1)
 
 
 # ====================================================================================================
