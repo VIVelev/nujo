@@ -101,11 +101,17 @@ class Conv2d(Flow):
         # Not used for now
         self.dilation = dilation if isinstance(dilation, tuple) else (dilation,
                                                                       dilation)
+        self.bias = bias
+
+        # Define trainable parameters
 
         self.kernels = randn(self.out_channels,
                              self.in_channels,
                              *self.kernel_size,
                              name=self.name + '.kernels')
+
+        if self.bias:
+            self.b = randn(self.out_channels, 1, name=self.name + '.bias')
 
     def forward(self, x: Tensor) -> Tensor:
         batch_size, channels, height, width = x.shape
@@ -114,6 +120,8 @@ class Conv2d(Flow):
         x_col = _Im2col(x, self.kernel_size, self.stride)()
         kernels_col = self.kernels.reshape(self.out_channels, -1)
         out_col = kernels_col @ x_col
+        if self.bias:
+            out_col += self.b
 
         # Reshape
         output_shape = (
