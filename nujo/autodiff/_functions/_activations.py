@@ -154,7 +154,7 @@ class _Softmax(Function):
     def forward(self) -> ndarray:
         # The max element of the input vector will be
         # substracted from the inputs for numerical stability.
-        # This will not change the output of the softmax.
+        # This will not change the relative output of the softmax.
 
         exps = exp(self.children[0].value -
                    max(self.children[0].value, axis=0, keepdims=True))
