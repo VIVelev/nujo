@@ -77,8 +77,9 @@ class Function(_Node, object):
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
             # Include the inputs' (children's) identifiers in the key
-            key += ''.join((str(x.id) if isinstance(x, Tensor) else str(x)
-                            for x in children))
+            key += ''.join(
+                ('T' + str(x.id) if isinstance(x, Tensor) else 'P' + str(x)
+                 for x in children))
 
             if key in cls._func_children_lookup_cache:
                 cls._cache_hit = True
