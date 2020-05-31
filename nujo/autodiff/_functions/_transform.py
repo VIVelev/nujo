@@ -26,10 +26,10 @@ class _Reshape(Function):
         self._input_shape = self.children[0].shape
 
     def forward(self) -> ndarray:
-        return self.children[0].value.reshape(self.shape)
+        return self.children[0].value.reshape(*self.shape)
 
     def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
-        return accum_grad.reshape(self._input_shape)
+        return accum_grad.reshape(*self._input_shape)
 
 
 # ====================================================================================================
@@ -43,7 +43,7 @@ class _Transpose(Function):
         super(_Transpose, self).__init__(input)
 
         self.dims = dims if dims is not None else reversed(
-            range(len(self.dims)))
+            range(len(self.children[0].shape)))
         self._detranspose_dims = sorted(range(len(self.dims)),
                                         key=lambda idx: self.dims[idx])
 
@@ -63,12 +63,12 @@ class _Padding(Function):
 
         super(_Padding, self).__init__(input)
 
-        # Shape of input should be: (batch_size, channels, height, width)
+        # Shape of `input` should be: (batch_size, channels, height, width)
         assert len(self.children[0].shape) == 4
 
         self.padding = padding
 
-    def forward(self):
+    def forward(self) -> ndarray:
         return pad(self.children[0].value, (
             (0, 0),
             (0, 0),
@@ -81,67 +81,68 @@ class _Padding(Function):
                           self.padding[1]:-self.padding[1]]
 
 
+# ====================================================================================================
+
+
 class _Im2col(Function):
+    ''' Image to columns transformation
+
+    Reference: CS231n Stanford
+    (https://cs231n.github.io/convolutional-networks/)
+
+    Parameters:
+    -----------
+     - input : image shaped array, shape: (batch_size, channels, height, width)
+     - kernel_size : tuple of 2 integers, image filter height and width
+     - stride : tuple of 2 integers
+
+    '''
     def __init__(self, input: Union[Tensor, ndarray, List[Number], Number],
                  kernel_size: Tuple[int, int], stride: Tuple[int, int]):
 
         super(_Im2col, self).__init__(input)
 
+        # Shape of `input` should be: (batch_size, channels, height, width)
+        assert len(self.children[0].shape) == 4
+
         self.kernel_size = kernel_size
-        self.stride = stride
-
-        self._im2col_indices: Tuple[ndarray, ndarray, ndarray] = None
-
-    def forward(self) -> ndarray:
-        ''' Method which turns the image shaped input to column shape
-
-        Reference: CS231n Stanford
-        (https://cs231n.github.io/convolutional-networks/)
-
-        '''
-
-        images = self.children[0].value
 
         # Calculate the indices where the dot products are
         # to be applied between weights and the image
-        self._im2col_indices = _Im2col.get_im2col_indices(
-            images.shape, self.kernel_size, self.stride)
+        self._im2col_indices: Tuple[ndarray, ndarray, ndarray] =\
+            self._get_im2col_indices(self.kernel_size, stride)
 
-        k, i, j = self._im2col_indices
+    def forward(self) -> ndarray:
+        ''' Method which turns the image shaped input to column shape
+        '''
+
+        images = self.children[0].value
 
         # Reshape content into column shape
         n_features = self.kernel_size[0] * self.kernel_size[1] *\
             images.shape[1]  # number of channels
 
+        k, i, j = self._im2col_indices
         return images[:, k, i, j].transpose(1, 2, 0).reshape(n_features, -1)
 
     def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
         ''' Method which turns the column shaped input to image shape
-
-        Reference: CS231n Stanford
-        (https://cs231n.github.io/convolutional-networks/)
-
         '''
 
-        # Get the indices where the dot products are
-        # to be applied between weights and the image
-        k, i, j = self._im2col_indices
-
         images = zeros(self.children[0].shape)
+
+        k, i, j = self._im2col_indices
         add.at(images, (slice(None), k, i, j),
                expand_dims(accum_grad, 1).transpose(2, 0, 1))
 
         return images
 
-    @classmethod
-    def get_im2col_indices(cls, images_shape, kernel_size, stride):
-        ''' Reference: CS231n Stanford
-        (https://cs231n.github.io/convolutional-networks/)
-
-        '''
+    def _get_im2col_indices(
+            self, kernel_size: Tuple[int, int],
+            stride: Tuple[int, int]) -> Tuple[ndarray, ndarray, ndarray]:
 
         # Obtain needed  information
-        _, channels, height, width = images_shape
+        _, channels, height, width = self.children[0].shape
         kernel_height, kernel_width = kernel_size
         stride_height, stride_width = stride
 

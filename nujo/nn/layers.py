@@ -3,7 +3,7 @@ from typing import Tuple, Union
 from nujo.autodiff._functions._transform import _Im2col, _Padding
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
-from nujo.init import randn
+from nujo.init.random import randn
 
 __all__ = [
     'Linear',
@@ -74,6 +74,7 @@ class Conv2d(Flow):
         Default: 0
      - bias : bool, optional, if True, adds a learnable bias to the output.
         Default: True
+     - name : string, identifier for the current layer
 
     '''
     def __init__(self,
@@ -101,6 +102,7 @@ class Conv2d(Flow):
         # Not used for now
         self.dilation = dilation if isinstance(dilation, tuple) else (dilation,
                                                                       dilation)
+
         self.bias = bias
 
         # Define trainable parameters
