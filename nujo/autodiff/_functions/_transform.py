@@ -85,7 +85,18 @@ class _Pad(Function):
 
 
 class _Im2col(Function):
-    ''' Image to columns transformation
+    ''' Image to column shape transformation
+
+    The local regions in the input image are stretched out into columns.
+
+    For example, if the input is [3x227x227] and it is to be convolved
+    with 3x11x11 filters at stride (4, 4), then we would take [3x11x11]
+    blocks of pixels in the input and stretch each block into a column
+    vector of size 3*11*11 = 363. Iterating this process in the input
+    at stride of (4, 4) gives (227-11)/4+1 = 55 locations along both
+    height and width, leading to an output matrix X_col of Im2col of size
+    [363 x 3025], where every column is a stretched out receptive field
+    and there are 55*55 = 3025 of them in total.
 
     Reference: CS231n Stanford
     (https://cs231n.github.io/convolutional-networks/)
