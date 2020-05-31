@@ -58,6 +58,11 @@ class _Transpose(Function):
 
 
 class _Pad(Function):
+    ''' Zero Padding
+
+    Pads an image shaped array with zeros.
+
+    '''
     def __init__(self, input: Union[Tensor, ndarray, List[Number], Number],
                  padding: Tuple[int, int]):
 
