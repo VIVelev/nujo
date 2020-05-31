@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Tuple, Union
 
 from nujo.autodiff._functions._transform import _Im2col, _Pad
@@ -135,8 +136,11 @@ class Conv2d(Flow):
         return out_col.reshape(*output_shape, batch_size)\
             .transpose(3, 0, 1, 2)
 
+    @lru_cache(maxsize=64)
     def get_output_shape(self, height: int,
                          width: int) -> Tuple[int, int, int]:
+        ''' Cached output shape calculation
+        '''
 
         return (
             self.out_channels,
