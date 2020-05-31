@@ -79,7 +79,6 @@ taking the best from both worlds.</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
 <li>children : varargs, the inpute tensors</li>
-<li>name : string, the name of the function</li>
 </ul></div>
 <details class="source">
 <summary>
@@ -100,66 +99,87 @@ taking the best from both worlds.</p>
     Parameters:
     -----------
      - children : varargs, the inpute tensors
-     - name : string, the name of the function
 
     &#39;&#39;&#39;
 
-    _children_history: Dict[str, &#39;Function&#39;] = {}
-    &#39;&#39;&#39; Cache where input tensors for
-    the current function type are stored.
+    _func_children_lookup_cache: Dict[str, &#39;Function&#39;] = {}
+    &#39;&#39;&#39; Cache used to lookup for functions that may have already been defined
+    in the computation graph.
+
+     - key : hash(FuncType) + (children&#39;s identifiers)
+     - value : the already defined function which will be reused
+
     &#39;&#39;&#39;
 
     _cache_hit = False
     &#39;&#39;&#39; Flag signaling cache hit/miss.
     &#39;&#39;&#39;
-    def __init__(self,
-                 *children: Union[Tensor, ndarray, List[Number], Number],
-                 name=&#39;Function&#39;):
+
+    T = TypeVar(&#39;T&#39;, Tensor, ndarray)
+
+    def __init__(self, *children: Union[Tensor, ndarray, List[Number],
+                                        Number]):
 
         if self._cache_hit:
             return
 
-        super(Function, self).__init__(*children, name=name)
+        super(Function, self).__init__(*Function._parse_inputs(children),
+                                       name=self.__class__.__name__)
 
         # This output placeholder is reused when possible
         self._output_placeholder = Tensor(
             None,
-            diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
+            diff=any(x.diff for x in self.children) and modes.DIFF_ENABLED,
             creator=self if modes.DIFF_ENABLED else None,
             name=self._generate_tensor_name())
 
         if modes.DIFF_ENABLED:  # If graph building is enabled.
             # Allocate space for parent&#39;s output (output placeholder)
-            # and its weight (derivative).
-
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
-                child.weights.append(None)
 
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
-        &#39;&#39;&#39; Used to review the cache for hit and return the cached tensor
-        or otherwise add the new tensor to the cache.
+        &#39;&#39;&#39; Used to lookup the cache for an already defined function of
+        the current type using the current `children` as inputs, and reuse
+        it. If a function satisfying this requirements could not be found,
+        a new function is created and added to the cache, in order to be,
+        potentially, later reused.
+
         &#39;&#39;&#39;
 
+        # Only cache functions that are in the computation graph
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
-            # Include the arguments&#39; uids in the key
+            # Include the inputs&#39; (children&#39;s) identifiers in the key
             key += &#39;&#39;.join((str(x.id) if isinstance(x, Tensor) else str(x)
                             for x in children))
 
-            if key in cls._children_history:
+            if key in cls._func_children_lookup_cache:
                 cls._cache_hit = True
-                return cls._children_history[key]
+                return cls._func_children_lookup_cache[key]
+
             else:
                 cls._cache_hit = False
-                creator = super(Function, cls).__new__(cls)
-                cls._children_history[key] = creator
-                return creator
+                func = super(Function, cls).__new__(cls)
+                cls._func_children_lookup_cache[key] = func
+                return func
 
+        # If the functions are not in the computation graph,
+        # perform standard python init.
         else:
             cls._cache_hit = False
             return super(Function, cls).__new__(cls)
+
+    @classmethod
+    def _parse_inputs(cls, inputs: List[Any]) -&gt; List[Tensor]:
+        &#39;&#39;&#39; Parse all inputs that are not Nodes to Tensors
+        &#39;&#39;&#39;
+
+        return [
+            x if isinstance(x, _Node) else Tensor(x, name=str(x))
+            for x in inputs
+        ]
 
     def __repr__(self):
         return super(Function, self).__repr__() + f&#39;#{self.id}&#39;
@@ -170,36 +190,52 @@ taking the best from both worlds.</p>
     @abstractmethod
     def forward(self) -&gt; ndarray:
         &#39;&#39;&#39; Implement forward pass of the function here.
+
+        Use the `self.children` list to access the inputs.
+
         &#39;&#39;&#39;
 
         pass
 
     @abstractmethod
-    def backward(self) -&gt; Tuple[ndarray, ...]:
+    def backward(self, idx: int, accum_grad: T) -&gt; T:
         &#39;&#39;&#39; Implement backward pass of the function here
-        (a.k.a. derivative calculation).
+
+        Compute the gradient of children[idx] w.r.t. output of the
+        computation graph from the accumulated gradient (the gradient
+        of the output of the function w.r.t. the output of the graph).
+
+        Parameters:
+        -----------
+        - idx : int, the index of the children for which to compute the
+         gradient w.r.t. output of the computation graph
+        - accum_grad : T (Tensor or ndarray), the accumulated grad in the graph
+         so far, you can otherwise think of it as the gradient of the output of
+         the function w.r.t. the output of the graph.
+
+            - `accum_grad` is Tensor if differentiantion is enabled
+             (`DIFF_ENABLED`) and the children has opted for differentiation
+             (`diff` is True), thus the computations will be recorded in the
+             computation graph and higher-order derivatives could be computed.
+            - otherwise, `accum_grad` is ndarray and the computations are not
+             recorded; ndarrays are used since the computations with them are
+             more efficient.
+
+        Returns:
+        --------
+        - grad : T (Tensor or ndarray), the computed gradient of
+         `self.children[idx]`
+
         &#39;&#39;&#39;
 
         pass
 
     def __call__(self) -&gt; Tensor:
-        &#39;&#39;&#39; Executes forward pass and
-        updates the weights (derivatives) for the dependent children.
+        &#39;&#39;&#39; Executes cached forward pass
         &#39;&#39;&#39;
 
         # Forward pass
         self._output_placeholder.value = self.forward()
-
-        if self._output_placeholder.diff:  # Is gradient dependecy?
-            self._output_placeholder.zero_grad()
-
-            # Update the weights
-            for tensor, derivative in zip(self.children, self.backward()):
-                idx = next(i for i, v in enumerate(tensor.parents_outputs)
-                           if v is self._output_placeholder)
-
-                tensor.weights[idx] = derivative
-
         return self._output_placeholder</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -225,22 +261,80 @@ taking the best from both worlds.</p>
 <li>nujo.autodiff._functions._elementary._Power</li>
 <li>nujo.autodiff._functions._elementary._Reciprocal</li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="nujo.autodiff.Function.T"><code class="name">var <span class="ident">T</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="nujo.autodiff.Function.backward"><code class="name flex">
-<span>def <span class="ident">backward</span></span>(<span>self) -> Tuple[numpy.ndarray, ...]</span>
+<span>def <span class="ident">backward</span></span>(<span>self, idx: int, accum_grad: ~T) -> ~T</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Implement backward pass of the function here
-(a.k.a. derivative calculation).</p></div>
+<div class="desc"><p>Implement backward pass of the function here</p>
+<p>Compute the gradient of children[idx] w.r.t. output of the
+computation graph from the accumulated gradient (the gradient
+of the output of the function w.r.t. the output of the graph).</p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>idx : int, the index of the children for which to compute the
+gradient w.r.t. output of the computation graph</li>
+<li>
+<p>accum_grad : T (Tensor or ndarray), the accumulated grad in the graph
+so far, you can otherwise think of it as the gradient of the output of
+the function w.r.t. the output of the graph.</p>
+<ul>
+<li><code>accum_grad</code> is Tensor if differentiantion is enabled
+(<code>DIFF_ENABLED</code>) and the children has opted for differentiation
+(<code>diff</code> is True), thus the computations will be recorded in the
+computation graph and higher-order derivatives could be computed.</li>
+<li>otherwise, <code>accum_grad</code> is ndarray and the computations are not
+recorded; ndarrays are used since the computations with them are
+more efficient.</li>
+</ul>
+</li>
+</ul>
+<h2 id="returns">Returns:</h2>
+<ul>
+<li>grad : T (Tensor or ndarray), the computed gradient of
+<code>self.children[idx]</code></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-def backward(self) -&gt; Tuple[ndarray, ...]:
+def backward(self, idx: int, accum_grad: T) -&gt; T:
     &#39;&#39;&#39; Implement backward pass of the function here
-    (a.k.a. derivative calculation).
+
+    Compute the gradient of children[idx] w.r.t. output of the
+    computation graph from the accumulated gradient (the gradient
+    of the output of the function w.r.t. the output of the graph).
+
+    Parameters:
+    -----------
+    - idx : int, the index of the children for which to compute the
+     gradient w.r.t. output of the computation graph
+    - accum_grad : T (Tensor or ndarray), the accumulated grad in the graph
+     so far, you can otherwise think of it as the gradient of the output of
+     the function w.r.t. the output of the graph.
+
+        - `accum_grad` is Tensor if differentiantion is enabled
+         (`DIFF_ENABLED`) and the children has opted for differentiation
+         (`diff` is True), thus the computations will be recorded in the
+         computation graph and higher-order derivatives could be computed.
+        - otherwise, `accum_grad` is ndarray and the computations are not
+         recorded; ndarrays are used since the computations with them are
+         more efficient.
+
+    Returns:
+    --------
+    - grad : T (Tensor or ndarray), the computed gradient of
+     `self.children[idx]`
+
     &#39;&#39;&#39;
 
     pass</code></pre>
@@ -250,7 +344,8 @@ def backward(self) -&gt; Tuple[ndarray, ...]:
 <span>def <span class="ident">forward</span></span>(<span>self) -> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Implement forward pass of the function here.</p></div>
+<div class="desc"><p>Implement forward pass of the function here.</p>
+<p>Use the <code>self.children</code> list to access the inputs.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -258,6 +353,9 @@ def backward(self) -&gt; Tuple[ndarray, ...]:
 <pre><code class="python">@abstractmethod
 def forward(self) -&gt; ndarray:
     &#39;&#39;&#39; Implement forward pass of the function here.
+
+    Use the `self.children` list to access the inputs.
+
     &#39;&#39;&#39;
 
     pass</code></pre>
@@ -322,12 +420,9 @@ the only child of a tensor</li>
         # Outputs of the functions the current tensor is input to.
         # Used for backpropagation of the gradients.
         self.parents_outputs: List[&#39;Tensor&#39;] = []
-        # The weights of the outputs (a.k.a. derivatives of the functions).
-        self.weights: List[ndarray] = []
 
         # Gradient of the current tensor
         self._grad: &#39;Tensor&#39; = None
-        self._grad_is_zeroed = True
 
         # Transposed tensor cache
         self._T: &#39;Tensor&#39; = None
@@ -353,11 +448,12 @@ the only child of a tensor</li>
     @property
     def grad(self) -&gt; &#39;Tensor&#39;:
         if self._grad is None:
-            self._grad = Tensor(None, name=f&#39;grad[{self.name}]&#39;)
+            self._grad = Tensor(empty(self._value.shape),
+                                name=f&#39;grad[{self.name}]&#39;)
 
         return self._grad
 
-    # Shape and shape transformations
+    # Shape and shape manipulations
 
     @property
     def shape(self) -&gt; Tuple[int, ...]:
@@ -365,6 +461,7 @@ the only child of a tensor</li>
 
     @property
     def T(self) -&gt; &#39;Tensor&#39;:
+        # Only transpose if something has changed
         if (self._value != self._prev_value).any():
             self._T = self.transpose()
             self._prev_value = self._value
@@ -407,47 +504,75 @@ the only child of a tensor</li>
 
     # Gradient computation
 
-    def compute_grad(self) -&gt; None:
-        if modes.DIFF_ENABLED and self.diff and \
-           self._grad_is_zeroed:
+    def _compute_grad_from(self,
+                           poutput: &#39;Tensor&#39;) -&gt; Union[&#39;Tensor&#39;, ndarray]:
+        &#39;&#39;&#39; Computes the gradient of `self` w.r.t. the output of the computation
+        graph from `poutput` (using the path of computations from `poutput`)
 
-            self._grad_is_zeroed = False
+            In other words, this functions returns:
+                (dOutput / dPoutput) * (dPoutput / dSelf)
+
+        &#39;&#39;&#39;
+
+        # Find the index of the children which gradient should be computed
+        # (a.k.a. find the index of `self` in `poutput.creator.children`)
+        idx = next(i for i, v in enumerate(poutput.creator.children)
+                   if v is self)
+
+        if poutput._grad.diff:
+            # Pass a diff enabled tensor to the backward call,
+            # thus recording grad computations in the computation
+            # graph, which enables higher-order differentiation.
+            grad = poutput.creator.backward(idx, poutput._grad)
+
+            # Check if `self` is scalar and needs to be averaged
+            if self._value.shape != () and\
+               self._value.shape[-1] == 1:
+
+                # Record the mean in the computation graph
+                from nujo.math.aggregate import mean
+                grad = mean(grad, dim=-1, keepdim=True)
+
+        else:
+            # Do not leave a trace in the computation graph!
+            # Use numpy arrays! :)
+            grad = poutput.creator.backward(idx, poutput._grad._value)
+
+            # Check if `self` is scalar and needs to be averaged
+            if self._value.shape != () and\
+               self._value.shape[-1] == 1:
+
+                grad = grad.mean(axis=-1, keepdims=True)
+
+        return grad
+
+    def compute_grad(self) -&gt; None:
+        if modes.DIFF_ENABLED and self.diff:
 
             # Make sure grad is Tensor (`grad property call`) and init value
-            self.grad._value = zeros(self._value.shape)
+            if self._grad is None:
+                self.zero_grad(propagate=False)
 
             # Top-parent grad
             if len(self.parents_outputs) == 0:
                 self._grad._value += 1
                 return
 
-            for poutput, weight in zip(self.parents_outputs, self.weights):
-                if poutput.creator.name == &#39;_MatrixMul&#39;:
-                    if self is poutput.creator.children[0]:
-                        # XW = Z, dX ...
-                        self._grad._value += poutput._grad._value @ weight.T
+            for poutput in self.parents_outputs:
+                curr_grad = self._compute_grad_from(poutput)
 
-                    else:
-                        # XW = Z, dW ...
-                        self._grad._value += (
-                            poutput._grad._value.T @ weight).T
-
-                elif poutput.creator.name == &#39;_Reshape&#39;:
-                    self._grad._value += poutput._grad._value.reshape(weight)
-
-                elif poutput.creator.name == &#39;_Transpose&#39;:
-                    self._grad._value += poutput._grad._value.transpose(weight)
-
+                if self._grad.diff:
+                    # Record grad computations in the computation graph
+                    self._grad += curr_grad
                 else:
-                    update = poutput._grad._value * weight
-                    if self._grad._value.shape == (1, 1):  # Is scalar?
-                        self._grad._value = self._grad._value + update.sum()
-                    else:
-                        self._grad._value = self._grad._value + update
+                    self._grad._value += curr_grad
 
-    def zero_grad(self) -&gt; None:
+    def zero_grad(self, propagate=True) -&gt; None:
         self.grad._value.fill(0)
-        self._grad_is_zeroed = True
+
+        if propagate:
+            for poutput in self.parents_outputs:
+                poutput.zero_grad()
 
     def backward(self, _debug=False) -&gt; None:
         &#39;&#39;&#39; It uses Breadth First Search to traverse the computation graph
@@ -470,7 +595,9 @@ the only child of a tensor</li>
 
             if node.creator:
                 for child in node.creator.children:
-                    nodes_to_visit.insert(0, child)
+                    # Avoid visiting the same node twice
+                    if all(child is not node for node in nodes_to_visit):
+                        nodes_to_visit.insert(0, child)
 
     # Useful methods
 
@@ -528,7 +655,6 @@ the only child of a tensor</li>
 
         # Transfer the gradient
         self._grad = getattr(other, &#39;grad&#39;, None)
-        self._grad_is_zeroed = getattr(other, &#39;_grad_is_zeroed&#39;, True)
 
         return self
 
@@ -625,6 +751,7 @@ the only child of a tensor</li>
 </summary>
 <pre><code class="python">@property
 def T(self) -&gt; &#39;Tensor&#39;:
+    # Only transpose if something has changed
     if (self._value != self._prev_value).any():
         self._T = self.transpose()
         self._prev_value = self._value
@@ -642,7 +769,8 @@ def T(self) -&gt; &#39;Tensor&#39;:
 <pre><code class="python">@property
 def grad(self) -&gt; &#39;Tensor&#39;:
     if self._grad is None:
-        self._grad = Tensor(None, name=f&#39;grad[{self.name}]&#39;)
+        self._grad = Tensor(empty(self._value.shape),
+                            name=f&#39;grad[{self.name}]&#39;)
 
     return self._grad</code></pre>
 </details>
@@ -731,7 +859,9 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 
         if node.creator:
             for child in node.creator.children:
-                nodes_to_visit.insert(0, child)</code></pre>
+                # Avoid visiting the same node twice
+                if all(child is not node for node in nodes_to_visit):
+                    nodes_to_visit.insert(0, child)</code></pre>
 </details>
 </dd>
 <dt id="nujo.autodiff.Tensor.compute_grad"><code class="name flex">
@@ -744,42 +874,25 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def compute_grad(self) -&gt; None:
-    if modes.DIFF_ENABLED and self.diff and \
-       self._grad_is_zeroed:
-
-        self._grad_is_zeroed = False
+    if modes.DIFF_ENABLED and self.diff:
 
         # Make sure grad is Tensor (`grad property call`) and init value
-        self.grad._value = zeros(self._value.shape)
+        if self._grad is None:
+            self.zero_grad(propagate=False)
 
         # Top-parent grad
         if len(self.parents_outputs) == 0:
             self._grad._value += 1
             return
 
-        for poutput, weight in zip(self.parents_outputs, self.weights):
-            if poutput.creator.name == &#39;_MatrixMul&#39;:
-                if self is poutput.creator.children[0]:
-                    # XW = Z, dX ...
-                    self._grad._value += poutput._grad._value @ weight.T
+        for poutput in self.parents_outputs:
+            curr_grad = self._compute_grad_from(poutput)
 
-                else:
-                    # XW = Z, dW ...
-                    self._grad._value += (
-                        poutput._grad._value.T @ weight).T
-
-            elif poutput.creator.name == &#39;_Reshape&#39;:
-                self._grad._value += poutput._grad._value.reshape(weight)
-
-            elif poutput.creator.name == &#39;_Transpose&#39;:
-                self._grad._value += poutput._grad._value.transpose(weight)
-
+            if self._grad.diff:
+                # Record grad computations in the computation graph
+                self._grad += curr_grad
             else:
-                update = poutput._grad._value * weight
-                if self._grad._value.shape == (1, 1):  # Is scalar?
-                    self._grad._value = self._grad._value + update.sum()
-                else:
-                    self._grad._value = self._grad._value + update</code></pre>
+                self._grad._value += curr_grad</code></pre>
 </details>
 </dd>
 <dt id="nujo.autodiff.Tensor.reshape"><code class="name flex">
@@ -857,7 +970,7 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 </details>
 </dd>
 <dt id="nujo.autodiff.Tensor.zero_grad"><code class="name flex">
-<span>def <span class="ident">zero_grad</span></span>(<span>self) -> NoneType</span>
+<span>def <span class="ident">zero_grad</span></span>(<span>self, propagate=True) -> NoneType</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -865,9 +978,12 @@ and compute the gradient for each differentiable Tensor in the graph.</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def zero_grad(self) -&gt; None:
+<pre><code class="python">def zero_grad(self, propagate=True) -&gt; None:
     self.grad._value.fill(0)
-    self._grad_is_zeroed = True</code></pre>
+
+    if propagate:
+        for poutput in self.parents_outputs:
+            poutput.zero_grad()</code></pre>
 </details>
 </dd>
 </dl>
@@ -925,6 +1041,7 @@ a.k.a. No gradients are computed for whatever tensor.</p></div>
 <li>
 <h4><code><a title="nujo.autodiff.Function" href="#nujo.autodiff.Function">Function</a></code></h4>
 <ul class="">
+<li><code><a title="nujo.autodiff.Function.T" href="#nujo.autodiff.Function.T">T</a></code></li>
 <li><code><a title="nujo.autodiff.Function.backward" href="#nujo.autodiff.Function.backward">backward</a></code></li>
 <li><code><a title="nujo.autodiff.Function.forward" href="#nujo.autodiff.Function.forward">forward</a></code></li>
 </ul>

@@ -13,6 +13,7 @@ for the tensors in the computation graph:
 Another way to see it is:
  - if DIFF_ENABLED is True, the computation graph is updated,
  otherwise it is not.
+
 '''
 
 

@@ -1,4 +1,5 @@
 from itertools import count
+from typing import Any
 
 
 class _Node:
@@ -8,19 +9,15 @@ class _Node:
 
     Parameters:
     -----------
-     - children : varargs, the children of the node.
-     - name : string, representation of the node.
+     - children : varargs, the children of the node
+     - name : string, representation of the node
 
     '''
 
     _id_generator = count()
 
-    def __init__(self, *children: ..., name='Node'):
-        # Parse all children that are not Nodes to Tensors
-        self.children = []
-        for child in children:
-            self.add_child(child)
-
+    def __init__(self, *children: Any, name='Node'):
+        self.children = list(children)
         self.name = name
         self.id: int = next(_Node._id_generator)
 
@@ -29,9 +26,3 @@ class _Node:
 
     def __repr__(self):
         return f'<{self.name}>'
-
-    def add_child(self, child) -> None:
-        from nujo.autodiff.tensor import Tensor
-
-        self.children.append(child if isinstance(child, _Node) else Tensor(
-            child, name=str(child)))

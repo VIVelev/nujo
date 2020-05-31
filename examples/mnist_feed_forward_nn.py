@@ -31,7 +31,7 @@ def train(net, x, y, num_epochs):
 
         # Print the loss for monitoring
         if epoch % 100 == 0:
-            print(f'EPOCH:\t{epoch}| LOSS:\t{loss.value[0,0]}')
+            print(f'EPOCH:\t{epoch}| LOSS:\t{loss.value}')
 
         # Backprop
         loss.backward()

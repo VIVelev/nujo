@@ -1,10 +1,10 @@
 from abc import abstractmethod
 from numbers import Number
-from typing import Dict, List, Tuple, Union
+from typing import Any, Dict, List, TypeVar, Union
 
 from numpy import ndarray
 
-from nujo.autodiff import modes
+import nujo.autodiff.modes as modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
 
@@ -24,66 +24,87 @@ class Function(_Node, object):
     Parameters:
     -----------
      - children : varargs, the inpute tensors
-     - name : string, the name of the function
 
     '''
 
-    _children_history: Dict[str, 'Function'] = {}
-    ''' Cache where input tensors for
-    the current function type are stored.
+    _func_children_lookup_cache: Dict[str, 'Function'] = {}
+    ''' Cache used to lookup for functions that may have already been defined
+    in the computation graph.
+
+     - key : hash(FuncType) + (children's identifiers)
+     - value : the already defined function which will be reused
+
     '''
 
     _cache_hit = False
     ''' Flag signaling cache hit/miss.
     '''
-    def __init__(self,
-                 *children: Union[Tensor, ndarray, List[Number], Number],
-                 name='Function'):
+
+    T = TypeVar('T', Tensor, ndarray)
+
+    def __init__(self, *children: Union[Tensor, ndarray, List[Number],
+                                        Number]):
 
         if self._cache_hit:
             return
 
-        super(Function, self).__init__(*children, name=name)
+        super(Function, self).__init__(*Function._parse_inputs(children),
+                                       name=self.__class__.__name__)
 
         # This output placeholder is reused when possible
         self._output_placeholder = Tensor(
             None,
-            diff=any([x.diff for x in self.children]) and modes.DIFF_ENABLED,
+            diff=any(x.diff for x in self.children) and modes.DIFF_ENABLED,
             creator=self if modes.DIFF_ENABLED else None,
             name=self._generate_tensor_name())
 
         if modes.DIFF_ENABLED:  # If graph building is enabled.
             # Allocate space for parent's output (output placeholder)
-            # and its weight (derivative).
-
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
-                child.weights.append(None)
 
     def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
                 **kwargs):
-        ''' Used to review the cache for hit and return the cached tensor
-        or otherwise add the new tensor to the cache.
+        ''' Used to lookup the cache for an already defined function of
+        the current type using the current `children` as inputs, and reuse
+        it. If a function satisfying this requirements could not be found,
+        a new function is created and added to the cache, in order to be,
+        potentially, later reused.
+
         '''
 
+        # Only cache functions that are in the computation graph
         if modes.DIFF_ENABLED:
             key = str(hash(cls))  # Inlcude the function type hash in the key
-            # Include the arguments' uids in the key
+            # Include the inputs' (children's) identifiers in the key
             key += ''.join((str(x.id) if isinstance(x, Tensor) else str(x)
                             for x in children))
 
-            if key in cls._children_history:
+            if key in cls._func_children_lookup_cache:
                 cls._cache_hit = True
-                return cls._children_history[key]
+                return cls._func_children_lookup_cache[key]
+
             else:
                 cls._cache_hit = False
-                creator = super(Function, cls).__new__(cls)
-                cls._children_history[key] = creator
-                return creator
+                func = super(Function, cls).__new__(cls)
+                cls._func_children_lookup_cache[key] = func
+                return func
 
+        # If the functions are not in the computation graph,
+        # perform standard python init.
         else:
             cls._cache_hit = False
             return super(Function, cls).__new__(cls)
+
+    @classmethod
+    def _parse_inputs(cls, inputs: List[Any]) -> List[Tensor]:
+        ''' Parse all inputs that are not Nodes to Tensors
+        '''
+
+        return [
+            x if isinstance(x, _Node) else Tensor(x, name=str(x))
+            for x in inputs
+        ]
 
     def __repr__(self):
         return super(Function, self).__repr__() + f'#{self.id}'
@@ -94,34 +115,50 @@ class Function(_Node, object):
     @abstractmethod
     def forward(self) -> ndarray:
         ''' Implement forward pass of the function here.
+
+        Use the `self.children` list to access the inputs.
+
         '''
 
         pass
 
     @abstractmethod
-    def backward(self) -> Tuple[ndarray, ...]:
+    def backward(self, idx: int, accum_grad: T) -> T:
         ''' Implement backward pass of the function here
-        (a.k.a. derivative calculation).
+
+        Compute the gradient of children[idx] w.r.t. output of the
+        computation graph from the accumulated gradient (the gradient
+        of the output of the function w.r.t. the output of the graph).
+
+        Parameters:
+        -----------
+        - idx : int, the index of the children for which to compute the
+         gradient w.r.t. output of the computation graph
+        - accum_grad : T (Tensor or ndarray), the accumulated grad in the graph
+         so far, you can otherwise think of it as the gradient of the output of
+         the function w.r.t. the output of the graph.
+
+            - `accum_grad` is Tensor if differentiantion is enabled
+             (`DIFF_ENABLED`) and the children has opted for differentiation
+             (`diff` is True), thus the computations will be recorded in the
+             computation graph and higher-order derivatives could be computed.
+            - otherwise, `accum_grad` is ndarray and the computations are not
+             recorded; ndarrays are used since the computations with them are
+             more efficient.
+
+        Returns:
+        --------
+        - grad : T (Tensor or ndarray), the computed gradient of
+         `self.children[idx]`
+
         '''
 
         pass
 
     def __call__(self) -> Tensor:
-        ''' Executes forward pass and
-        updates the weights (derivatives) for the dependent children.
+        ''' Executes cached forward pass
         '''
 
         # Forward pass
         self._output_placeholder.value = self.forward()
-
-        if self._output_placeholder.diff:  # Is gradient dependecy?
-            self._output_placeholder.zero_grad()
-
-            # Update the weights
-            for tensor, derivative in zip(self.children, self.backward()):
-                idx = next(i for i, v in enumerate(tensor.parents_outputs)
-                           if v is self._output_placeholder)
-
-                tensor.weights[idx] = derivative
-
         return self._output_placeholder

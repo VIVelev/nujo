@@ -1,9 +1,9 @@
 from numbers import Number
 from typing import List, Tuple, Union
 
-from numpy import array, ndarray, zeros
+from numpy import array, empty, ndarray
 
-from nujo.autodiff import modes
+import nujo.autodiff.modes as modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff._utils import _if_not_none
 
@@ -43,12 +43,9 @@ class Tensor(_Node):
         # Outputs of the functions the current tensor is input to.
         # Used for backpropagation of the gradients.
         self.parents_outputs: List['Tensor'] = []
-        # The weights of the outputs (a.k.a. derivatives of the functions).
-        self.weights: List[ndarray] = []
 
         # Gradient of the current tensor
         self._grad: 'Tensor' = None
-        self._grad_is_zeroed = True
 
         # Transposed tensor cache
         self._T: 'Tensor' = None
@@ -74,11 +71,12 @@ class Tensor(_Node):
     @property
     def grad(self) -> 'Tensor':
         if self._grad is None:
-            self._grad = Tensor(None, name=f'grad[{self.name}]')
+            self._grad = Tensor(empty(self._value.shape),
+                                name=f'grad[{self.name}]')
 
         return self._grad
 
-    # Shape and shape transformations
+    # Shape and shape manipulations
 
     @property
     def shape(self) -> Tuple[int, ...]:
@@ -86,6 +84,7 @@ class Tensor(_Node):
 
     @property
     def T(self) -> 'Tensor':
+        # Only transpose if something has changed
         if (self._value != self._prev_value).any():
             self._T = self.transpose()
             self._prev_value = self._value
@@ -128,47 +127,75 @@ class Tensor(_Node):
 
     # Gradient computation
 
-    def compute_grad(self) -> None:
-        if modes.DIFF_ENABLED and self.diff and \
-           self._grad_is_zeroed:
+    def _compute_grad_from(self,
+                           poutput: 'Tensor') -> Union['Tensor', ndarray]:
+        ''' Computes the gradient of `self` w.r.t. the output of the computation
+        graph from `poutput` (using the path of computations from `poutput`)
 
-            self._grad_is_zeroed = False
+            In other words, this functions returns:
+                (dOutput / dPoutput) * (dPoutput / dSelf)
+
+        '''
+
+        # Find the index of the children which gradient should be computed
+        # (a.k.a. find the index of `self` in `poutput.creator.children`)
+        idx = next(i for i, v in enumerate(poutput.creator.children)
+                   if v is self)
+
+        if poutput._grad.diff:
+            # Pass a diff enabled tensor to the backward call,
+            # thus recording grad computations in the computation
+            # graph, which enables higher-order differentiation.
+            grad = poutput.creator.backward(idx, poutput._grad)
+
+            # Check if `self` is scalar and needs to be averaged
+            if self._value.shape != () and\
+               self._value.shape[-1] == 1:
+
+                # Record the mean in the computation graph
+                from nujo.math.aggregate import mean
+                grad = mean(grad, dim=-1, keepdim=True)
+
+        else:
+            # Do not leave a trace in the computation graph!
+            # Use numpy arrays! :)
+            grad = poutput.creator.backward(idx, poutput._grad._value)
+
+            # Check if `self` is scalar and needs to be averaged
+            if self._value.shape != () and\
+               self._value.shape[-1] == 1:
+
+                grad = grad.mean(axis=-1, keepdims=True)
+
+        return grad
+
+    def compute_grad(self) -> None:
+        if modes.DIFF_ENABLED and self.diff:
 
             # Make sure grad is Tensor (`grad property call`) and init value
-            self.grad._value = zeros(self._value.shape)
+            if self._grad is None:
+                self.zero_grad(propagate=False)
 
             # Top-parent grad
             if len(self.parents_outputs) == 0:
                 self._grad._value += 1
                 return
 
-            for poutput, weight in zip(self.parents_outputs, self.weights):
-                if poutput.creator.name == '_MatrixMul':
-                    if self is poutput.creator.children[0]:
-                        # XW = Z, dX ...
-                        self._grad._value += poutput._grad._value @ weight.T
+            for poutput in self.parents_outputs:
+                curr_grad = self._compute_grad_from(poutput)
 
-                    else:
-                        # XW = Z, dW ...
-                        self._grad._value += (
-                            poutput._grad._value.T @ weight).T
-
-                elif poutput.creator.name == '_Reshape':
-                    self._grad._value += poutput._grad._value.reshape(weight)
-
-                elif poutput.creator.name == '_Transpose':
-                    self._grad._value += poutput._grad._value.transpose(weight)
-
+                if self._grad.diff:
+                    # Record grad computations in the computation graph
+                    self._grad += curr_grad
                 else:
-                    update = poutput._grad._value * weight
-                    if self._grad._value.shape == (1, 1):  # Is scalar?
-                        self._grad._value = self._grad._value + update.sum()
-                    else:
-                        self._grad._value = self._grad._value + update
+                    self._grad._value += curr_grad
 
-    def zero_grad(self) -> None:
+    def zero_grad(self, propagate=True) -> None:
         self.grad._value.fill(0)
-        self._grad_is_zeroed = True
+
+        if propagate:
+            for poutput in self.parents_outputs:
+                poutput.zero_grad()
 
     def backward(self, _debug=False) -> None:
         ''' It uses Breadth First Search to traverse the computation graph
@@ -191,7 +218,9 @@ class Tensor(_Node):
 
             if node.creator:
                 for child in node.creator.children:
-                    nodes_to_visit.insert(0, child)
+                    # Avoid visiting the same node twice
+                    if all(child is not node for node in nodes_to_visit):
+                        nodes_to_visit.insert(0, child)
 
     # Useful methods
 
@@ -249,7 +278,6 @@ class Tensor(_Node):
 
         # Transfer the gradient
         self._grad = getattr(other, 'grad', None)
-        self._grad_is_zeroed = getattr(other, '_grad_is_zeroed', True)
 
         return self
 
