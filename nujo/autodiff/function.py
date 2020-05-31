@@ -81,6 +81,9 @@ class Function(_Node, object):
                 ('T' + str(x.id) if isinstance(x, Tensor) else 'P' + str(x)
                  for x in children))
 
+            # 'T' and 'P' signatures were added in order to avoid
+            # collisions between Tensor and Python values
+
             if key in cls._func_children_lookup_cache:
                 cls._cache_hit = True
                 return cls._func_children_lookup_cache[key]
