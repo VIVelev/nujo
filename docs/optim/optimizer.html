@@ -44,7 +44,7 @@ class Optimizer:
      - lr : float, the learning rate
 
     &#39;&#39;&#39;
-    def __init__(self, params: Generator[Tensor, Tensor, None], lr: float):
+    def __init__(self, params: Generator[Tensor, None, None], lr: float):
         self.params = params
         self.lr = lr
 
@@ -58,18 +58,15 @@ class Optimizer:
         &#39;&#39;&#39;
 
         with no_diff():
-            parameters = self.params()
-            for param in parameters:
-                parameters.send(self.update_rule(param, param.grad))
+            for param in self.params():
+                param &lt;&lt;= self.update_rule(param, param.grad)
 
     def zero_grad(self) -&gt; None:
         &#39;&#39;&#39; Zeros the gradients of the parameters.
         &#39;&#39;&#39;
 
-        parameters = self.params()
-        for param in parameters:
-            param.zero_grad()
-            parameters.send(param)</code></pre>
+        for param in self.params():
+            param.zero_grad()</code></pre>
 </details>
 </section>
 <section>
@@ -83,7 +80,7 @@ class Optimizer:
 <dl>
 <dt id="nujo.optim.optimizer.Optimizer"><code class="flex name class">
 <span>class <span class="ident">Optimizer</span></span>
-<span>(</span><span>params: Generator[nujo.autodiff.tensor.Tensor, nujo.autodiff.tensor.Tensor, NoneType], lr: float)</span>
+<span>(</span><span>params: Generator[nujo.autodiff.tensor.Tensor, NoneType, NoneType], lr: float)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Stochastic Gradient Descent Optimizer</p>
@@ -113,7 +110,7 @@ optimizer you should inherit this class.</p>
      - lr : float, the learning rate
 
     &#39;&#39;&#39;
-    def __init__(self, params: Generator[Tensor, Tensor, None], lr: float):
+    def __init__(self, params: Generator[Tensor, None, None], lr: float):
         self.params = params
         self.lr = lr
 
@@ -127,18 +124,15 @@ optimizer you should inherit this class.</p>
         &#39;&#39;&#39;
 
         with no_diff():
-            parameters = self.params()
-            for param in parameters:
-                parameters.send(self.update_rule(param, param.grad))
+            for param in self.params():
+                param &lt;&lt;= self.update_rule(param, param.grad)
 
     def zero_grad(self) -&gt; None:
         &#39;&#39;&#39; Zeros the gradients of the parameters.
         &#39;&#39;&#39;
 
-        parameters = self.params()
-        for param in parameters:
-            param.zero_grad()
-            parameters.send(param)</code></pre>
+        for param in self.params():
+            param.zero_grad()</code></pre>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
@@ -163,9 +157,8 @@ optimizer you should inherit this class.</p>
     &#39;&#39;&#39;
 
     with no_diff():
-        parameters = self.params()
-        for param in parameters:
-            parameters.send(self.update_rule(param, param.grad))</code></pre>
+        for param in self.params():
+            param &lt;&lt;= self.update_rule(param, param.grad)</code></pre>
 </details>
 </dd>
 <dt id="nujo.optim.optimizer.Optimizer.update_rule"><code class="name flex">
@@ -196,10 +189,8 @@ def update_rule(self, param: Tensor, grad: Tensor) -&gt; Tensor:
     &#39;&#39;&#39; Zeros the gradients of the parameters.
     &#39;&#39;&#39;
 
-    parameters = self.params()
-    for param in parameters:
-        param.zero_grad()
-        parameters.send(param)</code></pre>
+    for param in self.params():
+        param.zero_grad()</code></pre>
 </details>
 </dd>
 </dl>
