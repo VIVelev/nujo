@@ -1,4 +1,4 @@
-''' a computation Flow
+''' a chainable computation Flow
 '''
 
 from abc import abstractmethod
@@ -25,7 +25,7 @@ class _FlowMeta(type):
 
 
 class Flow(metaclass=_FlowMeta):
-    ''' A computation Flow
+    ''' A chainable computation Flow
 
     A Flow is just a sequance of functions (addition, multiplication, etc.)
     that are grouped in a single object (Flow) and can be applied on a tensor.
@@ -47,6 +47,8 @@ class Flow(metaclass=_FlowMeta):
         if len(self._chain):  # If there is a chain
             self.name = self._generate_chain_name()
 
+    # setup methods
+
     def _register_parameters(self) -> None:
         ''' Tensor parameters registration - called after Flow.__init__
 
@@ -65,6 +67,8 @@ class Flow(metaclass=_FlowMeta):
 
     def _generate_chain_name(self) -> str:
         return ' >> '.join(map(lambda x: x.name, self._chain))
+
+    # parameters generators
 
     def parameters(self) -> Tensor:
         ''' Generator for all the parameters of the current flow
@@ -101,6 +105,8 @@ class Flow(metaclass=_FlowMeta):
 
                 if isinstance(prop, Tensor):
                     yield prop
+
+    # API methods
 
     def append(self, *flows: 'Flow') -> 'Flow':
         ''' Flow Append
@@ -162,6 +168,8 @@ class Flow(metaclass=_FlowMeta):
         '''
 
         pass
+
+    # methods implementing the flow functionality
 
     def __call__(self, *args, **kwargs) -> Tensor:
         output = self[0].forward(*args, **kwargs)
