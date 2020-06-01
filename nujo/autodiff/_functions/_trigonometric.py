@@ -28,7 +28,8 @@ class _Sin(Function):
                 (2 * self.i)
 
     def backward(self):
-        pass
+        # cos(X)
+        return _Cos(self.children[0])()
 
 
 # ====================================================================================================
@@ -49,6 +50,10 @@ class _Cos(Function):
                 e**-(self.i * self.children[0])) /\
                 self.i
 
+    def backward(self):
+        # sin(X)
+        return _Sin(self.children[0])()
+
 
 # ====================================================================================================
 
@@ -63,8 +68,10 @@ class _Tan(Function):
         super(_Tan, self).__init__(input)
 
     def forward(self) -> ndarray:
-        return _Sin(self.children[0].value)() /\
-               _Cos(self.children[0].value)()
+        return _Sin(self.children[0])() /\
+               _Cos(self.children[0])()
 
     def backward(self):
-        pass
+        # sec^2(X)
+        # sec(X) = 1 / cos(X)
+        return (1 / _Cos(self.children[0])())**2
