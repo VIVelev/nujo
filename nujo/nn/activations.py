@@ -5,6 +5,8 @@ https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-act
 
 '''
 
+from math import e
+
 from nujo.autodiff._functions._activations import (_BinaryStep, _LeakyReLU,
                                                    _ReLU, _Sigmoid, _Softmax,
                                                    _Swish, _TanH)
@@ -142,12 +144,25 @@ class Softmax(Flow):
     Nice read here:
     https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
 
+    Parameters:
+    -----------
+     - dim : int, the dimension along which to exponentiate and then sum;
+     (default: 0)
+     - base : float, the base of the exponentiation; (default: e)
+     (you can use this parameter to adjust the sharpness of attenuation
+     of the softmax; lower numbers will result in lower attenuation, and
+     higher numbers will result in higher attenuation, but most people
+     just stick with e)
+
     '''
-    def __init__(self, name='Softmax'):
+    def __init__(self, dim=0, base: float = e, name='Softmax'):
         super(Softmax, self).__init__(name=name)
 
+        self.dim = dim
+        self.base = base
+
     def forward(self, x: Tensor) -> Tensor:
-        return _Softmax(x)()
+        return _Softmax(x, dim=self.dim, base=self.base)()
 
 
 # ====================================================================================================

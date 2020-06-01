@@ -150,7 +150,7 @@ class _Softmax(Function):
     '''
     def __init__(self,
                  input: Union[Tensor, ndarray, List[Number], Number],
-                 dim: int = 0,
+                 dim=0,
                  base: float = e):
 
         super(_Softmax, self).__init__(input)
