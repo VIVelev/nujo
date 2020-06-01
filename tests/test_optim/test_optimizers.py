@@ -179,10 +179,7 @@ def vec_params():
 def get_generator_for():
     def gen(params):
         def g():
-            updated = (yield params[0])
-            yield
-            if updated is not None:
-                params[0] <<= updated
+            yield params[0]
 
         return g
 

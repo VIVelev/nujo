@@ -62,10 +62,7 @@ class Flow(metaclass=_FlowSetup):
 
     def parameters(self) -> Tensor:
         for param in self._total_parameters():
-            updated = (yield param)
-            yield
-            if updated is not None:
-                param <<= updated
+            yield param
 
     def _total_parameters(self) -> Tensor:
         total_params = [self._current_parameters()]
