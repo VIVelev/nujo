@@ -3,6 +3,7 @@
 
 from abc import abstractmethod
 from copy import deepcopy
+from itertools import chain
 from typing import List, Union
 
 from nujo.autodiff.tensor import Tensor
@@ -15,9 +16,10 @@ class _FlowSetup(type):
         ''' Flow's __init__ '''
         obj = type.__call__(cls, *args, **kwargs)  # Call __init__
 
-        obj = Flow(subflows=obj._get_subflows())
-        obj._register_parameters()
+        if not len(obj.subflows):
+            obj = Flow(_subflows=[obj])
 
+        obj._register_parameters()
         return obj
 
 
@@ -35,28 +37,14 @@ class Flow(metaclass=_FlowSetup):
     Parameters:
     -----------
      - name : string, name of the current flow
-     - subflows : list of flows
 
     '''
-    def __init__(self, name='Flow', subflows: List['Flow'] = []):
+    def __init__(self, name='Flow', _subflows: List['Flow'] = []):
         self.name = name
-        self.subflows = subflows
+        self.subflows = _subflows
 
         if len(self.subflows):
             self.name = self._generate_supflow_name()
-
-    def _get_subflows(self) -> List['Flow']:
-        subflows = []
-
-        for prop_name in dir(self):
-            prop = getattr(self, prop_name)
-
-            if isinstance(prop, Flow):
-                print(prop_name)
-                for subflow in prop.subflows:
-                    subflows.append(subflow)
-
-        return subflows if len(subflows) else [self]
 
     def _register_parameters(self) -> None:
         ''' Called after Flow.__init__
@@ -73,15 +61,30 @@ class Flow(metaclass=_FlowSetup):
         return ' >> '.join(map(lambda x: x.name, self.subflows))
 
     def parameters(self) -> Tensor:
+        for param in self._total_parameters():
+            updated = (yield param)
+            yield
+            if updated is not None:
+                param <<= updated
+
+    def _total_parameters(self) -> Tensor:
+        total_params = [self._current_parameters()]
+
+        for prop_name in dir(self):
+            prop = getattr(self, prop_name)
+
+            if isinstance(prop, Flow):
+                total_params.append(prop.parameters())
+
+        return chain(*total_params)
+
+    def _current_parameters(self) -> Tensor:
         for flow in self.subflows:
             for prop_name in dir(flow):
                 prop = getattr(flow, prop_name)
 
                 if isinstance(prop, Tensor):
-                    updated = (yield prop)
-                    yield
-                    if updated is not None:
-                        prop <<= updated
+                    yield prop
 
     def append(self, *flows: 'Flow') -> 'Flow':
         ''' Flow Append
@@ -161,7 +164,7 @@ class Flow(metaclass=_FlowSetup):
 
         '''
 
-        return Flow(subflows=[*self.subflows, *other.subflows])
+        return Flow(_subflows=[*self.subflows, *other.subflows])
 
     def __getitem__(self, key: Union[int, str]) -> 'Flow':
         ''' Get subflows by index/name
