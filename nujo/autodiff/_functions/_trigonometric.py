@@ -1,6 +1,6 @@
-# from typing import Union
-
 from math import e
+from numbers import Number
+from typing import List, Union
 
 from numpy import identity, ndarray
 
@@ -18,7 +18,7 @@ class _Sin(Function):
     sin(X) = (e^iX - e^-iX) / 2i
 
     '''
-    def __init__(self, input: Tensor):
+    def __init__(self, input: Union[Tensor, ndarray, List[Number], Number]):
         super(_Sin, self).__init__(input)
         self.i = identity(input.children[0].shape[0])
 
@@ -27,7 +27,7 @@ class _Sin(Function):
                 e**-(self.i * self.children[0])) /\
                 (2 * self.i)
 
-    def backward(self):
+    def backward(self) -> ndarray:
         # cos(X)
         return _Cos(self.children[0])()
 
@@ -41,7 +41,7 @@ class _Cos(Function):
     cos(X) = (e^iX + e^-iX) / i
 
     '''
-    def __init__(self, input):
+    def __init__(self, input: Union[Tensor, ndarray, List[Number], Number]):
         super(_Cos, self).__init__(input)
         self.i = identity(input.children[0].shape[0])
 
@@ -50,7 +50,7 @@ class _Cos(Function):
                 e**-(self.i * self.children[0])) /\
                 self.i
 
-    def backward(self):
+    def backward(self) -> ndarray:
         # sin(X)
         return _Sin(self.children[0])()
 
@@ -64,14 +64,14 @@ class _Tan(Function):
     tan(X) = sin(X) / cos(X)
 
     '''
-    def __init__(self, input):
+    def __init__(self, input: Union[Tensor, ndarray, List[Number], Number]):
         super(_Tan, self).__init__(input)
 
     def forward(self) -> ndarray:
         return _Sin(self.children[0])() /\
                _Cos(self.children[0])()
 
-    def backward(self):
+    def backward(self) -> ndarray:
         # sec^2(X)
         # sec(X) = 1 / cos(X)
         return (1 / _Cos(self.children[0])())**2
