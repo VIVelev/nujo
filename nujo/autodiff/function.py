@@ -1,12 +1,14 @@
 from abc import abstractmethod
 from numbers import Number
-from typing import Any, Dict, List, TypeVar, Union
+from typing import Any, Dict, Iterable, List, TypeVar, Union
 
 from numpy import ndarray
 
 import nujo.autodiff.modes as modes
 from nujo.autodiff._node import _Node
 from nujo.autodiff.tensor import Tensor
+
+# ====================================================================================================
 
 
 class Function(_Node, object):
@@ -48,7 +50,7 @@ class Function(_Node, object):
         if self._cache_hit:
             return
 
-        super(Function, self).__init__(*Function._parse_inputs(children),
+        super(Function, self).__init__(*_parse_inputs(children),
                                        name=self.__class__.__name__)
 
         # This output placeholder is reused when possible
@@ -75,10 +77,7 @@ class Function(_Node, object):
 
         # Only cache functions that are in the computation graph
         if modes.DIFF_ENABLED:
-            key = str(hash(cls))  # Inlcude the function type hash in the key
-            # Include the inputs' (children's) identifiers in the key
-            key += ''.join((str(x.id) if isinstance(x, Tensor) else str(x)
-                            for x in children))
+            key = _get_function_identifier(cls, children)
 
             if key in cls._func_children_lookup_cache:
                 cls._cache_hit = True
@@ -95,16 +94,6 @@ class Function(_Node, object):
         else:
             cls._cache_hit = False
             return super(Function, cls).__new__(cls)
-
-    @classmethod
-    def _parse_inputs(cls, inputs: List[Any]) -> List[Tensor]:
-        ''' Parse all inputs that are not Nodes to Tensors
-        '''
-
-        return [
-            x if isinstance(x, _Node) else Tensor(x, name=str(x))
-            for x in inputs
-        ]
 
     def __repr__(self):
         return super(Function, self).__repr__() + f'#{self.id}'
@@ -162,3 +151,38 @@ class Function(_Node, object):
         # Forward pass
         self._output_placeholder.value = self.forward()
         return self._output_placeholder
+
+
+# ====================================================================================================
+
+
+def _parse_inputs(inputs: Iterable[Any]) -> List[Tensor]:
+    ''' Parse all inputs that are not Nodes to Tensors
+    '''
+
+    return [
+        x if isinstance(x, _Node) else Tensor(x, name=str(x)) for x in inputs
+    ]
+
+
+# ====================================================================================================
+
+
+def _get_function_identifier(func_type: type, inputs: Iterable[Any]) -> str:
+    ''' Returns a string identifier for the current function type and its inputs,
+    used for cahching.
+
+    '''
+
+    key = str(hash(func_type))  # Inlcude the function type hash in the key
+    # Include the inputs' (children's) identifiers in the key
+    key += ''.join(('T' + str(x.id) if isinstance(x, Tensor) else 'P' + str(x)
+                    for x in inputs))
+
+    # 'T' and 'P' signatures were added in order to avoid
+    # collisions between Tensor and Python values
+
+    return key
+
+
+# ====================================================================================================

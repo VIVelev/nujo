@@ -239,6 +239,7 @@ class Tensor(_Node):
     def __setitem__(self, position: Union[int, Tuple[int, ...]],
                     value: Union['Tensor', ndarray, List[Number], Number]):
 
+        # TODO: This is a naive implementation. Fix it.
         self._value[position] = value
 
     def __hash__(self):

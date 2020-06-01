@@ -479,7 +479,7 @@ taking the best from both worlds.</p>
         if self._cache_hit:
             return
 
-        super(Function, self).__init__(*Function._parse_inputs(children),
+        super(Function, self).__init__(*_parse_inputs(children),
                                        name=self.__class__.__name__)
 
         # This output placeholder is reused when possible
@@ -506,10 +506,7 @@ taking the best from both worlds.</p>
 
         # Only cache functions that are in the computation graph
         if modes.DIFF_ENABLED:
-            key = str(hash(cls))  # Inlcude the function type hash in the key
-            # Include the inputs&#39; (children&#39;s) identifiers in the key
-            key += &#39;&#39;.join((str(x.id) if isinstance(x, Tensor) else str(x)
-                            for x in children))
+            key = _get_function_identifier(cls, children)
 
             if key in cls._func_children_lookup_cache:
                 cls._cache_hit = True
@@ -526,16 +523,6 @@ taking the best from both worlds.</p>
         else:
             cls._cache_hit = False
             return super(Function, cls).__new__(cls)
-
-    @classmethod
-    def _parse_inputs(cls, inputs: List[Any]) -&gt; List[Tensor]:
-        &#39;&#39;&#39; Parse all inputs that are not Nodes to Tensors
-        &#39;&#39;&#39;
-
-        return [
-            x if isinstance(x, _Node) else Tensor(x, name=str(x))
-            for x in inputs
-        ]
 
     def __repr__(self):
         return super(Function, self).__repr__() + f&#39;#{self.id}&#39;
@@ -976,6 +963,7 @@ the only child of a tensor</li>
     def __setitem__(self, position: Union[int, Tuple[int, ...]],
                     value: Union[&#39;Tensor&#39;, ndarray, List[Number], Number]):
 
+        # TODO: This is a naive implementation. Fix it.
         self._value[position] = value
 
     def __hash__(self):
