@@ -1,10 +1,10 @@
+from functools import lru_cache
 from typing import Tuple, Union
 
-from numpy import arange, repeat, tile
-
+from nujo.autodiff._functions._transform import _Im2col, _Pad
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
-from nujo.init import randn
+from nujo.init.random import randn
 
 __all__ = [
     'Linear',
@@ -75,6 +75,7 @@ class Conv2d(Flow):
         Default: 0
      - bias : bool, optional, if True, adds a learnable bias to the output.
         Default: True
+     - name : string, identifier for the current layer
 
     '''
     def __init__(self,
@@ -103,63 +104,51 @@ class Conv2d(Flow):
         self.dilation = dilation if isinstance(dilation, tuple) else (dilation,
                                                                       dilation)
 
+        self.bias = bias
+
+        # Define trainable parameters
+
         self.kernels = randn(self.out_channels,
                              self.in_channels,
                              *self.kernel_size,
                              name=self.name + '.kernels')
 
+        if self.bias:
+            self.b = randn(self.out_channels, 1, name=self.name + '.bias')
+
     def forward(self, x: Tensor) -> Tensor:
         batch_size, channels, height, width = x.shape
         assert channels == self.in_channels
 
-        # Turn image shape into column shape
-        # (enables dot product between input and weights)
-        pass
+        # Apply padding
+        x_padded = _Pad(x, self.padding)()
 
+        # Apply the kernels
+        x_col = _Im2col(x_padded, self.kernel_size, self.stride)()
+        kernels_col = self.kernels.reshape(self.out_channels, -1)
+        out_col = kernels_col @ x_col
+        if self.bias:
+            out_col += self.b
 
-def get_im2col_indices(images_shape, kernel_size, stride):
-    ''' Reference: CS231n Stanford '''
+        # Reshape
+        output_shape = self.get_output_shape(height, width)
 
-    batch_size, channels, height, width = images_shape
-    kernel_height, kernel_width = kernel_size
+        return out_col.reshape(*output_shape, batch_size)\
+            .transpose(3, 0, 1, 2)
 
-    out_height = (height - kernel_height) // stride + 1
-    out_width = (width - kernel_width) // stride + 1
+    @lru_cache(maxsize=64)
+    def get_output_shape(self, height: int,
+                         width: int) -> Tuple[int, int, int]:
+        ''' Cached output shape calculation
+        '''
 
-    i0 = repeat(arange(kernel_height), kernel_width)
-    i0 = tile(i0, channels)
-    i1 = stride * repeat(arange(out_height), out_width)
-    i = i0.reshape(-1, 1) + i1.reshape(1, -1)
-
-    j0 = tile(arange(kernel_width), kernel_height * channels)
-    j1 = stride * tile(arange(out_width), out_height)
-    j = j0.reshape(-1, 1) + j1.reshape(1, -1)
-
-    k = repeat(arange(channels), kernel_height * kernel_width).reshape(-1, 1)
-
-    return (k, i, j)
-
-
-def im2col(images, kernel_size, stride):
-    ''' Method which turns the image shaped input to column shape.
-    Used during the forward pass.
-
-    Reference: CS231n Stanford
-
-    '''
-
-    # Calculate the indices where the dot products are
-    # to be applied between weights and the image
-    k, i, j = get_im2col_indices(images.shape, kernel_size, stride)
-
-    # Get content from image at those indices
-    cols = images[:, k, i, j]
-    channels = images.shape[1]
-    # Reshape content into column shape
-    cols = cols.transpose(1, 2, 0) \
-        .reshape(kernel_size[0] * kernel_size[1] * channels, -1)
-
-    return cols
+        return (
+            self.out_channels,
+            ((height + self.padding[0] * 2 - self.kernel_size[0]) //
+             self.stride[0]) + 1,
+            ((width + self.padding[1] * 2 - self.kernel_size[1]) //
+             self.stride[1]) + 1,
+        )
 
 
 # ====================================================================================================
