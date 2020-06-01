@@ -20,7 +20,7 @@ class _Sin(Function):
     '''
     def __init__(self, input: Tensor):
         super(_Sin, self).__init__(input)
-        self.i = identity(input.children[0].value.shape[0])
+        self.i = identity(input.children[0].shape[0])
 
     def forward(self) -> ndarray:
         return (e**(self.i * self.children[0]) -
@@ -42,7 +42,7 @@ class _Cos(Function):
     '''
     def __init__(self, input):
         super(_Cos, self).__init__(input)
-        self.i = identity(input.children[0].value.shape[0])
+        self.i = identity(input.children[0].shape[0])
 
     def forward(self) -> ndarray:
         return (e**(self.i * self.children[0]) +
@@ -60,7 +60,7 @@ class _Tan(Function):
 
     '''
     def __init__(self, input):
-        pass
+        super(_Tan, self).__init__(input)
 
     def forward(self) -> ndarray:
         return _Sin(self.children[0].value)() /\
