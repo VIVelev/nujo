@@ -9,21 +9,21 @@ from typing import List, Union
 from nujo.autodiff.tensor import Tensor
 
 
-class _FlowSetup(type):
+class _FlowMeta(type):
     ''' Flow's metaclass used to setup the computation flow
     '''
     def __call__(cls, *args, **kwargs):
         ''' Flow's __init__ '''
         obj = type.__call__(cls, *args, **kwargs)  # Call __init__
+        obj._register_parameters()
 
         if not len(obj.subflows):
             obj = Flow(_subflows=[obj])
 
-        obj._register_parameters()
         return obj
 
 
-class Flow(metaclass=_FlowSetup):
+class Flow(metaclass=_FlowMeta):
     ''' A computation Flow
 
     A Flow is just a sequance of functions (addition, multiplication, etc.)
@@ -48,14 +48,17 @@ class Flow(metaclass=_FlowSetup):
 
     def _register_parameters(self) -> None:
         ''' Called after Flow.__init__
+
+        Makes all tensors bounded to `self` diff enabled,
+        sets their `diff` to `True`.
+
         '''
 
-        for flow in self.subflows:
-            for prop_name in dir(flow):
-                prop = getattr(flow, prop_name)
+        for prop_name in dir(self):
+            prop = getattr(self, prop_name)
 
-                if isinstance(prop, Tensor):
-                    prop.diff = True
+            if isinstance(prop, Tensor):
+                prop.diff = True
 
     def _generate_supflow_name(self) -> str:
         return ' >> '.join(map(lambda x: x.name, self.subflows))
