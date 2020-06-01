@@ -12,13 +12,12 @@ class _FlowSetup(type):
     ''' Flow's metaclass used to setup the computation flow
     '''
     def __call__(cls, *args, **kwargs):
-        ''' Flow() init call '''
-        obj = type.__call__(cls, *args, **kwargs)
+        ''' Flow's __init__ '''
+        obj = type.__call__(cls, *args, **kwargs)  # Call __init__
 
-        if not obj.subflows:
-            obj = Flow(subflows=[obj])
-
+        obj = Flow(subflows=obj._get_subflows())
         obj._register_parameters()
+
         return obj
 
 
@@ -45,6 +44,19 @@ class Flow(metaclass=_FlowSetup):
 
         if len(self.subflows):
             self.name = self._generate_supflow_name()
+
+    def _get_subflows(self) -> List['Flow']:
+        subflows = []
+
+        for prop_name in dir(self):
+            prop = getattr(self, prop_name)
+
+            if isinstance(prop, Flow):
+                print(prop_name)
+                for subflow in prop.subflows:
+                    subflows.append(subflow)
+
+        return subflows if len(subflows) else [self]
 
     def _register_parameters(self) -> None:
         ''' Called after Flow.__init__
