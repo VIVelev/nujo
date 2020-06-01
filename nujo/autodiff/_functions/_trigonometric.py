@@ -1,8 +1,7 @@
-from math import e
 from numbers import Number
 from typing import List, Union
 
-from numpy import identity, ndarray
+from numpy import cos, ndarray, sin, tan
 
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
@@ -20,16 +19,13 @@ class _Sin(Function):
     '''
     def __init__(self, input: Union[Tensor, ndarray, List[Number], Number]):
         super(_Sin, self).__init__(input)
-        self.i = identity(input.children[0].shape[0])
 
     def forward(self) -> ndarray:
-        return (e**(self.i * self.children[0]) -
-                e**-(self.i * self.children[0])) /\
-                (2 * self.i)
+        return sin(self.children[0].value)
 
-    def backward(self) -> ndarray:
+    def backward(self) -> Function.T:
         # cos(X)
-        return _Cos(self.children[0])()
+        return Tensor(_Cos(self.children[0].value)())
 
 
 # ====================================================================================================
@@ -43,16 +39,13 @@ class _Cos(Function):
     '''
     def __init__(self, input: Union[Tensor, ndarray, List[Number], Number]):
         super(_Cos, self).__init__(input)
-        self.i = identity(input.children[0].shape[0])
 
     def forward(self) -> ndarray:
-        return (e**(self.i * self.children[0]) +
-                e**-(self.i * self.children[0])) /\
-                self.i
+        return cos(self.children[0].value)
 
-    def backward(self) -> ndarray:
-        # sin(X)
-        return _Sin(self.children[0])()
+    def backward(self) -> Function.T:
+        # -sin(X)
+        return Tensor(-(_Sin(self.children[0].value)()))
 
 
 # ====================================================================================================
@@ -68,13 +61,11 @@ class _Tan(Function):
         super(_Tan, self).__init__(input)
 
     def forward(self) -> ndarray:
-        return _Sin(self.children[0])() /\
-               _Cos(self.children[0])()
+        return tan(self.children[0].value)
 
-    def backward(self) -> ndarray:
+    def backward(self) -> Function.T:
         # sec^2(X)
-        # sec(X) = 1 / cos(X)
-        return (1 / _Cos(self.children[0])())**2
+        return Tensor((1 / _Cos(self.children[0].value)())**2)
 
 
 # ====================================================================================================
