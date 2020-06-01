@@ -1,3 +1,4 @@
+from math import e
 from numbers import Number
 from typing import List, Union
 
@@ -147,8 +148,16 @@ class _Softmax(Function):
     https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
 
     '''
-    def __init__(self, input: Union[Tensor, ndarray, List[Number], Number]):
+    def __init__(self,
+                 input: Union[Tensor, ndarray, List[Number], Number],
+                 dim: int = 0,
+                 base: float = e):
+
         super(_Softmax, self).__init__(input)
+
+        self.dim = dim
+        self.base = base
+
         self._output: ndarray = None  # Used to compute the derivative
 
     def forward(self) -> ndarray:
@@ -156,9 +165,11 @@ class _Softmax(Function):
         # substracted from the inputs for numerical stability.
         # This will not change the relative output of the softmax.
 
-        exps = exp(self.children[0].value -
-                   max(self.children[0].value, axis=0, keepdims=True))
-        sums = sum(exps, axis=0, keepdims=True)
+        exps = self.base**(
+            self.children[0].value -
+            max(self.children[0].value, axis=self.dim, keepdims=True))
+
+        sums = sum(exps, axis=self.dim, keepdims=True)
 
         self._output = exps / sums
         return self._output
