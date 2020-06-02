@@ -18,7 +18,7 @@ def test_sin(input):
     assert allclose(sin(A), C.value)
 
     # Test Backprop
-    grad_A = sine.backward()
+    grad_A = sine.backward(0, 0)
     assert isinstance(grad_A, Tensor)
 
     # Test Derivative computation
@@ -40,7 +40,7 @@ def test_cos(input):
     assert allclose(cos(A), C.value)
 
     # Test Backprop
-    grad_A = cosine.backward()
+    grad_A = cosine.backward(0, 0)
     assert isinstance(grad_A, Tensor)
 
     # Test Derivative computation
@@ -62,7 +62,7 @@ def test_tan(input):
     assert allclose(tan(A), C.value)
 
     # Test Backprop
-    grad_A = tangent.backward()
+    grad_A = tangent.backward(0, 0)
     assert isinstance(grad_A, Tensor)
 
     # Test Derivative computation
