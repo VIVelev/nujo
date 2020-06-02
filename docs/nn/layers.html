@@ -27,7 +27,7 @@
 <pre><code class="python">from functools import lru_cache
 from typing import Tuple, Union
 
-from nujo.autodiff._functions._transform import _Im2col, _Pad
+from nujo.autodiff._functions._transform import _ConstPad, _Im2col
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 from nujo.init.random import randn
@@ -35,6 +35,7 @@ from nujo.init.random import randn
 __all__ = [
     &#39;Linear&#39;,
     &#39;Conv2d&#39;,
+    &#39;ConstPad2d&#39;,
 ]
 
 # ====================================================================================================
@@ -142,12 +143,16 @@ class Conv2d(Flow):
         if self.bias:
             self.b = randn(self.out_channels, 1, name=self.name + &#39;.bias&#39;)
 
+        self._padding_layer = ConstPad2d(self.padding,
+                                         value=0,
+                                         name=self.name + &#39;.padding&#39;)
+
     def forward(self, x: Tensor) -&gt; Tensor:
         batch_size, channels, height, width = x.shape
         assert channels == self.in_channels
 
         # Apply padding
-        x_padded = _Pad(x, self.padding)()
+        x_padded = self._padding_layer(x)
 
         # Apply the kernels
         x_col = _Im2col(x_padded, self.kernel_size, self.stride)()
@@ -158,7 +163,6 @@ class Conv2d(Flow):
 
         # Reshape
         output_shape = self.get_output_shape(height, width)
-
         return out_col.reshape(*output_shape, batch_size)\
             .transpose(3, 0, 1, 2)
 
@@ -177,6 +181,41 @@ class Conv2d(Flow):
         )
 
 
+# ====================================================================================================
+
+
+class ConstPad2d(Flow):
+    &#39;&#39;&#39; Pads the input tensor boundaries with a constant value.
+
+    Parameters:
+    -----------
+     - padding : int or tuple of two ints, specifying the padding
+     before and after.
+     - value : float, the value by which to pad
+     - name : string, identifier for the current layer
+
+    &#39;&#39;&#39;
+    def __init__(self,
+                 padding: Union[int, Tuple[int, int]],
+                 value: float = 0,
+                 name=&#39;ConstPad2d&#39;):
+
+        super(ConstPad2d, self).__init__(name=f&#39;{name}({padding})&#39;)
+
+        self.padding = padding if isinstance(padding, tuple) else (padding,
+                                                                   padding)
+        self.value = value
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        return _ConstPad(x, (
+            (0, 0),
+            (0, 0),
+            (self.padding[0], self.padding[0]),
+            (self.padding[1], self.padding[1]),
+        ),
+                         value=self.value)()
+
+
 # ====================================================================================================</code></pre>
 </details>
 </section>
@@ -189,6 +228,70 @@ class Conv2d(Flow):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="nujo.nn.layers.ConstPad2d"><code class="flex name class">
+<span>class <span class="ident">ConstPad2d</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Pads the input tensor boundaries with a constant value.</p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>padding : int or tuple of two ints, specifying the padding
+before and after.</li>
+<li>value : float, the value by which to pad</li>
+<li>name : string, identifier for the current layer</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ConstPad2d(Flow):
+    &#39;&#39;&#39; Pads the input tensor boundaries with a constant value.
+
+    Parameters:
+    -----------
+     - padding : int or tuple of two ints, specifying the padding
+     before and after.
+     - value : float, the value by which to pad
+     - name : string, identifier for the current layer
+
+    &#39;&#39;&#39;
+    def __init__(self,
+                 padding: Union[int, Tuple[int, int]],
+                 value: float = 0,
+                 name=&#39;ConstPad2d&#39;):
+
+        super(ConstPad2d, self).__init__(name=f&#39;{name}({padding})&#39;)
+
+        self.padding = padding if isinstance(padding, tuple) else (padding,
+                                                                   padding)
+        self.value = value
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        return _ConstPad(x, (
+            (0, 0),
+            (0, 0),
+            (self.padding[0], self.padding[0]),
+            (self.padding[1], self.padding[1]),
+        ),
+                         value=self.value)()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></b></code>:
+<ul class="hlist">
+<li><code><a title="nujo.flow.Flow.append" href="../flow.html#nujo.flow.Flow.append">append</a></code></li>
+<li><code><a title="nujo.flow.Flow.copy" href="../flow.html#nujo.flow.Flow.copy">copy</a></code></li>
+<li><code><a title="nujo.flow.Flow.forward" href="../flow.html#nujo.flow.Flow.forward">forward</a></code></li>
+<li><code><a title="nujo.flow.Flow.pop" href="../flow.html#nujo.flow.Flow.pop">pop</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
 <dt id="nujo.nn.layers.Conv2d"><code class="flex name class">
 <span>class <span class="ident">Conv2d</span></span>
 <span>(</span><span>*args, **kwargs)</span>
@@ -278,12 +381,16 @@ Default: True</li>
         if self.bias:
             self.b = randn(self.out_channels, 1, name=self.name + &#39;.bias&#39;)
 
+        self._padding_layer = ConstPad2d(self.padding,
+                                         value=0,
+                                         name=self.name + &#39;.padding&#39;)
+
     def forward(self, x: Tensor) -&gt; Tensor:
         batch_size, channels, height, width = x.shape
         assert channels == self.in_channels
 
         # Apply padding
-        x_padded = _Pad(x, self.padding)()
+        x_padded = self._padding_layer(x)
 
         # Apply the kernels
         x_col = _Im2col(x_padded, self.kernel_size, self.stride)()
@@ -294,7 +401,6 @@ Default: True</li>
 
         # Reshape
         output_shape = self.get_output_shape(height, width)
-
         return out_col.reshape(*output_shape, batch_size)\
             .transpose(3, 0, 1, 2)
 
@@ -443,6 +549,9 @@ def get_output_shape(self, height: int,
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="nujo.nn.layers.ConstPad2d" href="#nujo.nn.layers.ConstPad2d">ConstPad2d</a></code></h4>
+</li>
 <li>
 <h4><code><a title="nujo.nn.layers.Conv2d" href="#nujo.nn.layers.Conv2d">Conv2d</a></code></h4>
 <ul class="">
