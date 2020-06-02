@@ -137,7 +137,6 @@ class Conv2d(Flow):
 
         # Reshape
         output_shape = self.get_output_shape(height, width)
-
         return out_col.reshape(*output_shape, batch_size)\
             .transpose(3, 0, 1, 2)
 
@@ -160,6 +159,16 @@ class Conv2d(Flow):
 
 
 class ConstPad2d(Flow):
+    ''' Pads the input tensor boundaries with a constant value.
+
+    Parameters:
+    -----------
+     - padding : int or tuple of two ints, specifying the padding
+     before and after.
+     - value : float, the value by which to pad
+     - name : string, identifier for the current layer
+
+    '''
     def __init__(self,
                  padding: Union[int, Tuple[int, int]],
                  value: float = 0,

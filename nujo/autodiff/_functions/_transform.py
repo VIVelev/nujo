@@ -78,6 +78,8 @@ class _ConstPad(Function):
 
         super(_ConstPad, self).__init__(input)
 
+        # Assert a padding `(before, after)` was specified for each dimension
+        # only. No more, no less.
         assert len(self.children[0].shape) == len(padding)
 
         self.padding = padding
