@@ -58,13 +58,15 @@ class _Transpose(Function):
 
 
 class _Pad(Function):
-    ''' Zero Padding
+    ''' Padding by a value
 
-    Pads an image shaped array with zeros.
+    Pads an image shaped array with a given value. (default: 0)
 
     '''
-    def __init__(self, input: Union[Tensor, ndarray, List[Number], Number],
-                 padding: Tuple[int, int]):
+    def __init__(self,
+                 input: Union[Tensor, ndarray, List[Number], Number],
+                 padding: Tuple[int, int],
+                 value: float = 0):
 
         super(_Pad, self).__init__(input)
 
@@ -72,6 +74,7 @@ class _Pad(Function):
         assert len(self.children[0].shape) == 4
 
         self.padding = padding
+        self.value = value
 
     def forward(self) -> ndarray:
         return pad(self.children[0].value, (
@@ -79,7 +82,8 @@ class _Pad(Function):
             (0, 0),
             (self.padding[0], self.padding[0]),
             (self.padding[1], self.padding[1]),
-        ))
+        ),
+                   constant_values=self.value)
 
     def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
         return accum_grad[:, :, self.padding[0]:-self.padding[0],
