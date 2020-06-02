@@ -34,6 +34,8 @@ https://missinglink.ai/guides/neural-network-concepts/7-types-neural-network-act
 
 &#39;&#39;&#39;
 
+from math import e
+
 from nujo.autodiff._functions._activations import (_BinaryStep, _LeakyReLU,
                                                    _ReLU, _Sigmoid, _Softmax,
                                                    _Swish, _TanH)
@@ -171,12 +173,25 @@ class Softmax(Flow):
     Nice read here:
     https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
 
+    Parameters:
+    -----------
+     - dim : int, the dimension along which to exponentiate and then sum;
+     (default: 0)
+     - base : float, the base of the exponentiation; (default: e)
+     (you can use this parameter to adjust the sharpness of attenuation
+     of the softmax; lower numbers will result in lower attenuation, and
+     higher numbers will result in higher attenuation, but most people
+     just stick with e)
+
     &#39;&#39;&#39;
-    def __init__(self, name=&#39;Softmax&#39;):
+    def __init__(self, dim=0, base: float = e, name=&#39;Softmax&#39;):
         super(Softmax, self).__init__(name=name)
 
+        self.dim = dim
+        self.base = base
+
     def forward(self, x: Tensor) -&gt; Tensor:
-        return _Softmax(x)()
+        return _Softmax(x, dim=self.dim, base=self.base)()
 
 
 # ====================================================================================================</code></pre>
@@ -364,7 +379,17 @@ return 0</p></div>
 <pre><code>softmax(z) = e ^ z_i / sum(e ^ z_i)
 </code></pre>
 <p>Nice read here:
-<a href="https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/">https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/</a></p></div>
+<a href="https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/">https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/</a></p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>dim : int, the dimension along which to exponentiate and then sum;
+(default: 0)</li>
+<li>base : float, the base of the exponentiation; (default: e)
+(you can use this parameter to adjust the sharpness of attenuation
+of the softmax; lower numbers will result in lower attenuation, and
+higher numbers will result in higher attenuation, but most people
+just stick with e)</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -377,12 +402,25 @@ return 0</p></div>
     Nice read here:
     https://aimatters.wordpress.com/2019/06/17/the-softmax-function-derivative/
 
+    Parameters:
+    -----------
+     - dim : int, the dimension along which to exponentiate and then sum;
+     (default: 0)
+     - base : float, the base of the exponentiation; (default: e)
+     (you can use this parameter to adjust the sharpness of attenuation
+     of the softmax; lower numbers will result in lower attenuation, and
+     higher numbers will result in higher attenuation, but most people
+     just stick with e)
+
     &#39;&#39;&#39;
-    def __init__(self, name=&#39;Softmax&#39;):
+    def __init__(self, dim=0, base: float = e, name=&#39;Softmax&#39;):
         super(Softmax, self).__init__(name=name)
 
+        self.dim = dim
+        self.base = base
+
     def forward(self, x: Tensor) -&gt; Tensor:
-        return _Softmax(x)()</code></pre>
+        return _Softmax(x, dim=self.dim, base=self.base)()</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
