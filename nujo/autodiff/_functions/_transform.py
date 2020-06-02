@@ -1,7 +1,7 @@
 from numbers import Number
 from typing import List, Optional, Tuple, Union
 
-from numpy import add, arange, expand_dims, ndarray, pad, repeat, tile, zeros
+from numpy import add, arange, ndarray, pad, repeat, tile, zeros
 
 from nujo.autodiff.function import Function
 from nujo.autodiff.tensor import Tensor
@@ -86,8 +86,10 @@ class _Pad(Function):
                    constant_values=self.value)
 
     def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
-        return accum_grad[:, :, self.padding[0]:-self.padding[0],
-                          self.padding[1]:-self.padding[1]]
+        end = ((-self.padding[0] if self.padding[0] else accum_grad.shape[2]),
+               (-self.padding[1] if self.padding[1] else accum_grad.shape[3]))
+
+        return accum_grad[:, :, self.padding[0]:end[0], self.padding[1]:end[1]]
 
 
 # ====================================================================================================
@@ -133,6 +135,10 @@ class _Im2col(Function):
             _Im2col._get_im2col_indices(self.children[0].shape,
                                         self.kernel_size, stride)
 
+        # number of features in the column form
+        self._n_features = self.kernel_size[0] * self.kernel_size[1] *\
+            self.children[0].shape[1]  # number of channels
+
     def forward(self) -> ndarray:
         ''' Method which turns the image shaped input to column shape
         '''
@@ -140,21 +146,25 @@ class _Im2col(Function):
         images = self.children[0].value
 
         # Reshape content into column shape
-        n_features = self.kernel_size[0] * self.kernel_size[1] *\
-            images.shape[1]  # number of channels
-
         k, i, j = self._im2col_indices
-        return images[:, k, i, j].transpose(1, 2, 0).reshape(n_features, -1)
+        return images[:, k, i, j]\
+            .transpose(1, 2, 0).reshape(self._n_features, -1)
 
     def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
         ''' Method which turns the column shaped input to image shape
         '''
 
+        # Create images placeholder
         images = zeros(self.children[0].shape)
 
+        # Separate the image sections and the batch_size (shape[0])
+        separated_grad = accum_grad\
+            .reshape(self._n_features, -1, images.shape[0])\
+            .transpose(2, 0, 1)  # Move the batch_size at the beginning
+
+        # Fill in the placeholder
         k, i, j = self._im2col_indices
-        add.at(images, (slice(None), k, i, j),
-               expand_dims(accum_grad, 1).transpose(2, 0, 1))
+        add.at(images, (slice(None), k, i, j), separated_grad)
 
         return images
 
