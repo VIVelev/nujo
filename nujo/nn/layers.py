@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Tuple, Union
 
-from nujo.autodiff._functions._transform import _Im2col, _Pad
+from nujo.autodiff._functions._transform import _ConstPad, _Im2col
 from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
 from nujo.init.random import randn
@@ -121,7 +121,12 @@ class Conv2d(Flow):
         assert channels == self.in_channels
 
         # Apply padding
-        x_padded = _Pad(x, self.padding)()
+        x_padded = _ConstPad(x, (
+            (0, 0),
+            (0, 0),
+            (self.padding[0], self.padding[0]),
+            (self.padding[1], self.padding[1]),
+        ))()
 
         # Apply the kernels
         x_col = _Im2col(x_padded, self.kernel_size, self.stride)()

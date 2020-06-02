@@ -9,7 +9,7 @@ from nujo.autodiff.tensor import Tensor
 __all__ = [
     '_Reshape',
     '_Transpose',
-    '_Pad',
+    '_ConstPad',
     '_Im2col',
 ]
 
@@ -57,39 +57,46 @@ class _Transpose(Function):
 # ====================================================================================================
 
 
-class _Pad(Function):
-    ''' Padding by a value
+class _ConstPad(Function):
+    ''' Constant padding by a value
 
-    Pads an image shaped array with a given value. (default: 0)
+    Pads an array before and after for each dimension with a given constant
+    value. (default: 0)
+
+    Parameters:
+    -----------
+     - input : array to pad
+     - padding : tuple of tuples of two ints specifying the padding before
+     and after for each dimension
+     - value : float, the constant value to pad with (default: 0)
 
     '''
     def __init__(self,
                  input: Union[Tensor, ndarray, List[Number], Number],
-                 padding: Tuple[int, int],
+                 padding: Tuple[Tuple[int, int], ...],
                  value: float = 0):
 
-        super(_Pad, self).__init__(input)
+        super(_ConstPad, self).__init__(input)
 
-        # Shape of `input` should be: (batch_size, channels, height, width)
-        assert len(self.children[0].shape) == 4
+        assert len(self.children[0].shape) == len(padding)
 
         self.padding = padding
         self.value = value
 
     def forward(self) -> ndarray:
-        return pad(self.children[0].value, (
-            (0, 0),
-            (0, 0),
-            (self.padding[0], self.padding[0]),
-            (self.padding[1], self.padding[1]),
-        ),
+        return pad(self.children[0].value,
+                   self.padding,
                    constant_values=self.value)
 
     def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
-        end = ((-self.padding[0] if self.padding[0] else accum_grad.shape[2]),
-               (-self.padding[1] if self.padding[1] else accum_grad.shape[3]))
+        output = accum_grad
+        for dim_pad in self.padding:
+            if dim_pad[1] == 0:
+                output = output[dim_pad[0]:]
+            else:
+                output = output[dim_pad[0]:-dim_pad[1]]
 
-        return accum_grad[:, :, self.padding[0]:end[0], self.padding[1]:end[1]]
+        return output
 
 
 # ====================================================================================================
