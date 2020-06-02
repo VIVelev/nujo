@@ -9,6 +9,7 @@ from nujo.init.random import randn
 __all__ = [
     'Linear',
     'Conv2d',
+    'ConstPad2d',
 ]
 
 # ====================================================================================================
@@ -116,17 +117,16 @@ class Conv2d(Flow):
         if self.bias:
             self.b = randn(self.out_channels, 1, name=self.name + '.bias')
 
+        self._padding_layer = ConstPad2d(self.padding,
+                                         value=0,
+                                         name=self.name + '.padding')
+
     def forward(self, x: Tensor) -> Tensor:
         batch_size, channels, height, width = x.shape
         assert channels == self.in_channels
 
         # Apply padding
-        x_padded = _ConstPad(x, (
-            (0, 0),
-            (0, 0),
-            (self.padding[0], self.padding[0]),
-            (self.padding[1], self.padding[1]),
-        ))()
+        x_padded = self._padding_layer(x)
 
         # Apply the kernels
         x_col = _Im2col(x_padded, self.kernel_size, self.stride)()
@@ -154,6 +154,31 @@ class Conv2d(Flow):
             ((width + self.padding[1] * 2 - self.kernel_size[1]) //
              self.stride[1]) + 1,
         )
+
+
+# ====================================================================================================
+
+
+class ConstPad2d(Flow):
+    def __init__(self,
+                 padding: Union[int, Tuple[int, int]],
+                 value: float = 0,
+                 name='ConstPad2d'):
+
+        super(ConstPad2d, self).__init__(name=f'{name}({padding})')
+
+        self.padding = padding if isinstance(padding, tuple) else (padding,
+                                                                   padding)
+        self.value = value
+
+    def forward(self, x: Tensor) -> Tensor:
+        return _ConstPad(x, (
+            (0, 0),
+            (0, 0),
+            (self.padding[0], self.padding[0]),
+            (self.padding[1], self.padding[1]),
+        ),
+                         value=self.value)()
 
 
 # ====================================================================================================
