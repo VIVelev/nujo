@@ -140,11 +140,9 @@ def test_parameters(flows):
 
     param = next(supflow_params)
     assert param is mul2_param
-    supflow_params.send(0)
 
     param = next(supflow_params)
     assert param is add1_param
-    supflow_params.send(0)
 
 
 # ====================================================================================================

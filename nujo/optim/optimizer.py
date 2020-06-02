@@ -18,7 +18,7 @@ class Optimizer:
      - lr : float, the learning rate
 
     '''
-    def __init__(self, params: Generator[Tensor, Tensor, None], lr: float):
+    def __init__(self, params: Generator[Tensor, None, None], lr: float):
         self.params = params
         self.lr = lr
 
@@ -32,15 +32,12 @@ class Optimizer:
         '''
 
         with no_diff():
-            parameters = self.params()
-            for param in parameters:
-                parameters.send(self.update_rule(param, param.grad))
+            for param in self.params():
+                param <<= self.update_rule(param, param.grad)
 
     def zero_grad(self) -> None:
         ''' Zeros the gradients of the parameters.
         '''
 
-        parameters = self.params()
-        for param in parameters:
+        for param in self.params():
             param.zero_grad()
-            parameters.send(param)

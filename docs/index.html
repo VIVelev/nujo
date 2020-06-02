@@ -48,7 +48,7 @@ __version__ = &#39;0.2.0&#39;</code></pre>
 </dd>
 <dt><code class="name"><a title="nujo.flow" href="flow.html">nujo.flow</a></code></dt>
 <dd>
-<div class="desc"><p>a computation Flow</p></div>
+<div class="desc"><p>a chainable computation Flow</p></div>
 </dd>
 <dt><code class="name"><a title="nujo.init" href="init/index.html">nujo.init</a></code></dt>
 <dd>
@@ -88,74 +88,109 @@ __version__ = &#39;0.2.0&#39;</code></pre>
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>A computation Flow</p>
+<div class="desc"><p>A chainable computation Flow</p>
 <p>A Flow is just a sequance of functions (addition, multiplication, etc.)
 that are grouped in a single object (Flow) and can be applied on a tensor.</p>
-<p>Each nujo Flow has a list of flow objects (<code>subflows</code>) that
-a tensor will pass through when the Flow is called on that tensor.</p>
-<p>This allows the chaining of flows.</p>
+<p>Each nujo Flow has a list of flow objects (a chain) that a tensor will pass
+through when the Flow is called on that tensor.</p>
+<p>This allows the chaining of flows (connecting two or more chains together).</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
-<li>name : string, name of the current flow</li>
-<li>subflows : list of flows</li>
+<li>name : string, idetifier of the current flow</li>
 </ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Flow(metaclass=_FlowSetup):
-    &#39;&#39;&#39; A computation Flow
+<pre><code class="python">class Flow(metaclass=_FlowMeta):
+    &#39;&#39;&#39; A chainable computation Flow
 
     A Flow is just a sequance of functions (addition, multiplication, etc.)
     that are grouped in a single object (Flow) and can be applied on a tensor.
 
-    Each nujo Flow has a list of flow objects (`subflows`) that
-    a tensor will pass through when the Flow is called on that tensor.
+    Each nujo Flow has a list of flow objects (a chain) that a tensor will pass
+    through when the Flow is called on that tensor.
 
-    This allows the chaining of flows.
+    This allows the chaining of flows (connecting two or more chains together).
 
     Parameters:
     -----------
-     - name : string, name of the current flow
-     - subflows : list of flows
+     - name : string, idetifier of the current flow
 
     &#39;&#39;&#39;
-    def __init__(self, name=&#39;Flow&#39;, subflows: List[&#39;Flow&#39;] = []):
+    def __init__(self, name=&#39;Flow&#39;, _chain: List[&#39;Flow&#39;] = []):
         self.name = name
-        self.subflows = subflows
+        self._chain = _chain
 
-        if len(self.subflows):
-            self.name = self._generate_supflow_name()
+        if len(self._chain):  # If there is a chain
+            self.name = self._generate_chain_name()
+
+    # setup methods
 
     def _register_parameters(self) -&gt; None:
-        &#39;&#39;&#39; Called after Flow.__init__
+        &#39;&#39;&#39; Tensor parameters registration - called after Flow.__init__
+
+        Makes all tensors bounded to `self` diff enabled (sets their `diff`
+        to `True`).
+
+        Called only once, when the chain for the current flow is being created.
+
         &#39;&#39;&#39;
 
-        for flow in self.subflows:
-            for prop_name in dir(flow):
-                prop = getattr(flow, prop_name)
+        for prop_name in dir(self):
+            prop = getattr(self, prop_name)
 
-                if isinstance(prop, Tensor):
-                    prop.diff = True
+            if isinstance(prop, Tensor):
+                prop.diff = True
 
-    def _generate_supflow_name(self) -&gt; str:
-        return &#39; &gt;&gt; &#39;.join(map(lambda x: x.name, self.subflows))
+    def _generate_chain_name(self) -&gt; str:
+        return &#39; &gt;&gt; &#39;.join(map(lambda x: x.name, self._chain))
+
+    # parameters generators
 
     def parameters(self) -&gt; Tensor:
-        for flow in self.subflows:
+        &#39;&#39;&#39; Generator for all the parameters of the current flow
+        &#39;&#39;&#39;
+
+        for param in self._total_parameters():
+            yield param
+
+    def _total_parameters(self) -&gt; Tensor:
+        &#39;&#39;&#39; Returns an iterable of all the parameters of the current flow
+
+        Including those of other flows that are used in the current one
+        (namely other flows bounded to `self`).
+
+        &#39;&#39;&#39;
+
+        total_params = [self._current_parameters()]
+
+        for prop_name in dir(self):
+            prop = getattr(self, prop_name)
+
+            if isinstance(prop, Flow):
+                total_params.append(prop.parameters())
+
+        return chain(*total_params)
+
+    def _current_parameters(self) -&gt; Tensor:
+        &#39;&#39;&#39; Generator for the current tensor parameters bounded to `self`
+        &#39;&#39;&#39;
+
+        for flow in self._chain:
             for prop_name in dir(flow):
                 prop = getattr(flow, prop_name)
 
                 if isinstance(prop, Tensor):
-                    updated = (yield prop)
-                    yield
-                    if updated is not None:
-                        prop &lt;&lt;= updated
+                    yield prop
+
+    # API methods
 
     def append(self, *flows: &#39;Flow&#39;) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Flow Append
 
-        Appends a new Flow on top of the current one.
+        Connect the current chain with those of `flows` by adding them
+        at the end.
 
         Parameters:
         -----------
@@ -168,16 +203,18 @@ a tensor will pass through when the Flow is called on that tensor.</p>
         &#39;&#39;&#39;
 
         for flow in flows:
-            for subflow in flow:
-                self.subflows.append(subflow)
+            for chain_section in flow:  # Iterate over the chain
+                # Connect with the current chain
+                self._chain.append(chain_section)
 
-        self.name = self._generate_supflow_name()
+        self.name = self._generate_chain_name()  # Update the chain name
         return self
 
     def pop(self, idx=-1) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Flow Pop
 
-        Removes a flow at a given index, defaults to the last one (-1).
+        Removes a flow (and it&#39;s chain) at a given index, defaults to
+        the last one (-1).
 
         Parameters:
         -----------
@@ -189,13 +226,13 @@ a tensor will pass through when the Flow is called on that tensor.</p>
 
         &#39;&#39;&#39;
 
-        retflow = self.subflows.pop(idx)
-        self.name = self._generate_supflow_name()
+        retflow = self._chain.pop(idx)
+        self.name = self._generate_chain_name()
 
         return retflow
 
     def copy(self) -&gt; &#39;Flow&#39;:
-        &#39;&#39;&#39; Make a copy of the current flow
+        &#39;&#39;&#39; Make a copy of the flow
         &#39;&#39;&#39;
 
         return deepcopy(self)
@@ -210,11 +247,13 @@ a tensor will pass through when the Flow is called on that tensor.</p>
 
         pass
 
+    # methods implementing the flow functionality
+
     def __call__(self, *args, **kwargs) -&gt; Tensor:
         output = self[0].forward(*args, **kwargs)
 
-        for subflow in self[1:]:
-            output = subflow.forward(output, **kwargs)
+        for flow in self[1:]:
+            output = flow.forward(output, **kwargs)
 
         return output
 
@@ -230,16 +269,16 @@ a tensor will pass through when the Flow is called on that tensor.</p>
 
         &#39;&#39;&#39;
 
-        return Flow(subflows=[*self.subflows, *other.subflows])
+        return Flow(_chain=[*list(self), *list(other)])
 
     def __getitem__(self, key: Union[int, str]) -&gt; &#39;Flow&#39;:
-        &#39;&#39;&#39; Get subflows by index/name
+        &#39;&#39;&#39;Access flows in the chain by index/name
 
         Example:
             &gt;&gt;&gt; a = nj.Flow(&#39;A&#39;)
             &gt;&gt;&gt; b = nj.Flow(&#39;B&#39;)
             &gt;&gt;&gt; chained_flow = a &gt;&gt; b
-            &gt;&gt;&gt; chained_flow[0]  # a subflow can be get by index
+            &gt;&gt;&gt; chained_flow[0]  # a flow (chain section) can be get by index
             &#39;A&#39; (this is the repr for `a`)
             &gt;&gt;&gt; chained_flow[&#39;A&#39;]  # can also be get by name
             &#39;A&#39;
@@ -247,19 +286,19 @@ a tensor will pass through when the Flow is called on that tensor.</p>
         &#39;&#39;&#39;
 
         if type(key) is str:
-            flow = next((x for x in self.subflows if x.name == key), None)
+            flow = next((x for x in self._chain if x.name == key), None)
             if flow is not None:
                 return flow
             else:
                 raise ValueError(f&#39;Could not find a flow named: {key}&#39;)
         else:
-            return self.subflows[key]
+            return self._chain[key]
 
     def __iter__(self):
-        return iter(self.subflows)
+        return iter(self._chain)
 
     def __len__(self):
-        return len(self.subflows)
+        return len(self._chain)
 
     def __repr__(self):
         return &#39;&lt;|&#39; + self.name + &#39;&gt;&#39;</code></pre>
@@ -284,7 +323,8 @@ a tensor will pass through when the Flow is called on that tensor.</p>
 </code></dt>
 <dd>
 <div class="desc"><p>Flow Append</p>
-<p>Appends a new Flow on top of the current one.</p>
+<p>Connect the current chain with those of <code>flows</code> by adding them
+at the end.</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
 <li>flows : varargs, the flows to append, sequantially</li>
@@ -300,7 +340,8 @@ a tensor will pass through when the Flow is called on that tensor.</p>
 <pre><code class="python">def append(self, *flows: &#39;Flow&#39;) -&gt; &#39;Flow&#39;:
     &#39;&#39;&#39; Flow Append
 
-    Appends a new Flow on top of the current one.
+    Connect the current chain with those of `flows` by adding them
+    at the end.
 
     Parameters:
     -----------
@@ -313,10 +354,11 @@ a tensor will pass through when the Flow is called on that tensor.</p>
     &#39;&#39;&#39;
 
     for flow in flows:
-        for subflow in flow:
-            self.subflows.append(subflow)
+        for chain_section in flow:  # Iterate over the chain
+            # Connect with the current chain
+            self._chain.append(chain_section)
 
-    self.name = self._generate_supflow_name()
+    self.name = self._generate_chain_name()  # Update the chain name
     return self</code></pre>
 </details>
 </dd>
@@ -324,13 +366,13 @@ a tensor will pass through when the Flow is called on that tensor.</p>
 <span>def <span class="ident">copy</span></span>(<span>self) -> <a title="nujo.flow.Flow" href="flow.html#nujo.flow.Flow">Flow</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Make a copy of the current flow</p></div>
+<div class="desc"><p>Make a copy of the flow</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def copy(self) -&gt; &#39;Flow&#39;:
-    &#39;&#39;&#39; Make a copy of the current flow
+    &#39;&#39;&#39; Make a copy of the flow
     &#39;&#39;&#39;
 
     return deepcopy(self)</code></pre>
@@ -361,21 +403,17 @@ def forward(self, *args, **kwargs) -&gt; Tensor:
 <span>def <span class="ident">parameters</span></span>(<span>self) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Generator for all the parameters of the current flow</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def parameters(self) -&gt; Tensor:
-    for flow in self.subflows:
-        for prop_name in dir(flow):
-            prop = getattr(flow, prop_name)
+    &#39;&#39;&#39; Generator for all the parameters of the current flow
+    &#39;&#39;&#39;
 
-            if isinstance(prop, Tensor):
-                updated = (yield prop)
-                yield
-                if updated is not None:
-                    prop &lt;&lt;= updated</code></pre>
+    for param in self._total_parameters():
+        yield param</code></pre>
 </details>
 </dd>
 <dt id="nujo.Flow.pop"><code class="name flex">
@@ -383,7 +421,8 @@ def forward(self, *args, **kwargs) -&gt; Tensor:
 </code></dt>
 <dd>
 <div class="desc"><p>Flow Pop</p>
-<p>Removes a flow at a given index, defaults to the last one (-1).</p>
+<p>Removes a flow (and it's chain) at a given index, defaults to
+the last one (-1).</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
 <li>idx : integer, index of the flow to remove</li>
@@ -399,7 +438,8 @@ def forward(self, *args, **kwargs) -&gt; Tensor:
 <pre><code class="python">def pop(self, idx=-1) -&gt; &#39;Flow&#39;:
     &#39;&#39;&#39; Flow Pop
 
-    Removes a flow at a given index, defaults to the last one (-1).
+    Removes a flow (and it&#39;s chain) at a given index, defaults to
+    the last one (-1).
 
     Parameters:
     -----------
@@ -411,8 +451,8 @@ def forward(self, *args, **kwargs) -&gt; Tensor:
 
     &#39;&#39;&#39;
 
-    retflow = self.subflows.pop(idx)
-    self.name = self._generate_supflow_name()
+    retflow = self._chain.pop(idx)
+    self.name = self._generate_chain_name()
 
     return retflow</code></pre>
 </details>
