@@ -84,7 +84,7 @@ taking the best from both worlds.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Function(_Node, object):
+<pre><code class="python">class Function(_Node, metaclass=_FunctionMeta):
     &#39;&#39;&#39; Base Class for functions
 
     Functions are applied to tensors. They take multiple
@@ -106,22 +106,16 @@ taking the best from both worlds.</p>
     &#39;&#39;&#39; Cache used to lookup for functions that may have already been defined
     in the computation graph.
 
-     - key : hash(FuncType) + (children&#39;s identifiers)
-     - value : the already defined function which will be reused
+     - key : hash(FuncType) + (children&#39;s identifiers);
+     use `_get_function_identifier` to obtain a key
+     - value : the already defined function which can be reused
 
-    &#39;&#39;&#39;
-
-    _cache_hit = False
-    &#39;&#39;&#39; Flag signaling cache hit/miss.
     &#39;&#39;&#39;
 
     T = TypeVar(&#39;T&#39;, Tensor, ndarray)
 
     def __init__(self, *children: Union[Tensor, ndarray, List[Number],
                                         Number]):
-
-        if self._cache_hit:
-            return
 
         super(Function, self).__init__(*_parse_inputs(children),
                                        name=self.__class__.__name__)
@@ -137,36 +131,6 @@ taking the best from both worlds.</p>
             # Allocate space for parent&#39;s output (output placeholder)
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
-
-    def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
-                **kwargs):
-        &#39;&#39;&#39; Used to lookup the cache for an already defined function of
-        the current type using the current `children` as inputs, and reuse
-        it. If a function satisfying this requirements could not be found,
-        a new function is created and added to the cache, in order to be,
-        potentially, later reused.
-
-        &#39;&#39;&#39;
-
-        # Only cache functions that are in the computation graph
-        if modes.DIFF_ENABLED:
-            key = _get_function_identifier(cls, children)
-
-            if key in cls._func_children_lookup_cache:
-                cls._cache_hit = True
-                return cls._func_children_lookup_cache[key]
-
-            else:
-                cls._cache_hit = False
-                func = super(Function, cls).__new__(cls)
-                cls._func_children_lookup_cache[key] = func
-                return func
-
-        # If the functions are not in the computation graph,
-        # perform standard python init.
-        else:
-            cls._cache_hit = False
-            return super(Function, cls).__new__(cls)
 
     def __repr__(self):
         return super(Function, self).__repr__() + f&#39;#{self.id}&#39;
