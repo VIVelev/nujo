@@ -183,7 +183,7 @@ class _Im2col(Function):
 
         '''
 
-        # Obtain needed  information
+        # Obtain needed information
         channels = self.children[0].shape[1]
         kernel_height, kernel_width = self.kernel_size
         stride_height, stride_width = self.stride
@@ -218,7 +218,7 @@ class _Im2col(Function):
 
     @cached_property
     def _output_shape(self):
-        # Obtain needed  information
+        # Obtain needed information
         _, _, height, width = self.children[0].shape
         kernel_height, kernel_width = self.kernel_size
         stride_height, stride_width = self.stride

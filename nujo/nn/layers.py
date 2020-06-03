@@ -127,11 +127,12 @@ class Conv2d(Flow):
         # Apply padding
         x_padded = self._padding_layer(x)
 
-        # Apply the kernels
+        # Image to column transformation
         x_col = _Im2col(x_padded, self.kernel_size, self.stride,
                         self.dilation)()
-
         kernels_col = self.kernels.reshape(self.out_channels, -1)
+
+        # Apply the kernels
         out_col = kernels_col @ x_col
         if self.bias:
             out_col += self.b
@@ -147,7 +148,7 @@ class Conv2d(Flow):
         ''' Cached output shape calculation
         '''
 
-        # Obtain needed  information
+        # Obtain needed information
         pad_height, pad_width = self.padding
         kernel_height, kernel_width = self.kernel_size
         stride_height, stride_width = self.stride
