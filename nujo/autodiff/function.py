@@ -78,15 +78,15 @@ class Function(_Node, object):
         # Only cache functions that are in the computation graph
         if modes.DIFF_ENABLED:
             key = _get_function_identifier(cls, children)
+            cache = cls._func_children_lookup_cache
 
-            if key in cls._func_children_lookup_cache:
+            if key in cache:
                 cls._cache_hit = True
-                return cls._func_children_lookup_cache[key]
+                return cache[key]
 
             else:
                 cls._cache_hit = False
-                func = super(Function, cls).__new__(cls)
-                cls._func_children_lookup_cache[key] = func
+                func = cache[key] = super(Function, cls).__new__(cls)
                 return func
 
         # If the functions are not in the computation graph,
