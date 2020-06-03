@@ -11,7 +11,40 @@ from nujo.autodiff.tensor import Tensor
 # ====================================================================================================
 
 
-class Function(_Node, object):
+class _FunctionMeta(type):
+    def __call__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
+                 **kwargs):
+        ''' Used to lookup the cache for an already defined function of
+        the current type using the current `children` as inputs, and reuse
+        it. If a function satisfying this requirements could not be found,
+        a new function is created and added to the cache, in order to be,
+        potentially, later reused.
+
+        '''
+        obj = cls.__new__(cls, *children, **kwargs)
+
+        # Only cache functions that are in the computation graph
+        if modes.DIFF_ENABLED:
+            key = _get_function_identifier(cls, children)
+            cache = cls._func_children_lookup_cache
+
+            if key in cache:
+                return cache[key]
+
+            else:
+                cls.__init__(obj, *children, **kwargs)
+                cache[key] = obj
+                return obj
+
+        # Otherwise - standard
+        cls.__init__(obj, *children, **kwargs)
+        return obj
+
+
+# ====================================================================================================
+
+
+class Function(_Node, metaclass=_FunctionMeta):
     ''' Base Class for functions
 
     Functions are applied to tensors. They take multiple
@@ -33,22 +66,16 @@ class Function(_Node, object):
     ''' Cache used to lookup for functions that may have already been defined
     in the computation graph.
 
-     - key : hash(FuncType) + (children's identifiers)
-     - value : the already defined function which will be reused
+     - key : hash(FuncType) + (children's identifiers);
+     use `_get_function_identifier` to obtain a key
+     - value : the already defined function which can be reused
 
-    '''
-
-    _cache_hit = False
-    ''' Flag signaling cache hit/miss.
     '''
 
     T = TypeVar('T', Tensor, ndarray)
 
     def __init__(self, *children: Union[Tensor, ndarray, List[Number],
                                         Number]):
-
-        if self._cache_hit:
-            return
 
         super(Function, self).__init__(*_parse_inputs(children),
                                        name=self.__class__.__name__)
@@ -64,36 +91,6 @@ class Function(_Node, object):
             # Allocate space for parent's output (output placeholder)
             for child in self.children:
                 child.parents_outputs.append(self._output_placeholder)
-
-    def __new__(cls, *children: Union[Tensor, ndarray, List[Number], Number],
-                **kwargs):
-        ''' Used to lookup the cache for an already defined function of
-        the current type using the current `children` as inputs, and reuse
-        it. If a function satisfying this requirements could not be found,
-        a new function is created and added to the cache, in order to be,
-        potentially, later reused.
-
-        '''
-
-        # Only cache functions that are in the computation graph
-        if modes.DIFF_ENABLED:
-            key = _get_function_identifier(cls, children)
-            cache = cls._func_children_lookup_cache
-
-            if key in cache:
-                cls._cache_hit = True
-                return cache[key]
-
-            else:
-                cls._cache_hit = False
-                func = cache[key] = super(Function, cls).__new__(cls)
-                return func
-
-        # If the functions are not in the computation graph,
-        # perform standard python init.
-        else:
-            cls._cache_hit = False
-            return super(Function, cls).__new__(cls)
 
     def __repr__(self):
         return super(Function, self).__repr__() + f'#{self.id}'
@@ -170,7 +167,7 @@ def _parse_inputs(inputs: Iterable[Any]) -> List[Tensor]:
 
 def _get_function_identifier(func_type: type, inputs: Iterable[Any]) -> str:
     ''' Returns a string identifier for the current function type and its inputs,
-    used for cahching.
+    used for a key in the cache.
 
     '''
 
