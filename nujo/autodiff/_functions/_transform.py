@@ -1,3 +1,4 @@
+from functools import cached_property
 from numbers import Number
 from typing import List, Optional, Tuple, Union
 
@@ -146,18 +147,6 @@ class _Im2col(Function):
         self.stride = stride
         self.dilation = dilation
 
-        # Calculate the indices where the dot products are
-        # to be applied between weights and the image
-        self._im2col_indices: Tuple[ndarray, ndarray, ndarray] =\
-            _Im2col._get_im2col_indices(self.children[0].shape,
-                                        self.kernel_size,
-                                        self.stride,
-                                        self.dilation)
-
-        # number of features in the column form
-        self._n_features = self.kernel_size[0] * self.kernel_size[1] *\
-            self.children[0].shape[1]  # number of channels
-
     def forward(self) -> ndarray:
         ''' Method which turns the image shaped input to column shape
         '''
@@ -187,19 +176,18 @@ class _Im2col(Function):
 
         return images
 
-    @staticmethod
-    def _get_im2col_indices(
-            images_shape: Tuple[int, int, int, int],
-            kernel_size: Tuple[int, int],
-            stride: Tuple[int, int],
-            dilation: Tuple[int, int],
-    ) -> Tuple[ndarray, ndarray, ndarray]:
+    @cached_property
+    def _im2col_indices(self) -> Tuple[ndarray, ndarray, ndarray]:
+        ''' Calculate the indices where the dot products are
+        to be applied between weights and the image.
+
+        '''
 
         # Obtain needed  information
-        _, channels, height, width = images_shape
-        kernel_height, kernel_width = kernel_size
-        stride_height, stride_width = stride
-        dilation_height, dilation_width = dilation
+        _, channels, height, width = self.children[0].shape
+        kernel_height, kernel_width = self.kernel_size
+        stride_height, stride_width = self.stride
+        dilation_height, dilation_width = self.dilation
 
         # Calculate output shape
         out_height = (height - dilation_height *
@@ -234,6 +222,14 @@ class _Im2col(Function):
 
         # Return indices
         return section_channels, section_rows, section_cols
+
+    @cached_property
+    def _n_features(self):
+        ''' number of features in the column form
+        '''
+
+        return self.kernel_size[0] * self.kernel_size[1] *\
+            self.children[0].shape[1]  # number of channels
 
 
 # ====================================================================================================
