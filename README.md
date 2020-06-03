@@ -3,6 +3,7 @@
 [![codecov](https://codecov.io/gh/VIVelev/nujo/branch/master/graph/badge.svg)](https://codecov.io/gh/VIVelev/nujo)
 [![lint](https://github.com/VIVelev/nujo/workflows/lint/badge.svg)](https://github.com/VIVelev/nujo/actions?query=workflow%3A%22lint)
 [![test](https://github.com/VIVelev/nujo/workflows/test/badge.svg)](https://github.com/VIVelev/nujo/actions?query=workflow%3A%22test)
+[![pyversions](https://img.shields.io/pypi/pyversions/nujo)](https://pypi.org/project/nujo)
 [![code-size](https://img.shields.io/github/languages/code-size/VIVelev/nujo)](https://github.com/VIVelev/nujo)
 [![downloads](https://img.shields.io/pypi/dm/nujo)](https://pypi.org/project/nujo)
 [![license](https://img.shields.io/github/license/VIVelev/nujo)](LICENSE)
@@ -14,14 +15,15 @@ $ pip install nujo
 ```
 
 Now run the following to make sure nujo was installed properly:
+
 ```bash
 $ python
 >>> import nujo as nj
 >>> nj.__version__
-'0.1.0'
+'0.2.0'
 ```
 
-***Read the docs at [vivelev.github.io/nujo](https://vivelev.github.io/nujo/)***
+**_Read the docs at [vivelev.github.io/nujo](https://vivelev.github.io/nujo/)_**
 
 ## Examples
 
@@ -31,7 +33,8 @@ Check out the [examples/](examples/) folder.
 
 -   [NumPy](http://www.numpy.org/) - Fundamental package for scientific computing with Python
 -   [Graphviz](https://www.graphviz.org/) - Open source graph visualization software
--   [Requests](https://requests.readthedocs.io/en/master/) - HTTP for Humans
+-   [Requests](https://requests.readthedocs.io/) - HTTP for Humans
+-   [Pillow](https://pillow.readthedocs.io/) - Image processing
 
 ## Contributing
 

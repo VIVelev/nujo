@@ -2,12 +2,21 @@
 
 First off, thank you for considering contributing to nujo. It's people like you that make nujo such a great tool.
 
-## Ground Rules
+## Reporting issues
+  - Describe what you expect to happen
+  - Describe what happened
+  - If you could, include a [minimal reproducible example](https://stackoverflow.com/help/minimal-reproducible-example)
+  - List vesions of your Python, NumPy, Requests and GarphViz
+
+## Submiting code
+  - It is recommended to use [Visual Studio Code](https://code.visualstudio.com/)
+  - All commits will be tested against flake8 linter, so make sure to abide by PEP8
 
 ### Commit messages
   - "[up:*branch*] *commit-message*" - creating bugs
   - "[fix:*branch*] *commit-message*" - correcting bugs
-  - "[rm:*branch*] *commit-message*" - rage quit
+  - "[rm:*branch*] *commit-message*" - delete files
+  - For the branch name, skip the type(feature, release, hotfix)
 
 ### Branching strategy
 We are using *Gitflow* as a branching strategy.
@@ -27,7 +36,7 @@ The Kanban tool used for this project is [Trello](https://trello.com/b/fObyuiWt/
 
 ### Prerequisites
 
--   [Python](https://www.python.org/) - The Programming Language used
+-   [Python](https://www.python.org/) - The Programming Language used (version 3.6+)
 -   [Poetry](https://python-poetry.org/) - Dependency and Virtual Environment Management
 
 ***Download for Mac OSX using Homebrew***
@@ -52,12 +61,27 @@ Once you have **Installed and set up** nujo, run:
 $ pytest
 ```
 
-### Naming conventions
-
-- everything that is not ment to be used by the user (a.k.a. private) must start with a leading underscore.
+## Your First Contribution
+>coming soon...
 
 ### When and how to write unit tests?
 >coming soon...
 
-## Your First Contribution
->coming soon...
+### Pyhton Docstrings format
+Use the following format to document python code.
+
+```
+''' Name of the Python object you are documenting
+
+Short description
+
+Parameters:
+-----------
+ - param_name : param type, description...
+
+Returns:
+--------
+ - return_name : return type, description...
+
+'''
+```

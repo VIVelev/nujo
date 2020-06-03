@@ -29,22 +29,28 @@ class ComputationGraphPlotter:
         else:
             return 'oval'
 
-    def create(self, root: _Node) -> 'ComputationGraphPlotter':
+    def create(self,
+               root: _Node,
+               display_values=False) -> 'ComputationGraphPlotter':
+
         if len(root.children) == 0:
             return
 
+        root_name = str(root) if display_values else repr(root)
         for child in root.children:
-            self.computation_graph.node(str(child),
+            child_name = str(child) if display_values else repr(child)
+
+            self.computation_graph.node(child_name,
                                         color=self.get_color(child),
                                         shape=self.get_shape(child),
                                         style='filled')
 
-            self.computation_graph.node(str(root),
+            self.computation_graph.node(root_name,
                                         color=self.get_color(root),
                                         shape=self.get_shape(root),
                                         style='filled')
 
-            self.computation_graph.edge(str(child), str(root))
+            self.computation_graph.edge(child_name, root_name)
             self.create(child)
 
         return self

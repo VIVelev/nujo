@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.7.5" />
+<meta name="generator" content="pdoc 0.8.1" />
 <title>nujo.flow API documentation</title>
-<meta name="description" content="a computational Flow" />
+<meta name="description" content="a chainable computation Flow" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
-<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 </head>
 <body>
@@ -20,148 +20,191 @@
 <h1 class="title">Module <code>nujo.flow</code></h1>
 </header>
 <section id="section-intro">
-<p>a computational Flow</p>
+<p>a chainable computation Flow</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#39;&#39;&#39; a computational Flow
+<pre><code class="python">&#39;&#39;&#39; a chainable computation Flow
 &#39;&#39;&#39;
 
+from abc import abstractmethod
 from copy import deepcopy
+from itertools import chain
+from typing import List, Union
 
 from nujo.autodiff.tensor import Tensor
 
 
-class _FlowSetup(type):
-    &#39;&#39;&#39; Flow&#39;s metaclass used to setup the computational flow
+class _FlowMeta(type):
+    &#39;&#39;&#39; Flow&#39;s metaclass used to setup the computation flow
     &#39;&#39;&#39;
     def __call__(cls, *args, **kwargs):
-        &#39;&#39;&#39; Flow() init call &#39;&#39;&#39;
-        obj = type.__call__(cls, *args, **kwargs)
-        obj._register_parameters()
+        &#39;&#39;&#39; Flow&#39;s __init__ &#39;&#39;&#39;
+        obj = type.__call__(cls, *args, **kwargs)  # Call __init__
+
+        if len(obj) == 0:  # If no chain has been setup
+            obj._register_parameters()
+            # Set the chain, starting with the current flow
+            obj = Flow(_chain=[obj])
 
         return obj
 
 
-class Flow(metaclass=_FlowSetup):
-    &#39;&#39;&#39; A computational Flow
+class Flow(metaclass=_FlowMeta):
+    &#39;&#39;&#39; A chainable computation Flow
 
-    Flow of tensors through nujo functions.
+    A Flow is just a sequance of functions (addition, multiplication, etc.)
+    that are grouped in a single object (Flow) and can be applied on a tensor.
+
+    Each nujo Flow has a list of flow objects (a chain) that a tensor will pass
+    through when the Flow is called on that tensor.
+
+    This allows the chaining of flows (connecting two or more chains together).
 
     Parameters:
     -----------
-    name : string
-    subflows : list of flows, only if the current flow is a supflow
+     - name : string, idetifier of the current flow
 
     &#39;&#39;&#39;
-    def __init__(self, name=&#39;Flow&#39;, subflows=[]):
+    def __init__(self, name=&#39;Flow&#39;, _chain: List[&#39;Flow&#39;] = []):
         self.name = name
-        self.is_supflow = True if subflows else False
+        self._chain = _chain
 
-        self.subflows = []
-        self.parameters = []
+        if len(self._chain):  # If there is a chain
+            self.name = self._generate_chain_name()
 
-        if self.is_supflow:
-            self.append(*subflows)
+    # setup methods
 
     def _register_parameters(self) -&gt; None:
-        &#39;&#39;&#39; Called after Flow.__init__
+        &#39;&#39;&#39; Tensor parameters registration - called after Flow.__init__
+
+        Makes all tensors bounded to `self` diff enabled (sets their `diff`
+        to `True`).
+
+        Called only once, when the chain for the current flow is being created.
+
         &#39;&#39;&#39;
 
         for prop_name in dir(self):
             prop = getattr(self, prop_name)
-            if isinstance(prop, Tensor) and prop.diff:
-                self.parameters.append(prop)
 
-    def _generate_supflow_name(self) -&gt; str:
-        return &#39; &gt;&gt; &#39;.join(map(lambda x: x.name, self.subflows))
+            if isinstance(prop, Tensor):
+                prop.diff = True
+
+    def _generate_chain_name(self) -&gt; str:
+        return &#39; &gt;&gt; &#39;.join(map(lambda x: x.name, self._chain))
+
+    # parameters generators
+
+    def parameters(self) -&gt; Tensor:
+        &#39;&#39;&#39; Generator for all the parameters of the current flow
+        &#39;&#39;&#39;
+
+        for param in self._total_parameters():
+            yield param
+
+    def _total_parameters(self) -&gt; Tensor:
+        &#39;&#39;&#39; Returns an iterable of all the parameters of the current flow
+
+        Including those of other flows that are used in the current one
+        (namely other flows bounded to `self`).
+
+        &#39;&#39;&#39;
+
+        total_params = [self._current_parameters()]
+
+        for prop_name in dir(self):
+            prop = getattr(self, prop_name)
+
+            if isinstance(prop, Flow):
+                total_params.append(prop.parameters())
+
+        return chain(*total_params)
+
+    def _current_parameters(self) -&gt; Tensor:
+        &#39;&#39;&#39; Generator for the current tensor parameters bounded to `self`
+        &#39;&#39;&#39;
+
+        for flow in self._chain:
+            for prop_name in dir(flow):
+                prop = getattr(flow, prop_name)
+
+                if isinstance(prop, Tensor):
+                    yield prop
+
+    # API methods
 
     def append(self, *flows: &#39;Flow&#39;) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Flow Append
 
-        Appends a new Flow on top of the current one.
+        Connect the current chain with those of `flows` by adding them
+        at the end.
 
         Parameters:
         -----------
-        flows : varargs, the flows to append, sequantially
+         - flows : varargs, the flows to append, sequantially
 
         Returns:
         --------
-        supflow : Flow, the total computational flow
+         - flow : Flow, the total computation flow
 
         &#39;&#39;&#39;
 
-        if not self.is_supflow:
-            flows = list(flows)
-            flows.insert(0, self)
-            return Flow(subflows=flows)
-
         for flow in flows:
-            self.subflows.append(flow)
+            for chain_section in flow:  # Iterate over the chain
+                # Connect with the current chain
+                self._chain.append(chain_section)
 
-            if flow.parameters:
-                if flow.is_supflow:
-                    for params in flow.parameters:
-                        self.parameters.append(params)
-                else:
-                    self.parameters.append(flow.parameters)
-
-        self.name = self._generate_supflow_name()
+        self.name = self._generate_chain_name()  # Update the chain name
         return self
 
     def pop(self, idx=-1) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Flow Pop
 
-        Removes a flow at a given index, defaults to the last one (-1).
-
-        Once a supflow is a supflow it stays a supflow.
-        No mather how many subflows it contains.
+        Removes a flow (and it&#39;s chain) at a given index, defaults to
+        the last one (-1).
 
         Parameters:
         -----------
-        idx : integer, index of the flow to remove
+         - idx : integer, index of the flow to remove
 
         Returns:
         --------
-        flow : Flow, the total computational flow
+         - flow : Flow, the total computation flow
 
         &#39;&#39;&#39;
 
-        retflow = self.subflows.pop(idx)
-        self.name = self._generate_supflow_name()
+        retflow = self._chain.pop(idx)
+        self.name = self._generate_chain_name()
 
         return retflow
 
-    def forward(self, x: Tensor) -&gt; Tensor:
-        &#39;&#39;&#39; Flow Forward
-
-        The flow computation is defined here.
-
-        Parameters:
-        -----------
-        x : Tensor, input tensor
-
-        Returns:
-        --------
-        res : Tensor, computed result
-
-        &#39;&#39;&#39;
-
-        output_x = x
-        for subflow in self:
-            output_x = subflow(output_x)
-
-        return output_x
-
-    def copy(self):
-        &#39;&#39;&#39; Make a copy of the current flow
+    def copy(self) -&gt; &#39;Flow&#39;:
+        &#39;&#39;&#39; Make a copy of the flow
         &#39;&#39;&#39;
 
         return deepcopy(self)
 
+    @abstractmethod
+    def forward(self, *args, **kwargs) -&gt; Tensor:
+        &#39;&#39;&#39; Flow Forward
+
+        The flow computation is defined here.
+
+        &#39;&#39;&#39;
+
+        pass
+
+    # methods implementing the flow functionality
+
     def __call__(self, *args, **kwargs) -&gt; Tensor:
-        return self.forward(*args, **kwargs)
+        output = self[0].forward(*args, **kwargs)
+
+        for flow in self[1:]:
+            output = flow.forward(output, **kwargs)
+
+        return output
 
     def __rshift__(self, other: &#39;Flow&#39;) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Chaining operator
@@ -169,42 +212,42 @@ class Flow(metaclass=_FlowSetup):
         Example:
             &gt;&gt;&gt; a = nj.Flow()
             &gt;&gt;&gt; b = nj.Flow()
-            &gt;&gt;&gt; chained_supflow = a &gt;&gt; b
-            &gt;&gt;&gt; result = chained_supflow(...)
+            &gt;&gt;&gt; chained_flow = a &gt;&gt; b
+            &gt;&gt;&gt; result = chained_flow(...)
             &gt;&gt;&gt; ...
 
         &#39;&#39;&#39;
 
-        self_subflows = self.subflows if self.is_supflow else [self]
-        other_subflows = other.subflows if other.is_supflow else [other]
+        return Flow(_chain=[*list(self), *list(other)])
 
-        return Flow(subflows=[*self_subflows, *other_subflows])
-
-    def __getitem__(self, key: int or str) -&gt; &#39;Flow&#39;:
-        &#39;&#39;&#39; Subflow getter of a supflow
+    def __getitem__(self, key: Union[int, str]) -&gt; &#39;Flow&#39;:
+        &#39;&#39;&#39;Access flows in the chain by index/name
 
         Example:
             &gt;&gt;&gt; a = nj.Flow(&#39;A&#39;)
             &gt;&gt;&gt; b = nj.Flow(&#39;B&#39;)
-            &gt;&gt;&gt; chained_supflow = a &gt;&gt; b
-            &gt;&gt;&gt; chained_supflow[0]  # a subflow can be get by index
+            &gt;&gt;&gt; chained_flow = a &gt;&gt; b
+            &gt;&gt;&gt; chained_flow[0]  # a flow (chain section) can be get by index
             &#39;A&#39; (this is the repr for `a`)
-            &gt;&gt;&gt; chained_supflow[&#39;A&#39;]  # can also be get by name
+            &gt;&gt;&gt; chained_flow[&#39;A&#39;]  # can also be get by name
             &#39;A&#39;
 
         &#39;&#39;&#39;
 
         if type(key) is str:
-            flow = next((x for x in self.subflows if x.name == key), None)
+            flow = next((x for x in self._chain if x.name == key), None)
             if flow is not None:
                 return flow
             else:
                 raise ValueError(f&#39;Could not find a flow named: {key}&#39;)
         else:
-            return self.subflows[key]
+            return self._chain[key]
 
     def __iter__(self):
-        return iter(self.subflows)
+        return iter(self._chain)
+
+    def __len__(self):
+        return len(self._chain)
 
     def __repr__(self):
         return &#39;&lt;|&#39; + self.name + &#39;&gt;&#39;</code></pre>
@@ -224,133 +267,174 @@ class Flow(metaclass=_FlowSetup):
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>A computational Flow</p>
-<p>Flow of tensors through nujo functions.</p>
+<div class="desc"><p>A chainable computation Flow</p>
+<p>A Flow is just a sequance of functions (addition, multiplication, etc.)
+that are grouped in a single object (Flow) and can be applied on a tensor.</p>
+<p>Each nujo Flow has a list of flow objects (a chain) that a tensor will pass
+through when the Flow is called on that tensor.</p>
+<p>This allows the chaining of flows (connecting two or more chains together).</p>
 <h2 id="parameters">Parameters:</h2>
-<p>name : string
-subflows : list of flows, only if the current flow is a supflow</p></section>
+<ul>
+<li>name : string, idetifier of the current flow</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Flow(metaclass=_FlowSetup):
-    &#39;&#39;&#39; A computational Flow
+<pre><code class="python">class Flow(metaclass=_FlowMeta):
+    &#39;&#39;&#39; A chainable computation Flow
 
-    Flow of tensors through nujo functions.
+    A Flow is just a sequance of functions (addition, multiplication, etc.)
+    that are grouped in a single object (Flow) and can be applied on a tensor.
+
+    Each nujo Flow has a list of flow objects (a chain) that a tensor will pass
+    through when the Flow is called on that tensor.
+
+    This allows the chaining of flows (connecting two or more chains together).
 
     Parameters:
     -----------
-    name : string
-    subflows : list of flows, only if the current flow is a supflow
+     - name : string, idetifier of the current flow
 
     &#39;&#39;&#39;
-    def __init__(self, name=&#39;Flow&#39;, subflows=[]):
+    def __init__(self, name=&#39;Flow&#39;, _chain: List[&#39;Flow&#39;] = []):
         self.name = name
-        self.is_supflow = True if subflows else False
+        self._chain = _chain
 
-        self.subflows = []
-        self.parameters = []
+        if len(self._chain):  # If there is a chain
+            self.name = self._generate_chain_name()
 
-        if self.is_supflow:
-            self.append(*subflows)
+    # setup methods
 
     def _register_parameters(self) -&gt; None:
-        &#39;&#39;&#39; Called after Flow.__init__
+        &#39;&#39;&#39; Tensor parameters registration - called after Flow.__init__
+
+        Makes all tensors bounded to `self` diff enabled (sets their `diff`
+        to `True`).
+
+        Called only once, when the chain for the current flow is being created.
+
         &#39;&#39;&#39;
 
         for prop_name in dir(self):
             prop = getattr(self, prop_name)
-            if isinstance(prop, Tensor) and prop.diff:
-                self.parameters.append(prop)
 
-    def _generate_supflow_name(self) -&gt; str:
-        return &#39; &gt;&gt; &#39;.join(map(lambda x: x.name, self.subflows))
+            if isinstance(prop, Tensor):
+                prop.diff = True
+
+    def _generate_chain_name(self) -&gt; str:
+        return &#39; &gt;&gt; &#39;.join(map(lambda x: x.name, self._chain))
+
+    # parameters generators
+
+    def parameters(self) -&gt; Tensor:
+        &#39;&#39;&#39; Generator for all the parameters of the current flow
+        &#39;&#39;&#39;
+
+        for param in self._total_parameters():
+            yield param
+
+    def _total_parameters(self) -&gt; Tensor:
+        &#39;&#39;&#39; Returns an iterable of all the parameters of the current flow
+
+        Including those of other flows that are used in the current one
+        (namely other flows bounded to `self`).
+
+        &#39;&#39;&#39;
+
+        total_params = [self._current_parameters()]
+
+        for prop_name in dir(self):
+            prop = getattr(self, prop_name)
+
+            if isinstance(prop, Flow):
+                total_params.append(prop.parameters())
+
+        return chain(*total_params)
+
+    def _current_parameters(self) -&gt; Tensor:
+        &#39;&#39;&#39; Generator for the current tensor parameters bounded to `self`
+        &#39;&#39;&#39;
+
+        for flow in self._chain:
+            for prop_name in dir(flow):
+                prop = getattr(flow, prop_name)
+
+                if isinstance(prop, Tensor):
+                    yield prop
+
+    # API methods
 
     def append(self, *flows: &#39;Flow&#39;) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Flow Append
 
-        Appends a new Flow on top of the current one.
+        Connect the current chain with those of `flows` by adding them
+        at the end.
 
         Parameters:
         -----------
-        flows : varargs, the flows to append, sequantially
+         - flows : varargs, the flows to append, sequantially
 
         Returns:
         --------
-        supflow : Flow, the total computational flow
+         - flow : Flow, the total computation flow
 
         &#39;&#39;&#39;
 
-        if not self.is_supflow:
-            flows = list(flows)
-            flows.insert(0, self)
-            return Flow(subflows=flows)
-
         for flow in flows:
-            self.subflows.append(flow)
+            for chain_section in flow:  # Iterate over the chain
+                # Connect with the current chain
+                self._chain.append(chain_section)
 
-            if flow.parameters:
-                if flow.is_supflow:
-                    for params in flow.parameters:
-                        self.parameters.append(params)
-                else:
-                    self.parameters.append(flow.parameters)
-
-        self.name = self._generate_supflow_name()
+        self.name = self._generate_chain_name()  # Update the chain name
         return self
 
     def pop(self, idx=-1) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Flow Pop
 
-        Removes a flow at a given index, defaults to the last one (-1).
-
-        Once a supflow is a supflow it stays a supflow.
-        No mather how many subflows it contains.
+        Removes a flow (and it&#39;s chain) at a given index, defaults to
+        the last one (-1).
 
         Parameters:
         -----------
-        idx : integer, index of the flow to remove
+         - idx : integer, index of the flow to remove
 
         Returns:
         --------
-        flow : Flow, the total computational flow
+         - flow : Flow, the total computation flow
 
         &#39;&#39;&#39;
 
-        retflow = self.subflows.pop(idx)
-        self.name = self._generate_supflow_name()
+        retflow = self._chain.pop(idx)
+        self.name = self._generate_chain_name()
 
         return retflow
 
-    def forward(self, x: Tensor) -&gt; Tensor:
-        &#39;&#39;&#39; Flow Forward
-
-        The flow computation is defined here.
-
-        Parameters:
-        -----------
-        x : Tensor, input tensor
-
-        Returns:
-        --------
-        res : Tensor, computed result
-
-        &#39;&#39;&#39;
-
-        output_x = x
-        for subflow in self:
-            output_x = subflow(output_x)
-
-        return output_x
-
-    def copy(self):
-        &#39;&#39;&#39; Make a copy of the current flow
+    def copy(self) -&gt; &#39;Flow&#39;:
+        &#39;&#39;&#39; Make a copy of the flow
         &#39;&#39;&#39;
 
         return deepcopy(self)
 
+    @abstractmethod
+    def forward(self, *args, **kwargs) -&gt; Tensor:
+        &#39;&#39;&#39; Flow Forward
+
+        The flow computation is defined here.
+
+        &#39;&#39;&#39;
+
+        pass
+
+    # methods implementing the flow functionality
+
     def __call__(self, *args, **kwargs) -&gt; Tensor:
-        return self.forward(*args, **kwargs)
+        output = self[0].forward(*args, **kwargs)
+
+        for flow in self[1:]:
+            output = flow.forward(output, **kwargs)
+
+        return output
 
     def __rshift__(self, other: &#39;Flow&#39;) -&gt; &#39;Flow&#39;:
         &#39;&#39;&#39; Chaining operator
@@ -358,63 +442,76 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
         Example:
             &gt;&gt;&gt; a = nj.Flow()
             &gt;&gt;&gt; b = nj.Flow()
-            &gt;&gt;&gt; chained_supflow = a &gt;&gt; b
-            &gt;&gt;&gt; result = chained_supflow(...)
+            &gt;&gt;&gt; chained_flow = a &gt;&gt; b
+            &gt;&gt;&gt; result = chained_flow(...)
             &gt;&gt;&gt; ...
 
         &#39;&#39;&#39;
 
-        self_subflows = self.subflows if self.is_supflow else [self]
-        other_subflows = other.subflows if other.is_supflow else [other]
+        return Flow(_chain=[*list(self), *list(other)])
 
-        return Flow(subflows=[*self_subflows, *other_subflows])
-
-    def __getitem__(self, key: int or str) -&gt; &#39;Flow&#39;:
-        &#39;&#39;&#39; Subflow getter of a supflow
+    def __getitem__(self, key: Union[int, str]) -&gt; &#39;Flow&#39;:
+        &#39;&#39;&#39;Access flows in the chain by index/name
 
         Example:
             &gt;&gt;&gt; a = nj.Flow(&#39;A&#39;)
             &gt;&gt;&gt; b = nj.Flow(&#39;B&#39;)
-            &gt;&gt;&gt; chained_supflow = a &gt;&gt; b
-            &gt;&gt;&gt; chained_supflow[0]  # a subflow can be get by index
+            &gt;&gt;&gt; chained_flow = a &gt;&gt; b
+            &gt;&gt;&gt; chained_flow[0]  # a flow (chain section) can be get by index
             &#39;A&#39; (this is the repr for `a`)
-            &gt;&gt;&gt; chained_supflow[&#39;A&#39;]  # can also be get by name
+            &gt;&gt;&gt; chained_flow[&#39;A&#39;]  # can also be get by name
             &#39;A&#39;
 
         &#39;&#39;&#39;
 
         if type(key) is str:
-            flow = next((x for x in self.subflows if x.name == key), None)
+            flow = next((x for x in self._chain if x.name == key), None)
             if flow is not None:
                 return flow
             else:
                 raise ValueError(f&#39;Could not find a flow named: {key}&#39;)
         else:
-            return self.subflows[key]
+            return self._chain[key]
 
     def __iter__(self):
-        return iter(self.subflows)
+        return iter(self._chain)
+
+    def __len__(self):
+        return len(self._chain)
 
     def __repr__(self):
         return &#39;&lt;|&#39; + self.name + &#39;&gt;&#39;</code></pre>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
+<li><a title="nujo.nn.activations.BinaryStep" href="nn/activations.html#nujo.nn.activations.BinaryStep">BinaryStep</a></li>
+<li><a title="nujo.nn.activations.LeakyReLU" href="nn/activations.html#nujo.nn.activations.LeakyReLU">LeakyReLU</a></li>
+<li><a title="nujo.nn.activations.ReLU" href="nn/activations.html#nujo.nn.activations.ReLU">ReLU</a></li>
+<li><a title="nujo.nn.activations.Sigmoid" href="nn/activations.html#nujo.nn.activations.Sigmoid">Sigmoid</a></li>
+<li><a title="nujo.nn.activations.Softmax" href="nn/activations.html#nujo.nn.activations.Softmax">Softmax</a></li>
+<li><a title="nujo.nn.activations.Swish" href="nn/activations.html#nujo.nn.activations.Swish">Swish</a></li>
+<li><a title="nujo.nn.activations.TanH" href="nn/activations.html#nujo.nn.activations.TanH">TanH</a></li>
+<li><a title="nujo.nn.layers.Conv2d" href="nn/layers.html#nujo.nn.layers.Conv2d">Conv2d</a></li>
 <li><a title="nujo.nn.layers.Linear" href="nn/layers.html#nujo.nn.layers.Linear">Linear</a></li>
 <li>nujo.objective.loss._Loss</li>
 </ul>
 <h3>Methods</h3>
 <dl>
 <dt id="nujo.flow.Flow.append"><code class="name flex">
-<span>def <span class="ident">append</span></span>(<span>self, *flows)</span>
+<span>def <span class="ident">append</span></span>(<span>self, *flows: Flow) -> <a title="nujo.flow.Flow" href="#nujo.flow.Flow">Flow</a></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Flow Append</p>
-<p>Appends a new Flow on top of the current one.</p>
+<div class="desc"><p>Flow Append</p>
+<p>Connect the current chain with those of <code>flows</code> by adding them
+at the end.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>flows : varargs, the flows to append, sequantially</p>
+<ul>
+<li>flows : varargs, the flows to append, sequantially</li>
+</ul>
 <h2 id="returns">Returns:</h2>
-<p>supflow : Flow, the total computational flow</p></section>
+<ul>
+<li>flow : Flow, the total computation flow</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -422,101 +519,97 @@ subflows : list of flows, only if the current flow is a supflow</p></section>
 <pre><code class="python">def append(self, *flows: &#39;Flow&#39;) -&gt; &#39;Flow&#39;:
     &#39;&#39;&#39; Flow Append
 
-    Appends a new Flow on top of the current one.
+    Connect the current chain with those of `flows` by adding them
+    at the end.
 
     Parameters:
     -----------
-    flows : varargs, the flows to append, sequantially
+     - flows : varargs, the flows to append, sequantially
 
     Returns:
     --------
-    supflow : Flow, the total computational flow
+     - flow : Flow, the total computation flow
 
     &#39;&#39;&#39;
 
-    if not self.is_supflow:
-        flows = list(flows)
-        flows.insert(0, self)
-        return Flow(subflows=flows)
-
     for flow in flows:
-        self.subflows.append(flow)
+        for chain_section in flow:  # Iterate over the chain
+            # Connect with the current chain
+            self._chain.append(chain_section)
 
-        if flow.parameters:
-            if flow.is_supflow:
-                for params in flow.parameters:
-                    self.parameters.append(params)
-            else:
-                self.parameters.append(flow.parameters)
-
-    self.name = self._generate_supflow_name()
+    self.name = self._generate_chain_name()  # Update the chain name
     return self</code></pre>
 </details>
 </dd>
 <dt id="nujo.flow.Flow.copy"><code class="name flex">
-<span>def <span class="ident">copy</span></span>(<span>self)</span>
+<span>def <span class="ident">copy</span></span>(<span>self) -> <a title="nujo.flow.Flow" href="#nujo.flow.Flow">Flow</a></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Make a copy of the current flow</p></section>
+<div class="desc"><p>Make a copy of the flow</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def copy(self):
-    &#39;&#39;&#39; Make a copy of the current flow
+<pre><code class="python">def copy(self) -&gt; &#39;Flow&#39;:
+    &#39;&#39;&#39; Make a copy of the flow
     &#39;&#39;&#39;
 
     return deepcopy(self)</code></pre>
 </details>
 </dd>
 <dt id="nujo.flow.Flow.forward"><code class="name flex">
-<span>def <span class="ident">forward</span></span>(<span>self, x)</span>
+<span>def <span class="ident">forward</span></span>(<span>self, *args, **kwargs) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Flow Forward</p>
-<p>The flow computation is defined here.</p>
-<h2 id="parameters">Parameters:</h2>
-<p>x : Tensor, input tensor</p>
-<h2 id="returns">Returns:</h2>
-<p>res : Tensor, computed result</p></section>
+<div class="desc"><p>Flow Forward</p>
+<p>The flow computation is defined here.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def forward(self, x: Tensor) -&gt; Tensor:
+<pre><code class="python">@abstractmethod
+def forward(self, *args, **kwargs) -&gt; Tensor:
     &#39;&#39;&#39; Flow Forward
 
     The flow computation is defined here.
 
-    Parameters:
-    -----------
-    x : Tensor, input tensor
-
-    Returns:
-    --------
-    res : Tensor, computed result
-
     &#39;&#39;&#39;
 
-    output_x = x
-    for subflow in self:
-        output_x = subflow(output_x)
+    pass</code></pre>
+</details>
+</dd>
+<dt id="nujo.flow.Flow.parameters"><code class="name flex">
+<span>def <span class="ident">parameters</span></span>(<span>self) -> <a title="nujo.autodiff.tensor.Tensor" href="autodiff/tensor.html#nujo.autodiff.tensor.Tensor">Tensor</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator for all the parameters of the current flow</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def parameters(self) -&gt; Tensor:
+    &#39;&#39;&#39; Generator for all the parameters of the current flow
+    &#39;&#39;&#39;
 
-    return output_x</code></pre>
+    for param in self._total_parameters():
+        yield param</code></pre>
 </details>
 </dd>
 <dt id="nujo.flow.Flow.pop"><code class="name flex">
-<span>def <span class="ident">pop</span></span>(<span>self, idx=-1)</span>
+<span>def <span class="ident">pop</span></span>(<span>self, idx=-1) -> <a title="nujo.flow.Flow" href="#nujo.flow.Flow">Flow</a></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Flow Pop</p>
-<p>Removes a flow at a given index, defaults to the last one (-1).</p>
-<p>Once a supflow is a supflow it stays a supflow.
-No mather how many subflows it contains.</p>
+<div class="desc"><p>Flow Pop</p>
+<p>Removes a flow (and it's chain) at a given index, defaults to
+the last one (-1).</p>
 <h2 id="parameters">Parameters:</h2>
-<p>idx : integer, index of the flow to remove</p>
+<ul>
+<li>idx : integer, index of the flow to remove</li>
+</ul>
 <h2 id="returns">Returns:</h2>
-<p>flow : Flow, the total computational flow</p></section>
+<ul>
+<li>flow : Flow, the total computation flow</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -524,23 +617,21 @@ No mather how many subflows it contains.</p>
 <pre><code class="python">def pop(self, idx=-1) -&gt; &#39;Flow&#39;:
     &#39;&#39;&#39; Flow Pop
 
-    Removes a flow at a given index, defaults to the last one (-1).
-
-    Once a supflow is a supflow it stays a supflow.
-    No mather how many subflows it contains.
+    Removes a flow (and it&#39;s chain) at a given index, defaults to
+    the last one (-1).
 
     Parameters:
     -----------
-    idx : integer, index of the flow to remove
+     - idx : integer, index of the flow to remove
 
     Returns:
     --------
-    flow : Flow, the total computational flow
+     - flow : Flow, the total computation flow
 
     &#39;&#39;&#39;
 
-    retflow = self.subflows.pop(idx)
-    self.name = self._generate_supflow_name()
+    retflow = self._chain.pop(idx)
+    self.name = self._generate_chain_name()
 
     return retflow</code></pre>
 </details>
@@ -569,6 +660,7 @@ No mather how many subflows it contains.</p>
 <li><code><a title="nujo.flow.Flow.append" href="#nujo.flow.Flow.append">append</a></code></li>
 <li><code><a title="nujo.flow.Flow.copy" href="#nujo.flow.Flow.copy">copy</a></code></li>
 <li><code><a title="nujo.flow.Flow.forward" href="#nujo.flow.Flow.forward">forward</a></code></li>
+<li><code><a title="nujo.flow.Flow.parameters" href="#nujo.flow.Flow.parameters">parameters</a></code></li>
 <li><code><a title="nujo.flow.Flow.pop" href="#nujo.flow.Flow.pop">pop</a></code></li>
 </ul>
 </li>
@@ -578,7 +670,7 @@ No mather how many subflows it contains.</p>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.1</a>.</p>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad()</script>

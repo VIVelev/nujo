@@ -1,6 +1,5 @@
 from abc import abstractmethod
-
-from numpy import ndarray
+from typing import Generator
 
 from nujo.autodiff import Tensor, no_diff
 
@@ -8,35 +7,37 @@ from nujo.autodiff import Tensor, no_diff
 class Optimizer:
     ''' Stochastic Gradient Descent Optimizer
 
-    A base class.
+    A base class. If you want to implement a custom
+    optimizer you should inherit this class.
+
+    The optimizers are made to work with nujo flows.
 
     Parameters:
     -----------
-    params : list of ndarray(s), the parameters which to update
-    lr : float, the learning rate
+     - params : generator of Tensors, the parameters which to update
+     - lr : float, the learning rate
 
     '''
-    def __init__(self, params: list, lr: float) -> None:
+    def __init__(self, params: Generator[Tensor, None, None], lr: float):
         self.params = params
         self.lr = lr
 
     @abstractmethod
-    def update_rule(self, param: Tensor, grad: ndarray) -> Tensor:
+    def update_rule(self, param: Tensor, grad: Tensor) -> Tensor:
+        ''' Implement the update rule here. '''
         pass
 
     def step(self) -> None:
-        with no_diff():
-            # Iterate over layers
-            for l in range(len(self.params)):
-                # Iterate over params in layer `l`
-                for i in range(len(self.params[l])):
+        ''' Updates all the parameters.
+        '''
 
-                    self.params[l][i] <<= self.update_rule(
-                        self.params[l][i], self.params[l][i].grad)
+        with no_diff():
+            for param in self.params():
+                param <<= self.update_rule(param, param.grad)
 
     def zero_grad(self) -> None:
-        # Iterate over layers
-        for l in range(len(self.params)):
-            # Iterate over params in layer `l`
-            for i in range(len(self.params[l])):
-                self.params[l][i].zero_grad()
+        ''' Zeros the gradients of the parameters.
+        '''
+
+        for param in self.params():
+            param.zero_grad()

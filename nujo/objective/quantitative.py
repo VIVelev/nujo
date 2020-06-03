@@ -11,7 +11,10 @@ __all__ = [
 
 
 class L1Loss(QuantitativeLoss):
-    ''' L1 loss (or Mean Absolute Error)
+    ''' L1 loss (or Absolute Error)
+
+        | ÿ - y |
+
     '''
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         return self.reduction_fn(abs(input - target),
@@ -23,7 +26,10 @@ class L1Loss(QuantitativeLoss):
 
 
 class L2Loss(QuantitativeLoss):
-    ''' L2 loss (or Mean Squared Error)
+    ''' L2 loss (or Squared Error)
+
+        (ÿ - y)^2
+
     '''
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         return self.reduction_fn((input - target)**2,

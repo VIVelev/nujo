@@ -9,7 +9,10 @@ def gen_docs():
     print('Generating HTML documentation for nujo out of docstrings...')
 
     nujo = os.path.join(os.path.dirname(__file__), '../nujo')
-    docs = os.path.join(os.path.dirname(__file__), '.')
+    docs = os.path.dirname(__file__)
+
+    print('nujo dir:', nujo)
+    print('docs dir:', docs)
 
     os.system(f'pdoc3 --html {nujo} --output-dir {docs} --force')
     print('Done.\n')
@@ -19,7 +22,10 @@ def extract_docs():
     print('Extracting documentation...')
 
     source = os.path.join(os.path.dirname(__file__), 'nujo')
-    dest = os.path.join(os.path.dirname(__file__), '.')
+    dest = os.path.dirname(__file__)
+
+    print('source dir:', source)
+    print('dest dir:', dest)
 
     for f in os.listdir(source):
         current_dest = dest + '/' + f
