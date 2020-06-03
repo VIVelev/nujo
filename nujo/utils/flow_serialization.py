@@ -15,7 +15,6 @@ def save_flow(flow: Flow) -> None:
     -----------
     Flow : will take parameters and save them to a .npy file
 
-
     '''
     name = flow.name
     params = array(flow.parameters)
