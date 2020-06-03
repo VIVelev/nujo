@@ -62,7 +62,7 @@ class _FunctionMeta(type):
                 cache[key] = obj
                 return obj
 
-        # Otherwise - standard
+        # Otherwise - standard call
         cls.__init__(obj, *children, **kwargs)
         return obj
 
