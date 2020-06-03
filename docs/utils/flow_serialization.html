@@ -34,7 +34,7 @@ __all__ = [&#39;save_flow&#39;, &#39;load_flow&#39;]
 def save_flow(flow: Flow) -&gt; None:
     &#39;&#39;&#39;Save flow
 
-    Saves the parameters of a network to a file named:\n
+    Saves the parameters of a Flow to a file named:\n
     *name of flow*_parameters.npy in the current directory.
 
     Parameters:
@@ -43,14 +43,14 @@ def save_flow(flow: Flow) -&gt; None:
 
     &#39;&#39;&#39;
     name = flow.name
-    params = array(flow.parameters)
+    params = array([var for var in flow.parameters()])
     save(f&#39;{name}_parameters&#39;, params, allow_pickle=True)
 
 
 def load_flow(filename: str) -&gt; Flow:
     &#39;&#39;&#39;Load flow
 
-    Load the parameters as an array of a network from a file
+    Load the parameters of a Flow from a file
 
     Parameters:
     -----------
@@ -58,9 +58,7 @@ def load_flow(filename: str) -&gt; Flow:
     - filename : the file path to get array from
 
     &#39;&#39;&#39;
-    flow = Flow()
-    flow.parameters = load(filename, allow_pickle=True).tolist()
-    return flow</code></pre>
+    return Flow(_chain=load(filename, allow_pickle=True))</code></pre>
 </details>
 </section>
 <section>
@@ -75,7 +73,7 @@ def load_flow(filename: str) -&gt; Flow:
 </code></dt>
 <dd>
 <div class="desc"><p>Load flow</p>
-<p>Load the parameters as an array of a network from a file</p>
+<p>Load the parameters of a Flow from a file</p>
 <h2 id="parameters">Parameters:</h2>
 <ul>
 <li>Flow : this flow will have its parameters set to the read ones</li>
@@ -88,7 +86,7 @@ def load_flow(filename: str) -&gt; Flow:
 <pre><code class="python">def load_flow(filename: str) -&gt; Flow:
     &#39;&#39;&#39;Load flow
 
-    Load the parameters as an array of a network from a file
+    Load the parameters of a Flow from a file
 
     Parameters:
     -----------
@@ -96,9 +94,7 @@ def load_flow(filename: str) -&gt; Flow:
     - filename : the file path to get array from
 
     &#39;&#39;&#39;
-    flow = Flow()
-    flow.parameters = load(filename, allow_pickle=True).tolist()
-    return flow</code></pre>
+    return Flow(_chain=load(filename, allow_pickle=True))</code></pre>
 </details>
 </dd>
 <dt id="nujo.utils.flow_serialization.save_flow"><code class="name flex">
@@ -106,7 +102,7 @@ def load_flow(filename: str) -&gt; Flow:
 </code></dt>
 <dd>
 <div class="desc"><p>Save flow</p>
-<p>Saves the parameters of a network to a file named:</p>
+<p>Saves the parameters of a Flow to a file named:</p>
 <p><em>name of flow</em>_parameters.npy in the current directory.</p>
 <h2 id="parameters">Parameters:</h2>
 <p>Flow : will take parameters and save them to a .npy file</p></div>
@@ -117,7 +113,7 @@ def load_flow(filename: str) -&gt; Flow:
 <pre><code class="python">def save_flow(flow: Flow) -&gt; None:
     &#39;&#39;&#39;Save flow
 
-    Saves the parameters of a network to a file named:\n
+    Saves the parameters of a Flow to a file named:\n
     *name of flow*_parameters.npy in the current directory.
 
     Parameters:
@@ -126,7 +122,7 @@ def load_flow(filename: str) -&gt; Flow:
 
     &#39;&#39;&#39;
     name = flow.name
-    params = array(flow.parameters)
+    params = array([var for var in flow.parameters()])
     save(f&#39;{name}_parameters&#39;, params, allow_pickle=True)</code></pre>
 </details>
 </dd>
