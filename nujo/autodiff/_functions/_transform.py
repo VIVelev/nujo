@@ -125,11 +125,17 @@ class _Im2col(Function):
     -----------
      - input : image shaped array, shape: (batch_size, channels, height, width)
      - kernel_size : tuple of 2 integers, image filter height and width
-     - stride : tuple of 2 integers
+     - stride : tuple of 2 integers, stride of the convolution
+     - dilation : tuple of 2 integers, spacing between kernel elements
 
     '''
-    def __init__(self, input: Union[Tensor, ndarray, List[Number], Number],
-                 kernel_size: Tuple[int, int], stride: Tuple[int, int]):
+    def __init__(
+        self,
+        input: Union[Tensor, ndarray, List[Number], Number],
+        kernel_size: Tuple[int, int],
+        stride: Tuple[int, int],
+        dilation: Tuple[int, int],
+    ):
 
         super(_Im2col, self).__init__(input)
 
@@ -137,12 +143,16 @@ class _Im2col(Function):
         assert len(self.children[0].shape) == 4
 
         self.kernel_size = kernel_size
+        self.stride = stride
+        self.dilation = dilation
 
         # Calculate the indices where the dot products are
         # to be applied between weights and the image
         self._im2col_indices: Tuple[ndarray, ndarray, ndarray] =\
             _Im2col._get_im2col_indices(self.children[0].shape,
-                                        self.kernel_size, stride)
+                                        self.kernel_size,
+                                        self.stride,
+                                        self.dilation)
 
         # number of features in the column form
         self._n_features = self.kernel_size[0] * self.kernel_size[1] *\
@@ -182,27 +192,41 @@ class _Im2col(Function):
             images_shape: Tuple[int, int, int, int],
             kernel_size: Tuple[int, int],
             stride: Tuple[int, int],
+            dilation: Tuple[int, int],
     ) -> Tuple[ndarray, ndarray, ndarray]:
 
         # Obtain needed  information
         _, channels, height, width = images_shape
         kernel_height, kernel_width = kernel_size
         stride_height, stride_width = stride
+        dilation_height, dilation_width = dilation
 
         # Calculate output shape
-        out_height = (height - kernel_height) // stride_height + 1
-        out_width = (width - kernel_width) // stride_width + 1
+        out_height = (height - dilation_height *
+                      (kernel_height - 1) - 1) // stride_height + 1
+        out_width = (width - dilation_width *
+                     (kernel_width - 1) - 1) // stride_width + 1
 
         # Calculate sections' rows
-        section_rows = repeat(arange(kernel_height), kernel_width)
+        section_rows = repeat(
+            arange(0, kernel_height *
+                   (dilation_height + 1), dilation_height + 1) % out_height,
+            kernel_width)
+
         section_rows = tile(section_rows, channels)
         slide_rows = stride_width * repeat(arange(out_height), out_width)
-        section_rows = section_rows.reshape(-1, 1) + slide_rows.reshape(1, -1)
+        section_rows = (section_rows.reshape(-1, 1) +
+                        slide_rows.reshape(1, -1)) % out_height
 
         # Calculate sections' columns
-        section_cols = tile(arange(kernel_width), kernel_height * channels)
+        section_cols = tile(
+            arange(0, kernel_width *
+                   (dilation_width + 1), dilation_width + 1) % out_width,
+            kernel_height * channels)
+
         slide_cols = stride_height * tile(arange(out_width), out_height)
-        section_cols = section_cols.reshape(-1, 1) + slide_cols.reshape(1, -1)
+        section_cols = (section_cols.reshape(-1, 1) +
+                        slide_cols.reshape(1, -1)) % out_width
 
         # Calculate sections' channels
         section_channels = repeat(arange(channels),

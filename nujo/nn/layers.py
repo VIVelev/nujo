@@ -101,7 +101,6 @@ class Conv2d(Flow):
         self.padding = padding if isinstance(padding, tuple) else (padding,
                                                                    padding)
 
-        # Not used for now
         self.dilation = dilation if isinstance(dilation, tuple) else (dilation,
                                                                       dilation)
 
@@ -129,7 +128,9 @@ class Conv2d(Flow):
         x_padded = self._padding_layer(x)
 
         # Apply the kernels
-        x_col = _Im2col(x_padded, self.kernel_size, self.stride)()
+        x_col = _Im2col(x_padded, self.kernel_size, self.stride,
+                        self.dilation)()
+
         kernels_col = self.kernels.reshape(self.out_channels, -1)
         out_col = kernels_col @ x_col
         if self.bias:
@@ -148,10 +149,10 @@ class Conv2d(Flow):
 
         return (
             self.out_channels,
-            ((height + self.padding[0] * 2 - self.kernel_size[0]) //
-             self.stride[0]) + 1,
-            ((width + self.padding[1] * 2 - self.kernel_size[1]) //
-             self.stride[1]) + 1,
+            ((height + self.padding[0] * 2 - self.dilation[0] *
+              (self.kernel_size[0] - 1) - 1) // self.stride[0]) + 1,
+            ((width + self.padding[1] * 2 - self.dilation[0] *
+              (self.kernel_size[1] - 1) - 1) // self.stride[1]) + 1,
         )
 
 
