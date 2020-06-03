@@ -212,22 +212,21 @@ class _Im2col(Function):
                                   kernel_height * kernel_width).reshape(-1, 1)
 
         # Return indices
-        return (section_channels, section_rows % out_height,
-                section_cols % out_width)
+        return section_channels, section_rows, section_cols
 
     @cached_property
     def _output_shape(self):
         # Obtain needed  information
-        _, channels, height, width = self.children[0].shape
+        _, _, height, width = self.children[0].shape
         kernel_height, kernel_width = self.kernel_size
         stride_height, stride_width = self.stride
         dilation_height, dilation_width = self.dilation
 
         # Calculate output shape
         out_height = (height - dilation_height *
-                      (kernel_height - 1) - 1) // stride_height + 1
+                      (kernel_height - 1) - kernel_height) // stride_height + 1
         out_width = (width - dilation_width *
-                     (kernel_width - 1) - 1) // stride_width + 1
+                     (kernel_width - 1) - kernel_width) // stride_width + 1
 
         return out_height, out_width
 

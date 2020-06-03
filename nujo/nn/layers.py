@@ -150,9 +150,11 @@ class Conv2d(Flow):
         return (
             self.out_channels,
             ((height + self.padding[0] * 2 - self.dilation[0] *
-              (self.kernel_size[0] - 1) - 1) // self.stride[0]) + 1,
+              (self.kernel_size[0] - 1) - self.kernel_size[0]) //
+             self.stride[0]) + 1,
             ((width + self.padding[1] * 2 - self.dilation[0] *
-              (self.kernel_size[1] - 1) - 1) // self.stride[1]) + 1,
+              (self.kernel_size[1] - 1) - self.kernel_size[1]) //
+             self.stride[1]) + 1,
         )
 
 
