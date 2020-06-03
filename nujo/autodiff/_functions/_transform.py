@@ -197,8 +197,7 @@ class _Im2col(Function):
         section_rows = tile(section_rows, channels)
 
         slide_rows = stride_width * repeat(arange(out_height), out_width)
-        section_rows = (section_rows.reshape(-1, 1) +
-                        slide_rows.reshape(1, -1)) % out_height
+        section_rows = section_rows.reshape(-1, 1) + slide_rows.reshape(1, -1)
 
         # Calculate sections' columns
         step = dilation_width + 1
@@ -206,15 +205,15 @@ class _Im2col(Function):
                             kernel_height * channels)
 
         slide_cols = stride_height * tile(arange(out_width), out_height)
-        section_cols = (section_cols.reshape(-1, 1) +
-                        slide_cols.reshape(1, -1)) % out_width
+        section_cols = section_cols.reshape(-1, 1) + slide_cols.reshape(1, -1)
 
         # Calculate sections' channels
         section_channels = repeat(arange(channels),
                                   kernel_height * kernel_width).reshape(-1, 1)
 
         # Return indices
-        return section_channels, section_rows, section_cols
+        return (section_channels, section_rows % out_height,
+                section_cols % out_width)
 
     @cached_property
     def _output_shape(self):
