@@ -179,10 +179,45 @@ class _Im2col(Function):
     @cached_property
     def _im2col_indices(self) -> Tuple[ndarray, ndarray, ndarray]:
         ''' Calculate the indices where the dot products are
-        to be applied between weights and the image.
+        to be applied between the weights and the image.
 
         '''
 
+        # Obtain needed  information
+        channels = self.children[0].shape[1]
+        kernel_height, kernel_width = self.kernel_size
+        stride_height, stride_width = self.stride
+        dilation_height, dilation_width = self.dilation
+        out_height, out_width = self._output_shape
+
+        # Calculate sections' rows
+        step = dilation_height + 1
+        section_rows = repeat(arange(0, kernel_height * step, step),
+                              kernel_width)
+        section_rows = tile(section_rows, channels)
+
+        slide_rows = stride_width * repeat(arange(out_height), out_width)
+        section_rows = (section_rows.reshape(-1, 1) +
+                        slide_rows.reshape(1, -1)) % out_height
+
+        # Calculate sections' columns
+        step = dilation_width + 1
+        section_cols = tile(arange(0, kernel_width * step, step),
+                            kernel_height * channels)
+
+        slide_cols = stride_height * tile(arange(out_width), out_height)
+        section_cols = (section_cols.reshape(-1, 1) +
+                        slide_cols.reshape(1, -1)) % out_width
+
+        # Calculate sections' channels
+        section_channels = repeat(arange(channels),
+                                  kernel_height * kernel_width).reshape(-1, 1)
+
+        # Return indices
+        return section_channels, section_rows, section_cols
+
+    @cached_property
+    def _output_shape(self):
         # Obtain needed  information
         _, channels, height, width = self.children[0].shape
         kernel_height, kernel_width = self.kernel_size
@@ -195,33 +230,7 @@ class _Im2col(Function):
         out_width = (width - dilation_width *
                      (kernel_width - 1) - 1) // stride_width + 1
 
-        # Calculate sections' rows
-        section_rows = repeat(
-            arange(0, kernel_height *
-                   (dilation_height + 1), dilation_height + 1) % out_height,
-            kernel_width)
-
-        section_rows = tile(section_rows, channels)
-        slide_rows = stride_width * repeat(arange(out_height), out_width)
-        section_rows = (section_rows.reshape(-1, 1) +
-                        slide_rows.reshape(1, -1)) % out_height
-
-        # Calculate sections' columns
-        section_cols = tile(
-            arange(0, kernel_width *
-                   (dilation_width + 1), dilation_width + 1) % out_width,
-            kernel_height * channels)
-
-        slide_cols = stride_height * tile(arange(out_width), out_height)
-        section_cols = (section_cols.reshape(-1, 1) +
-                        slide_cols.reshape(1, -1)) % out_width
-
-        # Calculate sections' channels
-        section_channels = repeat(arange(channels),
-                                  kernel_height * kernel_width).reshape(-1, 1)
-
-        # Return indices
-        return section_channels, section_rows, section_cols
+        return out_height, out_width
 
     @cached_property
     def _n_features(self):
