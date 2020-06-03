@@ -196,6 +196,7 @@ class _Im2col(Function):
                               kernel_width)
         section_rows = tile(section_rows, channels)
 
+        # Slide rows by stride
         slide_rows = stride_width * repeat(arange(out_height), out_width)
         section_rows = section_rows.reshape(-1, 1) + slide_rows.reshape(1, -1)
 
@@ -204,6 +205,7 @@ class _Im2col(Function):
         section_cols = tile(arange(0, kernel_width * step, step),
                             kernel_height * channels)
 
+        # Slide cols by stride
         slide_cols = stride_height * tile(arange(out_width), out_height)
         section_cols = section_cols.reshape(-1, 1) + slide_cols.reshape(1, -1)
 

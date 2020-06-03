@@ -147,14 +147,18 @@ class Conv2d(Flow):
         ''' Cached output shape calculation
         '''
 
+        # Obtain needed  information
+        pad_height, pad_width = self.padding
+        kernel_height, kernel_width = self.kernel_size
+        stride_height, stride_width = self.stride
+        dilation_height, dilation_width = self.dilation
+
         return (
             self.out_channels,
-            ((height + self.padding[0] * 2 - self.dilation[0] *
-              (self.kernel_size[0] - 1) - self.kernel_size[0]) //
-             self.stride[0]) + 1,
-            ((width + self.padding[1] * 2 - self.dilation[0] *
-              (self.kernel_size[1] - 1) - self.kernel_size[1]) //
-             self.stride[1]) + 1,
+            ((height + pad_height * 2 - dilation_height *
+              (kernel_height - 1) - kernel_height) // stride_height) + 1,
+            ((width + pad_width * 2 - dilation_width *
+              (kernel_width - 1) - kernel_width) // stride_width) + 1,
         )
 
 
