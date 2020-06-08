@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.8.1" />
-<title>nujo.utils API documentation</title>
-<meta name="description" content="nujo utils" />
+<title>nujo.utils.flow_serialization API documentation</title>
+<meta name="description" content="" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -17,39 +17,119 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>nujo.utils</code></h1>
+<h1 class="title">Module <code>nujo.utils.flow_serialization</code></h1>
 </header>
 <section id="section-intro">
-<p>nujo utils</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#39;&#39;&#39; nujo utils &#39;&#39;&#39;
+<pre><code class="python">from numpy import array, load, save
 
-from nujo.utils.flow_serialization import *</code></pre>
+from nujo.flow import Flow
+
+__all__ = [
+    &#39;save_flow&#39;,
+    &#39;load_flow&#39;,
+]
+
+
+def save_flow(flow: Flow) -&gt; None:
+    &#39;&#39;&#39; Save flow
+
+    Saves the parameters of a Flow to a file named:\n
+    *name of flow*_parameters.npy in the current directory.
+
+    Parameters:
+    -----------
+    - Flow : will take parameters and save them to a .npy file
+
+    &#39;&#39;&#39;
+    params = array([var for var in flow.parameters()])
+    save(f&#39;{flow.name}_parameters&#39;, params, allow_pickle=True)
+
+
+def load_flow(filename: str) -&gt; Flow:
+    &#39;&#39;&#39; Load flow
+
+    Load the parameters of a Flow from a file
+
+    Parameters:
+    -----------
+    - Flow : this flow will have its parameters set to the read ones
+    - filename : the file path to get array from
+
+    &#39;&#39;&#39;
+    return Flow(_chain=load(filename, allow_pickle=True))</code></pre>
 </details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt><code class="name"><a title="nujo.utils.data" href="data/index.html">nujo.utils.data</a></code></dt>
+<dt id="nujo.utils.flow_serialization.load_flow"><code class="name flex">
+<span>def <span class="ident">load_flow</span></span>(<span>filename: str) -> <a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></span>
+</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Load flow</p>
+<p>Load the parameters of a Flow from a file</p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>Flow : this flow will have its parameters set to the read ones</li>
+<li>filename : the file path to get array from</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_flow(filename: str) -&gt; Flow:
+    &#39;&#39;&#39; Load flow
+
+    Load the parameters of a Flow from a file
+
+    Parameters:
+    -----------
+    - Flow : this flow will have its parameters set to the read ones
+    - filename : the file path to get array from
+
+    &#39;&#39;&#39;
+    return Flow(_chain=load(filename, allow_pickle=True))</code></pre>
+</details>
 </dd>
-<dt><code class="name"><a title="nujo.utils.flow_serialization" href="flow_serialization.html">nujo.utils.flow_serialization</a></code></dt>
+<dt id="nujo.utils.flow_serialization.save_flow"><code class="name flex">
+<span>def <span class="ident">save_flow</span></span>(<span>flow: <a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a>) -> NoneType</span>
+</code></dt>
 <dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="nujo.utils.viz" href="viz/index.html">nujo.utils.viz</a></code></dt>
-<dd>
-<div class="desc"></div>
+<div class="desc"><p>Save flow</p>
+<p>Saves the parameters of a Flow to a file named:</p>
+<p><em>name of flow</em>_parameters.npy in the current directory.</p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>Flow : will take parameters and save them to a .npy file</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_flow(flow: Flow) -&gt; None:
+    &#39;&#39;&#39; Save flow
+
+    Saves the parameters of a Flow to a file named:\n
+    *name of flow*_parameters.npy in the current directory.
+
+    Parameters:
+    -----------
+    - Flow : will take parameters and save them to a .npy file
+
+    &#39;&#39;&#39;
+    params = array([var for var in flow.parameters()])
+    save(f&#39;{flow.name}_parameters&#39;, params, allow_pickle=True)</code></pre>
+</details>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
 </section>
 <section>
 </section>
@@ -62,14 +142,13 @@ from nujo.utils.flow_serialization import *</code></pre>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="nujo" href="../index.html">nujo</a></code></li>
+<li><code><a title="nujo.utils" href="index.html">nujo.utils</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
-<ul>
-<li><code><a title="nujo.utils.data" href="data/index.html">nujo.utils.data</a></code></li>
-<li><code><a title="nujo.utils.flow_serialization" href="flow_serialization.html">nujo.utils.flow_serialization</a></code></li>
-<li><code><a title="nujo.utils.viz" href="viz/index.html">nujo.utils.viz</a></code></li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="nujo.utils.flow_serialization.load_flow" href="#nujo.utils.flow_serialization.load_flow">load_flow</a></code></li>
+<li><code><a title="nujo.utils.flow_serialization.save_flow" href="#nujo.utils.flow_serialization.save_flow">save_flow</a></code></li>
 </ul>
 </li>
 </ul>
