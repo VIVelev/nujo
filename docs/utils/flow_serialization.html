@@ -32,14 +32,14 @@ __all__ = [&#39;save_flow&#39;, &#39;load_flow&#39;]
 
 
 def save_flow(flow: Flow) -&gt; None:
-    &#39;&#39;&#39;Save flow
+    &#39;&#39;&#39; Save flow
 
     Saves the parameters of a Flow to a file named:\n
     *name of flow*_parameters.npy in the current directory.
 
     Parameters:
     -----------
-    Flow : will take parameters and save them to a .npy file
+    - Flow : will take parameters and save them to a .npy file
 
     &#39;&#39;&#39;
     name = flow.name
@@ -48,7 +48,7 @@ def save_flow(flow: Flow) -&gt; None:
 
 
 def load_flow(filename: str) -&gt; Flow:
-    &#39;&#39;&#39;Load flow
+    &#39;&#39;&#39; Load flow
 
     Load the parameters of a Flow from a file
 
@@ -84,7 +84,7 @@ def load_flow(filename: str) -&gt; Flow:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def load_flow(filename: str) -&gt; Flow:
-    &#39;&#39;&#39;Load flow
+    &#39;&#39;&#39; Load flow
 
     Load the parameters of a Flow from a file
 
@@ -105,20 +105,22 @@ def load_flow(filename: str) -&gt; Flow:
 <p>Saves the parameters of a Flow to a file named:</p>
 <p><em>name of flow</em>_parameters.npy in the current directory.</p>
 <h2 id="parameters">Parameters:</h2>
-<p>Flow : will take parameters and save them to a .npy file</p></div>
+<ul>
+<li>Flow : will take parameters and save them to a .npy file</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def save_flow(flow: Flow) -&gt; None:
-    &#39;&#39;&#39;Save flow
+    &#39;&#39;&#39; Save flow
 
     Saves the parameters of a Flow to a file named:\n
     *name of flow*_parameters.npy in the current directory.
 
     Parameters:
     -----------
-    Flow : will take parameters and save them to a .npy file
+    - Flow : will take parameters and save them to a .npy file
 
     &#39;&#39;&#39;
     name = flow.name
