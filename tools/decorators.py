@@ -1,5 +1,6 @@
 ''' this decorators are ment to be used with
 line/memory profiler's @profile decorator
+
 '''
 
 __all__ = [
