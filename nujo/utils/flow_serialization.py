@@ -2,7 +2,10 @@ from numpy import array, load, save
 
 from nujo.flow import Flow
 
-__all__ = ['save_flow', 'load_flow']
+__all__ = [
+    'save_flow',
+    'load_flow',
+]
 
 
 def save_flow(flow: Flow) -> None:
@@ -16,9 +19,8 @@ def save_flow(flow: Flow) -> None:
     - Flow : will take parameters and save them to a .npy file
 
     '''
-    name = flow.name
     params = array([var for var in flow.parameters()])
-    save(f'{name}_parameters', params, allow_pickle=True)
+    save(f'{flow.name}_parameters', params, allow_pickle=True)
 
 
 def load_flow(filename: str) -> Flow:
