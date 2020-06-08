@@ -2,7 +2,7 @@ import nujo as nj
 import nujo.nn as nn
 import nujo.objective as obj
 import nujo.optim as optim
-from nujo.utils.viz import ComputationGraphPlotter
+from nujo.utils import ComputationGraphPlotter
 
 # Define the net and optimizer
 net = nn.Linear(3, 6) >> nn.Linear(6, 2) >> nn.Linear(2, 1)
