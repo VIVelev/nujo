@@ -92,14 +92,11 @@ class _ConstPad(Function):
                    constant_values=self.value)
 
     def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
-        output = accum_grad
-        for dim_pad in self.padding:
-            if dim_pad[1] == 0:
-                output = output[dim_pad[0]:]
-            else:
-                output = output[dim_pad[0]:-dim_pad[1]]
+        idxs = tuple(
+            slice(dim_pad[0], accum_grad.shape[i] - dim_pad[1])
+            for i, dim_pad in enumerate(self.padding))
 
-        return output
+        return accum_grad[idxs]
 
 
 # ====================================================================================================
