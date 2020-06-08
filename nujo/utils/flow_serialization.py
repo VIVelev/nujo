@@ -6,14 +6,14 @@ __all__ = ['save_flow', 'load_flow']
 
 
 def save_flow(flow: Flow) -> None:
-    '''Save flow
+    ''' Save flow
 
     Saves the parameters of a Flow to a file named:\n
     *name of flow*_parameters.npy in the current directory.
 
     Parameters:
     -----------
-    Flow : will take parameters and save them to a .npy file
+    - Flow : will take parameters and save them to a .npy file
 
     '''
     name = flow.name
@@ -22,7 +22,7 @@ def save_flow(flow: Flow) -> None:
 
 
 def load_flow(filename: str) -> Flow:
-    '''Load flow
+    ''' Load flow
 
     Load the parameters of a Flow from a file
 
