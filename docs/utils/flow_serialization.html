@@ -28,7 +28,10 @@
 
 from nujo.flow import Flow
 
-__all__ = [&#39;save_flow&#39;, &#39;load_flow&#39;]
+__all__ = [
+    &#39;save_flow&#39;,
+    &#39;load_flow&#39;,
+]
 
 
 def save_flow(flow: Flow) -&gt; None:
@@ -42,9 +45,8 @@ def save_flow(flow: Flow) -&gt; None:
     - Flow : will take parameters and save them to a .npy file
 
     &#39;&#39;&#39;
-    name = flow.name
     params = array([var for var in flow.parameters()])
-    save(f&#39;{name}_parameters&#39;, params, allow_pickle=True)
+    save(f&#39;{flow.name}_parameters&#39;, params, allow_pickle=True)
 
 
 def load_flow(filename: str) -&gt; Flow:
@@ -123,9 +125,8 @@ def load_flow(filename: str) -&gt; Flow:
     - Flow : will take parameters and save them to a .npy file
 
     &#39;&#39;&#39;
-    name = flow.name
     params = array([var for var in flow.parameters()])
-    save(f&#39;{name}_parameters&#39;, params, allow_pickle=True)</code></pre>
+    save(f&#39;{flow.name}_parameters&#39;, params, allow_pickle=True)</code></pre>
 </details>
 </dd>
 </dl>
