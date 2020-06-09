@@ -2,7 +2,7 @@ import nujo as nj
 import nujo.nn as nn
 import nujo.objective as obj
 import nujo.optim as optim
-from nujo.utils.viz import ComputationGraphPlotter
+from nujo.utils import ComputationGraphPlotter
 
 # Define the net and optimizer
 net = nn.Linear(3, 6) >> nn.Linear(6, 2) >> nn.Linear(2, 1)
@@ -11,7 +11,6 @@ print('Defined net:', net)
 loss_fn = obj.L2Loss()
 print('Loss:', loss_fn)
 
-print(net.parameters)
 optimizer = optim.Adam(net.parameters, lr=0.1)
 print('Optimizer:', optimizer)
 

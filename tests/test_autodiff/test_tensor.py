@@ -33,17 +33,15 @@ def test_tensor_backward(tensors):
 
     C.backward()
 
-    assert len(C.parents_outputs) == len(C.weights) == 0
+    assert len(C.parents_outputs) == 0
     assert (C.grad == 1).all()
 
-    assert len(A.parents_outputs) == len(A.weights) == 1
+    assert len(A.parents_outputs) == 1
     assert (A.parents_outputs[0] == C).all()
-    assert (A.weights[0] == 1).all()
     assert (A.grad == 1).all()
 
-    assert len(B.parents_outputs) == len(B.weights) == 1
+    assert len(B.parents_outputs) == 1
     assert (B.parents_outputs[0] == C).all()
-    assert (B.weights[0] == 1).all()
     assert (B.grad == 1).all()
 
 
@@ -65,7 +63,6 @@ def test_tensor_shape_manipulation(tensors):
     A, A_np = A.reshape(-1, 1), A.value.reshape(-1, 1)
     assert (A == A_np).all()
 
-    assert (A.repeat(5, axis=1) == A_np.repeat(5, axis=1)).all()
     assert (A.squeeze(1) == A_np.squeeze(1)).all()
     assert (A.unsqueeze(1) == expand_dims(A_np, 1)).all()
 
@@ -79,7 +76,6 @@ def test_tensor_zero_grad(tensors):
 
     A.zero_grad()
     assert (A.grad == 0).all()
-    assert A._grad_is_zeroed
 
 
 # ====================================================================================================
@@ -96,7 +92,6 @@ def test_tensor_inplace_assignment(tensors):
     assert A.creator == C.creator or A.creator is None
     assert (A.value == C.value).all()
     assert (A.grad == C.grad).all()
-    assert A._grad_is_zeroed == C._grad_is_zeroed
 
 
 # ====================================================================================================

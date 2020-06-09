@@ -1,5 +1,5 @@
 from numbers import Number
-from typing import List, Tuple, Union
+from typing import List, Union
 
 from numpy import log, ndarray, ones
 
@@ -20,12 +20,10 @@ __all__ = [
 
 
 class _Addition(Function):
-    def __init__(self,
-                 input_a: Union[Tensor, ndarray, List[Number], Number],
-                 input_b: Union[Tensor, ndarray, List[Number], Number],
-                 name='Add'):
+    def __init__(self, input_a: Union[Tensor, ndarray, List[Number], Number],
+                 input_b: Union[Tensor, ndarray, List[Number], Number]):
 
-        super(_Addition, self).__init__(input_a, input_b, name=name)
+        super(_Addition, self).__init__(input_a, input_b)
 
         # The following assert will not allow numpy's
         # vector broadcasts such as:
@@ -36,43 +34,38 @@ class _Addition(Function):
         #
         # In future versions of nujo this may be supported.
 
-        assert (self.children[0].shape == self.children[1].shape
-                or self.children[0].shape != self.children[1].T.shape)
+        assert (self.children[0].value.shape == self.children[1].value.shape or
+                self.children[0].value.shape != self.children[1].value.T.shape)
 
     def forward(self) -> ndarray:
         return self.children[0].value + self.children[1].value
 
-    def backward(self) -> Tuple[ndarray, ndarray]:
-        return ones(self.children[0].shape), ones(self.children[1].shape)
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad * ones(self.children[idx].shape)
 
 
 # ====================================================================================================
 
 
 class _Negation(Function):
-    def __init__(self,
-                 input: Union[Tensor, ndarray, List[Number], Number],
-                 name='Neg'):
-
-        super(_Negation, self).__init__(input, name=name)
+    def __init__(self, input: Union[Tensor, ndarray, List[Number], Number]):
+        super(_Negation, self).__init__(input)
 
     def forward(self) -> ndarray:
         return -self.children[0].value
 
-    def backward(self) -> Tuple[ndarray]:
-        return -ones(self.children[0].shape),
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad * -ones(self.children[0].shape)
 
 
 # ====================================================================================================
 
 
 class _Multiplication(Function):
-    def __init__(self,
-                 input_a: Union[Tensor, ndarray, List[Number], Number],
-                 input_b: Union[Tensor, ndarray, List[Number], Number],
-                 name='Mul'):
+    def __init__(self, input_a: Union[Tensor, ndarray, List[Number], Number],
+                 input_b: Union[Tensor, ndarray, List[Number], Number]):
 
-        super(_Multiplication, self).__init__(input_a, input_b, name=name)
+        super(_Multiplication, self).__init__(input_a, input_b)
 
         # The following assert will not allow numpy's
         # vector broadcasts such as:
@@ -83,14 +76,17 @@ class _Multiplication(Function):
         #
         # In future versions of nujo this may be supported.
 
-        assert (self.children[0].shape == self.children[1].shape
-                or self.children[0].shape != self.children[1].T.shape)
+        assert (self.children[0].value.shape == self.children[1].value.shape or
+                self.children[0].value.shape != self.children[1].value.T.shape)
 
     def forward(self) -> ndarray:
         return self.children[0].value * self.children[1].value
 
-    def backward(self) -> Tuple[ndarray, ndarray]:
-        return self.children[1].value, self.children[0].value
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        if idx == 0:
+            return accum_grad * self.children[1].value
+        else:
+            return accum_grad * self.children[0].value
 
 
 # ====================================================================================================
@@ -99,81 +95,87 @@ class _Multiplication(Function):
 class _Reciprocal(Function):
     def __init__(self,
                  input: Union[Tensor, ndarray, List[Number], Number],
-                 name='Recipr',
                  eps=1e-18):
 
-        super(_Reciprocal, self).__init__(input, name=name)
+        super(_Reciprocal, self).__init__(input)
         self.eps = eps
 
     def forward(self) -> ndarray:
         return 1 / (self.children[0].value + self.eps)
 
-    def backward(self) -> Tuple[ndarray]:
-        return -1 / ((self.children[0].value + self.eps)**2),
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad * -1 / ((self.children[0].value + self.eps)**2)
 
 
 # ====================================================================================================
 
 
 class _Power(Function):
-    def __init__(self,
-                 input_a: Union[Tensor, ndarray, List[Number], Number],
-                 input_b: Union[Tensor, ndarray, List[Number], Number],
-                 name='Pow'):
+    def __init__(self, input_a: Union[Tensor, ndarray, List[Number], Number],
+                 input_b: Union[Tensor, ndarray, List[Number], Number]):
 
-        super(_Power, self).__init__(input_a, input_b, name=name)
+        super(_Power, self).__init__(input_a, input_b)
 
     def forward(self) -> ndarray:
         return self.children[0].value**self.children[1].value
 
-    def backward(self) -> Tuple[ndarray, ndarray]:
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
         # TODO: FIX wrong partial - the second
 
-        return (self.children[1].value *
-                self.children[0].value**(self.children[1].value - 1), 1)
+        if idx == 0:
+            return accum_grad * self.children[1].value *\
+                    self.children[0].value**(self.children[1].value - 1)
+        else:
+            return type(accum_grad)(1)
 
 
 # ====================================================================================================
 
 
 class _Logarithm(Function):
-    def __init__(self,
-                 input_a: Union[Tensor, ndarray, List[Number], Number],
-                 input_b: Union[Tensor, ndarray, List[Number], Number],
-                 name='Log'):
+    def __init__(self, input_a: Union[Tensor, ndarray, List[Number], Number],
+                 input_b: Union[Tensor, ndarray, List[Number], Number]):
 
-        super(_Logarithm, self).__init__(input_a, input_b, name=name)
+        super(_Logarithm, self).__init__(input_a, input_b)
 
-        assert (self.children[0] > 0).all()  # argument value limit
-        assert (self.children[1] > 0).all()  # base value limit
-        assert (self.children[1] != 0).all()  # base value limit
+        assert (self.children[0].value > 0).all()  # argument value limit
+        assert (self.children[1].value > 0).all()  # base value limit
+        assert (self.children[1].value != 0).all()  # base value limit
 
     def forward(self) -> ndarray:
         return log(self.children[0].value) / log(self.children[1].value)
 
-    def backward(self) -> Tuple[ndarray, ndarray]:
-        return 1 / (self.children[0].value * log(self.children[1].value)), 1
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        # TODO: FIX wrong partial - the second
+
+        if idx == 0:
+            return accum_grad /\
+                    (self.children[0].value * log(self.children[1].value))
+        else:
+            return type(accum_grad)(1)
 
 
 # ====================================================================================================
 
 
 class _MatrixMul(Function):
-    def __init__(self,
-                 input_a: Union[Tensor, ndarray, List[Number], Number],
-                 input_b: Union[Tensor, ndarray, List[Number], Number],
-                 name='MatMul'):
+    def __init__(self, input_a: Union[Tensor, ndarray, List[Number], Number],
+                 input_b: Union[Tensor, ndarray, List[Number], Number]):
 
-        super(_MatrixMul, self).__init__(input_a, input_b, name=name)
+        super(_MatrixMul, self).__init__(input_a, input_b)
 
         # Assert valid dimensions for matrix multiplication
-        assert self.children[0].shape[-1] == self.children[1].shape[0]
+        assert self.children[0].value.shape[-1] ==\
+               self.children[1].value.shape[0]
 
     def forward(self) -> ndarray:
         return self.children[0].value @ self.children[1].value
 
-    def backward(self) -> Tuple[ndarray, ndarray]:
-        return self.children[1].value, self.children[0].value
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        if idx == 0:
+            return accum_grad @ self.children[1].value.T
+        else:
+            return (accum_grad.T @ self.children[0].value).T
 
 
 # ====================================================================================================

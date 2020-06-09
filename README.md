@@ -20,7 +20,7 @@ Now run the following to make sure nujo was installed properly:
 $ python
 >>> import nujo as nj
 >>> nj.__version__
-'0.2.0'
+'0.3.0'
 ```
 
 **_Read the docs at [vivelev.github.io/nujo](https://vivelev.github.io/nujo/)_**
@@ -33,8 +33,6 @@ Check out the [examples/](examples/) folder.
 
 -   [NumPy](http://www.numpy.org/) - Fundamental package for scientific computing with Python
 -   [Graphviz](https://www.graphviz.org/) - Open source graph visualization software
--   [Requests](https://requests.readthedocs.io/) - HTTP for Humans
--   [Pillow](https://pillow.readthedocs.io/) - Image processing
 
 ## Contributing
 

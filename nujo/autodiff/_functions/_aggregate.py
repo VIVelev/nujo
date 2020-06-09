@@ -1,5 +1,5 @@
 from numbers import Number
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Union
 
 from numpy import ndarray, ones, prod, sum
 
@@ -18,10 +18,9 @@ class _InnerSum(Function):
     def __init__(self,
                  input: Union[Tensor, ndarray, List[Number], Number],
                  dim: Optional[int] = None,
-                 keepdim=False,
-                 name='InnerSum'):
+                 keepdim=False):
 
-        super(_InnerSum, self).__init__(input, name=name)
+        super(_InnerSum, self).__init__(input)
         self.dim = dim
         self.keepdim = keepdim
 
@@ -30,8 +29,8 @@ class _InnerSum(Function):
                    axis=self.dim,
                    keepdims=self.keepdim)
 
-    def backward(self) -> Tuple[ndarray]:
-        return ones(self.children[0].shape),
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad * ones(self.children[0].shape)
 
 
 # ====================================================================================================
@@ -41,10 +40,9 @@ class _InnerProd(Function):
     def __init__(self,
                  input: Union[Tensor, ndarray, List[Number], Number],
                  dim: Optional[int] = None,
-                 keepdim=False,
-                 name='InnerProd'):
+                 keepdim=False):
 
-        super(_InnerProd, self).__init__(input, name=name)
+        super(_InnerProd, self).__init__(input)
         self.dim = dim
         self.keepdim = keepdim
 
@@ -57,8 +55,8 @@ class _InnerProd(Function):
 
         return self._output
 
-    def backward(self) -> Tuple[ndarray]:
-        return self._output / self.children[0].value,
+    def backward(self, idx: int, accum_grad: Function.T) -> Function.T:
+        return accum_grad * self._output / self.children[0].value
 
 
 # ====================================================================================================

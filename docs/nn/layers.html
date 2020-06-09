@@ -24,13 +24,21 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from nujo.autodiff.tensor import Tensor
+<pre><code class="python">from functools import lru_cache
+from typing import Tuple, Union
+
+from nujo.autodiff._functions._transform import _ConstPad, _Im2col
+from nujo.autodiff.tensor import Tensor
 from nujo.flow import Flow
-from nujo.init import randn
+from nujo.init.random import randn
 
 __all__ = [
     &#39;Linear&#39;,
+    &#39;Conv2d&#39;,
+    &#39;ConstPad2d&#39;,
 ]
+
+# ====================================================================================================
 
 
 class Linear(Flow):
@@ -68,7 +76,155 @@ class Linear(Flow):
 
     def forward(self, x: Tensor) -&gt; Tensor:
         out = self.W @ x
-        return out + self.b if self.bias else out</code></pre>
+        return out + self.b if self.bias else out
+
+
+# ====================================================================================================
+
+
+class Conv2d(Flow):
+    &#39;&#39;&#39; A 2-dimensional convolutional layer
+
+    Applies a 2D convolution over an input signal composed of
+    several input planes.
+    More info: https://cs231n.github.io/convolutional-networks/
+
+    Parameters:
+    -----------
+     - in_channels : int, number of channels in the input image
+     - out_channels : int, number of channels produced by the convolution
+        (in other word, the number of kernels)
+     - kernel_size : int or tuple, size of the convolving kernel
+     - stride : int or tuple, optional, stride of the convolution. Default: 1
+     - padding : int or tuple, optional, zero-padding added to both sides of
+        the input. Default: 0
+     - dilation : int or tuple, optional - spacing between kernel elements.
+        Default: 0
+     - bias : bool, optional, if True, adds a learnable bias to the output.
+        Default: True
+     - name : string, identifier for the current layer
+
+    &#39;&#39;&#39;
+    def __init__(self,
+                 in_channels: int,
+                 out_channels: int,
+                 kernel_size: Union[int, Tuple[int, int]],
+                 stride: Union[int, Tuple[int, int]] = 1,
+                 padding: Union[int, Tuple[int, int]] = 0,
+                 dilation: Union[int, Tuple[int, int]] = 0,
+                 bias=True,
+                 name=&#39;Conv2d&#39;):
+
+        super(Conv2d,
+              self).__init__(name=f&#39;{name}({in_channels}, {out_channels})&#39;)
+
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+
+        self.kernel_size = kernel_size if isinstance(
+            kernel_size, tuple) else (kernel_size, kernel_size)
+        self.stride = stride if isinstance(stride, tuple) else (stride, stride)
+        self.padding = padding if isinstance(padding, tuple) else (padding,
+                                                                   padding)
+
+        self.dilation = dilation if isinstance(dilation, tuple) else (dilation,
+                                                                      dilation)
+
+        self.bias = bias
+
+        # Define trainable parameters
+
+        self.kernels = randn(self.out_channels,
+                             self.in_channels,
+                             *self.kernel_size,
+                             name=self.name + &#39;.kernels&#39;)
+
+        if self.bias:
+            self.b = randn(self.out_channels, 1, name=self.name + &#39;.bias&#39;)
+
+        self._padding_layer = ConstPad2d(self.padding,
+                                         value=0,
+                                         name=self.name + &#39;.padding&#39;)
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        batch_size, channels, height, width = x.shape
+        assert channels == self.in_channels
+
+        # Apply padding
+        x_padded = self._padding_layer(x)
+
+        # Image to column transformation
+        x_col = _Im2col(x_padded, self.kernel_size, self.stride,
+                        self.dilation)()
+        kernels_col = self.kernels.reshape(self.out_channels, -1)
+
+        # Apply the kernels
+        out_col = kernels_col @ x_col
+        if self.bias:
+            out_col += self.b
+
+        # Reshape
+        output_shape = self.get_output_shape(height, width)
+        return out_col.reshape(*output_shape, batch_size)\
+            .transpose(3, 0, 1, 2)
+
+    @lru_cache(maxsize=64)
+    def get_output_shape(self, height: int,
+                         width: int) -&gt; Tuple[int, int, int]:
+        &#39;&#39;&#39; Cached output shape calculation
+        &#39;&#39;&#39;
+
+        # Obtain needed information
+        pad_height, pad_width = self.padding
+        kernel_height, kernel_width = self.kernel_size
+        stride_height, stride_width = self.stride
+        dilation_height, dilation_width = self.dilation
+
+        return (
+            self.out_channels,
+            ((height + pad_height * 2 - dilation_height *
+              (kernel_height - 1) - kernel_height) // stride_height) + 1,
+            ((width + pad_width * 2 - dilation_width *
+              (kernel_width - 1) - kernel_width) // stride_width) + 1,
+        )
+
+
+# ====================================================================================================
+
+
+class ConstPad2d(Flow):
+    &#39;&#39;&#39; Pads the input tensor boundaries with a constant value.
+
+    Parameters:
+    -----------
+     - padding : int or tuple of two ints, specifying the padding
+     before and after.
+     - value : float, the value by which to pad
+     - name : string, identifier for the current layer
+
+    &#39;&#39;&#39;
+    def __init__(self,
+                 padding: Union[int, Tuple[int, int]],
+                 value: float = 0,
+                 name=&#39;ConstPad2d&#39;):
+
+        super(ConstPad2d, self).__init__(name=f&#39;{name}({padding})&#39;)
+
+        self.padding = padding if isinstance(padding, tuple) else (padding,
+                                                                   padding)
+        self.value = value
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        return _ConstPad(x, (
+            (0, 0),
+            (0, 0),
+            (self.padding[0], self.padding[0]),
+            (self.padding[1], self.padding[1]),
+        ),
+                         value=self.value)()
+
+
+# ====================================================================================================</code></pre>
 </details>
 </section>
 <section>
@@ -80,6 +236,255 @@ class Linear(Flow):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="nujo.nn.layers.ConstPad2d"><code class="flex name class">
+<span>class <span class="ident">ConstPad2d</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Pads the input tensor boundaries with a constant value.</p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>padding : int or tuple of two ints, specifying the padding
+before and after.</li>
+<li>value : float, the value by which to pad</li>
+<li>name : string, identifier for the current layer</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ConstPad2d(Flow):
+    &#39;&#39;&#39; Pads the input tensor boundaries with a constant value.
+
+    Parameters:
+    -----------
+     - padding : int or tuple of two ints, specifying the padding
+     before and after.
+     - value : float, the value by which to pad
+     - name : string, identifier for the current layer
+
+    &#39;&#39;&#39;
+    def __init__(self,
+                 padding: Union[int, Tuple[int, int]],
+                 value: float = 0,
+                 name=&#39;ConstPad2d&#39;):
+
+        super(ConstPad2d, self).__init__(name=f&#39;{name}({padding})&#39;)
+
+        self.padding = padding if isinstance(padding, tuple) else (padding,
+                                                                   padding)
+        self.value = value
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        return _ConstPad(x, (
+            (0, 0),
+            (0, 0),
+            (self.padding[0], self.padding[0]),
+            (self.padding[1], self.padding[1]),
+        ),
+                         value=self.value)()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></b></code>:
+<ul class="hlist">
+<li><code><a title="nujo.flow.Flow.append" href="../flow.html#nujo.flow.Flow.append">append</a></code></li>
+<li><code><a title="nujo.flow.Flow.copy" href="../flow.html#nujo.flow.Flow.copy">copy</a></code></li>
+<li><code><a title="nujo.flow.Flow.forward" href="../flow.html#nujo.flow.Flow.forward">forward</a></code></li>
+<li><code><a title="nujo.flow.Flow.parameters" href="../flow.html#nujo.flow.Flow.parameters">parameters</a></code></li>
+<li><code><a title="nujo.flow.Flow.pop" href="../flow.html#nujo.flow.Flow.pop">pop</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="nujo.nn.layers.Conv2d"><code class="flex name class">
+<span>class <span class="ident">Conv2d</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A 2-dimensional convolutional layer</p>
+<p>Applies a 2D convolution over an input signal composed of
+several input planes.
+More info: <a href="https://cs231n.github.io/convolutional-networks/">https://cs231n.github.io/convolutional-networks/</a></p>
+<h2 id="parameters">Parameters:</h2>
+<ul>
+<li>in_channels : int, number of channels in the input image</li>
+<li>out_channels : int, number of channels produced by the convolution
+(in other word, the number of kernels)</li>
+<li>kernel_size : int or tuple, size of the convolving kernel</li>
+<li>stride : int or tuple, optional, stride of the convolution. Default: 1</li>
+<li>padding : int or tuple, optional, zero-padding added to both sides of
+the input. Default: 0</li>
+<li>dilation : int or tuple, optional - spacing between kernel elements.
+Default: 0</li>
+<li>bias : bool, optional, if True, adds a learnable bias to the output.
+Default: True</li>
+<li>name : string, identifier for the current layer</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Conv2d(Flow):
+    &#39;&#39;&#39; A 2-dimensional convolutional layer
+
+    Applies a 2D convolution over an input signal composed of
+    several input planes.
+    More info: https://cs231n.github.io/convolutional-networks/
+
+    Parameters:
+    -----------
+     - in_channels : int, number of channels in the input image
+     - out_channels : int, number of channels produced by the convolution
+        (in other word, the number of kernels)
+     - kernel_size : int or tuple, size of the convolving kernel
+     - stride : int or tuple, optional, stride of the convolution. Default: 1
+     - padding : int or tuple, optional, zero-padding added to both sides of
+        the input. Default: 0
+     - dilation : int or tuple, optional - spacing between kernel elements.
+        Default: 0
+     - bias : bool, optional, if True, adds a learnable bias to the output.
+        Default: True
+     - name : string, identifier for the current layer
+
+    &#39;&#39;&#39;
+    def __init__(self,
+                 in_channels: int,
+                 out_channels: int,
+                 kernel_size: Union[int, Tuple[int, int]],
+                 stride: Union[int, Tuple[int, int]] = 1,
+                 padding: Union[int, Tuple[int, int]] = 0,
+                 dilation: Union[int, Tuple[int, int]] = 0,
+                 bias=True,
+                 name=&#39;Conv2d&#39;):
+
+        super(Conv2d,
+              self).__init__(name=f&#39;{name}({in_channels}, {out_channels})&#39;)
+
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+
+        self.kernel_size = kernel_size if isinstance(
+            kernel_size, tuple) else (kernel_size, kernel_size)
+        self.stride = stride if isinstance(stride, tuple) else (stride, stride)
+        self.padding = padding if isinstance(padding, tuple) else (padding,
+                                                                   padding)
+
+        self.dilation = dilation if isinstance(dilation, tuple) else (dilation,
+                                                                      dilation)
+
+        self.bias = bias
+
+        # Define trainable parameters
+
+        self.kernels = randn(self.out_channels,
+                             self.in_channels,
+                             *self.kernel_size,
+                             name=self.name + &#39;.kernels&#39;)
+
+        if self.bias:
+            self.b = randn(self.out_channels, 1, name=self.name + &#39;.bias&#39;)
+
+        self._padding_layer = ConstPad2d(self.padding,
+                                         value=0,
+                                         name=self.name + &#39;.padding&#39;)
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        batch_size, channels, height, width = x.shape
+        assert channels == self.in_channels
+
+        # Apply padding
+        x_padded = self._padding_layer(x)
+
+        # Image to column transformation
+        x_col = _Im2col(x_padded, self.kernel_size, self.stride,
+                        self.dilation)()
+        kernels_col = self.kernels.reshape(self.out_channels, -1)
+
+        # Apply the kernels
+        out_col = kernels_col @ x_col
+        if self.bias:
+            out_col += self.b
+
+        # Reshape
+        output_shape = self.get_output_shape(height, width)
+        return out_col.reshape(*output_shape, batch_size)\
+            .transpose(3, 0, 1, 2)
+
+    @lru_cache(maxsize=64)
+    def get_output_shape(self, height: int,
+                         width: int) -&gt; Tuple[int, int, int]:
+        &#39;&#39;&#39; Cached output shape calculation
+        &#39;&#39;&#39;
+
+        # Obtain needed information
+        pad_height, pad_width = self.padding
+        kernel_height, kernel_width = self.kernel_size
+        stride_height, stride_width = self.stride
+        dilation_height, dilation_width = self.dilation
+
+        return (
+            self.out_channels,
+            ((height + pad_height * 2 - dilation_height *
+              (kernel_height - 1) - kernel_height) // stride_height) + 1,
+            ((width + pad_width * 2 - dilation_width *
+              (kernel_width - 1) - kernel_width) // stride_width) + 1,
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="nujo.nn.layers.Conv2d.get_output_shape"><code class="name flex">
+<span>def <span class="ident">get_output_shape</span></span>(<span>self, height: int, width: int) -> Tuple[int, int, int]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Cached output shape calculation</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@lru_cache(maxsize=64)
+def get_output_shape(self, height: int,
+                     width: int) -&gt; Tuple[int, int, int]:
+    &#39;&#39;&#39; Cached output shape calculation
+    &#39;&#39;&#39;
+
+    # Obtain needed information
+    pad_height, pad_width = self.padding
+    kernel_height, kernel_width = self.kernel_size
+    stride_height, stride_width = self.stride
+    dilation_height, dilation_width = self.dilation
+
+    return (
+        self.out_channels,
+        ((height + pad_height * 2 - dilation_height *
+          (kernel_height - 1) - kernel_height) // stride_height) + 1,
+        ((width + pad_width * 2 - dilation_width *
+          (kernel_width - 1) - kernel_width) // stride_width) + 1,
+    )</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="nujo.flow.Flow" href="../flow.html#nujo.flow.Flow">Flow</a></b></code>:
+<ul class="hlist">
+<li><code><a title="nujo.flow.Flow.append" href="../flow.html#nujo.flow.Flow.append">append</a></code></li>
+<li><code><a title="nujo.flow.Flow.copy" href="../flow.html#nujo.flow.Flow.copy">copy</a></code></li>
+<li><code><a title="nujo.flow.Flow.forward" href="../flow.html#nujo.flow.Flow.forward">forward</a></code></li>
+<li><code><a title="nujo.flow.Flow.parameters" href="../flow.html#nujo.flow.Flow.parameters">parameters</a></code></li>
+<li><code><a title="nujo.flow.Flow.pop" href="../flow.html#nujo.flow.Flow.pop">pop</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
 <dt id="nujo.nn.layers.Linear"><code class="flex name class">
 <span>class <span class="ident">Linear</span></span>
 <span>(</span><span>*args, **kwargs)</span>
@@ -147,6 +552,7 @@ class Linear(Flow):
 <li><code><a title="nujo.flow.Flow.append" href="../flow.html#nujo.flow.Flow.append">append</a></code></li>
 <li><code><a title="nujo.flow.Flow.copy" href="../flow.html#nujo.flow.Flow.copy">copy</a></code></li>
 <li><code><a title="nujo.flow.Flow.forward" href="../flow.html#nujo.flow.Flow.forward">forward</a></code></li>
+<li><code><a title="nujo.flow.Flow.parameters" href="../flow.html#nujo.flow.Flow.parameters">parameters</a></code></li>
 <li><code><a title="nujo.flow.Flow.pop" href="../flow.html#nujo.flow.Flow.pop">pop</a></code></li>
 </ul>
 </li>
@@ -168,6 +574,15 @@ class Linear(Flow):
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="nujo.nn.layers.ConstPad2d" href="#nujo.nn.layers.ConstPad2d">ConstPad2d</a></code></h4>
+</li>
+<li>
+<h4><code><a title="nujo.nn.layers.Conv2d" href="#nujo.nn.layers.Conv2d">Conv2d</a></code></h4>
+<ul class="">
+<li><code><a title="nujo.nn.layers.Conv2d.get_output_shape" href="#nujo.nn.layers.Conv2d.get_output_shape">get_output_shape</a></code></li>
+</ul>
+</li>
 <li>
 <h4><code><a title="nujo.nn.layers.Linear" href="#nujo.nn.layers.Linear">Linear</a></code></h4>
 </li>

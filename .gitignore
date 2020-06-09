@@ -112,3 +112,7 @@ venv.bak/
 
 # nujo profiler
 *.pstats
+
+# numpy pickling
+*.npy
+*.npz
