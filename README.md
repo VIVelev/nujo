@@ -20,7 +20,7 @@ Now run the following to make sure nujo was installed properly:
 $ python
 >>> import nujo as nj
 >>> nj.__version__
-'0.2.0'
+'0.3.0'
 ```
 
 **_Read the docs at [vivelev.github.io/nujo](https://vivelev.github.io/nujo/)_**
