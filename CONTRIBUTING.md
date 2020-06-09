@@ -6,7 +6,7 @@ First off, thank you for considering contributing to nujo. It's people like you 
   - Describe what you expect to happen
   - Describe what happened
   - If you could, include a [minimal reproducible example](https://stackoverflow.com/help/minimal-reproducible-example)
-  - List vesions of your Python, NumPy, Requests and GarphViz
+  - List vesions of your Python, NumPy and GarphViz
 
 ## Submiting code
   - It is recommended to use [Visual Studio Code](https://code.visualstudio.com/)
