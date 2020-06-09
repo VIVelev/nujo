@@ -1,5 +1,5 @@
 import nujo as nj
-from nujo.utils.viz import ComputationGraphPlotter
+from nujo.utils import ComputationGraphPlotter
 
 x = nj.Tensor(10, name='X')
 y = 7 * (x**2) + 5 * x + 3

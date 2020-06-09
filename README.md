@@ -33,8 +33,6 @@ Check out the [examples/](examples/) folder.
 
 -   [NumPy](http://www.numpy.org/) - Fundamental package for scientific computing with Python
 -   [Graphviz](https://www.graphviz.org/) - Open source graph visualization software
--   [Requests](https://requests.readthedocs.io/) - HTTP for Humans
--   [Pillow](https://pillow.readthedocs.io/) - Image processing
 
 ## Contributing
 

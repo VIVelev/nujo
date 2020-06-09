@@ -6,5 +6,6 @@ if __name__ == '__main__':
 
     os.system(
         f'python -m cProfile -o output.pstats {path_to_script_with_args}')
+
     os.system('gprof2dot --colour-nodes-by-selftime -f pstats output.pstats |\
              dot -Tpng -o output.png')
