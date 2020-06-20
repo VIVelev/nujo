@@ -9,7 +9,6 @@ First off, thank you for considering contributing to nujo. It's people like you 
   - List vesions of your Python, NumPy and GarphViz
 
 ## Submiting code
-  - It is recommended to use [Visual Studio Code](https://code.visualstudio.com/)
   - All commits will be tested against flake8 linter, so make sure to abide by PEP8
 
 ### Commit messages
@@ -28,9 +27,6 @@ We have the following branches:
   - **hotfix/hotfix-name** - fixing important bugs in releases quickly
 
 [Gitflow reference](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
-
-### Task Management Tool
-The Kanban tool used for this project is [Trello](https://trello.com/b/fObyuiWt/nujo-develop)
 
 ## Getting started
 
