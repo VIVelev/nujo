@@ -5,7 +5,7 @@
 [![test](https://github.com/VIVelev/nujo/workflows/test/badge.svg)](https://github.com/VIVelev/nujo/actions?query=workflow%3A%22test)
 [![pyversions](https://img.shields.io/pypi/pyversions/nujo)](https://pypi.org/project/nujo)
 [![code-size](https://img.shields.io/github/languages/code-size/VIVelev/nujo)](https://github.com/VIVelev/nujo)
-[![downloads](https://img.shields.io/pypi/dm/nujo)](https://pypi.org/project/nujo)
+[![Downloads](https://pepy.tech/badge/nujo)](https://pepy.tech/project/nujo)
 [![license](https://img.shields.io/github/license/VIVelev/nujo)](LICENSE)
 
 ## Installing and setting up
